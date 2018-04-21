@@ -195,6 +195,8 @@ class IPv4Packet : NSObject {
         return UInt16(~sum & 0xffff)
     }
     
+    func updateHeaderChecksum() { self.headerChecksum = self.computeHeaderChecksum() }
+    
     override var debugDescription: String {
         var s:String = "IPv\(version), Src: \(sourceAddressString), Dest:\(destinationAddressString)\n"
         
