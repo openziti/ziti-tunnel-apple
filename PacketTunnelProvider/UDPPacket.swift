@@ -36,14 +36,26 @@ class UDPPacket : NSObject {
         }
     }
     
-    init(_ ipHeader:IPv4Packet, srcPort:UInt16, dstPort:UInt16, payload:Data?) {
-        self.ip = ipHeader
+    init(_ refPacket:UDPPacket, payload:Data?) {
+        self.ip = IPv4Packet(count:28)!
+        self.ip.identification = refPacket.ip.identification
         self.ip.protocolId = UInt8(IPPROTO_UDP)
+        self.ip.sourceAddress = refPacket.ip.destinationAddress
+        self.ip.destinationAddress = refPacket.ip.sourceAddress
         
         super.init()
+
+        self.sourcePort = refPacket.destinationPort
+        self.destinationPort = refPacket.sourcePort
         self.payload = payload
-        self.sourcePort = srcPort
-        self.destinationPort = dstPort
+        
+        if let ipPayload = ip.payload {
+            self.length = UInt16(ipPayload.count)
+        } else {
+            self.length = 8
+        }
+        
+        self.ip.updateHeaderChecksum()
     }
     
     var sourcePort:UInt16 {
@@ -117,7 +129,7 @@ class UDPPacket : NSObject {
             var header = Data(count:8)
             if let ipPayload = self.ip.payload {
                 if ipPayload.count >= 8 {
-                    header = ipPayload[..<8]
+                    header = ipPayload[ipPayload.startIndex..<(ipPayload.startIndex+8)]
                 }
             }
             

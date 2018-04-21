@@ -37,8 +37,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                 if let dns = DNSPacket(udp) {
                                     NSLog("\(dns.debugDescription)")
                                 }
-                                udp.sourcePort = 53
-                                NSLog("updated: \(udp.debugDescription)")
+                                //let udpR = UDPPacket(udp, payload:udp.payload)
+                                //NSLog("UDP-R: \(udpR.debugDescription)")
+                                //NSLog("IP-R: \(udpR.ip.debugDescription)")
                             }
                         }
                     }

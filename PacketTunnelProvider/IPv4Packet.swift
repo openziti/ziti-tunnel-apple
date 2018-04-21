@@ -32,6 +32,10 @@ class IPv4Packet : NSObject {
             return nil
         }
         self.data = Data(count: count)
+        
+        super.init()
+        self.version = 4
+        self.headerLength = 5
     }
     
     var version:UInt8 {
