@@ -36,6 +36,16 @@ class UDPPacket : NSObject {
         }
     }
     
+    init(_ ipHeader:IPv4Packet, srcPort:UInt16, dstPort:UInt16, payload:Data?) {
+        self.ip = ipHeader
+        self.ip.protocolId = UInt8(IPPROTO_UDP)
+        
+        super.init()
+        self.payload = payload
+        self.sourcePort = srcPort
+        self.destinationPort = dstPort
+    }
+    
     var sourcePort:UInt16 {
         get {
             if let ipPayload = self.ip.payload {
