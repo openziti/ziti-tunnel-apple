@@ -24,9 +24,9 @@ class IPv4Utils {
     
     static func payloadToString(_ payload: Data) -> String {
         var i = 0
-        var s = payload.map {
+        var s = " " + payload.map {
             var str = String(format: "%02X", $0);
-            if (i%4)==0 { str += "\n"}; i+=1
+            i += 1; if (i%4)==0 { str += "\n"};
             return str
         }.joined(separator: " ")
         
