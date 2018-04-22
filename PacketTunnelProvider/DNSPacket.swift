@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum DNSOpCode {
+enum DNSOpCode : UInt8 {
     case query
     case nQuery
     case status
@@ -30,7 +30,7 @@ enum DNSOpCode {
     }
 }
 
-enum DNSResponseCode {
+enum DNSResponseCode : UInt8 {
     case noError
     case formatError
     case serverFailure
@@ -94,8 +94,8 @@ enum DNSRecordClass : UInt16 {
 
 class DNSQuestion : NSObject {
     var qName:String = ""
-    var qType = DNSRecordType(0x0001)
-    var qClass = DNSRecordClass(0x0001)
+    var qType  = DNSRecordType.A
+    var qClass = DNSRecordClass.IN
     
     static func from(_ data:Data) -> (question: DNSQuestion?, nextIndex:Int) {
         
@@ -160,18 +160,32 @@ class DNSPacket : NSObject {
     var id:UInt16 {
         get {
             if let payload = udp.payload {
-               return IPv4Utils.extractUInt16(payload, from: payload.startIndex+0)
+               return IPv4Utils.extractUInt16(payload, from: payload.startIndex)
             }
             return 0
         }
+        
+        set {
+            if let payload = udp.payload {
+                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex, value: newValue)
+            }
+        }
     }
     
-    var qrFlag:UInt8 {
+    var qrFlag:Bool {
         get {
             if let payload = udp.payload {
-                return payload[payload.startIndex+2] >> 7
+                return (payload[payload.startIndex+2] >> 7) != 0
             }
-            return 0
+            return false
+        }
+        
+        set {
+            if let payload = udp.payload {
+                let prev = udp.ip.data[payload.startIndex+2]
+                let byteValue:UInt8 = newValue ? 0x01 : 0x00
+                udp.ip.data[payload.startIndex+2] = (prev & 0x7f) | (byteValue << 7)
+            }
         }
     }
     
@@ -182,41 +196,80 @@ class DNSPacket : NSObject {
             }
             return .unrecognized
         }
-    }
-    
-    var authoritativeAsnwerFlag:UInt8 {
-        get {
+        
+        set {
             if let payload = udp.payload {
-                return (payload[payload.startIndex+2] >> 2) & 0x01
+                let prev:UInt8 = udp.ip.data[payload.startIndex+2]
+                udp.ip.data[payload.startIndex+2] = (prev & 0x87) | ((newValue.rawValue << 3) & 0x78)
             }
-            return 0
         }
     }
     
-    var truncationFlag:UInt8 {
+    var authoritativeAsnwerFlag:Bool {
         get {
             if let payload = udp.payload {
-                return (payload[payload.startIndex+2] >> 1) & 0x01
+                return ((payload[payload.startIndex+2] >> 2) & 0x01) != 0
             }
-            return 0
+            return false
+        }
+        
+        set {
+            if let payload = udp.payload {
+                let prev = udp.ip.data[payload.startIndex+2]
+                let byteValue:UInt8 = newValue ? 0x01 : 0x00
+                udp.ip.data[payload.startIndex+2] = (prev & 0xfb) | (byteValue << 2)
+            }
         }
     }
     
-    var recursionDesiredFlag:UInt8 {
+    var truncationFlag:Bool {
         get {
             if let payload = udp.payload {
-                return payload[payload.startIndex+2] & 0x01
+                return ((payload[payload.startIndex+2] >> 1) & 0x01) != 0
             }
-            return 0
+            return false
+        }
+        
+        set {
+            if let payload = udp.payload {
+                let prev = udp.ip.data[payload.startIndex+2]
+                let byteValue:UInt8 = newValue ? 0x01 : 0x00
+                udp.ip.data[payload.startIndex+2] = (prev & 0xfd) | (byteValue << 1)
+            }
         }
     }
     
-    var recursionAvailableFlag:UInt8 {
+    var recursionDesiredFlag:Bool {
         get {
             if let payload = udp.payload {
-                return payload[payload.startIndex+3] >> 7
+                return (payload[payload.startIndex+2] & 0x01) != 0
             }
-            return 0
+            return false
+        }
+        
+        set {
+            if let payload = udp.payload {
+                let prev = udp.ip.data[payload.startIndex+2]
+                let byteValue:UInt8 = newValue ? 0x01 : 0x00
+                udp.ip.data[payload.startIndex+2] = (prev & 0xfe) | byteValue
+            }
+        }
+    }
+    
+    var recursionAvailableFlag:Bool {
+        get {
+            if let payload = udp.payload {
+                return (payload[payload.startIndex+3] >> 7) != 0
+            }
+            return false
+        }
+        
+        set {
+            if let payload = udp.payload {
+                let prev = udp.ip.data[payload.startIndex+2]
+                let byteValue:UInt8 = newValue ? 0x01 : 0x00
+                udp.ip.data[payload.startIndex+3] = (prev & 0x7f) | (byteValue << 7)
+            }
         }
     }
     
@@ -227,6 +280,13 @@ class DNSPacket : NSObject {
             }
             return .unrecognized
         }
+        
+        set {
+            if let payload = udp.payload {
+                let prev:UInt8 = udp.ip.data[payload.startIndex+3]
+                udp.ip.data[payload.startIndex+3] = (prev & 0xf0) | (newValue.rawValue & 0x0f)
+            }
+        }
     }
     
     var questionCount:UInt16 {
@@ -235,6 +295,12 @@ class DNSPacket : NSObject {
                 return IPv4Utils.extractUInt16(payload, from: payload.startIndex+4)
             }
             return 0
+        }
+        
+        set {
+            if let payload = udp.payload {
+                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex+4, value: newValue)
+            }
         }
     }
     
@@ -245,6 +311,12 @@ class DNSPacket : NSObject {
             }
             return 0
         }
+        
+        set {
+            if let payload = udp.payload {
+                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex+6, value: newValue)
+            }
+        }
     }
     
     var authorityRecordCount:UInt16 {
@@ -254,6 +326,12 @@ class DNSPacket : NSObject {
             }
             return 0
         }
+        
+        set {
+            if let payload = udp.payload {
+                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex+8, value: newValue)
+            }
+        }
     }
     
     var additionalRecordCount:UInt16 {
@@ -262,6 +340,12 @@ class DNSPacket : NSObject {
                 return IPv4Utils.extractUInt16(payload, from: payload.startIndex+10)
             }
             return 0
+        }
+        
+        set {
+            if let payload = udp.payload {
+                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex+10, value: newValue)
+            }
         }
     }
     
@@ -290,12 +374,7 @@ class DNSPacket : NSObject {
         
         s += "User Datagram Protocol, Src Port: \(self.udp.sourcePort), Dst Port: \(self.udp.destinationPort)\n"
         s += "Domain Name Service"
-        
-        if (self.qrFlag == 0) {
-            s += " (query)\n"
-        } else {
-            s += " (response)\n"
-        }
+        self.qrFlag ? (s += " (response)\n") : (s += " (query)\n")
         
         s += "   id: \(String(format:"0x%2x", self.id))\n"
         s += "   qrFlag: \(self.qrFlag)\n"
