@@ -38,7 +38,10 @@ class UDPPacket : NSObject {
     
     init(_ refPacket:UDPPacket, payload:Data?) {
         self.ip = IPv4Packet(count:28)!
+        self.ip.version = 4
+        self.ip.headerLength = 5
         self.ip.identification = ip.genIdentificationNumber()
+        self.ip.ttl = 255
         self.ip.protocolId = UInt8(IPPROTO_UDP)
         self.ip.sourceAddress = refPacket.ip.destinationAddress
         self.ip.destinationAddress = refPacket.ip.sourceAddress
