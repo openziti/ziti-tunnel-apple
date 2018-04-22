@@ -8,6 +8,14 @@
 
 import Foundation
 
+struct IPv4Flags : OptionSet {
+    let rawValue: UInt8
+    
+    static let moreFragments = IPv4Flags(rawValue: 1 << 0)
+    static let dontFragment  = IPv4Flags(rawValue: 1 << 1)
+    static let reserved      = IPv4Flags(rawValue: 1 << 2)
+}
+
 class IPv4Packet : NSObject {
     var data:Data
     
@@ -48,16 +56,6 @@ class IPv4Packet : NSObject {
         set { data[0] = (data[0] & 0xf0) | (newValue & 0x0f) }
     }
     
-    var dscp:UInt8 {
-        get { return data[1] >> 2 }
-        set { data[1] = (data[1] & 0xc0) | (newValue & 0x3f) }
-    }
-    
-    var ecn:UInt8 {
-        get { return data[1] & 0x03 }
-        set { data[1] = (data[1] & 0xfc) | (newValue & 0x03) }
-    }
-    
     var totalLength:UInt16 {
         get { return IPv4Utils.extractUInt16(data, from: 2) }
         set { IPv4Utils.updateUInt16(&data, at: 2, value: newValue) }
@@ -68,16 +66,16 @@ class IPv4Packet : NSObject {
         set { IPv4Utils.updateUInt16(&data, at: 4, value: newValue) }
     }
     
-    var flags:UInt8 {
-        get { return data[6] >> 5 }
-        set { data[6] = (data[6] & 0xe0) | (newValue & 0x1f) }
+    var flags:IPv4Flags {
+        get { return IPv4Flags(rawValue: data[6] >> 5) }
+        set { data[6] = (newValue.rawValue << 5) | data[6] & 0x1f }
     }
     
     var fragmentOffset:UInt16 {
         get { return IPv4Utils.extractUInt16(data, from: 6) & 0x1fff }
         set {
             let prev = data[6]
-            IPv4Utils.updateUInt16(&data, at: 6, value: newValue)
+            IPv4Utils.updateUInt16(&data, at: 6, value: newValue & 0x1fff)
             data[6] = (prev & 0xe0) | (data[6] & 0x1f)
         }
     }
@@ -201,17 +199,32 @@ class IPv4Packet : NSObject {
     
     func updateHeaderChecksum() { self.headerChecksum = self.computeHeaderChecksum() }
     
+    private static var identificationCounter:UInt16 = 0
+    func genIdentificationNumber() -> UInt16 {
+        let newId = IPv4Packet.identificationCounter
+        IPv4Packet.identificationCounter += 1
+        return newId
+    }
+    
     override var debugDescription: String {
         var s:String = "IPv\(version), Src: \(sourceAddressString), Dest:\(destinationAddressString)\n"
         
         s += "\n" +
             "   version: \(version)\n" +
             "   headerLength: \(headerLength)\n" +
-            "   dscp:\(String(format:"0x%2x", dscp))\n" +
-            "   ecn: \(ecn)\n" +
             "   totalLength: \(totalLength)\n" +
             "   identification: \(String(format:"0x%2x", identification)) (\(identification))\n" +
-            "   flags: \(String(format:"0x%2x", flags))\n" +
+            "   flags: \(String(format:"0x%2x", flags.rawValue))"
+        
+        if flags.contains(IPv4Flags.dontFragment) {
+            s += " (Don't Fragment)"
+        }
+        
+        if flags.contains(IPv4Flags.moreFragments) {
+            s += " (More Fragments)"
+        }
+            
+        s += "\n" +
             "   fragmentOffset: \(fragmentOffset)\n" +
             "   ttl: \(ttl)\n" +
             "   protocol: \(protocolString) (\(protocolId))\n" +
