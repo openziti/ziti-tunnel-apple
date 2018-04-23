@@ -22,6 +22,11 @@ class IPv4Utils {
         data.replaceSubrange(at..<(at+2), with: withUnsafeBytes(of: &swapped) { Array($0) })
     }
     
+    static func appendUInt16(_ data: inout Data, value:UInt16) {
+        var swapped = CFSwapInt16(value)
+        data.append(contentsOf: withUnsafeBytes(of: &swapped) { Array($0) })
+    }
+    
     static func payloadToString(_ payload: Data) -> String {
         var i = 0
         var s = " " + payload.map {
