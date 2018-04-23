@@ -96,25 +96,62 @@ class DNSName : NSObject {
     var name = ""
     var numBytes = 0
     
-    // TODO: PIG There is more to DNS name than this (e.g, compression)
-    // I can maybe get away with this as long as I only parse single questions...
-    // (will have to index back to the udp payload)
-    init(_ data:Data) {
-        var count = Int(data[data.startIndex])
-        var indx = data.startIndex + 1
+    init(_ data:Data, offset:Int) {
+        super.init()
         
-        while count > 0 {
-            for i in indx..<(count+indx) {
-                self.name += String(UnicodeScalar(data[i]))
+        var count = 0
+        var keepCountingBytes = true
+        var done = false
+        var currOffset = offset
+        
+        while !done {
+            let countOrOffset:UInt8 = data[data.startIndex + currOffset]
+            
+            if isAnOffset(countOrOffset) {
+                currOffset = Int(countOrOffset)
+                count = findCountAndOffset(data, offset:&currOffset)
+                if keepCountingBytes {
+                    self.numBytes += 2
+                }
+                keepCountingBytes = false
+            } else {
+                count = Int(countOrOffset)
+                if keepCountingBytes {
+                    self.numBytes += (count + 1)
+                }
             }
-            indx = indx + count
-            count = Int(data[indx])
-            if count != 0 {
-                self.name += "."
+            
+            if count == 0 {
+                done = true
+            } else {
+                if !self.name.isEmpty {
+                    self.name += "."
+                }
+                
+                let indx = data.startIndex + currOffset + 1
+                for i in indx..<(count+indx) {
+                    self.name += String(UnicodeScalar(data[i]))
+                }
+                currOffset += (count + 1)
             }
-            indx = indx + 1
         }
-        numBytes = indx
+    }
+    
+    private func isAnOffset(_ value:UInt8) -> Bool {
+        // if first two bits are set, we have a new offset
+        return (value & 0xc0) == 0xc0
+    }
+    
+    private func findCountAndOffset(_ data:Data, offset: inout Int) -> Int {
+        
+        let countOrOffset:UInt8 = data[data.startIndex + offset]
+        if isAnOffset(countOrOffset) {
+            // new offset is made from last 14 bits of two bytes
+            offset = Int(IPv4Utils.extractUInt16(data, from: data.startIndex + offset) & 0x3f)
+            return findCountAndOffset(data, offset:&offset)
+        } else {
+            return Int(countOrOffset)
+        }
     }
 }
 
@@ -124,16 +161,18 @@ class DNSQuestion : NSObject {
     let qClass:DNSRecordClass
     var numBytes = 0
     
-    init?(_ data:Data) {
+    init?(_ data:Data, offset:Int) {
         
         if data.count < 5 {
             NSLog("Invalid data for DNS Question")
             return nil
         }
         
-        self.qName = DNSName(data)
-        self.qType = DNSRecordType(IPv4Utils.extractUInt16(data, from: self.qName.numBytes))
-        self.qClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: self.qName.numBytes + 2))
+        self.qName = DNSName(data, offset:offset)
+        
+        let qTypeIndx = data.startIndex + self.qName.numBytes
+        self.qType = DNSRecordType(IPv4Utils.extractUInt16(data, from: qTypeIndx))
+        self.qClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: qTypeIndx + 2))
         self.numBytes = self.qName.numBytes + 4
     }
     
@@ -375,11 +414,13 @@ class DNSPacket : NSObject {
         get {
             var response:[DNSQuestion] = []
             if let payload = udp.payload {
-                var qData = payload[(payload.startIndex+12)...]
+                var dnsData = payload[(payload.startIndex+12)...]
+                var offset = 0
+                
                 for _ in 0..<self.questionCount {
-                    if let question = DNSQuestion(qData) {
-                        if question.numBytes < qData.count {
-                            qData = qData[question.numBytes...]
+                    if let question = DNSQuestion(dnsData, offset:offset) {
+                        if question.numBytes < dnsData.count {
+                            offset += question.numBytes
                         }
                         response.append(question)
                     }
