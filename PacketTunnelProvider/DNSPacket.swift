@@ -92,46 +92,55 @@ enum DNSRecordClass : UInt16 {
     }
 }
 
-class DNSQuestion : NSObject {
-    var qName:String = ""
-    var qType  = DNSRecordType.A
-    var qClass = DNSRecordClass.IN
+class DNSName : NSObject {
+    var name = ""
+    var numBytes = 0
     
-    static func from(_ data:Data) -> (question: DNSQuestion?, nextIndex:Int) {
-        
-        if data.count < 5 {
-            NSLog("Invalid data for DNS Question")
-            return (nil, 0)
-        }
-        
-        let question = DNSQuestion()
-        
+    // TODO: PIG There is more to DNS name than this (e.g, compression)
+    // I can maybe get away with this as long as I only parse single questions...
+    // (will have to index back to the udp payload)
+    init(_ data:Data) {
         var count = Int(data[data.startIndex])
         var indx = data.startIndex + 1
         
         while count > 0 {
             for i in indx..<(count+indx) {
-                question.qName += String(UnicodeScalar(data[i]))
+                self.name += String(UnicodeScalar(data[i]))
             }
             indx = indx + count
             count = Int(data[indx])
             if count != 0 {
-                question.qName += "."
+                self.name += "."
             }
             indx = indx + 1
         }
-        
-        question.qType  = DNSRecordType(IPv4Utils.extractUInt16(data, from: indx))
-        question.qClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: indx + 2))
-        
-        return (question, indx + 4)
-    }
-    
-    override var debugDescription: String {
-        return "   > " + self.qName + " type: \(self.qType), class \(self.qClass)\n"
+        numBytes = indx
     }
 }
 
+class DNSQuestion : NSObject {
+    let qName:DNSName
+    let qType:DNSRecordType
+    let qClass:DNSRecordClass
+    var numBytes = 0
+    
+    init?(_ data:Data) {
+        
+        if data.count < 5 {
+            NSLog("Invalid data for DNS Question")
+            return nil
+        }
+        
+        self.qName = DNSName(data)
+        self.qType = DNSRecordType(IPv4Utils.extractUInt16(data, from: self.qName.numBytes))
+        self.qClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: self.qName.numBytes + 2))
+        self.numBytes = self.qName.numBytes + 4
+    }
+    
+    override var debugDescription: String {
+        return "   > " + self.qName.name + " type: \(self.qType), class \(self.qClass)\n"
+    }
+}
 
 class DNSPacket : NSObject {
     var udp:UDPPacket
@@ -155,6 +164,19 @@ class DNSPacket : NSObject {
             NSLog("Invalid (nil) UDP Payload for DNS Packet")
             return nil
         }
+    }
+    
+    init(_ refPacket:DNSPacket, questions:[DNSQuestion]?) {
+        self.udp = UDPPacket(refPacket.udp, payload:Data(count:12))
+        
+        super.init()
+        
+        self.id = refPacket.id
+        self.qrFlag = true
+        self.opCode = DNSOpCode.query
+        self.recursionDesiredFlag = refPacket.recursionDesiredFlag
+        self.responseCode = DNSResponseCode.noError
+        self.questions = (questions != nil) ? questions! : []
     }
     
     var id:UInt16 {
@@ -350,23 +372,58 @@ class DNSPacket : NSObject {
     }
     
     var questions:[DNSQuestion] {
-        var response:[DNSQuestion] = []
-        
-        if let payload = udp.payload {
-            var qData = payload[(payload.startIndex+12)...]
-            for _ in 0..<self.questionCount {
-                let questionResponse = DNSQuestion.from(qData)
-                
-                if questionResponse.nextIndex < qData.count {
-                    qData = qData[questionResponse.nextIndex...]
-                }
-                
-                if let question = questionResponse.question {
-                    response.append(question)
+        get {
+            var response:[DNSQuestion] = []
+            if let payload = udp.payload {
+                var qData = payload[(payload.startIndex+12)...]
+                for _ in 0..<self.questionCount {
+                    if let question = DNSQuestion(qData) {
+                        if question.numBytes < qData.count {
+                            qData = qData[question.numBytes...]
+                        }
+                        response.append(question)
+                    }
                 }
             }
+            return response
         }
-        return response
+        set {
+            if let payload = udp.payload {
+                
+                let startIndx = payload.startIndex + 12
+                let endIndx = startIndx + self.questionsByteCount
+                let newBytes = self.questionsBytes(newValue)
+                
+                if (endIndx > startIndx) {
+                    udp.ip.data.removeSubrange(startIndx..<endIndx)
+                }
+                
+                if newBytes.count > 0 {
+                    udp.ip.data.insert(contentsOf:newBytes, at: startIndx)
+                }
+            }
+            self.questionCount = UInt16(newValue.count)
+        }
+    }
+    
+    var questionsByteCount:Int {
+        get { return questions.reduce(0) { (sum,q) in return sum + q.numBytes } }
+    }
+    
+    func questionsBytes(_ questions:[DNSQuestion]) -> Data {
+        var data = Data()
+        questions.forEach { q in
+            let segments:[String] = q.qName.name.components(separatedBy: ".")
+            segments.forEach { seg in
+                data.append(UInt8(seg.count))
+                data.append(contentsOf:seg.utf8)
+            }
+            data.append(0x00)
+            IPv4Utils.appendUInt16(&data, value: q.qType.rawValue)
+            IPv4Utils.appendUInt16(&data, value: q.qClass.rawValue)
+        }
+        
+        return data
     }
     
     override var debugDescription: String {
