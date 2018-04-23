@@ -15,69 +15,49 @@ enum ZitiPacketTunnelError : Error {
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     var conf = [String: AnyObject]()
+    var selfDNS = ""
+    
+    private func processDNS(_ dns:DNSPacket) {
+        NSLog("DNS-->: \(dns.debugDescription)")
+        
+        let dnsR = DNSPacket(dns, questions:dns.questions)
+        NSLog("<--DNS: \(dnsR.debugDescription)")
+        NSLog("<--UDP: \(dnsR.udp.debugDescription)")
+        NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
+    }
+    
+    private func processUDP(_ udp:UDPPacket) {
+        NSLog("UDP-->: \(udp.debugDescription)")
+        
+        // if this is a DNS request sent to us, handle it
+        if udp.ip.destinationAddressString == self.selfDNS && udp.destinationPort == 53 {
+            if let dns = DNSPacket(udp) {
+                processDNS(dns)
+            }
+        }
+    }
+    
+    /*
+     private func processTCP(_ tcp:TCPPacket) {
+     
+     }*/
+    
+    private func processIP(_ ip:IPv4Packet) {
+        NSLog("IP-->: \(ip.debugDescription)")
+        if (ip.protocolId == IPv4ProtocolId.UDP) {
+            if let udp = UDPPacket(ip) {
+                processUDP(udp)
+            }
+        }
+    }
     
     func readPacketFlow() {
         self.packetFlow.readPacketObjects { (packets:[NEPacket]) in
             NSLog("Got \(packets.count) packets!")
             for packet:NEPacket in packets {
-                NSLog("   protocolFamily: \(packet.protocolFamily)")
-                if let metadata = packet.metadata {
-                    NSLog("   metatadata.sourceApp: \(metadata.sourceAppSigningIdentifier)")
-                } else {
-                    NSLog("   metadata: nil")
+                if let ip = IPv4Packet(data:packet.data) {
+                    self.processIP(ip)
                 }
-                
-                if let ipPacket = IPv4Packet(data:packet.data) {
-                    NSLog("\(ipPacket.debugDescription)")
-                    
-                    if (ipPacket.protocolId == UInt8(IPPROTO_UDP)) {
-                        if let udp = UDPPacket(ipPacket) {
-                            NSLog("\(udp.debugDescription)")
-                            if udp.destinationPort == 53 {
-                                if let dns = DNSPacket(udp) {
-                                    NSLog("\(dns.debugDescription)")
-                                }
-                                //let udpR = UDPPacket(udp, payload:udp.payload)
-                                //NSLog("UDP-R: \(udpR.debugDescription)")
-                                //NSLog("IP-R: \(udpR.ip.debugDescription)")
-                            }
-                        }
-                    }
-                }
-                
-                /*
-                let ipPacket = IPv4Packet()
-                
-                do {
-                    try ipPacket.loadPacket(packet)
-                    NSLog("   \(ipPacket.debugDescription)")
-                    
-                    if let udpP = ipPacket.udpPacket {
-                        NSLog("   \(udpP.debugDescription)")
-                        
-                        if let dnsP = udpP.dnsPacket {
-                            // TODO: If Query, class 1, type 1 and we care, respond
-                            if dnsP.qrFlag == 0 && dnsP.questions.count > 0 {
-                                for q in dnsP.questions {
-                                    if q.qClass == 0x01 && q.qType == 0x01 {
-                                        if q.qName == "dave.services.netfoundry.io" {
-                                            NSLog("GOTCHA DAVE!")
-                                            
-                                            // Switch SRC and DEST in IP and UDP. Didle flags, Tack on the answer, write to TUN
-                                        }
-                                    }
-                                }
-                            }
-                            // else, forward to upstream DNS and respond
-                        }
-                    }
-                } catch {
-                    NSLog("   Error loading IP Packet")
-                }
- */
-                
-                // note: if dest is our dns server, need to see if its for our routes (169.254/16).  If dest if
-                // somewhere else, drop it (e.g., see multicast, netbios stuff...).  If its one of our routes, off we go...
             }
             self.readPacketFlow()
         }
@@ -102,6 +82,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             tunnelNetworkSettings.ipv4Settings?.includedRoutes = [includedRoute]
             tunnelNetworkSettings.mtu = Int(mtu as! String) as NSNumber?
             
+            self.selfDNS = (dns as! String).components(separatedBy: ",")[0]
             let dnsSettings = NEDNSSettings(servers: (dns as! String).components(separatedBy: ","))
             if let matchDomains = conf["matchDomains"] {
                 dnsSettings.matchDomains = (matchDomains as! String).components(separatedBy: ",")
@@ -117,6 +98,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
         
         NSLog("dnsSettings.matchDomains = \(String(describing: tunnelNetworkSettings.dnsSettings?.matchDomains))")
+        NSLog("selfDNS = \(self.selfDNS)")
 
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
             if let error = error {

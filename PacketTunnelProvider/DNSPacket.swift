@@ -66,8 +66,8 @@ enum DNSResponseCode : UInt8 {
 
 enum DNSRecordType : UInt16 {
     case A = 1
-    case AAAA = 28
     case PTR = 12
+    case AAAA = 28
     case unrecognized
     
     init(_ data:UInt16) {
@@ -156,6 +156,9 @@ class DNSName : NSObject {
 }
 
 class DNSQuestion : NSObject {
+    
+    static let minNumBytes = 5
+    
     let qName:DNSName
     let qType:DNSRecordType
     let qClass:DNSRecordClass
@@ -163,7 +166,7 @@ class DNSQuestion : NSObject {
     
     init?(_ data:Data, offset:Int) {
         
-        if data.count < 5 {
+        if data.count < DNSQuestion.minNumBytes {
             NSLog("Invalid data for DNS Question")
             return nil
         }
@@ -172,8 +175,8 @@ class DNSQuestion : NSObject {
         
         let qTypeIndx = data.startIndex + self.qName.numBytes
         self.qType = DNSRecordType(IPv4Utils.extractUInt16(data, from: qTypeIndx))
-        self.qClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: qTypeIndx + 2))
-        self.numBytes = self.qName.numBytes + 4
+        self.qClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: qTypeIndx + MemoryLayout<UInt16>.size))
+        self.numBytes = self.qName.numBytes + (MemoryLayout<UInt16>.size * 2)
     }
     
     override var debugDescription: String {
@@ -184,13 +187,24 @@ class DNSQuestion : NSObject {
 class DNSPacket : NSObject {
     var udp:UDPPacket
     
+    static let numHeaderBytes = 12
+    
+    static let idOffset = 0
+    static let flagsOffset = 2
+    static let responseCodeOffset = 3
+    static let questionCountOffset = 4
+    static let answerRecordCountOffset = 6
+    static let authorityRecordCountOffset = 8
+    static let additionalRecordCountOffset = 10
+    static let answersOffset = 12
+    
     init?(_ udp:UDPPacket) {
         self.udp = udp
         
         super.init()
-        
+
         if let udpPayload = self.udp.payload {
-            if udpPayload.count < 12 {
+            if udpPayload.count < UDPPacket.numHeaderBytes {
                 NSLog("Invalid DNS Packet size \(udpPayload.count)")
                 return nil
             }
@@ -221,14 +235,17 @@ class DNSPacket : NSObject {
     var id:UInt16 {
         get {
             if let payload = udp.payload {
-               return IPv4Utils.extractUInt16(payload, from: payload.startIndex)
+               return IPv4Utils.extractUInt16(payload,
+                                              from: payload.startIndex + DNSPacket.idOffset)
             }
             return 0
         }
         
         set {
             if let payload = udp.payload {
-                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex, value: newValue)
+                IPv4Utils.updateUInt16(&udp.ip.data,
+                                       at: payload.startIndex + DNSPacket.idOffset,
+                                       value: newValue)
             }
         }
     }
@@ -236,7 +253,7 @@ class DNSPacket : NSObject {
     var qrFlag:Bool {
         get {
             if let payload = udp.payload {
-                return (payload[payload.startIndex+2] >> 7) != 0
+                return (payload[payload.startIndex + DNSPacket.flagsOffset] >> 7) != 0
             }
             return false
         }
@@ -245,7 +262,7 @@ class DNSPacket : NSObject {
             if let payload = udp.payload {
                 let prev = udp.ip.data[payload.startIndex+2]
                 let byteValue:UInt8 = newValue ? 0x01 : 0x00
-                udp.ip.data[payload.startIndex+2] = (prev & 0x7f) | (byteValue << 7)
+                udp.ip.data[payload.startIndex + DNSPacket.flagsOffset] = (prev & 0x7f) | (byteValue << 7)
             }
         }
     }
@@ -253,15 +270,16 @@ class DNSPacket : NSObject {
     var opCode:DNSOpCode {
         get {
             if let payload = udp.payload {
-                return DNSOpCode(payload[payload.startIndex+2])
+                return DNSOpCode(payload[payload.startIndex + DNSPacket.flagsOffset])
             }
             return .unrecognized
         }
         
         set {
             if let payload = udp.payload {
-                let prev:UInt8 = udp.ip.data[payload.startIndex+2]
-                udp.ip.data[payload.startIndex+2] = (prev & 0x87) | ((newValue.rawValue << 3) & 0x78)
+                let prev:UInt8 = udp.ip.data[payload.startIndex + DNSPacket.flagsOffset]
+                udp.ip.data[payload.startIndex + DNSPacket.flagsOffset] =
+                    (prev & 0x87) | ((newValue.rawValue << 3) & 0x78)
             }
         }
     }
@@ -269,7 +287,7 @@ class DNSPacket : NSObject {
     var authoritativeAsnwerFlag:Bool {
         get {
             if let payload = udp.payload {
-                return ((payload[payload.startIndex+2] >> 2) & 0x01) != 0
+                return ((payload[payload.startIndex + DNSPacket.flagsOffset] >> 2) & 0x01) != 0
             }
             return false
         }
@@ -278,7 +296,7 @@ class DNSPacket : NSObject {
             if let payload = udp.payload {
                 let prev = udp.ip.data[payload.startIndex+2]
                 let byteValue:UInt8 = newValue ? 0x01 : 0x00
-                udp.ip.data[payload.startIndex+2] = (prev & 0xfb) | (byteValue << 2)
+                udp.ip.data[payload.startIndex + DNSPacket.flagsOffset] = (prev & 0xfb) | (byteValue << 2)
             }
         }
     }
@@ -286,16 +304,16 @@ class DNSPacket : NSObject {
     var truncationFlag:Bool {
         get {
             if let payload = udp.payload {
-                return ((payload[payload.startIndex+2] >> 1) & 0x01) != 0
+                return ((payload[payload.startIndex + DNSPacket.flagsOffset] >> 1) & 0x01) != 0
             }
             return false
         }
         
         set {
             if let payload = udp.payload {
-                let prev = udp.ip.data[payload.startIndex+2]
+                let prev = udp.ip.data[payload.startIndex + DNSPacket.flagsOffset]
                 let byteValue:UInt8 = newValue ? 0x01 : 0x00
-                udp.ip.data[payload.startIndex+2] = (prev & 0xfd) | (byteValue << 1)
+                udp.ip.data[payload.startIndex + DNSPacket.flagsOffset] = (prev & 0xfd) | (byteValue << 1)
             }
         }
     }
@@ -303,7 +321,7 @@ class DNSPacket : NSObject {
     var recursionDesiredFlag:Bool {
         get {
             if let payload = udp.payload {
-                return (payload[payload.startIndex+2] & 0x01) != 0
+                return (payload[payload.startIndex + DNSPacket.flagsOffset] & 0x01) != 0
             }
             return false
         }
@@ -312,7 +330,7 @@ class DNSPacket : NSObject {
             if let payload = udp.payload {
                 let prev = udp.ip.data[payload.startIndex+2]
                 let byteValue:UInt8 = newValue ? 0x01 : 0x00
-                udp.ip.data[payload.startIndex+2] = (prev & 0xfe) | byteValue
+                udp.ip.data[payload.startIndex + DNSPacket.flagsOffset] = (prev & 0xfe) | byteValue
             }
         }
     }
@@ -320,16 +338,18 @@ class DNSPacket : NSObject {
     var recursionAvailableFlag:Bool {
         get {
             if let payload = udp.payload {
-                return (payload[payload.startIndex+3] >> 7) != 0
+                // first bit of the responseCode byte
+                return (payload[payload.startIndex + DNSPacket.responseCodeOffset] >> 7) != 0
             }
             return false
         }
         
         set {
             if let payload = udp.payload {
-                let prev = udp.ip.data[payload.startIndex+2]
+                // first bit of responseCode byte
+                let prev = udp.ip.data[payload.startIndex + DNSPacket.responseCodeOffset]
                 let byteValue:UInt8 = newValue ? 0x01 : 0x00
-                udp.ip.data[payload.startIndex+3] = (prev & 0x7f) | (byteValue << 7)
+                udp.ip.data[payload.startIndex + DNSPacket.responseCodeOffset] = (prev & 0x7f) | (byteValue << 7)
             }
         }
     }
@@ -337,15 +357,16 @@ class DNSPacket : NSObject {
     var responseCode:DNSResponseCode {
         get {
             if let payload = udp.payload {
-                return DNSResponseCode(payload[payload.startIndex+3])
+                return DNSResponseCode(payload[payload.startIndex + DNSPacket.responseCodeOffset])
             }
             return .unrecognized
         }
         
         set {
             if let payload = udp.payload {
-                let prev:UInt8 = udp.ip.data[payload.startIndex+3]
-                udp.ip.data[payload.startIndex+3] = (prev & 0xf0) | (newValue.rawValue & 0x0f)
+                let prev:UInt8 = udp.ip.data[payload.startIndex + DNSPacket.responseCodeOffset]
+                udp.ip.data[payload.startIndex + DNSPacket.responseCodeOffset] =
+                    (prev & 0xf0) | (newValue.rawValue & 0x0f)
             }
         }
     }
@@ -353,14 +374,16 @@ class DNSPacket : NSObject {
     var questionCount:UInt16 {
         get {
             if let payload = udp.payload {
-                return IPv4Utils.extractUInt16(payload, from: payload.startIndex+4)
+                return IPv4Utils.extractUInt16(payload, from: payload.startIndex + DNSPacket.questionCountOffset)
             }
             return 0
         }
         
         set {
             if let payload = udp.payload {
-                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex+4, value: newValue)
+                IPv4Utils.updateUInt16(&udp.ip.data,
+                                       at: payload.startIndex+DNSPacket.questionCountOffset,
+                                       value: newValue)
             }
         }
     }
@@ -368,14 +391,16 @@ class DNSPacket : NSObject {
     var answerRecordCount:UInt16 {
         get {
             if let payload = udp.payload {
-                return IPv4Utils.extractUInt16(payload, from: payload.startIndex+6)
+                return IPv4Utils.extractUInt16(payload, from: payload.startIndex + DNSPacket.answerRecordCountOffset)
             }
             return 0
         }
         
         set {
             if let payload = udp.payload {
-                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex+6, value: newValue)
+                IPv4Utils.updateUInt16(&udp.ip.data,
+                                       at: payload.startIndex + DNSPacket.answerRecordCountOffset,
+                                       value: newValue)
             }
         }
     }
@@ -383,14 +408,16 @@ class DNSPacket : NSObject {
     var authorityRecordCount:UInt16 {
         get {
             if let payload = udp.payload {
-                return IPv4Utils.extractUInt16(payload, from: payload.startIndex+8)
+                return IPv4Utils.extractUInt16(payload, from: payload.startIndex + DNSPacket.authorityRecordCountOffset)
             }
             return 0
         }
         
         set {
             if let payload = udp.payload {
-                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex+8, value: newValue)
+                IPv4Utils.updateUInt16(&udp.ip.data,
+                                       at: payload.startIndex + DNSPacket.authorityRecordCountOffset,
+                                       value: newValue)
             }
         }
     }
@@ -398,14 +425,16 @@ class DNSPacket : NSObject {
     var additionalRecordCount:UInt16 {
         get {
             if let payload = udp.payload {
-                return IPv4Utils.extractUInt16(payload, from: payload.startIndex+10)
+                return IPv4Utils.extractUInt16(payload, from: payload.startIndex + DNSPacket.additionalRecordCountOffset)
             }
             return 0
         }
         
         set {
             if let payload = udp.payload {
-                IPv4Utils.updateUInt16(&udp.ip.data, at: payload.startIndex+10, value: newValue)
+                IPv4Utils.updateUInt16(&udp.ip.data,
+                                       at: payload.startIndex + DNSPacket.additionalRecordCountOffset,
+                                       value: newValue)
             }
         }
     }
@@ -414,7 +443,7 @@ class DNSPacket : NSObject {
         get {
             var response:[DNSQuestion] = []
             if let payload = udp.payload {
-                var dnsData = payload[(payload.startIndex+12)...]
+                var dnsData = payload[(payload.startIndex + DNSPacket.answersOffset)...]
                 var offset = 0
                 
                 for _ in 0..<self.questionCount {
@@ -431,7 +460,7 @@ class DNSPacket : NSObject {
         set {
             if let payload = udp.payload {
                 
-                let startIndx = payload.startIndex + 12
+                let startIndx = payload.startIndex + DNSPacket.answersOffset
                 let endIndx = startIndx + self.questionsByteCount
                 let newBytes = self.questionsBytes(newValue)
                 
@@ -463,7 +492,6 @@ class DNSPacket : NSObject {
             IPv4Utils.appendUInt16(&data, value: q.qType.rawValue)
             IPv4Utils.appendUInt16(&data, value: q.qClass.rawValue)
         }
-        
         return data
     }
     
