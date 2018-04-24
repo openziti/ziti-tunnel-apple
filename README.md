@@ -1,7 +1,5 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
 ### What is this repository for? ###
 
 * Investigative 'spike' on packet tunneling on macos (very very similiar to IOS)
