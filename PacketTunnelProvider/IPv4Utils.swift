@@ -34,6 +34,11 @@ class IPv4Utils {
         data.append(contentsOf: withUnsafeBytes(of: &swapped) { Array($0) })
     }
     
+    static func appendUInt32(_ data: inout Data, value:UInt32) {
+        var swapped = CFSwapInt32(value)
+        data.append(contentsOf: withUnsafeBytes(of: &swapped) { Array($0) })
+    }
+    
     static func payloadToString(_ payload: Data) -> String {
         var i = 0
         var s = " " + payload.map {
