@@ -16,6 +16,13 @@ class IPv4Utils {
             $0.pointee
         })
     }
+    
+    static func extractUInt32(_ data:Data, from:Int) -> UInt32 {
+        let byteArray = [UInt8](data.subdata(in: from..<(from+4)))
+        return CFSwapInt32(UnsafePointer(byteArray).withMemoryRebound(to:UInt32.self, capacity: 1) {
+            $0.pointee
+        })
+    }
 
     static func updateUInt16(_ data: inout Data, at:Int, value:UInt16) {
         var swapped = CFSwapInt16(value)
