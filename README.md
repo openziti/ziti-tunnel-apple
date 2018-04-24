@@ -2,7 +2,7 @@
 
 ### What is this repository for? ###
 
-* Investigative 'spike' on packet tunneling on macos (very very similiar to IOS)
+* Investigative 'spike' on packet tunneling on macos (very very similiar to ios...)
 * Spike / POC
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
