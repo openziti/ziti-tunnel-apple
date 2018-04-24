@@ -66,15 +66,25 @@ enum DNSResponseCode : UInt8 {
 
 enum DNSRecordType : UInt16 {
     case A = 1
+    case NS = 2
+    case CNAME = 5
+    case SOA = 6
     case PTR = 12
+    case MX = 15
+    case TXT = 16
     case AAAA = 28
     case unrecognized
     
     init(_ data:UInt16) {
         switch data {
         case 1: self = .A
-        case 28: self = .AAAA
+        case 2: self = .NS
+        case 5: self = .CNAME
+        case 6: self = .SOA
         case 12: self = .PTR
+        case 15: self = .MX
+        case 16: self = .TXT
+        case 28: self = .AAAA
         default: self = .unrecognized
         }
     }
@@ -93,7 +103,7 @@ enum DNSRecordClass : UInt16 {
 }
 
 class DNSName : NSObject {
-    var name = ""
+    var nameString = ""
     var numBytes = 0
     
     init(_ data:Data, offset:Int) {
@@ -124,17 +134,22 @@ class DNSName : NSObject {
             if count == 0 {
                 done = true
             } else {
-                if !self.name.isEmpty {
-                    self.name += "."
+                if !self.nameString.isEmpty {
+                    self.nameString += "."
                 }
                 
                 let indx = data.startIndex + currOffset + 1
                 for i in indx..<(count+indx) {
-                    self.name += String(UnicodeScalar(data[i]))
+                    self.nameString += String(UnicodeScalar(data[i]))
                 }
                 currOffset += (count + 1)
             }
         }
+    }
+    
+    init(_ nameString:String) {
+        self.nameString = nameString
+        self.numBytes = nameString.count + 2 // leading count, trailing 0x00
     }
     
     private func isAnOffset(_ value:UInt8) -> Bool {
@@ -155,13 +170,15 @@ class DNSName : NSObject {
     }
 }
 
-class DNSQuestion : NSObject {
+typealias DNSQuestion = DNSResoureRecodeBase
+
+class DNSResoureRecodeBase : NSObject {
     
     static let minNumBytes = 5
     
-    let qName:DNSName
-    let qType:DNSRecordType
-    let qClass:DNSRecordClass
+    let name:DNSName
+    let recordType:DNSRecordType
+    let recordClass:DNSRecordClass
     var numBytes = 0
     
     init?(_ data:Data, offset:Int) {
@@ -171,16 +188,99 @@ class DNSQuestion : NSObject {
             return nil
         }
         
-        self.qName = DNSName(data, offset:offset)
+        self.name = DNSName(data, offset:offset)
         
-        let qTypeIndx = data.startIndex + self.qName.numBytes
-        self.qType = DNSRecordType(IPv4Utils.extractUInt16(data, from: qTypeIndx))
-        self.qClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: qTypeIndx + MemoryLayout<UInt16>.size))
-        self.numBytes = self.qName.numBytes + (MemoryLayout<UInt16>.size * 2)
+        let rTypeIndx = data.startIndex + self.name.numBytes
+        self.recordType = DNSRecordType(IPv4Utils.extractUInt16(data, from: rTypeIndx))
+        self.recordClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: rTypeIndx + MemoryLayout<UInt16>.size))
+        self.numBytes = self.name.numBytes + (MemoryLayout<UInt16>.size * 2)
+    }
+    
+    init(_ nameString:String, recordType:DNSRecordType, recordClass:DNSRecordClass) {
+        self.name = DNSName(nameString)
+        self.recordType = recordType
+        self.recordClass = recordClass
+        self.numBytes = self.name.numBytes + (MemoryLayout<UInt16>.size * 2)
+    }
+    
+    func toBytes() -> Data {
+        var data = Data()
+        
+        let segments:[String] = self.name.nameString.components(separatedBy: ".")
+        segments.forEach { seg in
+            data.append(UInt8(seg.count))
+            data.append(contentsOf:seg.utf8)
+        }
+        data.append(0x00)
+        IPv4Utils.appendUInt16(&data, value: self.recordType.rawValue)
+        IPv4Utils.appendUInt16(&data, value: self.recordClass.rawValue)
+
+        return data
     }
     
     override var debugDescription: String {
-        return "   > " + self.qName.name + " type: \(self.qType), class \(self.qClass)\n"
+        return "   > " + self.name.nameString + " type: \(self.recordType), class \(self.recordClass)\n"
+    }
+}
+
+class DNSResourceRecord : DNSResoureRecodeBase {
+    
+    var ttl:UInt32 = 0
+    var resourceDataLength:UInt16 = 0
+    var resourceData:Data? = nil
+    
+    override init?(_ data:Data, offset:Int) {
+        super.init(data, offset:offset)
+        
+        var indx = data.startIndex + offset + self.numBytes
+        
+        self.ttl = IPv4Utils.extractUInt32(data, from: indx)
+        self.numBytes += MemoryLayout<UInt32>.size
+        indx += MemoryLayout<UInt32>.size
+        
+        self.resourceDataLength = IPv4Utils.extractUInt16(data, from: indx)
+        self.numBytes += MemoryLayout<UInt16>.size
+        indx += MemoryLayout<UInt16>.size
+        
+        let rdl = Int(self.resourceDataLength)
+        self.resourceData = data[indx..<(indx + rdl)]
+        self.numBytes += rdl
+    }
+    
+    init(_ nameString:String, recordType:DNSRecordType, recordClass:DNSRecordClass, ttl:UInt32, resourceData:Data?) {
+        super.init(nameString, recordType:recordType, recordClass:recordClass)
+        self.ttl = ttl
+        
+        self.numBytes += MemoryLayout<UInt32>.size + MemoryLayout<UInt16>.size // ttl and recordLength
+        
+        if let data = resourceData {
+            self.resourceData = data
+            self.resourceDataLength = UInt16(data.count)
+            self.numBytes += data.count
+        }
+    }
+    
+    override func toBytes() -> Data {
+        var data = super.toBytes()
+        IPv4Utils.appendUInt32(&data, value: self.ttl)
+        IPv4Utils.appendUInt16(&data, value: self.resourceDataLength)
+        
+        if let rd = self.resourceData {
+            data.append(rd)
+        }
+        return data
+    }
+
+    override var debugDescription: String {
+        var s =  "   > " + self.name.nameString + " type: \(self.recordType), class \(self.recordClass)\n"
+        s += "      ttl: \(self.ttl)\n"
+        s += "      resourceDataLength: \(self.resourceDataLength)\n"
+        
+        if let data = self.resourceData {
+            s += " Resource Data:\n"
+            s += IPv4Utils.payloadToString(data)
+        }
+        return s
     }
 }
 
@@ -439,6 +539,123 @@ class DNSPacket : NSObject {
         }
     }
     
+    private func getResourceRecords(recordStartIndx:Int, recordCount:Int) -> [DNSResourceRecord] {
+        var response:[DNSResourceRecord] = []
+        
+        if let payload = udp.payload {
+            var dnsData = payload[(payload.startIndex + recordStartIndx)...]
+            var offset = 0
+            
+            for _ in 0..<recordCount {
+                if let record = DNSResourceRecord(dnsData, offset:offset) {
+                    if record.numBytes < dnsData.count {
+                        offset += record.numBytes
+                    }
+                    response.append(record)
+                }
+            }
+        }
+        return response
+    }
+    
+    private func setResourceRecords(_ newRecords:[DNSResourceRecord], recordStartIndx:Int, currRecordByteCount:Int ) {
+        if let payload = udp.payload {
+            
+            let startIndx = payload.startIndex + recordStartIndx
+            let endIndx = startIndx + currRecordByteCount
+            let newBytes = self.recordBytes(newRecords)
+            
+            if (endIndx > startIndx) {
+                udp.ip.data.removeSubrange(startIndx..<endIndx)
+            }
+            
+            if newBytes.count > 0 {
+                udp.ip.data.insert(contentsOf:newBytes, at: startIndx)
+            }
+        }
+    }
+    
+    private func recordBytes(_ records:[DNSResourceRecord]) -> Data {
+        var data = Data()
+        records.forEach { r in data.append(r.toBytes()) }
+        return data
+    }
+    
+    var answerRecords:[DNSResourceRecord] {
+        get {
+            // answers start immediately after questions...
+            let startIndx = self.questionsByteCount
+            return self.getResourceRecords(
+                recordStartIndx: startIndx,
+                recordCount: Int(self.answerRecordCount))
+        }
+        
+        set {
+            let startIndx = self.questionsByteCount
+            let currRecordByteCount = self.answerRecordsByteCount
+            self.setResourceRecords(newValue,
+                                    recordStartIndx: startIndx,
+                                    currRecordByteCount: Int(currRecordByteCount))
+            self.answerRecordCount = UInt16(newValue.count)
+        }
+    }
+    
+    var answerRecordsByteCount:Int {
+        get { return answerRecords.reduce(0) { (sum,r) in return sum + r.numBytes } }
+    }
+    
+    var authorityRecords:[DNSResourceRecord] {
+        get {
+            // answers start immediately after answers
+            let startIndx = self.questionsByteCount + self.answerRecordsByteCount
+            return self.getResourceRecords(
+                recordStartIndx: startIndx,
+                recordCount: Int(self.authorityRecordCount))
+        }
+        
+        set {
+            let startIndx = self.questionsByteCount + self.answerRecordsByteCount
+            let currRecordByteCount = self.authorityRecordsByteCount
+            self.setResourceRecords(newValue,
+                                    recordStartIndx: startIndx,
+                                    currRecordByteCount: Int(currRecordByteCount))
+            self.authorityRecordCount = UInt16(newValue.count)
+        }
+    }
+    
+    var authorityRecordsByteCount:Int {
+        get { return authorityRecords.reduce(0) { (sum,r) in return sum + r.numBytes } }
+    }
+    
+    var additionalRecords:[DNSResourceRecord] {
+        get {
+            // answers start immediately after authority records
+            let startIndx = self.questionsByteCount +
+                Int(self.answerRecordsByteCount) +
+                Int(self.authorityRecordCount)
+            
+            return self.getResourceRecords(
+                recordStartIndx: startIndx,
+                recordCount: Int(self.additionalRecordCount))
+        }
+        
+        set {
+            let startIndx = self.questionsByteCount +
+                Int(self.answerRecordsByteCount) +
+                Int(self.authorityRecordCount)
+            
+            let currRecordByteCount = self.additionalRecordsByteCount
+            self.setResourceRecords(newValue,
+                                    recordStartIndx: startIndx,
+                                    currRecordByteCount: Int(currRecordByteCount))
+            self.additionalRecordCount = UInt16(newValue.count)
+        }
+    }
+    
+    var additionalRecordsByteCount:Int {
+        get { return additionalRecords.reduce(0) { (sum,r) in return sum + r.numBytes } }
+    }
+    
     var questions:[DNSQuestion] {
         get {
             var response:[DNSQuestion] = []
@@ -482,16 +699,7 @@ class DNSPacket : NSObject {
     
     func questionsBytes(_ questions:[DNSQuestion]) -> Data {
         var data = Data()
-        questions.forEach { q in
-            let segments:[String] = q.qName.name.components(separatedBy: ".")
-            segments.forEach { seg in
-                data.append(UInt8(seg.count))
-                data.append(contentsOf:seg.utf8)
-            }
-            data.append(0x00)
-            IPv4Utils.appendUInt16(&data, value: q.qType.rawValue)
-            IPv4Utils.appendUInt16(&data, value: q.qClass.rawValue)
-        }
+        questions.forEach { q in data.append(q.toBytes()) }
         return data
     }
     
