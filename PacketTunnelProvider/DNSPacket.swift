@@ -277,7 +277,6 @@ class DNSResourceRecord : DNSResoureRecodeBase {
         s += "      resourceDataLength: \(self.resourceDataLength)\n"
         
         if let data = self.resourceData {
-            s += " Resource Data:\n"
             s += IPv4Utils.payloadToString(data)
         }
         return s
@@ -319,7 +318,7 @@ class DNSPacket : NSObject {
         }
     }
     
-    init(_ refPacket:DNSPacket, questions:[DNSQuestion]?) {
+    init(_ refPacket:DNSPacket, questions:[DNSQuestion]?, answers:[DNSResourceRecord]?) {
         self.udp = UDPPacket(refPacket.udp, payload:Data(count:12))
         
         super.init()
@@ -330,6 +329,7 @@ class DNSPacket : NSObject {
         self.recursionDesiredFlag = refPacket.recursionDesiredFlag
         self.responseCode = DNSResponseCode.noError
         self.questions = (questions != nil) ? questions! : []
+        self.answerRecords = (answers != nil) ? answers! : []
     }
     
     var id:UInt16 {
@@ -543,7 +543,7 @@ class DNSPacket : NSObject {
         var response:[DNSResourceRecord] = []
         
         if let payload = udp.payload {
-            var dnsData = payload[(payload.startIndex + recordStartIndx)...]
+            var dnsData = payload[(payload.startIndex + DNSPacket.answersOffset + recordStartIndx)...]
             var offset = 0
             
             for _ in 0..<recordCount {
@@ -561,7 +561,7 @@ class DNSPacket : NSObject {
     private func setResourceRecords(_ newRecords:[DNSResourceRecord], recordStartIndx:Int, currRecordByteCount:Int ) {
         if let payload = udp.payload {
             
-            let startIndx = payload.startIndex + recordStartIndx
+            let startIndx = payload.startIndex + DNSPacket.answersOffset + recordStartIndx
             let endIndx = startIndx + currRecordByteCount
             let newBytes = self.recordBytes(newRecords)
             
@@ -723,10 +723,26 @@ class DNSPacket : NSObject {
         s += "   authorityRecordCount: \(self.authorityRecordCount)\n"
         s += "   additionalRecordCount: \(self.additionalRecordCount)\n"
         
-        s += "   Queries:\n"
+        s += "\n   Queries:\n"
         for question in self.questions {
             s += question.debugDescription
         }
+        
+        s += "\n   Answers:\n"
+        for answer in self.answerRecords {
+            s += answer.debugDescription
+        }
+        
+        s += "\n   Authority:\n"
+        for authority in self.authorityRecords {
+            s += authority.debugDescription
+        }
+        
+        s += "\n   Additional:\n"
+        for additional in self.additionalRecords {
+            s += additional.debugDescription
+        }
+        
         return s;
     }
 }
