@@ -232,7 +232,10 @@ class IPv4Packet : NSObject {
         return UInt16(~sum & 0xffff)
     }
     
-    func updateHeaderChecksum() { self.headerChecksum = self.computeHeaderChecksum() }
+    func updateHeaderChecksum() {
+        self.totalLength = UInt16(self.data.count)
+        self.headerChecksum = self.computeHeaderChecksum()
+    }
     
     private static var identificationCounter:UInt16 = 0
     func genIdentificationNumber() -> UInt16 {

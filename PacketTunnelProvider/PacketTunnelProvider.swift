@@ -12,6 +12,12 @@ enum ZitiPacketTunnelError : Error {
     case configurationError
 }
 
+// for some quick testing
+var intercepts:[(intercept:String, response:String)] = [
+    ("google.services.netfoundry.io", "74.125.201.99"),
+    ("gotcha.services.netfoundry.io", "169.254.126.101")
+]
+
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     var conf = [String: AnyObject]()
@@ -20,10 +26,59 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     private func processDNS(_ dns:DNSPacket) {
         NSLog("DNS-->: \(dns.debugDescription)")
         
-        let dnsR = DNSPacket(dns, questions:dns.questions)
-        NSLog("<--DNS: \(dnsR.debugDescription)")
-        NSLog("<--UDP: \(dnsR.udp.debugDescription)")
-        NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
+        //  quick and dirty to see if on right path
+        var answers:[DNSResourceRecord] = []
+        dns.questions.forEach { q in
+            
+            NSLog("...process DNS question \(q.name.nameString), \(q.recordType), \(q.recordClass)")
+            
+            // only respond to type A, class IN
+            if q.recordType == DNSRecordType.A && q.recordClass == DNSRecordClass.IN {
+                let matches = intercepts.filter{ return $0.0 == q.name.nameString }
+                NSLog("...search for \(q.name.nameString) returned \(matches.count) matches")
+                
+                matches.forEach {result in
+                    var data = Data()
+                    let ipParts:[String] = result.response.components(separatedBy: ".")
+                    ipParts.forEach { part in
+                        // f'ing swift strings.  punting...
+                        let b = UInt8((part as NSString).integerValue)
+                        data.append(b)
+                    }
+ 
+                    let ans = DNSResourceRecord(result.intercept,
+                                                recordType:DNSRecordType.A,
+                                                recordClass:DNSRecordClass.IN,
+                                                ttl:0,
+                                                resourceData:data)
+                    answers.append(ans)
+                }
+            }
+            
+            // This logic needs work (name error should only be sent back for single question)
+            //     (should look at .notImplemented response as well...)
+            //      maybe send one response per question?
+            //
+            NSLog("...have \(answers.count) answers")
+            let dnsR = DNSPacket(dns, questions:dns.questions, answers:answers)
+            if answers.count != dns.questions.count {
+                dnsR.responseCode = DNSResponseCode.nameError
+            }
+            
+            // update checksume and lengths
+            dnsR.udp.updateLengthsAndChecksums()
+            
+            NSLog("<--DNS: \(dnsR.debugDescription)")
+            NSLog("<--UDP: \(dnsR.udp.debugDescription)")
+            NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
+            
+            // write response to tun
+            if self.packetFlow.writePackets([dnsR.udp.ip.data], withProtocols: [AF_INET as NSNumber]) {
+                NSLog("...successfully wrote packet to TUN")
+            } else {
+                NSLog("...failed writing packet to TUN")
+            }
+        }
     }
     
     private func processUDP(_ udp:UDPPacket) {
@@ -32,7 +87,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // if this is a DNS request sent to us, handle it
         if udp.ip.destinationAddressString == self.selfDNS && udp.destinationPort == 53 {
             if let dns = DNSPacket(udp) {
-                processDNS(dns)
+                // only process requests...
+                if !dns.qrFlag {
+                    processDNS(dns)
+                }
             }
         }
     }

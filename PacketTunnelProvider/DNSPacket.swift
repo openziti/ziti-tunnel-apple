@@ -327,6 +327,8 @@ class DNSPacket : NSObject {
         self.qrFlag = true
         self.opCode = DNSOpCode.query
         self.recursionDesiredFlag = refPacket.recursionDesiredFlag
+        self.recursionAvailableFlag = true
+        self.authoritativeAsnwerFlag = true
         self.responseCode = DNSResponseCode.noError
         self.questions = (questions != nil) ? questions! : []
         self.answerRecords = (answers != nil) ? answers! : []
@@ -394,7 +396,7 @@ class DNSPacket : NSObject {
         
         set {
             if let payload = udp.payload {
-                let prev = udp.ip.data[payload.startIndex+2]
+                let prev = udp.ip.data[payload.startIndex + DNSPacket.flagsOffset]
                 let byteValue:UInt8 = newValue ? 0x01 : 0x00
                 udp.ip.data[payload.startIndex + DNSPacket.flagsOffset] = (prev & 0xfb) | (byteValue << 2)
             }
@@ -428,7 +430,7 @@ class DNSPacket : NSObject {
         
         set {
             if let payload = udp.payload {
-                let prev = udp.ip.data[payload.startIndex+2]
+                let prev = udp.ip.data[payload.startIndex + DNSPacket.flagsOffset]
                 let byteValue:UInt8 = newValue ? 0x01 : 0x00
                 udp.ip.data[payload.startIndex + DNSPacket.flagsOffset] = (prev & 0xfe) | byteValue
             }
@@ -701,6 +703,10 @@ class DNSPacket : NSObject {
         var data = Data()
         questions.forEach { q in data.append(q.toBytes()) }
         return data
+    }
+    
+    func updateLengthsAndChecksums() {
+        self.udp.updateLengthsAndChecksums()
     }
     
     override var debugDescription: String {

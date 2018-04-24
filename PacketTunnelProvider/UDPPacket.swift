@@ -64,9 +64,7 @@ class UDPPacket : NSObject {
             self.length = UInt16(ipPayload.count)
         } else {
             self.length = UInt16(UDPPacket.numHeaderBytes)
-        }
-        
-        self.ip.updateHeaderChecksum()
+        }        
     }
     
     var sourcePort:UInt16 {
@@ -166,6 +164,14 @@ class UDPPacket : NSObject {
                 self.length = UInt16(header.count)
             }
         }
+    }
+    
+    func updateLengthsAndChecksums() {
+        if let ipPayload = self.ip.payload {
+            self.length = UInt16(ipPayload.count)
+        }
+        self.ip.totalLength = UInt16(self.ip.data.count)
+        self.ip.updateHeaderChecksum()
     }
     
     override var debugDescription: String {
