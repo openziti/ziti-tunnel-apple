@@ -20,6 +20,7 @@
 		5AF7868B208A91650093498C /* IPv4Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPv4Utils.swift */; };
 		5AF7868D208A99640093498C /* UDPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF7868C208A99640093498C /* UDPPacket.swift */; };
 		5AF7868F208AACC50093498C /* DNSPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF7868E208AACC50093498C /* DNSPacket.swift */; };
+		5AF78691208FFF670093498C /* PacketRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78690208FFF670093498C /* PacketRouter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		5AF78688208A8D050093498C /* IPv4Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Utils.swift; sourceTree = "<group>"; };
 		5AF7868C208A99640093498C /* UDPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPPacket.swift; sourceTree = "<group>"; };
 		5AF7868E208AACC50093498C /* DNSPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSPacket.swift; sourceTree = "<group>"; };
+		5AF78690208FFF670093498C /* PacketRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketRouter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +133,7 @@
 				5A02AAD0206EBDD5006261C6 /* PacketTunnelProvider.entitlements */,
 				5AF7868C208A99640093498C /* UDPPacket.swift */,
 				5AF7868E208AACC50093498C /* DNSPacket.swift */,
+				5AF78690208FFF670093498C /* PacketRouter.swift */,
 			);
 			path = PacketTunnelProvider;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 				5AF7868D208A99640093498C /* UDPPacket.swift in Sources */,
 				5AF7868B208A91650093498C /* IPv4Utils.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
+				5AF78691208FFF670093498C /* PacketRouter.swift in Sources */,
 				5AF7868F208AACC50093498C /* DNSPacket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
