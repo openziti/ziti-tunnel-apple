@@ -50,7 +50,7 @@ class DNSResolver : NSObject {
             NSLog("DNS-->: \(dns.debugDescription)")
             
             // only resolve queries ;) (should never see this...)
-            if !dns.qrFlag {
+            if dns.qrFlag {
                 return
             }
             
