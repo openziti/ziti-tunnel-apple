@@ -24,6 +24,7 @@
 		5AF786932090967F0093498C /* DNSName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786922090967F0093498C /* DNSName.swift */; };
 		5AF78695209096CD0093498C /* DNSResourceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78694209096CD0093498C /* DNSResourceRecord.swift */; };
 		5AF786972090F56D0093498C /* DNSProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786962090F56D0093498C /* DNSProxy.swift */; };
+		5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSResolver.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 		5AF786922090967F0093498C /* DNSName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSName.swift; sourceTree = "<group>"; };
 		5AF78694209096CD0093498C /* DNSResourceRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResourceRecord.swift; sourceTree = "<group>"; };
 		5AF786962090F56D0093498C /* DNSProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSProxy.swift; sourceTree = "<group>"; };
+		5AF786982090FFCA0093498C /* DNSResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResolver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +145,7 @@
 				5AF786922090967F0093498C /* DNSName.swift */,
 				5AF78694209096CD0093498C /* DNSResourceRecord.swift */,
 				5AF786962090F56D0093498C /* DNSProxy.swift */,
+				5AF786982090FFCA0093498C /* DNSResolver.swift */,
 			);
 			path = PacketTunnelProvider;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */,
+				5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */,
 				5AF7868D208A99640093498C /* UDPPacket.swift in Sources */,
 				5AF7868B208A91650093498C /* IPv4Utils.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
