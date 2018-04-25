@@ -39,6 +39,17 @@ class IPv4Utils {
         data.append(contentsOf: withUnsafeBytes(of: &swapped) { Array($0) })
     }
     
+    static func ipAddressStringToData(_ ipString:String) -> Data {
+        var data = Data()
+        let ipParts:[String] = ipString.components(separatedBy: ".")
+        ipParts.forEach { part in
+            // f'ing swift strings.  punting to obj-c...
+            let b = UInt8((part as NSString).integerValue)
+            data.append(b)
+        }
+        return data
+    }
+    
     static func payloadToString(_ payload: Data) -> String {
         var i = 0
         var s = " " + payload.map {
