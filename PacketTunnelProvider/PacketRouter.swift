@@ -96,7 +96,7 @@ class PacketRouter : NSObject {
             NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
             
             // write response to tun (returns false on error, but nothing to do if it fails...)
-            self.tunnelProvider.packetFlow.writePackets
+            self.tunnelProvider.packetFlow.writePackets([dnsR.udp.ip.data], withProtocols: [AF_INET as NSNumber])
         }
     }
 }
