@@ -9,11 +9,18 @@
 import NetworkExtension
 import Foundation
 
-// for some quick testing
-fileprivate var intercepts:[(intercept:String, response:String)] = [
+// for some quick testing (could do simple UI, will eventuall come from Ziti for names,
+// internal 'find any open' for intercepts..)
+fileprivate var dnsLookup:[(name:String, intercept:String)] = [
     ("google.services.netfoundry.io", "74.125.201.99"),
     ("gotcha.services.netfoundry.io", "169.254.126.101")
 ]
+
+/*
+fileprivate var interceptLookup:[(name:String, intercept:String)] = [
+    ("169.254.126.101", "ziti-controller-test-01.netfoundry.io")
+]
+ */
 
 class PacketRouter : NSObject {
     
@@ -58,18 +65,18 @@ class PacketRouter : NSObject {
             
             // only respond to type A, class IN
             if q.recordType == DNSRecordType.A && q.recordClass == DNSRecordClass.IN {
-                let matches = intercepts.filter{ return $0.0 == q.name.nameString }
+                let matches = dnsLookup.filter{ return $0.0 == q.name.nameString }
                 
                 matches.forEach {result in
                     var data = Data()
-                    let ipParts:[String] = result.response.components(separatedBy: ".")
+                    let ipParts:[String] = result.intercept.components(separatedBy: ".")
                     ipParts.forEach { part in
-                        // f'ing swift strings.  punting...
+                        // f'ing swift strings.  punting to obj-c...
                         let b = UInt8((part as NSString).integerValue)
                         data.append(b)
                     }
                     
-                    let ans = DNSResourceRecord(result.intercept,
+                    let ans = DNSResourceRecord(result.name,
                                                 recordType:DNSRecordType.A,
                                                 recordClass:DNSRecordClass.IN,
                                                 ttl:0,
