@@ -15,7 +15,6 @@ enum ZitiPacketTunnelError : Error {
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     var conf = [String: AnyObject]()
-    var selfDNS = ""
     
     lazy var packetRouter:PacketRouter = {
         return PacketRouter(tunnelProvider:self)
@@ -25,7 +24,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         self.packetFlow.readPacketObjects { (packets:[NEPacket]) in
             NSLog("Got \(packets.count) packets!")
             for packet:NEPacket in packets {
-                self.packetRouter.route(packet.data)
+                if packet.protocolFamily == AF_INET {
+                    self.packetRouter.route(packet.data)
+                } else {
+                    NSLog("...ignoring non AF_INET packet")
+                }
             }
             self.readPacketFlow()
         }
@@ -50,7 +53,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             tunnelNetworkSettings.ipv4Settings?.includedRoutes = [includedRoute]
             tunnelNetworkSettings.mtu = Int(mtu as! String) as NSNumber?
             
-            self.selfDNS = (dns as! String).components(separatedBy: ",")[0]
             let dnsSettings = NEDNSSettings(servers: (dns as! String).components(separatedBy: ","))
             if let matchDomains = conf["matchDomains"] {
                 dnsSettings.matchDomains = (matchDomains as! String).components(separatedBy: ",")
