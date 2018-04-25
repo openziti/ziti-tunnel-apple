@@ -52,7 +52,7 @@ class IPv4Packet : NSObject {
     
     var data:Data
     
-    init?(data: Data) {
+    init?(_ data: Data) {
         if data.count < IPv4Packet.minHeaderBytes {
             NSLog("Invalid IPv4 Packet size \(data.count)")
             return nil
@@ -239,7 +239,7 @@ class IPv4Packet : NSObject {
     
     private static var identificationCounter:UInt16 = 0
     func genIdentificationNumber() -> UInt16 {
-        let newId = IPv4Packet.identificationCounter
+        let newId = IPv4Packet.identificationCounter % UInt16.max
         IPv4Packet.identificationCounter += 1
         return newId
     }
