@@ -12,110 +12,20 @@ enum ZitiPacketTunnelError : Error {
     case configurationError
 }
 
-// for some quick testing
-var intercepts:[(intercept:String, response:String)] = [
-    ("google.services.netfoundry.io", "74.125.201.99"),
-    ("gotcha.services.netfoundry.io", "169.254.126.101")
-]
-
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     var conf = [String: AnyObject]()
     var selfDNS = ""
     
-    private func processDNS(_ dns:DNSPacket) {
-        NSLog("DNS-->: \(dns.debugDescription)")
-        
-        //  quick and dirty to see if on right path
-        var answers:[DNSResourceRecord] = []
-        dns.questions.forEach { q in
-            
-            NSLog("...process DNS question \(q.name.nameString), \(q.recordType), \(q.recordClass)")
-            
-            // only respond to type A, class IN
-            if q.recordType == DNSRecordType.A && q.recordClass == DNSRecordClass.IN {
-                let matches = intercepts.filter{ return $0.0 == q.name.nameString }
-                NSLog("...search for \(q.name.nameString) returned \(matches.count) matches")
-                
-                matches.forEach {result in
-                    var data = Data()
-                    let ipParts:[String] = result.response.components(separatedBy: ".")
-                    ipParts.forEach { part in
-                        // f'ing swift strings.  punting...
-                        let b = UInt8((part as NSString).integerValue)
-                        data.append(b)
-                    }
- 
-                    let ans = DNSResourceRecord(result.intercept,
-                                                recordType:DNSRecordType.A,
-                                                recordClass:DNSRecordClass.IN,
-                                                ttl:0,
-                                                resourceData:data)
-                    answers.append(ans)
-                }
-            }
-            
-            // This logic needs work (name error should only be sent back for single question)
-            //     (should look at .notImplemented response as well...)
-            //      maybe send one response per question?
-            //
-            NSLog("...have \(answers.count) answers")
-            let dnsR = DNSPacket(dns, questions:dns.questions, answers:answers)
-            if answers.count != dns.questions.count {
-                dnsR.responseCode = DNSResponseCode.nameError
-            }
-            
-            // update checksume and lengths
-            dnsR.udp.updateLengthsAndChecksums()
-            
-            NSLog("<--DNS: \(dnsR.debugDescription)")
-            NSLog("<--UDP: \(dnsR.udp.debugDescription)")
-            NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
-            
-            // write response to tun
-            if self.packetFlow.writePackets([dnsR.udp.ip.data], withProtocols: [AF_INET as NSNumber]) {
-                NSLog("...successfully wrote packet to TUN")
-            } else {
-                NSLog("...failed writing packet to TUN")
-            }
-        }
-    }
-    
-    private func processUDP(_ udp:UDPPacket) {
-        NSLog("UDP-->: \(udp.debugDescription)")
-        
-        // if this is a DNS request sent to us, handle it
-        if udp.ip.destinationAddressString == self.selfDNS && udp.destinationPort == 53 {
-            if let dns = DNSPacket(udp) {
-                // only process requests...
-                if !dns.qrFlag {
-                    processDNS(dns)
-                }
-            }
-        }
-    }
-    
-    /*
-     private func processTCP(_ tcp:TCPPacket) {
-     
-     }*/
-    
-    private func processIP(_ ip:IPv4Packet) {
-        NSLog("IP-->: \(ip.debugDescription)")
-        if (ip.protocolId == IPv4ProtocolId.UDP) {
-            if let udp = UDPPacket(ip) {
-                processUDP(udp)
-            }
-        }
-    }
+    lazy var packetRouter:PacketRouter = {
+        return PacketRouter(tunnelProvider:self)
+    }()
     
     func readPacketFlow() {
         self.packetFlow.readPacketObjects { (packets:[NEPacket]) in
             NSLog("Got \(packets.count) packets!")
             for packet:NEPacket in packets {
-                if let ip = IPv4Packet(data:packet.data) {
-                    self.processIP(ip)
-                }
+                self.packetRouter.route(packet.data)
             }
             self.readPacketFlow()
         }
@@ -156,7 +66,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
         
         NSLog("dnsSettings.matchDomains = \(String(describing: tunnelNetworkSettings.dnsSettings?.matchDomains))")
-        NSLog("selfDNS = \(self.selfDNS)")
 
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
             if let error = error {
@@ -175,7 +84,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // Start listening for traffic headed our way via the tun interface
         //
         readPacketFlow();
-        
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
