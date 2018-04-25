@@ -135,13 +135,11 @@ class PacketRouter : NSObject {
     private func inSubnet(_ ip:IPv4Packet) -> Bool {
         let conf = self.tunnelProvider.conf
         if let ipAddress = conf["ip"], let subnetMask = conf["subnet"] {
-            
-            let matchIpAddressData = ipAddressStringToData(ip.destinationAddressString)
             let ipAddressData = ipAddressStringToData(ipAddress as! String)
             let subnetMaskData = ipAddressStringToData(subnetMask as! String)
-            // brute force it...
-            for i in 0..<4 {
-                if (matchIpAddressData[i] & subnetMaskData[i]) != (ipAddressData[i] & subnetMaskData[i]) {
+            
+            for (dest, (ip, mask)) in zip(ip.destinationAddress, zip(ipAddressData, subnetMaskData)) {
+                if (dest & mask) != (ip & dest) {
                     return false
                 }
             }
