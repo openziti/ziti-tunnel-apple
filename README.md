@@ -4,7 +4,6 @@
 
 * Investigative 'spike' on packet tunneling on macos (very very similiar to ios...)
 * Spike / POC
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
 ### How do I get set up? ###
 
