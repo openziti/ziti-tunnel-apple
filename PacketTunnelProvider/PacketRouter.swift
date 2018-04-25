@@ -25,9 +25,11 @@ fileprivate var interceptLookup:[(name:String, intercept:String)] = [
 class PacketRouter : NSObject {
     
     let tunnelProvider:PacketTunnelProvider
-    
+    let dnsProxy:DNSProxy
+
     init(tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
+        self.dnsProxy = DNSProxy(tunnelProvider)
     }
     
     private func isSelfDnsMessage(_ udp:UDPPacket) -> Bool {
@@ -63,6 +65,7 @@ class PacketRouter : NSObject {
         return data
     }
     
+    // TODO - get this out of PacketRouter once figure out best way to handle name lookups, etc
     private func processDNS(_ dns:DNSPacket) {
         NSLog("DNS-->: \(dns.debugDescription)")
         
@@ -79,7 +82,7 @@ class PacketRouter : NSObject {
             }
             
             //
-            // only respond to type A, class IN, other respond with 'not implemented'
+            // only respond to type A, class IN, for others respond with 'not implemented'
             // btw - DNS standard says Question count 'usually' set to 1 on A/AAAA lookups.  Google tells me
             // BIND rejects requests that have more than 1 question...  I'll make a half-hearted
             // attempt to handle multiple...
@@ -126,8 +129,7 @@ class PacketRouter : NSObject {
                 // write response to tun (returns false on error, but nothing to do if it fails...)
                 self.tunnelProvider.packetFlow.writePackets([dnsR.udp.ip.data], withProtocols: [AF_INET as NSNumber])
             } else {
-                // TODO: forward to onward DNS
-                NSLog("...TODO: forward to onward DNS")
+                self.dnsProxy.proxyDnsMessage(dns)
             }
         }
     }
