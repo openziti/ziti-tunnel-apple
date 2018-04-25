@@ -327,7 +327,6 @@ class DNSPacket : NSObject {
         self.qrFlag = true
         self.opCode = DNSOpCode.query
         self.recursionDesiredFlag = refPacket.recursionDesiredFlag
-        self.recursionAvailableFlag = true
         self.authoritativeAsnwerFlag = true
         self.responseCode = DNSResponseCode.noError
         self.questions = (questions != nil) ? questions! : []
