@@ -49,10 +49,8 @@ class DNSResolver : NSObject {
         if let dns = DNSPacket(udp) {        
             NSLog("DNS-->: \(dns.debugDescription)")
             
-            // only resolve queries ;) (should never see this...)
-            if dns.qrFlag {
-                return
-            }
+            // only resolve queries (should never see this...)
+            if dns.qrFlag { return }
             
             var answers:[DNSResourceRecord] = []
             var inMatchDomains = false
