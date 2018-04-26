@@ -12,44 +12,33 @@ import NetworkExtension
 class DNSProxy : NSObject {
     let tunnelProvider:PacketTunnelProvider
     
+    // DNS transactionId:(sourPorce,timeSent)
+    var requestLookup:[UInt16:(src:UDPPacket, timeSent:TimeInterval)] = [:]
+    
     init(_ tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
     }
     
-    //
+    // prune timed-out requests (give proxied DNS .5 secs to respond)
+    private func reapRequestLut() {
+        var newLut:[UInt16:(UDPPacket,TimeInterval)] = [:]
+        self.requestLookup.forEach { entry in
+            let currTime = NSDate().timeIntervalSinceNow
+            if (currTime - entry.value.timeSent) < 0.5 {
+                newLut[entry.key] = entry.value
+            }
+        }
+        NSLog("DNSProxy: reaped \(self.requestLookup.count - newLut.count) entries")
+        self.requestLookup = newLut
+    }
+    
     // What I'm going for here is a lazy property inialization that I can set to nill
     // and have re-init next time I access it...
-    //
     private func createSession() -> NWUDPSession {
-        // TODO: get forwardingDnsServer address from conf...
         let session:NWUDPSession =  self.tunnelProvider.createUDPSession(
-            to: NWHostEndpoint(hostname: "1.1.1.1", port: "53"),
+            to: NWHostEndpoint(hostname: "1.1.1.1", port: "53"),  // TODO: get forwardingDnsServer address from conf...
             from: nil)
-        
-        session.setReadHandler( { (packets, error) in
-            if let e = error {
-                NSLog("Error handling read from forwarding DNS packet \(e)")
-                return
-            }
-            
-            if let pkts = packets {
-                for packet in pkts {
-                    NSLog("Received response from onward DNS server:\n\(IPv4Utils.payloadToString(packet))")
-                    
-                    //let udp = UDPPacket(payload:packet)
-                    //    set dest IP address to my IP.  set source to my DNS.  what f'ing port to use? need to store/lookup
-                    // update checksums
-                    // write to packet flow
-                    /*NSLog("<--DNS: \(dnsR.debugDescription)")
-                     NSLog("<--UDP: \(dnsR.udp.debugDescription)")
-                     NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
-                     
-                     // write response to tun (returns false on error, but nothing to do if it fails...)
-                     self.tunnelProvider.packetFlow.writePackets([dnsR.udp.ip.data], withProtocols: [AF_INET as NSNumber])*/
-                }
-            }
-        }, maxDatagrams: NSIntegerMax)
-        
+        session.setReadHandler(self.handleDnsResponse, maxDatagrams: NSIntegerMax)
         return session
     }
     
@@ -67,20 +56,51 @@ class DNSProxy : NSObject {
         }
     }
     
+    private func handleDnsResponse(packets:[Data]?, error:Error?) {
+        if let error = error {
+            NSLog("Error handling read from forwarding DNS packet \(error)")
+            return
+        }
+        
+        if let packets = packets {
+            for udpPayload in packets {
+                let transactionId = IPv4Utils.extractUInt16(udpPayload, from: DNSPacket.idOffset)
+                if let udpRequest = self.requestLookup.removeValue(forKey: transactionId) {
+                    let udpResponse = UDPPacket(udpRequest.src, payload:udpPayload)
+                    udpResponse.updateLengthsAndChecksums()
+                    
+                    NSLog("<--UDP: \(udpResponse.debugDescription)")
+                    NSLog("<--IP: \(udpResponse.ip.debugDescription)")
+                    self.tunnelProvider.packetFlow.writePackets([udpResponse.ip.data], withProtocols: [AF_INET as NSNumber])
+                } else {
+                    NSLog("Unable to corrolate DNS response to request for transactionId \(transactionId)")
+                }
+            }
+        }
+    }
+    
     //
     // Here's what's going on:
-    //  * create this session 'lazy' (dnsForwardingSession)
+    //  * create this session 'lazy' (this.session)
     //  * check the state
     //       if session is .ready, use if
     //       else if session .cancelled .failed or .invalid, kill session (and drop the packet)
     //       else if session .preparing or .waiting, drop the packet and move on (it'll be re-sent most likely...
     //
     func proxyDnsMessage(_ dns:DNSPacket) {
+        
+        // clean-up any timed-out requests
+        self.reapRequestLut()
+        
         if let udpPayload = dns.udp.payload {
             if let session = self.session {
                 switch session.state {
                 case .ready:
                     NSLog("...Forwarding DNS packet...")
+                    
+                    // cache the request so we know how to respond
+                    self.requestLookup[dns.id] = (dns.udp, NSDate().timeIntervalSinceNow)
+                    
                     session.writeDatagram(udpPayload, completionHandler: { error in
                         if let e = error {
                             NSLog("Error forwarding DNS packet \(e)")
