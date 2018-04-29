@@ -14,9 +14,7 @@ enum ZitiPacketTunnelError : Error {
 
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
-    lazy var packetRouter:PacketRouter = {
-        return PacketRouter(tunnelProvider:self)
-    }()
+    var packetRouter:PacketRouter? = nil
     
     var ipAddress:String = "169.254.126.1"
     var subnetMask:String = "255.255.255.0"
@@ -27,10 +25,16 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func readPacketFlow() {
         self.packetFlow.readPacketObjects { (packets:[NEPacket]) in
+            
+            guard let pr = self.packetRouter else {
+                NSLog("PacketTunnelProvider: invalid packet router.")
+                return
+            }
+            
             NSLog("Got \(packets.count) packets!")
             for packet:NEPacket in packets {
                 if packet.protocolFamily == AF_INET {
-                    self.packetRouter.route(packet.data)
+                    pr.route(packet.data)
                 } else {
                     NSLog("...ignoring non AF_INET packet, protocolFamily=\(packet.protocolFamily)")
                 }
@@ -99,7 +103,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         let dnsSettings = NEDNSSettings(servers: self.dnsAddresses)
         dnsSettings.matchDomains = self.dnsMatchDomains
-dnsSettings.matchDomains = [""] 
+        //dnsSettings.matchDomains = [""] to be the default domain
         tunnelNetworkSettings.dnsSettings = dnsSettings
         
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
@@ -110,6 +114,8 @@ dnsSettings.matchDomains = [""]
             
             // if all good, start listening for for ziti protocol..
         }
+        
+        self.packetRouter = PacketRouter(tunnelProvider:self)
         
         // call completion handler with nil to indicate success (TODO: better approach would be make sure we
         // get a bit further along...)
@@ -124,6 +130,8 @@ dnsSettings.matchDomains = [""]
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         NSLog("stopTunnel")
 
+        self.packetRouter = nil
+        
         completionHandler()
     }
     
