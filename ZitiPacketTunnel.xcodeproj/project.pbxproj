@@ -16,6 +16,7 @@
 		5A02AADC206EBE85006261C6 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A02AADB206EBE85006261C6 /* NetworkExtension.framework */; };
 		5A02AAE420703167006261C6 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A02AADB206EBE85006261C6 /* NetworkExtension.framework */; };
 		5A0AA17320791EA000338D46 /* ZitiPacketTunnel-macos.mobileconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */; };
+		5A2EA2A3209554D900437608 /* DNSFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A2209554D900437608 /* DNSFilter.swift */; };
 		5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78686208A702A0093498C /* IPv4Packet.swift */; };
 		5AF7868B208A91650093498C /* IPv4Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPv4Utils.swift */; };
 		5AF7868D208A99640093498C /* UDPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF7868C208A99640093498C /* UDPPacket.swift */; };
@@ -66,6 +67,7 @@
 		5A02AADB206EBE85006261C6 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		5A0AA1712079145D00338D46 /* ZitiPacketTunnel.mobileconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ZitiPacketTunnel.mobileconfig; sourceTree = "<group>"; };
 		5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "ZitiPacketTunnel-macos.mobileconfig"; sourceTree = "<group>"; };
+		5A2EA2A2209554D900437608 /* DNSFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSFilter.swift; sourceTree = "<group>"; };
 		5AF78686208A702A0093498C /* IPv4Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Packet.swift; sourceTree = "<group>"; };
 		5AF78688208A8D050093498C /* IPv4Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Utils.swift; sourceTree = "<group>"; };
 		5AF7868C208A99640093498C /* UDPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPPacket.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				5AF78694209096CD0093498C /* DNSResourceRecord.swift */,
 				5AF786962090F56D0093498C /* DNSProxy.swift */,
 				5AF786982090FFCA0093498C /* DNSResolver.swift */,
+				5A2EA2A2209554D900437608 /* DNSFilter.swift */,
 			);
 			path = PacketTunnelProvider;
 			sourceTree = "<group>";
@@ -307,6 +310,7 @@
 				5AF786972090F56D0093498C /* DNSProxy.swift in Sources */,
 				5AF786932090967F0093498C /* DNSName.swift in Sources */,
 				5AF78695209096CD0093498C /* DNSResourceRecord.swift in Sources */,
+				5A2EA2A3209554D900437608 /* DNSFilter.swift in Sources */,
 				5AF7868F208AACC50093498C /* DNSPacket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -449,6 +453,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ZitiPacketTunnel/ZitiPacketTunnel.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 45L2MKV8H4;
@@ -457,6 +462,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ampifyllc.ZitiPacketTunnel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -467,6 +473,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ZitiPacketTunnel/ZitiPacketTunnel.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 45L2MKV8H4;
@@ -475,6 +482,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ampifyllc.ZitiPacketTunnel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
@@ -483,6 +492,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 45L2MKV8H4;
 				INFOPLIST_FILE = PacketTunnelProvider/Info.plist;
@@ -490,6 +500,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
 			};
@@ -499,6 +510,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 45L2MKV8H4;
 				INFOPLIST_FILE = PacketTunnelProvider/Info.plist;
@@ -506,6 +518,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
 			};
