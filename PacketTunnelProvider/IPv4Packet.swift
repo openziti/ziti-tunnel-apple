@@ -162,10 +162,6 @@ class IPv4Packet : NSObject {
             let nOptsBytes = Int(self.headerLength - IPv4Packet.minHeaderLength) * IPv4Packet.headerWordLength
             return data[IPv4Packet.optionsOffset...(IPv4Packet.optionsOffset + nOptsBytes)]
         }
-        
-        //set {
-            // TODO (remove if there, insert newValue if not nill, updata totalLength)
-        //}
     }
     
     var payload:Data? {
