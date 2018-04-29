@@ -25,6 +25,8 @@ fileprivate var dnsLookup:[(name:String, intercept:String)] = [
 
 class DNSResolver : NSObject {
     
+    static let dnsPort:UInt16 = 53
+    
     let tunnelProvider:PacketTunnelProvider
     let dnsProxy:DNSProxy
     
@@ -34,12 +36,9 @@ class DNSResolver : NSObject {
     }
     
     func needsResolution(_ udp:UDPPacket) -> Bool {
-        let conf = self.tunnelProvider.conf
-        if let dns = conf["dns"] {
-            let dnsServers = (dns as! String).components(separatedBy: ",")
-            if udp.destinationPort == 53 && dnsServers.contains(udp.ip.destinationAddressString) {
-                return true
-            }
+        let dnsAddresses = self.tunnelProvider.dnsAddresses
+        if udp.destinationPort == DNSResolver.dnsPort && dnsAddresses.contains(udp.ip.destinationAddressString) {
+            return true
         }
         return false
     }
@@ -54,7 +53,8 @@ class DNSResolver : NSObject {
             
             var answers:[DNSResourceRecord] = []
             var inMatchDomains = false
-            var hasUnsupportedType = false
+            var respondUnsupported = false
+            var shouldFilter = false
             
             dns.questions.forEach { q in
                 
@@ -71,7 +71,8 @@ class DNSResolver : NSObject {
                 // attempt to handle multiple...
                 //
                 if q.recordType != DNSRecordType.A || q.recordClass != DNSRecordClass.IN {
-                    hasUnsupportedType = true
+                    shouldFilter = DNSFilter.shouldFilter(q)
+                    respondUnsupported = true
                 } else {
                     
                     // possible we might match multiple IP addesses for same service...
@@ -93,10 +94,12 @@ class DNSResolver : NSObject {
                 // Otherwise, forward to onward DNS server
                 //
                 NSLog("...have \(answers.count) answers, inMatchDomains=\(inMatchDomains)")
-                if inMatchDomains || answers.count > 0 {
+                if shouldFilter {
+                    NSLog("DNS dropping request")
+                } else if inMatchDomains || answers.count > 0 {
                     let dnsR = DNSPacket(dns, questions:dns.questions, answers:answers)
                     
-                    if hasUnsupportedType {
+                    if respondUnsupported {
                         dnsR.responseCode = DNSResponseCode.notImplemented
                     } else if answers.count != dns.questions.count {
                         dnsR.responseCode = DNSResponseCode.nameError
@@ -115,17 +118,15 @@ class DNSResolver : NSObject {
                     self.dnsProxy.proxyDnsMessage(dns)
                 }
             }
+        } else {
+            NSLog("ATTEMPT TO RESOLVE NON DNS MESSAGE")
         }
     }
     
     private func inMatchDomains(_ qName:String) -> Bool {
-        let conf = self.tunnelProvider.conf
-        if let matchDomains = conf["matchDomains"] {
-            let domains = (matchDomains as! String).components(separatedBy: ",")
-            return domains.contains{ domain in
-                return qName == domain || qName.hasSuffix("."  + domain)
-            }
+        let domains = self.tunnelProvider.dnsMatchDomains
+        return domains.contains{ domain in
+            return qName == domain || qName.hasSuffix("."  + domain)
         }
-        return false
     }
 }
