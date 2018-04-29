@@ -64,7 +64,9 @@
                 <key>dns</key>
                 <string>169.254.126.2</string>
                 <key>matchDomains</key>
-                <string>services.netfoundry.io</string>
+                <string></string>
+                <key>dnsProxies</Key>
+                <string>1.1.1.1,1.0.0.1</string>
 			</dict>
 		</dict>
 	</array>
