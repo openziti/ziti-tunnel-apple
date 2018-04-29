@@ -61,7 +61,8 @@ class ViewController: NSViewController {
                                                               "subnet": "255.255.255.0",
                                                               "mtu": "2000",
                                                               "dns": "169.254.126.2",
-                                                              "matchDomains": "services.netfoundry.io"]
+                                                              "matchDomains": "",
+                                                              "dnsProxies": "1.1.1.1,1.0.0.1"]
                     
                     providerProtocol.serverAddress = "169.254.126.255" // TODO
                     providerProtocol.username = "NetFoundry"
