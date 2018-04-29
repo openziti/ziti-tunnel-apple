@@ -10,10 +10,14 @@ import Foundation
 import NetworkExtension
 
 class DNSProxy : NSObject {
-    static let requestTimeout:TimeInterval = 0.15 // DNS is fast...
-    static let superOldThreshold:TimeInterval = 5.0
+     // DNS is fast (usu wll under .1 secs), standard time-out of macOS to resend is 5 secs
+    static let requestTimeout:TimeInterval = 2.5
+    static let superOldThreshold:TimeInterval = requestTimeout * 3.0
     
     let tunnelProvider:PacketTunnelProvider
+    
+    // pending request queue while we wait for session to be established
+    private var pendingRequestQueue:[DNSPacket] = []
     
     // cache requests while we wait for reply from remote DNS server
     typealias DNSRequestHash = [UInt16:(src:UDPPacket, timeSent:TimeInterval)]
@@ -33,8 +37,6 @@ class DNSProxy : NSObject {
             self.dnsServers.append((addr, lastFailedAt:0))
         }
         self.currDNSServer = self.dnsServers[0]
-        
-        // TODO: observe tunnel provider to see if dns address list changes...
     }
     
     static let defaultDDNSServer = DNSServerEntry("1.1.1.1", 0)
@@ -59,7 +61,7 @@ class DNSProxy : NSObject {
         }
     }
     
-    private func handleDNSError(pendingRequests:DNSRequestHash) {
+    private func handleDNSError(requestCache:DNSRequestHash) {
         // Udate failed time for whichever is curr DNS
         let now = NSDate().timeIntervalSince1970
         self.dnsServers = self.dnsServers.map { entry in
@@ -74,11 +76,11 @@ class DNSProxy : NSObject {
         if self.dnsServers.count > 1 {
             self.session = nil
             
-            // clear pending requests
+            // clear outstanding requests
             self.requestCache = [:]
             
             // re-send any that weren't reaped
-            pendingRequests.forEach { entry in
+            requestCache.forEach { entry in
                 self.proxyDnsMessage(DNSPacket(entry.value.src)!)
             }
         }
@@ -114,7 +116,7 @@ class DNSProxy : NSObject {
         //
         if maxAge < DNSProxy.superOldThreshold && reapCount > 0 {
             NSLog("*** DNSPRoxy timeout.")
-            self.handleDNSError(pendingRequests:newCache)
+            self.handleDNSError(requestCache:newCache)
         } else {
             self.requestCache = newCache
         }
@@ -124,7 +126,7 @@ class DNSProxy : NSObject {
     // and have re-init next time I access it...
     private func createSession() -> NWUDPSession {
         let address = self.nextDNSServer.address
-        let session:NWUDPSession =  self.tunnelProvider.createUDPSession(
+        let session =  self.tunnelProvider.createUDPSession(
             to: NWHostEndpoint(hostname: address, port: String(DNSResolver.dnsPort)),
             from: nil)
         session.setReadHandler(self.handleDnsResponse, maxDatagrams: NSIntegerMax)
@@ -136,6 +138,7 @@ class DNSProxy : NSObject {
         get {
             if self._session == nil {
                 self._session = createSession()
+                self._session?.addObserver(self, forKeyPath: "state", options: .new, context: &self._session)
             }
             return self._session!
         }
@@ -148,7 +151,7 @@ class DNSProxy : NSObject {
     private func handleDnsResponse(packets:[Data]?, error:Error?) {
         if let error = error {
             NSLog("Error handling read from forwarding DNS packet \(error)")
-            self.handleDNSError(pendingRequests: [:])
+            self.handleDNSError(requestCache: [:])
             return
         }
         
@@ -170,14 +173,37 @@ class DNSProxy : NSObject {
         }
     }
     
-    //
-    // Here's what's going on:
-    //  * create this session 'lazy' (this.session)
-    //  * check the state
-    //       if session is .ready, use if
-    //       else if session .cancelled .failed or .invalid, kill session (and drop the packet)
-    //       else if session .preparing or .waiting, drop the packet and move on (it'll be re-sent most likely...
-    //
+    // Implementation of KVO state observer to send pending requests
+    open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        
+        guard keyPath == "state" && context?.assumingMemoryBound(to: Optional<NWTCPConnection>.self).pointee == self._session else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            return
+        }
+        
+        if let session = self._session {
+            NSLog("DNS UDP session state changed to \(session.state)")
+            switch session.state {
+            case .ready:
+                self.pendingRequestQueue.forEach { dns in
+                    NSLog("...Forwarding DNS packet to \(self.currDNSServer)")
+                    self.requestCache[dns.id] = (dns.udp, NSDate().timeIntervalSince1970)
+                    session.writeDatagram(dns.udp.payload!, completionHandler: { error in
+                        if let e = error {
+                            NSLog("Error forwarding DNS packet \(e)")
+                        }
+                    })
+                }
+                session.removeObserver(self, forKeyPath: "state", context:&self._session)
+            case .cancelled, .invalid, .failed:
+                session.removeObserver(self, forKeyPath: "state", context:&self._session)
+            case .preparing, .waiting:
+                NSLog("...Still waiting for valid session")
+                break
+            }
+        }
+    }
+    
     func proxyDnsMessage(_ dns:DNSPacket) {
         
         // clean-up any timed-out requests
@@ -191,18 +217,19 @@ class DNSProxy : NSObject {
                     
                     // cache the request so we know how to respond
                     self.requestCache[dns.id] = (dns.udp, NSDate().timeIntervalSince1970)
-                    
                     session.writeDatagram(udpPayload, completionHandler: { error in
                         if let e = error {
                             NSLog("Error forwarding DNS packet \(e)")
                         }
                     })
                 case .cancelled, .failed, .invalid:
-                    // TODO - implement pending queue, and send them all when .ready...
-                    NSLog("...Dropping DNS packet - forwarding session in invalid state. Re-creating...")
+                    NSLog("...Dropping DNS packet - forwarding session in invalid state \(session.state.rawValue). Will re-create on next send...")
+                    // setting session to nil will cause it to auto-recreate next time it's accessed (if ever)
                     self.session = nil
                 case .preparing, .waiting:
-                    NSLog("...Dropping DNS packet - forwarding session not yet ready...")
+                    NSLog("...Forwarding session not yet ready \(session.state.rawValue), will send when it is")
+                    // pending requests are handled by the KVO ssession state observer
+                    self.pendingRequestQueue.append(dns)
                 }
             }
         }
