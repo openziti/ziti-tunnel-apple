@@ -14,11 +14,16 @@ enum ZitiPacketTunnelError : Error {
 
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
-    var conf = [String: AnyObject]()
-    
     lazy var packetRouter:PacketRouter = {
         return PacketRouter(tunnelProvider:self)
     }()
+    
+    var ipAddress:String = "169.254.126.1"
+    var subnetMask:String = "255.255.255.0"
+    var mtu:Int = 2000
+    var dnsAddresses:[String] = ["169.254.126.2"]
+    var dnsMatchDomains:[String] = []
+    var dnsProxyAddresses:[String] = ["1.1.1.1", "1.0.0.1"]
     
     func readPacketFlow() {
         self.packetFlow.readPacketObjects { (packets:[NEPacket]) in
@@ -27,48 +32,76 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 if packet.protocolFamily == AF_INET {
                     self.packetRouter.route(packet.data)
                 } else {
-                    NSLog("...ignoring non AF_INET packet")
+                    NSLog("...ignoring non AF_INET packet, protocolFamily=\(packet.protocolFamily)")
                 }
             }
             self.readPacketFlow()
         }
+    }
+    
+    private func parseConf(_ conf:[String:AnyObject]) -> Bool {
+        if let ip = conf["ip"] { self.ipAddress = ip as! String }
+        if let subnet = conf["subnet"] { self.subnetMask = subnet as! String }
+        if let mtu = conf["mtu"] { self.mtu = Int(mtu as! String)! }
+        if let dns = conf["dns"] { self.dnsAddresses = (dns as! String).components(separatedBy: ",") }
+        
+        if let matchDomains = conf["matchDomains"] {
+            self.dnsMatchDomains = (matchDomains as! String).components(separatedBy: ",")
+        } else {
+            self.dnsMatchDomains = [""] // all routes...
+        }
+        
+        if let dnsProxies = conf["dnsProxies"] {
+            self.dnsProxyAddresses = (dnsProxies as! String).components(separatedBy: ",")
+        }
+        
+        // TODO: sanity checks / defaults on each... (e.g., valid ip address, if matchDomains=all make sure we have proxy
+        return true
+    }
+    
+    override var debugDescription: String {
+        var str = "PacketTunnelProvider \(self)"
+        
+        str += "\n" +
+            "ipAddress: \(self.ipAddress)\n" +
+            "subnetMask: \(self.subnetMask)\n" +
+            "mtu: \(self.mtu)\n" +
+            "dns: \(self.dnsAddresses.joined(separator:","))\n" +
+            "dnsMatchDomains: \(self.dnsMatchDomains.joined(separator:","))\n" +
+            "dnsProxies \(self.dnsProxyAddresses.joined(separator:","))"
+        
+        return str
     }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         
         NSLog("startTunnel")
         
-        conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as [String : AnyObject]
-        
-        let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
-        
-        if let ip = conf["ip"], let subnet = conf["subnet"], let mtu = conf["mtu"], let dns = conf["dns"] {
-            
-            tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [ip as! String],
-                                                                subnetMasks: [subnet as! String])
-            
-            let includedRoute = NEIPv4Route(destinationAddress: ip as! String,
-                                            subnetMask: subnet as! String)
-            
-            tunnelNetworkSettings.ipv4Settings?.includedRoutes = [includedRoute]
-            tunnelNetworkSettings.mtu = Int(mtu as! String) as NSNumber?
-            
-            let dnsSettings = NEDNSSettings(servers: (dns as! String).components(separatedBy: ","))
-            if let matchDomains = conf["matchDomains"] {
-                dnsSettings.matchDomains = (matchDomains as! String).components(separatedBy: ",")
-            } else {
-                dnsSettings.matchDomains = [""]
-            }
-            tunnelNetworkSettings.dnsSettings = dnsSettings
-            
-        } else {
-            NSLog("Invalid configuration")
+        let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as [String : AnyObject]
+        if parseConf(conf) != true {
+            NSLog("Unable to startTunnel. Invalid providerConfiguration")
             completionHandler(ZitiPacketTunnelError.configurationError)
             return
         }
         
-        NSLog("dnsSettings.matchDomains = \(String(describing: tunnelNetworkSettings.dnsSettings?.matchDomains))")
-
+        NSLog(self.debugDescription)
+        
+        let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
+        
+        tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [self.ipAddress],
+                                                            subnetMasks: [self.subnetMask])
+        
+        let includedRoute = NEIPv4Route(destinationAddress: self.ipAddress,
+                                        subnetMask: self.subnetMask)
+        
+        tunnelNetworkSettings.ipv4Settings?.includedRoutes = [includedRoute]
+        tunnelNetworkSettings.mtu = self.mtu as NSNumber
+        
+        let dnsSettings = NEDNSSettings(servers: self.dnsAddresses)
+        dnsSettings.matchDomains = self.dnsMatchDomains
+dnsSettings.matchDomains = [""] 
+        tunnelNetworkSettings.dnsSettings = dnsSettings
+        
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
             if let error = error {
                 NSLog(error.localizedDescription)
