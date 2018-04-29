@@ -20,15 +20,12 @@ class PacketRouter : NSObject {
     }
     
     private func inSubnet(_ ip:IPv4Packet) -> Bool {
-        let conf = self.tunnelProvider.conf
-        if let ipAddress = conf["ip"], let subnetMask = conf["subnet"] {
-            let ipAddressData = IPv4Utils.ipAddressStringToData(ipAddress as! String)
-            let subnetMaskData = IPv4Utils.ipAddressStringToData(subnetMask as! String)
-            
-            for (dest, (ip, mask)) in zip(ip.destinationAddress, zip(ipAddressData, subnetMaskData)) {
-                if (dest & mask) != (ip & dest) {
-                    return false
-                }
+        let ipAddressData = IPv4Utils.ipAddressStringToData(self.tunnelProvider.ipAddress)
+        let subnetMaskData = IPv4Utils.ipAddressStringToData(self.tunnelProvider.subnetMask)
+        
+        for (dest, (ip, mask)) in zip(ip.destinationAddress, zip(ipAddressData, subnetMaskData)) {
+            if (dest & mask) != (ip & dest) {
+                return false
             }
         }
         return true
