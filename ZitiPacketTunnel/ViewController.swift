@@ -49,26 +49,19 @@ class ViewController: NSViewController {
                 }
                 
                 // This shouldn't happen unless first time run and no profile preference has been
-                // imported, but handy for development
+                // imported, but handy for development...
                 if self.tunnelProviderManager.protocolConfiguration == nil {
                     
                     let providerProtocol = NETunnelProviderProtocol()
+                    providerProtocol.providerBundleIdentifier = ProviderConfig.providerBundleIdentifier
                     
-                    providerProtocol.providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
-                    
-                    
-                    providerProtocol.providerConfiguration = ["ip": "169.254.126.1",
-                                                              "subnet": "255.255.255.0",
-                                                              "mtu": "2000",
-                                                              "dns": "169.254.126.2",
-                                                              "matchDomains": "",
-                                                              "dnsProxies": "1.1.1.1,1.0.0.1"]
-                    
-                    providerProtocol.serverAddress = "169.254.126.255" // TODO
-                    providerProtocol.username = "NetFoundry"
+                    let defaultProviderConf = ProviderConfig()
+                    providerProtocol.providerConfiguration = defaultProviderConf.createDictionary()
+                    providerProtocol.serverAddress = defaultProviderConf.serverAddress
+                    providerProtocol.username = defaultProviderConf.username
                     
                     self.tunnelProviderManager.protocolConfiguration = providerProtocol
-                    self.tunnelProviderManager.localizedDescription = "Ziti Packet Tunnel"
+                    self.tunnelProviderManager.localizedDescription = defaultProviderConf.localizedDescription
                     self.tunnelProviderManager.isEnabled = true
                     
                     self.tunnelProviderManager.saveToPreferences(completionHandler: { (error:Error?) in
@@ -100,25 +93,25 @@ class ViewController: NSViewController {
             return
         }
         
-        let conf = (self.tunnelProviderManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as [String : AnyObject]
+        let conf = (self.tunnelProviderManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
 
-        if let ip = conf["ip"] {
+        if let ip = conf[ProviderConfig.IP_KEY] {
             self.ipAddressText.stringValue = ip as! String
         }
         
-        if let subnet = conf["subnet"] {
+        if let subnet = conf[ProviderConfig.SUBNET_KEY] {
             self.subnetMaskText.stringValue = subnet as! String
         }
         
-        if let mtu = conf["mtu"] {
+        if let mtu = conf[ProviderConfig.MTU_KEY] {
             self.mtuText.stringValue = mtu as! String
         }
         
-        if let dns = conf["dns"] {
+        if let dns = conf[ProviderConfig.DNS_KEY] {
             self.dnsServersText.stringValue = dns as! String
         }
         
-        if let matchDomains = conf["matchDomains"] {
+        if let matchDomains = conf[ProviderConfig.MATCH_DOMAINS_KEY] {
             self.matchedDomainsText.stringValue = matchDomains as! String
         } 
     }

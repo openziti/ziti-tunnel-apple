@@ -33,7 +33,7 @@ class DNSProxy : NSObject {
         
         super.init()
         
-        self.tunnelProvider.dnsProxyAddresses.forEach { addr in
+        self.tunnelProvider.providerConfig.dnsProxyAddresses.forEach { addr in
             self.dnsServers.append((addr, lastFailedAt:0))
         }
         self.currDNSServer = self.dnsServers[0]

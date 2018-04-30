@@ -36,7 +36,7 @@ class DNSResolver : NSObject {
     }
     
     func needsResolution(_ udp:UDPPacket) -> Bool {
-        let dnsAddresses = self.tunnelProvider.dnsAddresses
+        let dnsAddresses = self.tunnelProvider.providerConfig.dnsAddresses
         if udp.destinationPort == DNSResolver.dnsPort && dnsAddresses.contains(udp.ip.destinationAddressString) {
             return true
         }
@@ -143,7 +143,7 @@ class DNSResolver : NSObject {
     }
     
     private func inMatchDomains(_ qName:String) -> Bool {
-        let domains = self.tunnelProvider.dnsMatchDomains
+        let domains = self.tunnelProvider.providerConfig.dnsMatchDomains
         return domains.contains{ domain in
             return qName == domain || qName.hasSuffix("."  + domain)
         }
