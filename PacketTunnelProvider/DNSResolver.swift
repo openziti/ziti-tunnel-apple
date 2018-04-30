@@ -71,7 +71,18 @@ class DNSResolver : NSObject {
                 // attempt to handle multiple...
                 //
                 if q.recordType != DNSRecordType.A || q.recordClass != DNSRecordClass.IN {
-                    shouldFilter = DNSFilter.shouldFilter(q)
+                    //
+                    // Filtering out based on locally-served-zones: need to figure this out.
+                    //     Forwarding them results in a response saying 'stop it' (basically),
+                    //     but dropping on the floor also isn't great (they get resent, and
+                    //     ultimately sent to alternate resolver, which then causess a few
+                    //     additional requests to go to that alternate resolver (so we don't
+                    //     see 'em).
+                    //
+                    // Could change to respond with 'stop it' messages.  Not sure worth it
+                    //   give risk of introducing a problem.  For now will let them through...
+                    //
+                    shouldFilter = false //DNSFilter.shouldFilter(q)
                     respondUnsupported = true
                 } else {
                     
