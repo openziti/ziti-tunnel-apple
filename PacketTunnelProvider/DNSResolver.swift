@@ -65,12 +65,13 @@ class DNSResolver : NSObject {
                 }
                 
                 //
-                // only respond to type A, class IN, for others respond with 'not implemented'
+                // only respond to type A or AAAA, class IN, for others respond with 'not implemented'
                 // btw - DNS standard says Question count 'usually' set to 1 on A/AAAA lookups.  Google tells me
                 // BIND rejects requests that have more than 1 question...  I'll make a half-hearted
                 // attempt to handle multiple...
                 //
-                if q.recordType != DNSRecordType.A || q.recordClass != DNSRecordClass.IN {
+                if (q.recordType != DNSRecordType.A && q.recordType != DNSRecordType.AAAA) || q.recordClass != DNSRecordClass.IN {
+                    
                     //
                     // Filtering out based on locally-served-zones: need to figure this out.
                     //     Forwarding them results in a response saying 'stop it' (basically),
@@ -90,13 +91,20 @@ class DNSResolver : NSObject {
                     let matches = dnsLookup.filter{ return $0.0 == q.name.nameString }
                     
                     matches.forEach {result in
-                        let data = IPv4Utils.ipAddressStringToData(result.intercept)
-                        let ans = DNSResourceRecord(result.name,
-                                                    recordType:DNSRecordType.A,
-                                                    recordClass:DNSRecordClass.IN,
-                                                    ttl:0,
-                                                    resourceData:data)
-                        answers.append(ans)
+                        
+                        if q.recordType == DNSRecordType.AAAA {
+                            // setting inMatchDomains to true without supplying an answer will case .nameError
+                            // (not found) response for AAAA (since we are only supporting IPv4)
+                            inMatchDomains = true
+                        } else {
+                            let data = IPv4Utils.ipAddressStringToData(result.intercept)
+                            let ans = DNSResourceRecord(result.name,
+                                                        recordType:DNSRecordType.A,
+                                                        recordClass:DNSRecordClass.IN,
+                                                        ttl:0,
+                                                        resourceData:data)
+                            answers.append(ans)
+                        }
                     }
                 }
                 
