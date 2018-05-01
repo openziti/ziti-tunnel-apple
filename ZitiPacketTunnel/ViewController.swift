@@ -9,7 +9,7 @@
 import Cocoa
 import NetworkExtension
 
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSTextFieldDelegate {
 
     @IBOutlet weak var connectButton: NSButton!
     @IBOutlet weak var connectStatus: NSTextField!
@@ -19,6 +19,9 @@ class ViewController: NSViewController {
     @IBOutlet weak var mtuText: NSTextField!
     @IBOutlet weak var dnsServersText: NSTextField!
     @IBOutlet weak var matchedDomainsText: NSTextField!
+    @IBOutlet weak var dnsProxiesText: NSTextField!
+    @IBOutlet weak var revertButton: NSButton!
+    @IBOutlet weak var applyButton: NSButton!
     
     var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
     
@@ -88,6 +91,7 @@ class ViewController: NSViewController {
         self.mtuText.stringValue = ""
         self.dnsServersText.stringValue = ""
         self.matchedDomainsText.stringValue = ""
+        self.dnsProxiesText.stringValue = ""
         
         if self.tunnelProviderManager.protocolConfiguration == nil {
             return
@@ -113,7 +117,13 @@ class ViewController: NSViewController {
         
         if let matchDomains = conf[ProviderConfig.MATCH_DOMAINS_KEY] {
             self.matchedDomainsText.stringValue = matchDomains as! String
-        } 
+        }
+        
+        if let dnsProxies = conf[ProviderConfig.DNS_PROXIES_KEY] {
+            self.dnsProxiesText.stringValue = dnsProxies as! String
+        }
+        
+        self.ipAddressText.becomeFirstResponder()
     }
     
     @objc func TunnelStatusDidChange(_ notification: Notification?) {
@@ -152,6 +162,12 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         
         editBox.borderType = NSBorderType.lineBorder
+        self.ipAddressText.delegate = self
+        self.subnetMaskText.delegate = self
+        self.mtuText.delegate = self
+        self.dnsServersText.delegate = self
+        self.matchedDomainsText.delegate = self
+        self.dnsProxiesText.delegate = self
 
         initTunnelProviderManager()
         
@@ -173,7 +189,23 @@ class ViewController: NSViewController {
         // Update the view, if already loaded.
         }
     }
+    
+    // Occurs whenever you input first symbol after focus is here
+    override func controlTextDidBeginEditing(_ obj: Notification) {
+        self.revertButton.isEnabled = true
+        self.applyButton.isEnabled = true
+    }
 
+    @IBAction func onApplyButton(_ sender: Any) {
+        // TODO (validate first), then .reasserting, start/stop tunnel
+    }
+    
+    @IBAction func onRevertButton(_ sender: Any) {
+        self.updateConfigControls()
+        self.revertButton.isEnabled = false
+        self.applyButton.isEnabled = false
+    }
+    
     @IBAction func onConnectButton(_ sender: NSButton) {
         print("onConnectButton")
         
@@ -193,7 +225,5 @@ class ViewController: NSViewController {
             }
         }
     }
-    
-
 }
 
