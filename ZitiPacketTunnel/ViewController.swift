@@ -212,7 +212,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             print("Error validating conf. \(error)")
             //NSAlert(error:error).runModal()
             let alert = NSAlert()
-            alert.window.title = "Ziti Packer Tunnel"
             alert.messageText = "Configuration Error"
             alert.informativeText =  error.description
             alert.alertStyle = NSAlert.Style.warning
