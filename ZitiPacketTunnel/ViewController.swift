@@ -223,11 +223,18 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             if let error = error {
                 print("Error saving perferences \(error)")
                 NSAlert(error:error).runModal()
+            } else {
+                if self.tunnelProviderManager.connection.status == .connected {
+                    let alert = NSAlert()
+                    alert.messageText = "Configuration Saved"
+                    alert.informativeText =  "Will take affect on tunnel re-start"
+                    alert.alertStyle = NSAlert.Style.informational
+                    alert.runModal()
+                }
+                self.applyButton.isEnabled = false
+                self.revertButton.isEnabled = false
             }
         }
-        
-        // TODO: Either send message to the Provider letting it know config changed or, if tunnel is
-        // running re-start it...?  Or do nothing...
         
 /*        if let session = self.tunnelProviderManager.connection as? NETunnelProviderSession,
             let message = "Hello Provider".data(using: String.Encoding.utf8),

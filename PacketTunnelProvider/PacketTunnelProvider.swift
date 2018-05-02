@@ -63,7 +63,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
         dnsSettings.matchDomains = self.providerConfig.dnsMatchDomains
-dnsSettings.matchDomains = [""] //to be the default domain
         tunnelNetworkSettings.dnsSettings = dnsSettings
         
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
