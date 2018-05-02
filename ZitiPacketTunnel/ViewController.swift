@@ -210,11 +210,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if let error = conf.parseDictionary(dict) {
             // TOOO alert and get outta here
             print("Error validating conf. \(error)")
-            //NSAlert(error:error).runModal()
             let alert = NSAlert()
             alert.messageText = "Configuration Error"
             alert.informativeText =  error.description
-            alert.alertStyle = NSAlert.Style.warning
+            alert.alertStyle = NSAlert.Style.critical
             alert.runModal()
             return
         }
