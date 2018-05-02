@@ -42,14 +42,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         NSLog("startTunnel")
         
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
-        do {
-            try self.providerConfig.parseDictionary(conf)
-            NSLog("\(self.providerConfig.debugDescription)")
-        } catch {
+        if let error = self.providerConfig.parseDictionary(conf) {
             NSLog("Unable to startTunnel. Invalid providerConfiguration. \(error)")
             completionHandler(error)
+            return
         }
         
+        NSLog("\(self.providerConfig.debugDescription)")
         
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         

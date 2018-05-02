@@ -197,7 +197,63 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
 
     @IBAction func onApplyButton(_ sender: Any) {
-        // TODO (validate first), then .reasserting, start/stop tunnel
+        
+        var dict = ProviderConfigDict()
+        dict[ProviderConfig.IP_KEY] = self.ipAddressText.stringValue
+        dict[ProviderConfig.SUBNET_KEY] = self.subnetMaskText.stringValue
+        dict[ProviderConfig.MTU_KEY] = self.mtuText.stringValue
+        dict[ProviderConfig.DNS_KEY] = self.dnsServersText.stringValue
+        dict[ProviderConfig.MATCH_DOMAINS_KEY] = self.matchedDomainsText.stringValue
+        dict[ProviderConfig.DNS_PROXIES_KEY] = self.dnsProxiesText.stringValue
+        
+        let conf:ProviderConfig = ProviderConfig()
+        if let error = conf.parseDictionary(dict) {
+            // TOOO alert and get outta here
+            print("Error validating conf. \(error)")
+            //NSAlert(error:error).runModal()
+            let alert = NSAlert()
+            alert.window.title = "Ziti Packer Tunnel"
+            alert.messageText = "Configuration Error"
+            alert.informativeText =  error.description
+            alert.alertStyle = NSAlert.Style.warning
+            alert.runModal()
+            return
+        }
+        
+        (self.tunnelProviderManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = conf.createDictionary()
+        self.tunnelProviderManager.saveToPreferences { error in
+            if let error = error {
+                print("Error saving perferences \(error)")
+                NSAlert(error:error).runModal()
+            }
+        }
+        
+        // TODO: Either send message to the Provider letting it know config changed or, if tunnel is
+        // running re-start it...?  Or do nothing...
+        
+/*        if let session = self.tunnelProviderManager.connection as? NETunnelProviderSession,
+            let message = "Hello Provider".data(using: String.Encoding.utf8),
+            self.tunnelProviderManager.connection.status != .invalid {
+            
+            do {
+                try session.sendProviderMessage(message) { response in
+                    if response != nil {
+                        let responseString = NSString(data: response!, encoding: String.Encoding.utf8.rawValue)
+                        print("Received response from the provider: \(responseString ?? "-no response-")")
+                        let alert = NSAlert()
+                        alert.messageText = "Ziti Packer Tunnel"
+                        alert.informativeText = "Received response from the provider: \(responseString ?? "-no response-")"
+                        alert.alertStyle = NSAlert.Style.informational
+                        alert.runModal()
+                    } else {
+                        print("Got a nil response from the provider")
+                    }
+                }
+            } catch {
+                print("Failed to send a message to the provider")
+            }
+        }
+ */
     }
     
     @IBAction func onRevertButton(_ sender: Any) {
@@ -209,20 +265,15 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBAction func onConnectButton(_ sender: NSButton) {
         print("onConnectButton")
         
-        self.tunnelProviderManager.loadFromPreferences { (error:Error?) in
-            if let error = error {
+        if (sender.title == "Turn Ziti On") {
+            do {
+                try self.tunnelProviderManager.connection.startVPNTunnel()
+            } catch {
                 print(error)
+                NSAlert(error:error).runModal()
             }
-            
-            if (sender.title == "Turn Ziti On") {
-                do {
-                    try self.tunnelProviderManager.connection.startVPNTunnel()
-                } catch {
-                    print(error)
-                }
-            } else {
-                self.tunnelProviderManager.connection.stopVPNTunnel()
-            }
+        } else {
+            self.tunnelProviderManager.connection.stopVPNTunnel()
         }
     }
 }
