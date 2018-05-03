@@ -27,6 +27,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
     
     private func initTunnelProviderManager() {
+        
         NETunnelProviderManager.loadAllFromPreferences { (savedManagers: [NETunnelProviderManager]?, error: Error?) in
             
             //
@@ -80,7 +81,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 self.updateConfigControls()
                 
                 // update the Connect Button label
-                self.TunnelStatusDidChange(nil)
+                self.tunnelStatusDidChange(nil)
             })
         }
     }
@@ -127,7 +128,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         self.ipAddressText.becomeFirstResponder()
     }
     
-    @objc func TunnelStatusDidChange(_ notification: Notification?) {
+    @objc func tunnelStatusDidChange(_ notification: Notification?) {
         print("Tunnel Status changed:")
         let status = self.tunnelProviderManager.connection.status
         switch status {
@@ -181,7 +182,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
          */
         
         NotificationCenter.default.addObserver(self, selector:
-            #selector(ViewController.TunnelStatusDidChange(_:)), name:
+            #selector(ViewController.tunnelStatusDidChange(_:)), name:
             NSNotification.Name.NEVPNStatusDidChange, object: nil)
     }
 
