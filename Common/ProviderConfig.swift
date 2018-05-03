@@ -111,13 +111,17 @@ class ProviderConfig : NSObject {
         self.ipAddress = (conf[ProviderConfig.IP_KEY] as! String).trimmingCharacters(in: .whitespaces)
         self.subnetMask = (conf[ProviderConfig.SUBNET_KEY] as! String).trimmingCharacters(in: .whitespaces)
         self.mtu = Int(conf[ProviderConfig.MTU_KEY] as! String)!
-        self.dnsAddresses = (conf[ProviderConfig.DNS_KEY] as! String).components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces)}
+        self.dnsAddresses = (conf[ProviderConfig.DNS_KEY] as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
     
-        self.dnsMatchDomains = (conf[ProviderConfig.MATCH_DOMAINS_KEY] as! String).components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces)}
-        if self.dnsMatchDomains.count == 0 {
-            self.dnsMatchDomains = [""] // all routes...
+        self.dnsMatchDomains = [""] // all routes by default
+        if let mds = conf[ProviderConfig.MATCH_DOMAINS_KEY] {
+            let mdsArray = (mds as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
+            if mdsArray.count > 0 {
+                self.dnsMatchDomains = mdsArray
+            }
         }
-        self.dnsProxyAddresses = (conf[ProviderConfig.DNS_PROXIES_KEY] as! String).components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        
+        self.dnsProxyAddresses = (conf[ProviderConfig.DNS_PROXIES_KEY] as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
     
         return nil
     }
