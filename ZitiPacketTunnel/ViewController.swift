@@ -23,6 +23,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var revertButton: NSButton!
     @IBOutlet weak var applyButton: NSButton!
     
+    static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
     
     private func initTunnelProviderManager() {
@@ -56,7 +57,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 if self.tunnelProviderManager.protocolConfiguration == nil {
                     
                     let providerProtocol = NETunnelProviderProtocol()
-                    providerProtocol.providerBundleIdentifier = ProviderConfig.providerBundleIdentifier
+                    providerProtocol.providerBundleIdentifier = ViewController.providerBundleIdentifier
                     
                     let defaultProviderConf = ProviderConfig()
                     providerProtocol.providerConfiguration = defaultProviderConf.createDictionary()

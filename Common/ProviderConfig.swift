@@ -31,7 +31,6 @@ enum ProviderConfigError : Error {
 typealias ProviderConfigDict = [String : Any]
 
 class ProviderConfig : NSObject {
-    static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     
     static var IP_KEY = "ip"
     static var SUBNET_KEY = "subnet"
