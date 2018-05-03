@@ -115,13 +115,12 @@ class ViewController: UIViewController {
     
     @IBAction func connectSwitchChanged(_ sender: Any) {
         print("Connect switch: \(connectSwitch.isOn)")
-        /*
-        if !connectSwitch.isOn {
+        
+        if connectSwitch.isOn {
             do {
                 try self.tunnelProviderManager.connection.startVPNTunnel()
             } catch {
                 print(error)
-                //NSAlert(error:error).runModal()
                 let alert = UIAlertController(
                     title:"Ziti PT Error",
                     message: error.localizedDescription,
@@ -132,7 +131,7 @@ class ViewController: UIViewController {
         } else {
             self.tunnelProviderManager.connection.stopVPNTunnel()
         }
- */
+ 
     }
     
     override func viewDidLoad() {
