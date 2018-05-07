@@ -47,7 +47,7 @@ class ProviderConfig : NSObject {
     var dnsMatchDomains:[String] = [""]
     var dnsProxyAddresses:[String] = ["1.1.1.1, 1.0.0.1"]
     
-    var serverAddress = "169.254.126.255"
+    var serverAddress = "169.254.126.254"
     var username = "NetFoundry"
     var localizedDescription = "Ziti Packet Tunnel"
     
