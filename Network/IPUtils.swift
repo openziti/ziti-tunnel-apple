@@ -9,7 +9,7 @@
 import Foundation
 
 // convenience..
-class IPv4Utils {
+class IPUtils {
     static func extractUInt16(_ data:Data, from:Int) -> UInt16 {
         let byteArray = [UInt8](data.subdata(in: from..<(from+2)))
         return CFSwapInt16(UnsafePointer(byteArray).withMemoryRebound(to:UInt16.self, capacity: 1) {
@@ -39,7 +39,7 @@ class IPv4Utils {
         data.append(contentsOf: withUnsafeBytes(of: &swapped) { Array($0) })
     }
     
-    static func ipAddressStringToData(_ ipString:String) -> Data {
+    static func ipV4AddressStringToData(_ ipString:String) -> Data {
         var data = Data()
         let ipParts:[String] = ipString.components(separatedBy: ".")
         ipParts.forEach { part in

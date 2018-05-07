@@ -16,11 +16,11 @@ class UDPPacket : NSObject {
     static let lengthOffset = 4
     static let checksumOffset = 6
     
-    var ip:IPv4Packet
+    var ip:IPPacket
     
-    init?(_ ipPacket:IPv4Packet) {
+    init?(_ ipPacket:IPPacket) {
         self.ip = ipPacket
-        if (ipPacket.protocolId != IPv4ProtocolId.UDP) {
+        if (ipPacket.protocolId != IPProtocolId.UDP) {
             NSLog("Invalid UDP Packet, protocol=\(ipPacket.protocolId)")
             return nil
         }
@@ -44,15 +44,8 @@ class UDPPacket : NSObject {
     }
     
     init(_ refPacket:UDPPacket, payload:Data?) {
-        self.ip = IPv4Packet(count:(IPv4Packet.minHeaderBytes + UDPPacket.numHeaderBytes))!
-        self.ip.version = IPv4Packet.version4
-        self.ip.headerLength = IPv4Packet.minHeaderLength
-        self.ip.identification = ip.genIdentificationNumber()
-        self.ip.flags = IPv4Flags.dontFragment
-        self.ip.ttl = IPv4Packet.defaultTtl
-        self.ip.protocolId = IPv4ProtocolId.UDP
-        self.ip.sourceAddress = refPacket.ip.destinationAddress
-        self.ip.destinationAddress = refPacket.ip.sourceAddress
+        
+        self.ip = refPacket.ip.createFromRefPacket(refPacket.ip)
         
         super.init()
 
@@ -70,14 +63,14 @@ class UDPPacket : NSObject {
     var sourcePort:UInt16 {
         get {
             if let ipPayload = self.ip.payload {
-                return IPv4Utils.extractUInt16(ipPayload,
+                return IPUtils.extractUInt16(ipPayload,
                                                from: ipPayload.startIndex + UDPPacket.sourePortOffset)
             }
             return 0
         }
         set {
             if let ipPayload = self.ip.payload {
-                IPv4Utils.updateUInt16(&ip.data,
+                IPUtils.updateUInt16(&ip.data,
                                        at: ipPayload.startIndex + UDPPacket.sourePortOffset,
                                        value: newValue)
             }
@@ -87,14 +80,14 @@ class UDPPacket : NSObject {
     var destinationPort:UInt16 {
         get {
             if let ipPayload = self.ip.payload {
-                return IPv4Utils.extractUInt16(ipPayload,
+                return IPUtils.extractUInt16(ipPayload,
                                                from: ipPayload.startIndex + UDPPacket.destinationPortOffset)
             }
             return 0
         }
         set {
             if let ipPayload = self.ip.payload {
-                IPv4Utils.updateUInt16(&ip.data,
+                IPUtils.updateUInt16(&ip.data,
                                        at: ipPayload.startIndex + UDPPacket.destinationPortOffset,
                                        value: newValue)
             }
@@ -104,14 +97,14 @@ class UDPPacket : NSObject {
     var length:UInt16 {
         get {
             if let ipPayload = self.ip.payload {
-                return IPv4Utils.extractUInt16(ipPayload,
+                return IPUtils.extractUInt16(ipPayload,
                                                from: ipPayload.startIndex + UDPPacket.lengthOffset)
             }
             return 0
         }
         set {
             if let ipPayload = self.ip.payload {
-                IPv4Utils.updateUInt16(&ip.data,
+                IPUtils.updateUInt16(&ip.data,
                                        at: ipPayload.startIndex + UDPPacket.lengthOffset,
                                        value: newValue)
             }
@@ -121,7 +114,7 @@ class UDPPacket : NSObject {
     var checksum:UInt16 {
         get {
             if let ipPayload = self.ip.payload {
-                return IPv4Utils.extractUInt16(ipPayload,
+                return IPUtils.extractUInt16(ipPayload,
                                                from: ipPayload.startIndex + UDPPacket.checksumOffset)
             }
             return 0
@@ -129,7 +122,7 @@ class UDPPacket : NSObject {
         
         set {
             if let ipPayload = self.ip.payload {
-                IPv4Utils.updateUInt16(&ip.data,
+                IPUtils.updateUInt16(&ip.data,
                                        at: ipPayload.startIndex + UDPPacket.checksumOffset,
                                        value: newValue)
             }
@@ -170,8 +163,7 @@ class UDPPacket : NSObject {
         if let ipPayload = self.ip.payload {
             self.length = UInt16(ipPayload.count)
         }
-        self.ip.totalLength = UInt16(self.ip.data.count)
-        self.ip.updateHeaderChecksum()
+        self.ip.updateLengthsAndChecksums()
     }
     
     override var debugDescription: String {
@@ -182,7 +174,7 @@ class UDPPacket : NSObject {
         s += "   Checksum: \(String(format:"0x%2x", self.checksum))\n"
         
         if let payload = self.payload {
-            s += IPv4Utils.payloadToString(payload)
+            s += IPUtils.payloadToString(payload)
         }
         return s;
     }

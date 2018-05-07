@@ -157,7 +157,7 @@ class DNSProxy : NSObject {
         
         if let packets = packets {
             for udpPayload in packets {
-                let transactionId = IPv4Utils.extractUInt16(udpPayload, from: DNSPacket.idOffset)
+                let transactionId = IPUtils.extractUInt16(udpPayload, from: DNSPacket.idOffset)
                 if let udpRequest = self.requestCache.removeValue(forKey: transactionId) {
                     let udpResponse = UDPPacket(udpRequest.src, payload:udpPayload)
                     udpResponse.updateLengthsAndChecksums()

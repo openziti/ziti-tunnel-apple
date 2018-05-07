@@ -16,21 +16,7 @@ struct IPv4Flags : OptionSet {
     static let reserved      = IPv4Flags(rawValue: 1 << 2)
 }
 
-enum IPv4ProtocolId : UInt8 {
-    case TCP = 6
-    case UDP = 17
-    case other
-    
-    init(_ byte:UInt8) {
-        switch byte {
-        case  6: self = .TCP
-        case 17: self = .UDP
-        default: self = .other
-        }
-    }
-}
-
-class IPv4Packet : NSObject {
+class IPv4Packet : NSObject, IPPacket {
     
     static let version4:UInt8 = 4
     
@@ -59,6 +45,7 @@ class IPv4Packet : NSObject {
         }
 
         self.data = data
+        
         super.init()
         
         if self.totalLength > data.count {
@@ -72,12 +59,26 @@ class IPv4Packet : NSObject {
             NSLog("Invalid IPv4 Packet size \(count)")
             return nil
         }
+        
         self.data = Data(count: count)
         
         super.init()
         
         self.version = IPv4Packet.version4
         self.headerLength = IPv4Packet.minHeaderLength
+    }
+    
+    func createFromRefPacket(_ refPacket: IPPacket) -> IPPacket {
+        let ip = IPv4Packet(count:(IPv4Packet.minHeaderBytes + UDPPacket.numHeaderBytes))!
+        ip.version = IPv4Packet.version4
+        ip.headerLength = IPv4Packet.minHeaderLength
+        ip.identification = ip.genIdentificationNumber()
+        ip.flags = IPv4Flags.dontFragment
+        ip.ttl = IPv4Packet.defaultTtl
+        ip.protocolId = IPProtocolId.UDP
+        ip.sourceAddress = refPacket.destinationAddress
+        ip.destinationAddress = refPacket.sourceAddress
+        return ip
     }
     
     var version:UInt8 {
@@ -97,13 +98,13 @@ class IPv4Packet : NSObject {
     }
     
     var totalLength:UInt16 {
-        get { return IPv4Utils.extractUInt16(data, from: IPv4Packet.totalLengthOffset) }
-        set { IPv4Utils.updateUInt16(&data, at: IPv4Packet.totalLengthOffset, value: newValue) }
+        get { return IPUtils.extractUInt16(data, from: IPv4Packet.totalLengthOffset) }
+        set { IPUtils.updateUInt16(&data, at: IPv4Packet.totalLengthOffset, value: newValue) }
     }
     
     var identification:UInt16 {
-        get { return IPv4Utils.extractUInt16(data, from: IPv4Packet.identificationOffset) }
-        set { IPv4Utils.updateUInt16(&data, at: IPv4Packet.identificationOffset, value: newValue) }
+        get { return IPUtils.extractUInt16(data, from: IPv4Packet.identificationOffset) }
+        set { IPUtils.updateUInt16(&data, at: IPv4Packet.identificationOffset, value: newValue) }
     }
     
     var flags:IPv4Flags {
@@ -112,10 +113,10 @@ class IPv4Packet : NSObject {
     }
     
     var fragmentOffset:UInt16 {
-        get { return IPv4Utils.extractUInt16(data, from: IPv4Packet.flagsAndFragementsOffset) & 0x1fff }
+        get { return IPUtils.extractUInt16(data, from: IPv4Packet.flagsAndFragementsOffset) & 0x1fff }
         set {
             let prev = data[IPv4Packet.flagsAndFragementsOffset]
-            IPv4Utils.updateUInt16(&data, at: IPv4Packet.flagsAndFragementsOffset, value: newValue & 0x1fff)
+            IPUtils.updateUInt16(&data, at: IPv4Packet.flagsAndFragementsOffset, value: newValue & 0x1fff)
             data[IPv4Packet.flagsAndFragementsOffset] = (prev & 0xe0) | (data[IPv4Packet.flagsAndFragementsOffset] & 0x1f)
         }
     }
@@ -125,14 +126,14 @@ class IPv4Packet : NSObject {
         set { data[IPv4Packet.ttlOffset] = newValue }
     }
     
-    var protocolId:IPv4ProtocolId {
-        get { return IPv4ProtocolId(data[IPv4Packet.protocolOffset]) }
+    var protocolId:IPProtocolId {
+        get { return IPProtocolId(data[IPv4Packet.protocolOffset]) }
         set { data[IPv4Packet.protocolOffset] = newValue.rawValue }
     }
     
     var headerChecksum:UInt16 {
-        get { return IPv4Utils.extractUInt16(data, from: IPv4Packet.headerChecksumOffset) }
-        set { IPv4Utils.updateUInt16(&data, at: IPv4Packet.headerChecksumOffset, value: newValue) }
+        get { return IPUtils.extractUInt16(data, from: IPv4Packet.headerChecksumOffset) }
+        set { IPUtils.updateUInt16(&data, at: IPv4Packet.headerChecksumOffset, value: newValue) }
     }
     
     var sourceAddress : Data {
@@ -233,6 +234,11 @@ class IPv4Packet : NSObject {
         self.headerChecksum = self.computeHeaderChecksum()
     }
     
+    func updateLengthsAndChecksums() {
+        self.totalLength = UInt16(self.data.count)
+        self.updateHeaderChecksum()
+    }
+    
     private static var identificationCounter:UInt16 = 0
     func genIdentificationNumber() -> UInt16 {
         let newId = IPv4Packet.identificationCounter % UInt16.max
@@ -272,7 +278,7 @@ class IPv4Packet : NSObject {
         }
         
         if let payload = self.payload {
-            s += IPv4Utils.payloadToString(payload)
+            s += IPUtils.payloadToString(payload)
         }
         
         return s

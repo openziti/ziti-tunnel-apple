@@ -29,8 +29,8 @@ class DNSResoureRecodeBase : NSObject {
         self.name = DNSName(data, offset:offset)
         
         let rTypeIndx = data.startIndex + self.name.numBytes
-        self.recordType = DNSRecordType(IPv4Utils.extractUInt16(data, from: rTypeIndx))
-        self.recordClass = DNSRecordClass(IPv4Utils.extractUInt16(data, from: rTypeIndx + MemoryLayout<UInt16>.size))
+        self.recordType = DNSRecordType(IPUtils.extractUInt16(data, from: rTypeIndx))
+        self.recordClass = DNSRecordClass(IPUtils.extractUInt16(data, from: rTypeIndx + MemoryLayout<UInt16>.size))
         self.numBytes = self.name.numBytes + (MemoryLayout<UInt16>.size * 2)
     }
     
@@ -50,8 +50,8 @@ class DNSResoureRecodeBase : NSObject {
             data.append(contentsOf:seg.utf8)
         }
         data.append(0x00)
-        IPv4Utils.appendUInt16(&data, value: self.recordType.rawValue)
-        IPv4Utils.appendUInt16(&data, value: self.recordClass.rawValue)
+        IPUtils.appendUInt16(&data, value: self.recordType.rawValue)
+        IPUtils.appendUInt16(&data, value: self.recordClass.rawValue)
         
         return data
     }
@@ -72,11 +72,11 @@ class DNSResourceRecord : DNSResoureRecodeBase {
         
         var indx = data.startIndex + offset + self.numBytes
         
-        self.ttl = IPv4Utils.extractUInt32(data, from: indx)
+        self.ttl = IPUtils.extractUInt32(data, from: indx)
         self.numBytes += MemoryLayout<UInt32>.size
         indx += MemoryLayout<UInt32>.size
         
-        self.resourceDataLength = IPv4Utils.extractUInt16(data, from: indx)
+        self.resourceDataLength = IPUtils.extractUInt16(data, from: indx)
         self.numBytes += MemoryLayout<UInt16>.size
         indx += MemoryLayout<UInt16>.size
         
@@ -100,8 +100,8 @@ class DNSResourceRecord : DNSResoureRecodeBase {
     
     override func toBytes() -> Data {
         var data = super.toBytes()
-        IPv4Utils.appendUInt32(&data, value: self.ttl)
-        IPv4Utils.appendUInt16(&data, value: self.resourceDataLength)
+        IPUtils.appendUInt32(&data, value: self.ttl)
+        IPUtils.appendUInt16(&data, value: self.resourceDataLength)
         
         if let rd = self.resourceData {
             data.append(rd)
@@ -115,7 +115,7 @@ class DNSResourceRecord : DNSResoureRecodeBase {
         s += "      resourceDataLength: \(self.resourceDataLength)\n"
         
         if let data = self.resourceData {
-            s += IPv4Utils.payloadToString(data)
+            s += IPUtils.payloadToString(data)
         }
         return s
     }

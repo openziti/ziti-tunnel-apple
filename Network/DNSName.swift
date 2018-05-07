@@ -68,7 +68,7 @@ class DNSName : NSObject {
         let countOrOffset:UInt8 = data[data.startIndex + offset]
         if isAnOffset(countOrOffset) {
             // new offset is made from last 14 bits of two bytes
-            offset = Int(IPv4Utils.extractUInt16(data, from: data.startIndex + offset) & 0x3f)
+            offset = Int(IPUtils.extractUInt16(data, from: data.startIndex + offset) & 0x3f)
             return findCountAndOffset(data, offset:&offset)
         } else {
             return Int(countOrOffset)

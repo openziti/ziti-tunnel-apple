@@ -97,7 +97,7 @@ class DNSResolver : NSObject {
                             // (not found) response for AAAA (since we are only supporting IPv4)
                             inMatchDomains = true
                         } else {
-                            let data = IPv4Utils.ipAddressStringToData(result.intercept)
+                            let data = IPUtils.ipV4AddressStringToData(result.intercept)
                             let ans = DNSResourceRecord(result.name,
                                                         recordType:DNSRecordType.A,
                                                         recordClass:DNSRecordClass.IN,
