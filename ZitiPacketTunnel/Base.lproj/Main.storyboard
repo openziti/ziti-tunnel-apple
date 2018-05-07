@@ -731,7 +731,7 @@
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1dX-R7-T5l">
-                                <rect key="frame" x="199" y="303" width="47" height="17"/>
+                                <rect key="frame" x="18" y="303" width="228" height="17"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Status:" id="6a3-wV-dyP">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -911,6 +911,7 @@
                         <constraints>
                             <constraint firstItem="Cv8-fk-doz" firstAttribute="top" secondItem="yhe-Hc-OL2" secondAttribute="bottom" constant="20" id="I9S-q5-rUY"/>
                             <constraint firstItem="Cv8-fk-doz" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" id="JpK-A4-ejE"/>
+                            <constraint firstItem="1dX-R7-T5l" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" id="U6N-aD-PYK"/>
                             <constraint firstItem="1dX-R7-T5l" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="17" id="cY5-fC-iGl"/>
                             <constraint firstAttribute="trailing" secondItem="Cv8-fk-doz" secondAttribute="trailing" constant="20" id="i2h-fR-gS4"/>
                             <constraint firstAttribute="bottom" secondItem="Cv8-fk-doz" secondAttribute="bottom" constant="20" id="itz-8t-GIJ"/>
