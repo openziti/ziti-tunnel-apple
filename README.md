@@ -2,7 +2,7 @@
 
 ### What is this repository for? ###
 
-* Investigative 'spike' on packet tunneling on macos (very very similiar to ios...)
+* Investigative 'spike' on packet tunneling on macOS and iOS
 * Spike / POC
 
 ### How do I get set up? ###
