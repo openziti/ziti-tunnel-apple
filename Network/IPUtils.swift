@@ -50,6 +50,29 @@ class IPUtils {
         return data
     }
     
+    private static func v6SegToStr(_ seg:Data) -> String {
+        return seg.map{String(format: "%x", $0)}.joined(separator: ":")
+    }
+    
+    static let v6AddrNumBytes = 16
+    static func ipV6AddressToSting(_ addr:Data) -> String {
+        var str = "::" // 'unspecified' or 'invalid'
+        
+        let zeroSplit = addr.split(whereSeparator: { $0 != 0 }).max(by: {$1.count > $0.count})
+        if let z = zeroSplit {
+            if z.count > 0 && z.count < IPUtils.v6AddrNumBytes {
+                if z.startIndex == 0 {
+                    str = "::" + IPUtils.v6SegToStr(addr[z.endIndex...])
+                } else {
+                    str = IPUtils.v6SegToStr(addr[..<z.startIndex]) + "::" + IPUtils.v6SegToStr(addr[z.endIndex...])
+                }
+            } else if z.count != IPUtils.v6AddrNumBytes {
+                str = IPUtils.v6SegToStr(addr)
+            }
+        }
+        return str
+    }
+    
     static func payloadToString(_ payload: Data) -> String {
         var i = 0
         var s = " " + payload.map {

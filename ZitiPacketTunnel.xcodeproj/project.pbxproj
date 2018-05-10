@@ -16,6 +16,8 @@
 		5A02AADC206EBE85006261C6 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A02AADB206EBE85006261C6 /* NetworkExtension.framework */; };
 		5A02AAE420703167006261C6 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A02AADB206EBE85006261C6 /* NetworkExtension.framework */; };
 		5A0AA17320791EA000338D46 /* ZitiPacketTunnel-macos.mobileconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */; };
+		5A100A6620A4FD6100B0B99D /* IPv6Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A06F70820A1120C00E0D9A7 /* IPv6Packet.swift */; };
+		5A100A6720A4FD6300B0B99D /* IPv6Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A06F70820A1120C00E0D9A7 /* IPv6Packet.swift */; };
 		5A2EA2A3209554D900437608 /* DNSFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A2209554D900437608 /* DNSFilter.swift */; };
 		5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
 		5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
@@ -496,6 +498,7 @@
 			files = (
 				5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */,
 				5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */,
+				5A100A6620A4FD6100B0B99D /* IPv6Packet.swift in Sources */,
 				5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */,
 				5AF7868D208A99640093498C /* UDPPacket.swift in Sources */,
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
@@ -526,6 +529,7 @@
 			files = (
 				5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */,
 				5A2EA2F1209B75B800437608 /* ProviderConfig.swift in Sources */,
+				5A100A6720A4FD6300B0B99D /* IPv6Packet.swift in Sources */,
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
 				5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */,
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,

@@ -69,13 +69,13 @@ class IPv4Packet : NSObject, IPPacket {
     }
     
     func createFromRefPacket(_ refPacket: IPPacket) -> IPPacket {
-        let ip = IPv4Packet(count:(IPv4Packet.minHeaderBytes + UDPPacket.numHeaderBytes))!
+        let ip = IPv4Packet(count:(IPv4Packet.minHeaderBytes))!
         ip.version = IPv4Packet.version4
         ip.headerLength = IPv4Packet.minHeaderLength
         ip.identification = ip.genIdentificationNumber()
         ip.flags = IPv4Flags.dontFragment
         ip.ttl = IPv4Packet.defaultTtl
-        ip.protocolId = IPProtocolId.UDP
+        ip.protocolId = refPacket.protocolId
         ip.sourceAddress = refPacket.destinationAddress
         ip.destinationAddress = refPacket.sourceAddress
         return ip
