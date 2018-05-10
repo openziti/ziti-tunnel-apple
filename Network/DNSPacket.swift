@@ -121,18 +121,18 @@ class DNSPacket : NSObject {
         
         super.init()
 
-        if let udpPayload = self.udp.payload {
-            if udpPayload.count < UDPPacket.numHeaderBytes {
-                NSLog("Invalid DNS Packet size \(udpPayload.count)")
-                return nil
-            }
-            
-            if self.questions.count < 1 {
-                NSLog("Invalid DNS question count=\(self.questions.count)")
-                return nil
-            }
-        } else {
+        guard let udpPayload = self.udp.payload else {
             NSLog("Invalid (nil) UDP Payload for DNS Packet")
+            return nil
+        }
+        
+        guard udpPayload.count < UDPPacket.numHeaderBytes else {
+            NSLog("Invalid DNS Packet size \(udpPayload.count)")
+            return nil
+        }
+        
+        guard self.questions.count < 1 else {
+            NSLog("Invalid DNS question count=\(self.questions.count)")
             return nil
         }
     }

@@ -27,18 +27,18 @@ class UDPPacket : NSObject {
         
         super.init()
         
-        if let ipPayload = self.ip.payload {
-            if ipPayload.count < UDPPacket.numHeaderBytes {
-                NSLog("Invalid UDP Packet size \(ipPayload.count)")
-                return nil
-            }
-            
-            if self.length > ipPayload.count {
-                NSLog("Invalid UDP Packet length=\(self.length), buffer size=\(ipPayload.count)")
-                return nil
-            }
-        } else {
+        guard let ipPayload = self.ip.payload else {
             NSLog("Invalid (nil) IP Payload for UDP Packet")
+            return nil
+        }
+        
+        guard ipPayload.count < UDPPacket.numHeaderBytes else {
+            NSLog("Invalid UDP Packet size \(ipPayload.count)")
+            return nil
+        }
+        
+        guard self.length > ipPayload.count else {
+            NSLog("Invalid UDP Packet length=\(self.length), buffer size=\(ipPayload.count)")
             return nil
         }
     }

@@ -158,17 +158,18 @@ class DNSProxy : NSObject {
         if let packets = packets {
             for udpPayload in packets {
                 let transactionId = IPUtils.extractUInt16(udpPayload, from: DNSPacket.idOffset)
-                if let udpRequest = self.requestCache.removeValue(forKey: transactionId) {
-                    let udpResponse = UDPPacket(udpRequest.src, payload:udpPayload)
-                    udpResponse.updateLengthsAndChecksums()
-                    
-                    //NSLog("<--DNS: \(DNSPacket(udpResponse).debugDescription)")
-                    NSLog("<--UDP: \(udpResponse.debugDescription)")
-                    NSLog("<--IP: \(udpResponse.ip.debugDescription)")
-                    self.tunnelProvider.packetFlow.writePackets([udpResponse.ip.data], withProtocols: [AF_INET as NSNumber])
-                } else {
+                guard let udpRequest = self.requestCache.removeValue(forKey: transactionId) else {
                     NSLog("Unable to corrolate DNS response to request for transactionId \(transactionId)")
+                    continue
                 }
+                
+                let udpResponse = UDPPacket(udpRequest.src, payload:udpPayload)
+                udpResponse.updateLengthsAndChecksums()
+                
+                //NSLog("<--DNS: \(DNSPacket(udpResponse).debugDescription)")
+                NSLog("<--UDP: \(udpResponse.debugDescription)")
+                NSLog("<--IP: \(udpResponse.ip.debugDescription)")
+                self.tunnelProvider.packetFlow.writePackets([udpResponse.ip.data], withProtocols: [AF_INET as NSNumber])
             }
         }
     }
