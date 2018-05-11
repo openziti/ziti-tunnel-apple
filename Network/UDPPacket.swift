@@ -20,12 +20,12 @@ class UDPPacket : NSObject {
     
     init?(_ ipPacket:IPPacket) {
         self.ip = ipPacket
-        if (ipPacket.protocolId != IPProtocolId.UDP) {
+        super.init()
+        
+        guard ipPacket.protocolId == IPProtocolId.UDP else {
             NSLog("Invalid UDP Packet, protocol=\(ipPacket.protocolId)")
             return nil
         }
-        
-        super.init()
         
         guard let ipPayload = self.ip.payload else {
             NSLog("Invalid (nil) IP Payload for UDP Packet")
