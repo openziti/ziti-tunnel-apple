@@ -54,21 +54,27 @@ class IPUtils {
         return seg.map{String(format: "%x", $0)}.joined(separator: ":")
     }
     
-    static let v6AddrNumBytes = 16
+    static let v6AddrNumWords = 8
     static func ipV6AddressToSting(_ addr:Data) -> String {
         var str = "::" // 'unspecified' or 'invalid'
         
-        let zeroSplit = addr.split(whereSeparator: { $0 != 0 }).max(by: {$1.count > $0.count})
-        if let z = zeroSplit {
-            if z.count > 0 && z.count < IPUtils.v6AddrNumBytes {
-                if z.startIndex == 0 {
-                    str = "::" + IPUtils.v6SegToStr(addr[z.endIndex...])
-                } else {
-                    str = IPUtils.v6SegToStr(addr[..<z.startIndex]) + "::" + IPUtils.v6SegToStr(addr[z.endIndex...])
-                }
-            } else if z.count != IPUtils.v6AddrNumBytes {
-                str = IPUtils.v6SegToStr(addr)
+        var addrWords:[UInt16] = addr.withUnsafeBytes {
+            UnsafeBufferPointer<UInt16>(start: $0, count: Int(addr.count/2)).map(UInt16.init(bigEndian:))
+        }
+        
+        let zeroSplit = addrWords.split(whereSeparator: { $0 != 0 }).max(by: {$1.count > $0.count})
+        guard let z = zeroSplit else {
+            return addrWords.map{String(format: "%x", $0)}.joined(separator: ":")
+        }
+        
+        if z.count > 0 && z.count < IPUtils.v6AddrNumWords {
+            if z.startIndex == 0 {
+                str = "::" + addrWords[z.endIndex...].map{String(format: "%x", $0)}.joined(separator: ":")
+            } else {
+                str = addrWords[..<z.startIndex].map{String(format: "%x", $0)}.joined(separator: ":") + "::" + addrWords[z.endIndex...].map{String(format: "%x", $0)}.joined(separator: ":")
             }
+        } else if z.count != IPUtils.v6AddrNumWords {
+            str = addrWords.map{String(format: "%x", $0)}.joined(separator: ":")
         }
         return str
     }
