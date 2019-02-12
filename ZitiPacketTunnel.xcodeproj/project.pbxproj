@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		028DCC831DCED3687B7E78E1 /* Pods_ZitiMobilePacketTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84FB6BB218CDC78AC6D19812 /* Pods_ZitiMobilePacketTunnel.framework */; };
 		5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */; };
 		5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AAB9206EBD7E006261C6 /* ViewController.swift */; };
 		5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A02AABB206EBD7E006261C6 /* Assets.xcassets */; };
@@ -18,7 +19,6 @@
 		5A0AA17320791EA000338D46 /* ZitiPacketTunnel-macos.mobileconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */; };
 		5A100A6620A4FD6100B0B99D /* IPv6Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A06F70820A1120C00E0D9A7 /* IPv6Packet.swift */; };
 		5A100A6720A4FD6300B0B99D /* IPv6Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A06F70820A1120C00E0D9A7 /* IPv6Packet.swift */; };
-		5A2EA2A3209554D900437608 /* DNSFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A2209554D900437608 /* DNSFilter.swift */; };
 		5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
 		5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
 		5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2CB209B750A00437608 /* AppDelegate.swift */; };
@@ -37,13 +37,12 @@
 		5A2EA2F5209B75D100437608 /* PacketRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78690208FFF670093498C /* PacketRouter.swift */; };
 		5A2EA2F6209B75D500437608 /* DNSName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786922090967F0093498C /* DNSName.swift */; };
 		5A2EA2F7209B75DA00437608 /* DNSResourceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78694209096CD0093498C /* DNSResourceRecord.swift */; };
-		5A2EA2F8209B75DD00437608 /* DNSProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786962090F56D0093498C /* DNSProxy.swift */; };
 		5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSResolver.swift */; };
-		5A2EA2FA209B75E500437608 /* DNSFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A2209554D900437608 /* DNSFilter.swift */; };
 		5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */; };
 		5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
+		5AADD45C20BD91BB004D5462 /* StatusTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AADD45B20BD91BB004D5462 /* StatusTableViewCell.swift */; };
 		5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78686208A702A0093498C /* IPv4Packet.swift */; };
 		5AF7868B208A91650093498C /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF7868D208A99640093498C /* UDPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF7868C208A99640093498C /* UDPPacket.swift */; };
@@ -51,8 +50,8 @@
 		5AF78691208FFF670093498C /* PacketRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78690208FFF670093498C /* PacketRouter.swift */; };
 		5AF786932090967F0093498C /* DNSName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786922090967F0093498C /* DNSName.swift */; };
 		5AF78695209096CD0093498C /* DNSResourceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78694209096CD0093498C /* DNSResourceRecord.swift */; };
-		5AF786972090F56D0093498C /* DNSProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786962090F56D0093498C /* DNSProxy.swift */; };
 		5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSResolver.swift */; };
+		B1E92EEC973199D2CA36083E /* Pods_ZitiPacketTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9B4085ED28A5EAE3F50391 /* Pods_ZitiPacketTunnel.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,6 +97,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		30CCAB06BA6A3067037EA889 /* Pods_PacketTunnelProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PacketTunnelProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A55A7BA433FB826387BBA51 /* Pods_MobilePacketTunnelProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MobilePacketTunnelProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A02AAB4206EBD7E006261C6 /* ZitiPacketTunnel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZitiPacketTunnel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5A02AAB9206EBD7E006261C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -112,7 +113,6 @@
 		5A02AADB206EBE85006261C6 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		5A06F70820A1120C00E0D9A7 /* IPv6Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv6Packet.swift; sourceTree = "<group>"; };
 		5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "ZitiPacketTunnel-macos.mobileconfig"; sourceTree = "<group>"; };
-		5A2EA2A2209554D900437608 /* DNSFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSFilter.swift; sourceTree = "<group>"; };
 		5A2EA2A52097890400437608 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		5A2EA2C9209B750A00437608 /* ZitiMobilePacketTunnel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZitiMobilePacketTunnel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A2EA2CB209B750A00437608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -127,6 +127,7 @@
 		5A2EA2EC209B756400437608 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.3.sdk/System/Library/Frameworks/NetworkExtension.framework; sourceTree = DEVELOPER_DIR; };
 		5A2EA2EF209B758800437608 /* ZitiMobilePacketTunnel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZitiMobilePacketTunnel.entitlements; sourceTree = "<group>"; };
 		5A67F8F0209F948F00DEFE87 /* IPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPPacket.swift; sourceTree = "<group>"; };
+		5AADD45B20BD91BB004D5462 /* StatusTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTableViewCell.swift; sourceTree = "<group>"; };
 		5AF78686208A702A0093498C /* IPv4Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Packet.swift; sourceTree = "<group>"; };
 		5AF78688208A8D050093498C /* IPUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPUtils.swift; sourceTree = "<group>"; };
 		5AF7868C208A99640093498C /* UDPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPPacket.swift; sourceTree = "<group>"; };
@@ -134,8 +135,13 @@
 		5AF78690208FFF670093498C /* PacketRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacketRouter.swift; sourceTree = "<group>"; };
 		5AF786922090967F0093498C /* DNSName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSName.swift; sourceTree = "<group>"; };
 		5AF78694209096CD0093498C /* DNSResourceRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResourceRecord.swift; sourceTree = "<group>"; };
-		5AF786962090F56D0093498C /* DNSProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSProxy.swift; sourceTree = "<group>"; };
 		5AF786982090FFCA0093498C /* DNSResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResolver.swift; sourceTree = "<group>"; };
+		84FB6BB218CDC78AC6D19812 /* Pods_ZitiMobilePacketTunnel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZitiMobilePacketTunnel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		978311BDCEB29038D6107FBD /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiMobilePacketTunnel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
+		AC974576E3CDEA4C5794CF93 /* Pods-ZitiPacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiPacketTunnel.release.xcconfig"; path = "Pods/Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
+		B6C0D5A186420F300A0564CC /* Pods-ZitiPacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiPacketTunnel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
+		EC9B4085ED28A5EAE3F50391 /* Pods_ZitiPacketTunnel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZitiPacketTunnel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FCF985CB4AE4D4F1ED4D9F8D /* Pods-ZitiMobilePacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiMobilePacketTunnel.release.xcconfig"; path = "Pods/Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A02AAE420703167006261C6 /* NetworkExtension.framework in Frameworks */,
+				B1E92EEC973199D2CA36083E /* Pods_ZitiPacketTunnel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A2EA2EE209B758800437608 /* NetworkExtension.framework in Frameworks */,
+				028DCC831DCED3687B7E78E1 /* Pods_ZitiMobilePacketTunnel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +193,7 @@
 				5A2EA2E0209B754500437608 /* MobilePacketTunnelProvider */,
 				5A02AAB5206EBD7E006261C6 /* Products */,
 				5A02AAD8206EBE3C006261C6 /* Frameworks */,
+				81CF7B854BD7FF07BE88BDBB /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -227,6 +236,10 @@
 			children = (
 				5A2EA2EC209B756400437608 /* NetworkExtension.framework */,
 				5A02AADB206EBE85006261C6 /* NetworkExtension.framework */,
+				4A55A7BA433FB826387BBA51 /* Pods_MobilePacketTunnelProvider.framework */,
+				30CCAB06BA6A3067037EA889 /* Pods_PacketTunnelProvider.framework */,
+				84FB6BB218CDC78AC6D19812 /* Pods_ZitiMobilePacketTunnel.framework */,
+				EC9B4085ED28A5EAE3F50391 /* Pods_ZitiPacketTunnel.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -251,9 +264,7 @@
 				5AF78690208FFF670093498C /* PacketRouter.swift */,
 				5AF786922090967F0093498C /* DNSName.swift */,
 				5AF78694209096CD0093498C /* DNSResourceRecord.swift */,
-				5AF786962090F56D0093498C /* DNSProxy.swift */,
 				5AF786982090FFCA0093498C /* DNSResolver.swift */,
-				5A2EA2A2209554D900437608 /* DNSFilter.swift */,
 				5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */,
 			);
 			path = Network;
@@ -266,6 +277,7 @@
 				5A2EA2CB209B750A00437608 /* AppDelegate.swift */,
 				5A2EA2CD209B750A00437608 /* ViewController.swift */,
 				5A2EA2CF209B750A00437608 /* Main.storyboard */,
+				5AADD45B20BD91BB004D5462 /* StatusTableViewCell.swift */,
 				5A2EA2D2209B750C00437608 /* Assets.xcassets */,
 				5A2EA2D4209B750C00437608 /* LaunchScreen.storyboard */,
 				5A2EA2D7209B750C00437608 /* Info.plist */,
@@ -282,6 +294,17 @@
 			path = MobilePacketTunnelProvider;
 			sourceTree = "<group>";
 		};
+		81CF7B854BD7FF07BE88BDBB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				978311BDCEB29038D6107FBD /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */,
+				FCF985CB4AE4D4F1ED4D9F8D /* Pods-ZitiMobilePacketTunnel.release.xcconfig */,
+				B6C0D5A186420F300A0564CC /* Pods-ZitiPacketTunnel.debug.xcconfig */,
+				AC974576E3CDEA4C5794CF93 /* Pods-ZitiPacketTunnel.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -289,10 +312,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A02AAC4206EBD7E006261C6 /* Build configuration list for PBXNativeTarget "ZitiPacketTunnel" */;
 			buildPhases = (
+				39B41F6101DE7F77136D1380 /* [CP] Check Pods Manifest.lock */,
 				5A02AAB0206EBD7E006261C6 /* Sources */,
 				5A02AAB1206EBD7E006261C6 /* Frameworks */,
 				5A02AAB2206EBD7E006261C6 /* Resources */,
 				5A02AAD7206EBDD5006261C6 /* Embed App Extensions */,
+				A01C0B7C5BDB2E3E047AF473 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -325,10 +350,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A2EA2D8209B750C00437608 /* Build configuration list for PBXNativeTarget "ZitiMobilePacketTunnel" */;
 			buildPhases = (
+				E3F066B079CB27282CE64EE7 /* [CP] Check Pods Manifest.lock */,
 				5A2EA2C5209B750A00437608 /* Sources */,
 				5A2EA2C6209B750A00437608 /* Frameworks */,
 				5A2EA2C7209B750A00437608 /* Resources */,
 				5A2EA2EB209B754500437608 /* Embed App Extensions */,
+				E3E6B17CD246D7B71C13B0E9 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -481,6 +508,81 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		39B41F6101DE7F77136D1380 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ZitiPacketTunnel-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A01C0B7C5BDB2E3E047AF473 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/JWTDecode-macOS/JWTDecode.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JWTDecode.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E3E6B17CD246D7B71C13B0E9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/JWTDecode-iOS/JWTDecode.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JWTDecode.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E3F066B079CB27282CE64EE7 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ZitiMobilePacketTunnel-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		5A02AAB0206EBD7E006261C6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -505,10 +607,8 @@
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
 				5AF78691208FFF670093498C /* PacketRouter.swift in Sources */,
 				5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */,
-				5AF786972090F56D0093498C /* DNSProxy.swift in Sources */,
 				5AF786932090967F0093498C /* DNSName.swift in Sources */,
 				5AF78695209096CD0093498C /* DNSResourceRecord.swift in Sources */,
-				5A2EA2A3209554D900437608 /* DNSFilter.swift in Sources */,
 				5AF7868F208AACC50093498C /* DNSPacket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -520,6 +620,7 @@
 				5A2EA2F0209B75B700437608 /* ProviderConfig.swift in Sources */,
 				5A2EA2CE209B750A00437608 /* ViewController.swift in Sources */,
 				5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */,
+				5AADD45C20BD91BB004D5462 /* StatusTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -536,10 +637,8 @@
 				5A2EA2F2209B75C400437608 /* IPv4Packet.swift in Sources */,
 				5A2EA2F4209B75CD00437608 /* DNSPacket.swift in Sources */,
 				5A2EA2F5209B75D100437608 /* PacketRouter.swift in Sources */,
-				5A2EA2F8209B75DD00437608 /* DNSProxy.swift in Sources */,
 				5A2EA2F6209B75D500437608 /* DNSName.swift in Sources */,
 				5A2EA2F7209B75DA00437608 /* DNSResourceRecord.swift in Sources */,
-				5A2EA2FA209B75E500437608 /* DNSFilter.swift in Sources */,
 				5A2EA2F3209B75C800437608 /* UDPPacket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -699,8 +798,9 @@
 		};
 		5A02AAC5206EBD7E006261C6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B6C0D5A186420F300A0564CC /* Pods-ZitiPacketTunnel.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ZitiPacketTunnel/ZitiPacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
@@ -719,8 +819,9 @@
 		};
 		5A02AAC6206EBD7E006261C6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AC974576E3CDEA4C5794CF93 /* Pods-ZitiPacketTunnel.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ZitiPacketTunnel/ZitiPacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
@@ -777,8 +878,9 @@
 		};
 		5A2EA2D9209B750C00437608 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 978311BDCEB29038D6107FBD /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
@@ -798,8 +900,9 @@
 		};
 		5A2EA2DA209B750C00437608 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FCF985CB4AE4D4F1ED4D9F8D /* Pods-ZitiMobilePacketTunnel.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
