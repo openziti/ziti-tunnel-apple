@@ -32,12 +32,12 @@ class UDPPacket : NSObject {
             return nil
         }
         
-        guard ipPayload.count < UDPPacket.numHeaderBytes else {
-            NSLog("Invalid UDP Packet size \(ipPayload.count)")
+        guard ipPayload.count >= UDPPacket.numHeaderBytes else {
+            NSLog("Invalid UDP Packet size \(ipPayload.count) is less than UDP header size \(UDPPacket.numHeaderBytes)")
             return nil
         }
         
-        guard self.length > ipPayload.count else {
+        guard self.length <= ipPayload.count else {
             NSLog("Invalid UDP Packet length=\(self.length), buffer size=\(ipPayload.count)")
             return nil
         }

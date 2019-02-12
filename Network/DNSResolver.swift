@@ -28,11 +28,9 @@ class DNSResolver : NSObject {
     static let dnsPort:UInt16 = 53
     
     let tunnelProvider:PacketTunnelProvider
-    let dnsProxy:DNSProxy
     
     init(_ tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
-        self.dnsProxy = DNSProxy(tunnelProvider)
     }
     
     func needsResolution(_ udp:UDPPacket) -> Bool {
@@ -44,7 +42,6 @@ class DNSResolver : NSObject {
     }
     
     func resolve(_ udp:UDPPacket) {
-        
         guard let dns = DNSPacket(udp) else {
             NSLog("ATTEMPT TO RESOLVE NON DNS MESSAGE")
             return
@@ -53,93 +50,70 @@ class DNSResolver : NSObject {
         NSLog("DNS-->: \(dns.debugDescription)")
         
         // only resolve queries (should never see this...)
-        if dns.qrFlag { return }
+        if dns.qrFlag {
+            NSLog("ATTEMPT TO RESOLVE RESPONSE MESSAGE")
+            return
+        }
         
         var answers:[DNSResourceRecord] = []
         var inMatchDomains = false
-        var respondUnsupported = false
-        var shouldFilter = false
-        
-        dns.questions.forEach { q in
+        var responseCode:DNSResponseCode = DNSResponseCode.notImplemented
+    
+        // Respond only to single Query. If multiple queries, respond notImplemented (defacto standard)
+        if dns.questions.count == 1 {
+            let q:DNSQuestion = dns.questions[0]
             
-            // if any q.name is in our matchDomains, gonna reply one way or another
-            // (found or not), otherwise if no matches, we need to forward this to onward DNS Server
-            if inMatchDomains == false {
-                inMatchDomains = self.inMatchDomains(q.name.nameString)
-            }
+            // respond to all queries if matching names (.nameError if unable to respolve)
+            inMatchDomains = self.inMatchDomains(q.name.nameString)
             
             //
-            // only respond to type A or AAAA, class IN, for others respond with 'not implemented'
-            // btw - DNS standard says Question count 'usually' set to 1 on A/AAAA lookups.  Google tells me
-            // BIND rejects requests that have more than 1 question...  I'll make a half-hearted
-            // attempt to handle multiple...
+            // Only give a valid response to A requests
+            // - if find matches, return 'em
+            // - if no match, but in a matching domain, return nameError
+            // - otherwise if no match, reject (allowing next resolver to respond
+            // For AAAA requests
+            // - if find matches, return nameError
+            // - if no match, reject
             //
-            if (q.recordType != DNSRecordType.A && q.recordType != DNSRecordType.AAAA) || q.recordClass != DNSRecordClass.IN {
-                
-                //
-                // Filtering out based on locally-served-zones: need to figure this out.
-                //     Forwarding them results in a response saying 'stop it' (basically),
-                //     but dropping on the floor also isn't great (they get resent, and
-                //     ultimately sent to alternate resolver, which then causess a few
-                //     additional requests to go to that alternate resolver (so we don't
-                //     see 'em).
-                //
-                // Could change to respond with 'stop it' messages.  Not sure worth it
-                //   give risk of introducing a problem.  For now will let them through...
-                //
-                shouldFilter = false //DNSFilter.shouldFilter(q)
-                respondUnsupported = true
-            } else {
-                
-                // possible we might match multiple IP addesses for same service...
+            if q.recordType == DNSRecordType.A || q.recordType == DNSRecordType.AAAA {
                 let matches = dnsLookup.filter{ return $0.0 == q.name.nameString }
                 
-                matches.forEach {result in
-                    
-                    if q.recordType == DNSRecordType.AAAA {
-                        // setting inMatchDomains to true without supplying an answer will case .nameError
-                        // (not found) response for AAAA (since we are only supporting IPv4)
-                        inMatchDomains = true
+                if (matches.count > 0) {
+                    if (q.recordType == DNSRecordType.A) {
+                        responseCode = DNSResponseCode.noError
+                        matches.forEach {result in
+                            let data = IPUtils.ipV4AddressStringToData(result.intercept)
+                            let ans = DNSResourceRecord(result.name,
+                                                        recordType:DNSRecordType.A,
+                                                        recordClass:DNSRecordClass.IN,
+                                                        ttl:0,
+                                                        resourceData:data)
+                            answers.append(ans)
+                        }
                     } else {
-                        let data = IPUtils.ipV4AddressStringToData(result.intercept)
-                        let ans = DNSResourceRecord(result.name,
-                                                    recordType:DNSRecordType.A,
-                                                    recordClass:DNSRecordClass.IN,
-                                                    ttl:0,
-                                                    resourceData:data)
-                        answers.append(ans)
+                        // AAAA with matches, return nameError
+                        responseCode = DNSResponseCode.nameError
                     }
+                } else if inMatchDomains {
+                    responseCode = DNSResponseCode.nameError
+                } else {
+                    responseCode = DNSResponseCode.refused
                 }
             }
-            
-            //
-            // If have answers or a question is in a match domain, respond.
-            // Otherwise, forward to onward DNS server
-            //
-            NSLog("...have \(answers.count) answers, inMatchDomains=\(inMatchDomains)")
-            if shouldFilter {
-                NSLog("DNS dropping request")
-            } else if inMatchDomains || answers.count > 0 {
-                let dnsR = DNSPacket(dns, questions:dns.questions, answers:answers)
-                
-                if respondUnsupported {
-                    dnsR.responseCode = DNSResponseCode.notImplemented
-                } else if answers.count != dns.questions.count {
-                    dnsR.responseCode = DNSResponseCode.nameError
-                }
-                
-                // update checksume and lengths
-                dnsR.udp.updateLengthsAndChecksums()
-                
-                NSLog("<--DNS: \(dnsR.debugDescription)")
-                NSLog("<--UDP: \(dnsR.udp.debugDescription)")
-                NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
-                
-                // write response to tun (returns false on error, but nothing to do if it fails...)
-                self.tunnelProvider.packetFlow.writePackets([dnsR.udp.ip.data], withProtocols: [AF_INET as NSNumber])
-            } else {
-                self.dnsProxy.proxyDnsMessage(dns)
-            }
+        }
+        
+        let dnsR = DNSPacket(dns, questions:dns.questions, answers:answers)
+        dnsR.responseCode = responseCode
+        dnsR.udp.updateLengthsAndChecksums()
+        
+        NSLog("<--DNS: \(dnsR.debugDescription)")
+        NSLog("<--UDP: \(dnsR.udp.debugDescription)")
+        NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
+        
+        // write response to tun (returns false on error, but nothing to do if it fails...)
+        if self.tunnelProvider.packetFlow.writePackets([dnsR.udp.ip.data],
+                                                       withProtocols: [AF_INET as NSNumber]) == false {
+            NSLog("### Faild writing DNS response packet")
         }
     }
     

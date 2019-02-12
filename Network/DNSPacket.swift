@@ -126,12 +126,12 @@ class DNSPacket : NSObject {
             return nil
         }
         
-        guard udpPayload.count < UDPPacket.numHeaderBytes else {
+        guard udpPayload.count >= UDPPacket.numHeaderBytes else {
             NSLog("Invalid DNS Packet size \(udpPayload.count)")
             return nil
         }
         
-        guard self.questions.count < 1 else {
+        guard self.questions.count > 0 else {
             NSLog("Invalid DNS question count=\(self.questions.count)")
             return nil
         }
@@ -141,8 +141,10 @@ class DNSPacket : NSObject {
         self.udp = UDPPacket(refPacket.udp, payload:Data(count:12))
         
         super.init()
-        
+
         self.id = refPacket.id
+        self.udp.sourcePort = refPacket.udp.destinationPort
+        self.udp.destinationPort = refPacket.udp.sourcePort
         self.qrFlag = true
         self.opCode = DNSOpCode.query
         self.recursionDesiredFlag = refPacket.recursionDesiredFlag

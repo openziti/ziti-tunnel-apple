@@ -59,6 +59,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                         subnetMask: self.providerConfig.subnetMask)
         
         tunnelNetworkSettings.ipv4Settings?.includedRoutes = [includedRoute]
+        
+        // TODO: ipv6Settings
+        
         tunnelNetworkSettings.mtu = self.providerConfig.mtu as NSNumber
         
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
