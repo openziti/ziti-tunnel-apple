@@ -8,6 +8,7 @@
 
 import Cocoa
 import NetworkExtension
+import JWTDecode
 
 class ViewController: NSViewController, NSTextFieldDelegate {
 
@@ -19,7 +20,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var mtuText: NSTextField!
     @IBOutlet weak var dnsServersText: NSTextField!
     @IBOutlet weak var matchedDomainsText: NSTextField!
-    @IBOutlet weak var dnsProxiesText: NSTextField!
     @IBOutlet weak var revertButton: NSButton!
     @IBOutlet weak var applyButton: NSButton!
     
@@ -28,6 +28,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     private func initTunnelProviderManager() {
         
+        //let delegate = NSApplication.shared.delegate as! AppDelegate
+       let jwt = try! decode(jwt: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjgxNDUzNjIsImFwaUJhc2VVcmwiOiJodHRwczovL3ppdGktZGV2LWNvbnRyb2xsZXIwMS5sb2NhbGhvc3Q6MTA4MC8iLCJlbnJvbGxtZW50VXJsIjoiaHR0cHM6Ly96aXRpLWRldi1jb250cm9sbGVyMDEubG9jYWxob3N0OjEwODAvZW5yb2xsP21ldGhvZD1vdHQmdG9rZW49ZWU4Y2VhMTAtNjQ0YS0xMWU4LWEyZDgtNTkzMWIwZDMwMzRhIiwibWV0aG9kIjoib3R0IiwidG9rZW4iOiJlZThjZWExMC02NDRhLTExZTgtYTJkOC01OTMxYjBkMzAzNGEiLCJ2ZXJzaW9ucyI6eyJhcGkiOiIxLjAuMCIsImVucm9sbG1lbnRBcGkiOiIxLjAuMCJ9LCJyb290Q2EiOiItLS0tLUJFR0lOIENFUlRJRklDQVRFLS0tLS1cbk1JSUZtakNDQTRLZ0F3SUJBZ0lKQU1rd04zaERXUzBNTUEwR0NTcUdTSWIzRFFFQkN3VUFNRm94Q3pBSkJnTlZcbkJBWVRBbFZUTVFzd0NRWURWUVFJREFKT1F6RVRNQkVHQTFVRUNnd0tUbVYwUm05MWJtUnllVEVwTUNjR0ExVUVcbkF3d2dUbVYwUm05MWJtUnllU0JhYVhScElFbHVkR1Z5Ym1Gc0lGSnZiM1FnUTBFd0hoY05NVGd3TlRNd01UUTBcbk5UTXlXaGNOTXpnd05USTFNVFEwTlRNeVdqQmFNUXN3Q1FZRFZRUUdFd0pWVXpFTE1Ba0dBMVVFQ0F3Q1RrTXhcbkV6QVJCZ05WQkFvTUNrNWxkRVp2ZFc1a2Nua3hLVEFuQmdOVkJBTU1JRTVsZEVadmRXNWtjbmtnV21sMGFTQkpcbmJuUmxjbTVoYkNCU2IyOTBJRU5CTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFcbjBocS9UMnpnSG5kYUxVK1FuUHVDZDdLeDJrdmJNRHY4UTBFTUpJWHRnVnpjeDRRL0MycXkxQ3JQY1hCWThnb1lcbnBhVTBneTZpK1hDZDQyU2lhSHQ4djRLb2Rka0c1WTVOcXhPeExLbWc5bFA4M0lpY20zVGtyQkpPNHlsclFmMjFcbitYVHRUbGpkbGRjRmtXd0huWk1vcHVpMjNpWVh0M0Roa1Y2MVZ5SU1pS0ZqOWhuS3V6Tnd5amhqZnpXWFQ3a0lcbmhYZkNhN1JGTXdvZmlCbFRjVzZmeXVBZ000TUVndDlIMGxVRE9LYzB5QWZ5YjZ0bWNPNkoxS2kzaWh1bWZ0bmhcbnNobHhMd2w2ZnlLTXNWQjdVNGpGaG1iRy84NmsyS2Fwa3dBREQyRUJLNkpnVkdyRUxSSUpaWjVrREhmWTUrOVhcbk9OY2l3NUtBV2YyTXZpQlZQSlFxaURCZFZPV25sOEREUXBNaDlTVEFudm5aSm1nY25SQkhnTklBRGlxRHhqSTNcbk5MTXN0UU01MmdBTkJxMllESVBVb0o0SzRtQlFaOGRUV3NEcEhnWEF3RFJHSzN3czc4NTRMWUpKTUYraWZ3OGVcbmtCckRzYmQzK1ZqK0s1azFpU1ZSaVBrYXBZU3FPaUZpR3lsVVVGcXNsaURPaW1FVEtVOHFvRm03bklMeTg0RWJcbmRNNVhzRm9mS2xPQkhHTEppQ3FkTFJXemtMdTI2bW0yL25zRmNvZGx0OXZCVlcrdzVtTGlVREU1T0hndGtTL2dcbmJMdHZvcXdTQXIxT3dJQ0F5Mlp5bjNaaFc3a1VJeWZwRjl0di9GQVJtNzc0MGwyZ3dHMzVNN0M5Nm1IUlRjK2tcbmdMNkJYc1JYbmNoSG1YVWh2WStwN0xZLzE2YTBMSmxvVXB5UXhnQU55YVVDQXdFQUFhTmpNR0V3SFFZRFZSME9cbkJCWUVGTlF4VDY4RjZYaDc4RVh2QWZvN05IbzZ1M256TUI4R0ExVWRJd1FZTUJhQUZOUXhUNjhGNlhoNzhFWHZcbkFmbzdOSG82dTNuek1BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0RnWURWUjBQQVFIL0JBUURBZ0dHTUEwR0NTcUdcblNJYjNEUUVCQ3dVQUE0SUNBUURINkM1UzZINFF5U0FtcHIxL0lBZklzK05KVVY1L2M3RUhPeXNlRi91SGlMU2lcbnZaMzQvWEYvcWNXWVY2SkJ4a21XMGdrdk1vQjQ1aXhlaERtNVNmQ29QcnA5MG1ET2IvTUtWcGdPWEFEdU1tcGJcbjdaS2dXL0ZSelMrOW1LL2xpUDlNRzA0SFB5b2JGVVJyRzd4cGRsTlY2elVOdEtaU2wyczg0Y2xBRXNOa3F4S3BcbjhjclJTN2NUaWJIaFpyYm0wd21RZHU2eU96aUZEVzJ3c0szN0lOdmRPTWtvN0RyTTFvQkVmR0tQUGhPV0xvc21cblJpb3R5MjRqR3U5TnZYZmVQZk1UTFZsdlFyMnFxN3BMMUF1U1MrcGJVc3FNV1Z1T2x3SzRXeHFSUnFVbktTRGFcbjlrNkRDdEZ4cjduWXNBNHM1eGZ3RFRYcFB2VzcvWUoyaXlqZjRkRDZ5SXdzRUNOOFFNNUhicmVUL2NuZUtoSGlcbkNtRlI5OTNIM2p5UVhUU0xRQnJiQ0l2MmxNRHdrNklONUZTbkxSTExCK2lZK3RPL1ltYUJNSDBwVExwamg2ckxcbkRiNkRmc1lHc1oreEREVGJJT2ZkcTVBRWVEUStNUzNRTmxFcjRhR1MvTmM3Sm96eG15YmRoeDFXayswdmVxbG5cblBNNDk3QjNvMSttN1RJWC9RY1VoYzVYRkNDUStyL1V0bHVmdlVHYkZJVGgvUjdNK0RnMlBFWThJUHZQZEV2emRcbkFtZndMeTNGLzJXU2Ira0RkR3hYRk1RbUIzcWpGVlhoZ05OTjNOMWpTeDhWYnZOWERrK2U1UG91REdpTjROMkpcblNpN0lqcHVtalJwZ05qRXVvWGJkYndBZzZ6V1pxcFdpNmRrNEc2MkVrZXZ1STlYV3liaGg0ZUpLOFRsSCtRPT1cbi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS1cbiIsImlhdCI6MTUyNzcxMzM2Mn0.ZnUIX44SV3sGg9kxQSDjwtpowJfq8Jc28kfjBGqyy2DFmmsmGvRS6Z80bEKOklAblpEiMFuudE2PR3aIlFpUy0bpBODHvIb1lb11TbfxMmwdaxmZnOXah9WSX9hPM3Z5r7Q51__5Aoee19K5AvivTWCAMMWV6ZX5G-qewQ9G63SjfhLoDHYK4njXQXRC2AusqC2YzifWmP7Ynfz8DxeVMtHsb4OOctO3pTqY2v67vnBL5nJbCAukm1DDYA_gZZOLsK5xCIU2d8EF0TMAMzWactRvqGdwMCw00pO1k0um5b3nnI4E-STL9pjIgWADossWia0Brwo-rblGfPWW0qJnjA")
+        //print(jwt)
+        print("API Base URL: \(jwt.body["apiBaseUrl"] as! String)")
+        print("Enrollment URL: \(jwt.body["enrollmentUrl"] as! String)")
+        print("Method: \(jwt.body["method"] as! String)")
+        print("Root CA: \(jwt.body["rootCa"] as! String)")
+
         NETunnelProviderManager.loadAllFromPreferences { (savedManagers: [NETunnelProviderManager]?, error: Error?) in
             
             //
@@ -93,7 +101,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         self.mtuText.stringValue = ""
         self.dnsServersText.stringValue = ""
         self.matchedDomainsText.stringValue = ""
-        self.dnsProxiesText.stringValue = ""
         
         if self.tunnelProviderManager.protocolConfiguration == nil {
             return
@@ -119,10 +126,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         if let matchDomains = conf[ProviderConfig.MATCH_DOMAINS_KEY] {
             self.matchedDomainsText.stringValue = matchDomains as! String
-        }
-        
-        if let dnsProxies = conf[ProviderConfig.DNS_PROXIES_KEY] {
-            self.dnsProxiesText.stringValue = dnsProxies as! String
         }
         
         self.ipAddressText.becomeFirstResponder()
@@ -169,7 +172,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         self.mtuText.delegate = self
         self.dnsServersText.delegate = self
         self.matchedDomainsText.delegate = self
-        self.dnsProxiesText.delegate = self
 
         initTunnelProviderManager()
         
@@ -206,7 +208,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         dict[ProviderConfig.MTU_KEY] = self.mtuText.stringValue
         dict[ProviderConfig.DNS_KEY] = self.dnsServersText.stringValue
         dict[ProviderConfig.MATCH_DOMAINS_KEY] = self.matchedDomainsText.stringValue
-        dict[ProviderConfig.DNS_PROXIES_KEY] = self.dnsProxiesText.stringValue
         
         let conf:ProviderConfig = ProviderConfig()
         if let error = conf.parseDictionary(dict) {

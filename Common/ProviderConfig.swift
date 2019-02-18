@@ -14,7 +14,6 @@ enum ProviderConfigError : Error {
     case invalidMtu
     case invalidDnsAddresses
     case invalidMatchDomains
-    case invalidDnsProxyAdddresses
     
     var description: String {
         switch self {
@@ -23,7 +22,6 @@ enum ProviderConfigError : Error {
         case .invalidMtu: return "Invalid MTU"
         case .invalidDnsAddresses: return "Invalid DNS Addresses (expect comma-delimited list of IPv4 addresses)"
         case .invalidMatchDomains: return "Invalid DNS Match Domains (expect comma-delimited list of domains)"
-        case .invalidDnsProxyAdddresses: return "Invalid Onwatd DNS Addresses (expect comma-delimited list of IPv4 addresses)"
         }
     }
 }
@@ -37,7 +35,6 @@ class ProviderConfig : NSObject {
     static var MTU_KEY = "mtu"
     static var DNS_KEY = "dns"
     static var MATCH_DOMAINS_KEY = "matchDomains"
-    static var DNS_PROXIES_KEY = "dnsProxies"
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "169.254.126.1"
@@ -45,7 +42,6 @@ class ProviderConfig : NSObject {
     var mtu:Int = 1500
     var dnsAddresses:[String] = ["169.254.126.2"]
     var dnsMatchDomains:[String] = [""]
-    var dnsProxyAddresses:[String] = ["1.1.1.1, 1.0.0.1"]
     
     var serverAddress = "169.254.126.254"
     var username = "NetFoundry"
@@ -56,8 +52,7 @@ class ProviderConfig : NSObject {
             ProviderConfig.SUBNET_KEY: self.subnetMask,
             ProviderConfig.MTU_KEY: String(self.mtu),
             ProviderConfig.DNS_KEY: self.dnsAddresses.joined(separator: ","),
-            ProviderConfig.MATCH_DOMAINS_KEY: self.dnsMatchDomains.joined(separator: ","),
-            ProviderConfig.DNS_PROXIES_KEY: self.dnsProxyAddresses.joined(separator: ",")]
+            ProviderConfig.MATCH_DOMAINS_KEY: self.dnsMatchDomains.joined(separator: ",")]
     }
     
     private func isValidIpAddress(_ obj:Any?) -> Bool {
@@ -86,15 +81,6 @@ class ProviderConfig : NSObject {
             return ProviderConfigError.invalidDnsAddresses
         }
         
-        if let dns = conf[ProviderConfig.DNS_PROXIES_KEY] {
-            let dnsArray = (dns as! String).components(separatedBy: ",")
-            if dnsArray.count == 0 || dnsArray.contains { !isValidIpAddress($0) } {
-                return ProviderConfigError.invalidDnsProxyAdddresses
-            }
-        } else {
-            return ProviderConfigError.invalidDnsProxyAdddresses
-        }
-        
         if (Int(conf[ProviderConfig.MTU_KEY] as! String) == nil) {
             return ProviderConfigError.invalidMtu
         }
@@ -120,9 +106,6 @@ class ProviderConfig : NSObject {
                 self.dnsMatchDomains = mdsArray
             }
         }
-        
-        self.dnsProxyAddresses = (conf[ProviderConfig.DNS_PROXIES_KEY] as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
-    
         return nil
     }
     
@@ -132,7 +115,6 @@ class ProviderConfig : NSObject {
             "subnetMask: \(self.subnetMask)\n" +
             "mtu: \(self.mtu)\n" +
             "dns: \(self.dnsAddresses.joined(separator:","))\n" +
-            "dnsMatchDomains: \(self.dnsMatchDomains.joined(separator:","))\n" +
-            "dnsProxies \(self.dnsProxyAddresses.joined(separator:","))"
+            "dnsMatchDomains: \(self.dnsMatchDomains.joined(separator:","))"
     }
 }

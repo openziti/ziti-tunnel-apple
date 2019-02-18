@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
-        <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -686,7 +685,7 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="ZitiPacketTunnel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="ZitiPacketTunnel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="650" height="337"/>
@@ -756,7 +755,7 @@
                                         </constraints>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" title="0.0.0.0" drawsBackground="YES" id="X19-mT-DRW">
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -788,7 +787,7 @@
                                         <rect key="frame" x="244" y="123" width="346" height="22"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="iyL-0F-JMH">
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -804,23 +803,7 @@
                                         <rect key="frame" x="244" y="91" width="346" height="22"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="DWd-Lf-7zO">
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MAw-qL-lzX">
-                                        <rect key="frame" x="100" y="61" width="131" height="17"/>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Onward DNS Servers" id="NqG-qk-gGl">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IKS-8I-UE5">
-                                        <rect key="frame" x="244" y="59" width="346" height="22"/>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="ZcQ-9l-BHa">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -851,7 +834,7 @@
                                         </constraints>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" title="0" drawsBackground="YES" id="tbk-O5-CE0">
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -862,7 +845,7 @@
                                         </constraints>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" title="0.0.0.0" drawsBackground="YES" id="nVn-fa-0T5">
                                             <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -876,28 +859,23 @@
                                     <constraint firstItem="jcK-mX-H5h" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="leading" constant="20" id="4bb-ZS-KL8"/>
                                     <constraint firstItem="7WK-R6-Yc1" firstAttribute="top" secondItem="Zro-ks-EC8" secondAttribute="bottom" constant="15" id="5bn-ZU-LBj"/>
                                     <constraint firstItem="QUt-On-R2o" firstAttribute="centerY" secondItem="5BE-ug-V8w" secondAttribute="centerY" id="7Yk-vh-kTT"/>
-                                    <constraint firstItem="IKS-8I-UE5" firstAttribute="centerY" secondItem="MAw-qL-lzX" secondAttribute="centerY" id="7tr-SE-nCy"/>
                                     <constraint firstAttribute="bottom" secondItem="Wr2-mh-28F" secondAttribute="bottom" constant="20" id="AYQ-xi-D4V"/>
                                     <constraint firstItem="Zro-ks-EC8" firstAttribute="trailing" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" id="Bcd-Wi-7yR"/>
                                     <constraint firstAttribute="bottom" secondItem="b6r-4D-8Fa" secondAttribute="bottom" constant="20" id="BtR-H5-xei"/>
-                                    <constraint firstItem="MAw-qL-lzX" firstAttribute="trailing" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" id="GDQ-CL-TJg"/>
                                     <constraint firstItem="9lI-0U-P6y" firstAttribute="centerY" secondItem="pce-re-CyM" secondAttribute="centerY" id="GVI-hQ-dlA"/>
                                     <constraint firstItem="H4T-E4-X4c" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" constant="15" id="GrB-IU-sHO"/>
                                     <constraint firstAttribute="trailing" secondItem="Wr2-mh-28F" secondAttribute="trailing" constant="20" id="JXN-Zh-FWf"/>
                                     <constraint firstItem="oOV-Ym-k8m" firstAttribute="centerY" secondItem="Zro-ks-EC8" secondAttribute="centerY" id="JsE-0T-ovG"/>
-                                    <constraint firstAttribute="trailing" secondItem="IKS-8I-UE5" secondAttribute="trailing" constant="20" id="NPY-u5-IYy"/>
                                     <constraint firstItem="5BE-ug-V8w" firstAttribute="trailing" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" id="TE0-XI-7aL"/>
                                     <constraint firstItem="5BE-ug-V8w" firstAttribute="top" secondItem="Cv8-fk-doz" secondAttribute="top" constant="23" id="Tdm-NN-jx6"/>
                                     <constraint firstItem="oOV-Ym-k8m" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" constant="15" id="VbW-0J-VOJ"/>
                                     <constraint firstItem="Zro-ks-EC8" firstAttribute="top" secondItem="VuS-82-PJa" secondAttribute="bottom" constant="15" id="WX2-2v-TzO"/>
                                     <constraint firstItem="7WK-R6-Yc1" firstAttribute="trailing" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" id="c8x-dt-tHG"/>
                                     <constraint firstItem="VuS-82-PJa" firstAttribute="trailing" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" id="d8w-Ss-myj"/>
-                                    <constraint firstItem="IKS-8I-UE5" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" constant="15" id="fJC-JI-nMz"/>
                                     <constraint firstItem="QUt-On-R2o" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" constant="15" id="hah-qB-CUv"/>
                                     <constraint firstItem="jYb-46-dbN" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" constant="15" id="itq-ro-tfe"/>
                                     <constraint firstItem="Wr2-mh-28F" firstAttribute="leading" secondItem="b6r-4D-8Fa" secondAttribute="trailing" constant="10" id="jq7-Ve-4KE"/>
                                     <constraint firstItem="VuS-82-PJa" firstAttribute="top" secondItem="pce-re-CyM" secondAttribute="bottom" constant="15" id="leg-3H-kwN"/>
-                                    <constraint firstItem="MAw-qL-lzX" firstAttribute="top" secondItem="7WK-R6-Yc1" secondAttribute="bottom" constant="15" id="mCJ-jd-Aat"/>
                                     <constraint firstItem="pce-re-CyM" firstAttribute="top" secondItem="5BE-ug-V8w" secondAttribute="bottom" constant="15" id="old-Ks-dBD"/>
                                     <constraint firstAttribute="trailing" secondItem="H4T-E4-X4c" secondAttribute="trailing" constant="20" id="qbn-YI-PEj"/>
                                     <constraint firstItem="9lI-0U-P6y" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.75" constant="15" id="qlg-gx-Mcj"/>
@@ -926,7 +904,6 @@
                         <outlet property="applyButton" destination="Wr2-mh-28F" id="8o8-nV-daf"/>
                         <outlet property="connectButton" destination="yhe-Hc-OL2" id="w0f-1v-uce"/>
                         <outlet property="connectStatus" destination="abc-QL-VZa" id="NfN-Jq-ltE"/>
-                        <outlet property="dnsProxiesText" destination="IKS-8I-UE5" id="g7N-x0-5cK"/>
                         <outlet property="dnsServersText" destination="oOV-Ym-k8m" id="9e5-BN-rHG"/>
                         <outlet property="editBox" destination="Cv8-fk-doz" id="9SQ-Qq-pzm"/>
                         <outlet property="ipAddressText" destination="QUt-On-R2o" id="xGK-8V-RGb"/>
