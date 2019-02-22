@@ -40,6 +40,11 @@
 		5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSResolver.swift */; };
 		5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */; };
+		5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */; };
+		5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
+		5A379ACD221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
+		5A379ACE221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
+		5A379ACF221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5AADD45C20BD91BB004D5462 /* StatusTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AADD45B20BD91BB004D5462 /* StatusTableViewCell.swift */; };
@@ -126,6 +131,8 @@
 		5A2EA2E4209B754500437608 /* MobilePacketTunnelProvider.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobilePacketTunnelProvider.entitlements; sourceTree = "<group>"; };
 		5A2EA2EC209B756400437608 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.3.sdk/System/Library/Frameworks/NetworkExtension.framework; sourceTree = DEVELOPER_DIR; };
 		5A2EA2EF209B758800437608 /* ZitiMobilePacketTunnel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZitiMobilePacketTunnel.entitlements; sourceTree = "<group>"; };
+		5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelConfigViewController.swift; sourceTree = "<group>"; };
+		5A379ACB221EDB1400051475 /* ZitiIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentity.swift; sourceTree = "<group>"; };
 		5A67F8F0209F948F00DEFE87 /* IPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPPacket.swift; sourceTree = "<group>"; };
 		5AADD45B20BD91BB004D5462 /* StatusTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTableViewCell.swift; sourceTree = "<group>"; };
 		5AF78686208A702A0093498C /* IPv4Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Packet.swift; sourceTree = "<group>"; };
@@ -218,6 +225,7 @@
 				5A02AABD206EBD7E006261C6 /* Main.storyboard */,
 				5A02AAC0206EBD7E006261C6 /* Info.plist */,
 				5A02AAC1206EBD7E006261C6 /* ZitiPacketTunnel.entitlements */,
+				5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */,
 			);
 			path = ZitiPacketTunnel;
 			sourceTree = "<group>";
@@ -247,6 +255,7 @@
 		5A2EA2A4209788CF00437608 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				5A379ACA221ED52800051475 /* Ziti */,
 				5A2EA2A52097890400437608 /* ProviderConfig.swift */,
 			);
 			path = Common;
@@ -292,6 +301,14 @@
 				5A2EA2E4209B754500437608 /* MobilePacketTunnelProvider.entitlements */,
 			);
 			path = MobilePacketTunnelProvider;
+			sourceTree = "<group>";
+		};
+		5A379ACA221ED52800051475 /* Ziti */ = {
+			isa = PBXGroup;
+			children = (
+				5A379ACB221EDB1400051475 /* ZitiIdentity.swift */,
+			);
+			path = Ziti;
 			sourceTree = "<group>";
 		};
 		81CF7B854BD7FF07BE88BDBB /* Pods */ = {
@@ -588,9 +605,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */,
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
 				5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */,
 				5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */,
+				5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -598,6 +617,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A379ACD221EDB1400051475 /* ZitiIdentity.swift in Sources */,
 				5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */,
 				5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */,
 				5A100A6620A4FD6100B0B99D /* IPv6Packet.swift in Sources */,
@@ -621,6 +641,7 @@
 				5A2EA2CE209B750A00437608 /* ViewController.swift in Sources */,
 				5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */,
 				5AADD45C20BD91BB004D5462 /* StatusTableViewCell.swift in Sources */,
+				5A379ACE221EDB1400051475 /* ZitiIdentity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -628,6 +649,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A379ACF221EDB1400051475 /* ZitiIdentity.swift in Sources */,
 				5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */,
 				5A2EA2F1209B75B800437608 /* ProviderConfig.swift in Sources */,
 				5A100A6720A4FD6300B0B99D /* IPv6Packet.swift in Sources */,
