@@ -17,6 +17,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var box: NSBox!
     @IBOutlet weak var buttonsView: NSView!
+    @IBOutlet weak var idEnabledBtn: NSButton!
+    @IBOutlet weak var idLabel: NSTextField!
+    @IBOutlet weak var idNameLabel: NSTextField!
+    @IBOutlet weak var idNetworkLabel: NSTextField!
+    @IBOutlet weak var idCreatedAtLabel: NSTextField!
+    @IBOutlet weak var idEnrollStatusLabel: NSTextField!
+    @IBOutlet weak var idExpiresAtLabel: NSTextField!
+    @IBOutlet weak var idEnrollBtn: NSButton!
+    
+    var servicesViewController:ServicesViewController? = nil
     
     static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
@@ -47,7 +57,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             
             self.tunnelProviderManager.loadFromPreferences(completionHandler: { (error:Error?) in
-                
                 if let error = error {
                     NSLog(error.localizedDescription)
                 }
@@ -55,7 +64,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 // This shouldn't happen unless first time run and no profile preference has been
                 // imported, but handy for development...
                 if self.tunnelProviderManager.protocolConfiguration == nil {
-                    
                     let providerProtocol = NETunnelProviderProtocol()
                     providerProtocol.providerBundleIdentifier = ViewController.providerBundleIdentifier
                     
@@ -127,6 +135,43 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             buttonsView.layer!.borderColor = CGColor(gray: 0.75, alpha: 1.0)
         }
     }
+    
+    private func dateToString(_ date:Int) -> String {
+        return DateFormatter.localizedString(
+            from: Date(timeIntervalSince1970: TimeInterval(date)),
+            dateStyle: .long, timeStyle: .long)
+    }
+    
+    private func updateServiceUI(zId:ZitiIdentity?=nil) {
+        if let zId = zId {
+            box.alphaValue = 1.0
+            idEnabledBtn.isEnabled = true
+            idEnabledBtn.state = zId.enabled ? .on : .off
+            idLabel.stringValue = zId.id
+            idNameLabel.stringValue = zId.name
+            idNetworkLabel.stringValue = zId.apiBaseUrl
+            idCreatedAtLabel.stringValue = dateToString(zId.iat)
+            idEnrollStatusLabel.stringValue = zId.enrollmentStatus().rawValue
+            idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.exp))"
+            idExpiresAtLabel.isHidden = false
+            idEnrollBtn.isHidden = zId.enrollmentStatus() == .Pending ? false : true
+        } else {
+            box.alphaValue = 0.25
+            idEnabledBtn.isEnabled = false
+            idEnabledBtn.state = .off
+            idLabel.stringValue = "-"
+            idNameLabel.stringValue = "-"
+            idNetworkLabel.stringValue = "-"
+            idCreatedAtLabel.stringValue = "-"
+            idEnrollStatusLabel.stringValue = "-"
+            idExpiresAtLabel.isHidden = true
+            idEnrollBtn.isHidden = true
+        }
+        
+        if let svc = servicesViewController {
+            svc.updateServices(zId)
+        }
+    }
    
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -139,21 +184,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         // init the manager
         initTunnelProviderManager()
         
-        /* quick test...
-        self.tunnelProviderManager.removeFromPreferences(completionHandler: { (error:Error?) in
-            if let error = error {
-                print(error)
-            }
-        })
-         */
-        
         // Load previous identities
-        let userDefaults = UserDefaults.standard
-        if let decoded  = userDefaults.object(forKey: ZitiIdentity.ZITI_IDENTITIES) {
-            if let identities = NSKeyedUnarchiver.unarchiveObject(with: decoded as!Data) {
-                zitiIdentities = identities as! [ZitiIdentity]
-            }
-        }
+        self.zitiIdentities = ZitiIdentity.loadIdentities()
+        self.tableView.reloadData()
         self.representedObject = 0
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
         
@@ -165,29 +198,27 @@ class ViewController: NSViewController, NSTextFieldDelegate {
 
     override var representedObject: Any? {
         didSet {
-            tableView.reloadData()
+            zitiIdentities.count == 0 ? updateServiceUI() : updateServiceUI(zId: zitiIdentities[representedObject as! Int])
         }
     }
     
-    func storeIdentities() {
-        let userDefaults = UserDefaults.standard
-        let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.zitiIdentities)
-        userDefaults.set(encodedData, forKey: ZitiIdentity.ZITI_IDENTITIES)
-        userDefaults.synchronize()
-    }
-    
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
-        let tcvc = segue.destinationController as! TunnelConfigViewController
-        tcvc.tunnelProviderManager = self.tunnelProviderManager
+        if let tcvc = segue.destinationController as? TunnelConfigViewController {
+            tcvc.tunnelProviderManager = self.tunnelProviderManager
+        } else if let svc = segue.destinationController as? ServicesViewController {
+            servicesViewController = svc
+            //PIG set representedObj...
+        }
     }
     
     func tableViewSelectionDidChange(_ notification: Notification) {
-        print("tableViewSelectionDidChange " + String(tableView.selectedRow))
+        if (tableView.selectedRow >= 0) {
+            print("tableViewSelectionDidChange " + String(tableView.selectedRow))
+            representedObject = tableView.selectedRow
+        }
     }
 
     @IBAction func onConnectButton(_ sender: NSButton) {
-        print("onConnectButton")
-        
         if (sender.title == "Turn Ziti On") {
             do {
                 try self.tunnelProviderManager.connection.startVPNTunnel()
@@ -197,6 +228,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
         } else {
             self.tunnelProviderManager.connection.stopVPNTunnel()
+        }
+    }
+    
+    @IBAction func onEnableServiceBtn(_ sender: NSButton) {
+        if zitiIdentities.count > 0 {
+            let zId = zitiIdentities[representedObject as! Int]
+            zId.enabled = sender.state == .on
+            ZitiIdentity.storeIdentities(self.zitiIdentities)
         }
     }
     
@@ -215,12 +254,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 do {
                     let token = try String(contentsOf: panel.urls[0], encoding: .utf8)
                     let jwt = try decode(jwt: token)
-                    let ztid = try ZitiIdentity(jwt.body)
+                    let ztid = ZitiIdentity(jwt.body)
+                    
+                    // TODO: Error check zId (fields and no duplicates)
+                    
                     //print("ztid: " + ztid.debugDescription)
                     self.zitiIdentities.insert(ztid, at: 0)
                     
                     // update stored identities
-                    self.storeIdentities()
+                    ZitiIdentity.storeIdentities(self.zitiIdentities)
+                    self.tableView.reloadData()
                     self.representedObject = 0
                     self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
                 } catch {
@@ -235,16 +278,31 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    func dialogOKCancel(question: String, text: String) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = question
+        alert.informativeText = text
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+    
     @IBAction func removeIdentityButton(_ sender: Any) {
         let indx = representedObject as! Int
-        self.zitiIdentities.remove(at: indx)
-        if indx >= self.zitiIdentities.count {
-            representedObject = self.zitiIdentities.count - 1
-        } else {
-            representedObject = indx
+        let zid = zitiIdentities[indx]
+        let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
+        if dialogOKCancel(question: "Are you sure?", text: text) == true {
+            self.zitiIdentities.remove(at: indx)
+            tableView.reloadData()
+            if indx >= self.zitiIdentities.count {
+                representedObject = self.zitiIdentities.count - 1
+            } else {
+                representedObject = indx
+            }
+            tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
+            ZitiIdentity.storeIdentities(self.zitiIdentities)
         }
-        tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
-        storeIdentities()
     }
 }
 

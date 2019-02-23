@@ -41,6 +41,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         NSLog("startTunnel")
         
+        let zitiIdentities = ZitiIdentity.loadIdentities()
+        NSLog("GOT \(zitiIdentities.count) identities")
+        zitiIdentities.forEach { zid in
+            NSLog("ZitiIdentity \(zid.name): \(zid.id)")
+        }
+        
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {
             NSLog("Unable to startTunnel. Invalid providerConfiguration. \(error)")
