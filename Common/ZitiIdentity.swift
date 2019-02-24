@@ -65,24 +65,6 @@ class ZitiIdentity : NSObject, NSCoding {
         return .Pending
     }
     
-    static func loadIdentities() -> [ZitiIdentity] {
-        var zitiIdentities:[ZitiIdentity] = []
-        let sharedDefaults = UserDefaults(suiteName: ZitiIdentity.APP_GROUP_ID)
-        if let decoded  = sharedDefaults?.object(forKey: ZitiIdentity.ZITI_IDENTITIES) {
-            if let identities = NSKeyedUnarchiver.unarchiveObject(with: decoded as! Data) {
-                zitiIdentities = identities as! [ZitiIdentity]
-            }
-        }
-        return zitiIdentities
-    }
-    
-    static func storeIdentities(_ zitiIdentities:[ZitiIdentity]) {
-        let sharedDefaults = UserDefaults(suiteName: ZitiIdentity.APP_GROUP_ID)
-        let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: zitiIdentities)
-        sharedDefaults?.set(encodedData, forKey: ZitiIdentity.ZITI_IDENTITIES)
-        sharedDefaults?.synchronize()
-    }
-    
     init(_ json:[String:Any]) {
         self.exp = json["exp"] as? Int ?? 0
         self.iat = json["iat"] as? Int ?? 0
