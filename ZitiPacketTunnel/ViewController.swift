@@ -150,9 +150,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.apiBaseUrl
-            idCreatedAtLabel.stringValue = dateToString(zId.iat)
+            idCreatedAtLabel.stringValue = zId.iat>0 ? dateToString(zId.iat):"unknown"
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus().rawValue
-            idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.exp))"
+            idExpiresAtLabel.stringValue = "(expiration: \(zId.exp>0 ? dateToString(zId.exp):"unknown")"
             idExpiresAtLabel.isHidden = false
             idEnrollBtn.isHidden = zId.enrollmentStatus() == .Pending ? false : true
         } else {
@@ -223,8 +223,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             do {
                 try self.tunnelProviderManager.connection.startVPNTunnel()
             } catch {
-                print(error)
                 NSAlert(error:error).runModal()
+                dialogAlert("Tunnel Error", error.localizedDescription)
             }
         } else {
             self.tunnelProviderManager.connection.stopVPNTunnel()
@@ -256,9 +256,20 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     let jwt = try decode(jwt: token)
                     let ztid = ZitiIdentity(jwt.body)
                     
-                    // TODO: Error check zId (fields and no duplicates)
+                    // only support OTT
+                    if ztid.method != "ott" {
+                        self.dialogAlert("Invalid Enrollment Metho", "Only OTT Enrollment is supported by this application")
+                        return
+                    }
                     
-                    //print("ztid: " + ztid.debugDescription)
+                    // alread have this one?
+                    if self.zitiIdentities.first(where:{$0.id == ztid.id}) != nil {
+                        self.dialogAlert("Duplicate Identity Not Allowed",
+                                         "Identy \(ztid.name) is already present with id \(ztid.id)")
+                        return
+                    }
+                    
+                    // add it
                     self.zitiIdentities.insert(ztid, at: 0)
                     
                     // update stored identities
@@ -267,15 +278,19 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     self.representedObject = 0
                     self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
                 } catch {
-                    let alert = NSAlert()
-                    alert.messageText = "JWT Error"
-                    alert.informativeText =  error.localizedDescription
-                    alert.alertStyle = NSAlert.Style.critical
-                    alert.runModal()
+                    self.dialogAlert("JWT Error", error.localizedDescription)
                     return
                 }
             }
         }
+    }
+    
+    func dialogAlert(_ msg:String, _ text:String? = nil) {
+        let alert = NSAlert()
+        alert.messageText = msg
+        alert.informativeText =  text ?? ""
+        alert.alertStyle = NSAlert.Style.critical
+        alert.runModal()
     }
     
     func dialogOKCancel(question: String, text: String) -> Bool {
