@@ -39,6 +39,7 @@ class ZitiIdentity : NSObject, NSCoding {
     
     // TODO: Get TEAMID programatically... (and will be diff on iOS)
     static let APP_GROUP_ID = "45L2MK8H4.ZitiPacketTunnel.group"
+    static let ZITI_IDENTITY = "ZitiIdentity"
     static let ZITI_IDENTITIES = "ZitiIdentities"
     
     let exp:Int

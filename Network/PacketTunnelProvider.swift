@@ -41,7 +41,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         NSLog("startTunnel")
         
-        let zitiIdentities = ZitiIdentity.loadIdentities()
+        let zitiIdentities = ZitiIdentityStore().load()
         NSLog("GOT \(zitiIdentities.count) identities")
         zitiIdentities.forEach { zid in
             NSLog("ZitiIdentity \(zid.name): \(zid.id)")

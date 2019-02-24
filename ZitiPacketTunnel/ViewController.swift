@@ -27,6 +27,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var idEnrollBtn: NSButton!
     
     var servicesViewController:ServicesViewController? = nil
+    var zidStore = ZitiIdentityStore()
     
     static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
@@ -185,7 +186,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         initTunnelProviderManager()
         
         // Load previous identities
-        self.zitiIdentities = ZitiIdentity.loadIdentities()
+        self.zitiIdentities = zidStore.load()
         self.tableView.reloadData()
         self.representedObject = 0
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
@@ -235,7 +236,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if zitiIdentities.count > 0 {
             let zId = zitiIdentities[representedObject as! Int]
             zId.enabled = sender.state == .on
-            ZitiIdentity.storeIdentities(self.zitiIdentities)
+            zidStore.store(zId)
         }
     }
     
@@ -272,8 +273,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     // add it
                     self.zitiIdentities.insert(ztid, at: 0)
                     
-                    // update stored identities
-                    ZitiIdentity.storeIdentities(self.zitiIdentities)
+                    // update stored identity
+                    self.zidStore.store(ztid)
                     self.tableView.reloadData()
                     self.representedObject = 0
                     self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
@@ -309,6 +310,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
         if dialogOKCancel(question: "Are you sure?", text: text) == true {
             self.zitiIdentities.remove(at: indx)
+            zidStore.remove(zid)
             tableView.reloadData()
             if indx >= self.zitiIdentities.count {
                 representedObject = self.zitiIdentities.count - 1
@@ -316,7 +318,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 representedObject = indx
             }
             tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
-            ZitiIdentity.storeIdentities(self.zitiIdentities)
         }
     }
 }
