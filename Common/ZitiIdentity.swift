@@ -36,12 +36,6 @@ enum ZitiEnrollmentStatus : String {
 // lose namespacing so we can share archive between app and extension
 @objc(ZitiIdentity)
 class ZitiIdentity : NSObject, NSCoding {
-    
-    // TODO: Get TEAMID programatically... (and will be diff on iOS)
-    static let APP_GROUP_ID = "45L2MK8H4.ZitiPacketTunnel.group"
-    static let ZITI_IDENTITY = "ZitiIdentity"
-    static let ZITI_IDENTITIES = "ZitiIdentities"
-    
     let exp:Int
     let iat:Int
     let apiBaseUrl:String
@@ -95,7 +89,7 @@ class ZitiIdentity : NSObject, NSCoding {
     }
     
     init(exp:Int, iat:Int, apiBaseUrl:String, enrollmentUrl:String, method:String, name:String, id:String, token:String, apiVersion:String, enrollmentApiVersion:String, rootCa:String, enrolled:Bool, enabled:Bool) {
-        
+
         self.exp = exp
         self.iat = iat
         self.apiBaseUrl = apiBaseUrl
@@ -143,6 +137,10 @@ class ZitiIdentity : NSObject, NSCoding {
         aCoder.encode(rootCa, forKey: "rootCa")
         aCoder.encode(enrolled, forKey: "enrolled")
         aCoder.encode(enabled, forKey: "enabled")
+    }
+    
+    func enroll() -> Error? {
+        return nil
     }
     
     override var debugDescription: String {

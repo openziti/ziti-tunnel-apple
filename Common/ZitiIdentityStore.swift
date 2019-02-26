@@ -9,7 +9,12 @@
 import Foundation
 
 class ZitiIdentityStore : NSObject, NSFilePresenter {
-    var presentedItemURL: URL? = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: ZitiIdentity.APP_GROUP_ID)
+    
+    // TODO: Get TEAMID programatically... (and will be diff on iOS)
+    static let APP_GROUP_ID = "45L2MK8H4.ZitiPacketTunnel.group"
+    
+    var presentedItemURL: URL? = FileManager.default.containerURL(
+        forSecurityApplicationGroupIdentifier: APP_GROUP_ID)
     lazy var presentedItemOperationQueue = OperationQueue.main
     
     override init() {
