@@ -20,7 +20,7 @@ class ZitiCSR : NSObject {
     let SEQUENCE_OBJECT_sha256WithRSAEncryption:[UInt8] = [0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 1, 1, 0x0B, 0x05, 0x00]
     
     var country = "US"
-    var org = "Netfoundry" // grrr on lowercase f
+    var org = "NetFoundry"
     var commonName = ""
     
     init(_ cn:String) {
@@ -40,21 +40,40 @@ class ZitiCSR : NSObject {
         }
         
         // certificate request info
-        var cri = Data()
+        var csr = Data()
         let version: [UInt8] = [0x02, 0x01, 0x00] // version 0
-        cri.append(version, count: version.count)
+        csr.append(version, count: version.count)
         
         var subject = Data()
-        appendSubjectItem(OBJECT_countryName, value: country, into: &subject)
-        appendSubjectItem(OBJECT_organizationName, value: org, into: &subject)
-        appendSubjectItem(OBJECT_commonName, value: commonName, into: &subject)
-        enclose(&subject, by: SEQUENCE_tag)
-        cri.append(subject)
-        cri.append(publicKeyInfo)
-        cri.append(contentsOf: [0xA0, 0x00]) // Attributes
-        enclose(&cri, by: SEQUENCE_tag)
+        appendSubjectItem(OBJECT_countryName, value: country, to: &subject)
+        appendSubjectItem(OBJECT_organizationName, value: org, to: &subject)
+        appendSubjectItem(OBJECT_commonName, value: commonName, to: &subject)
+        subject.insert(contentsOf: [SEQUENCE_tag] + getDERLength(subject.count), at: 0)
+        csr.append(subject)
+        csr.append(publicKeyInfo)
+        csr.append(contentsOf: [0xA0, 0x00]) // Attributes
+        csr.insert(contentsOf: [SEQUENCE_tag] + getDERLength(csr.count), at: 0)
         
-        // Hash and sign
+        // hash and sign
+        var error: Unmanaged<CFError>?
+        guard let sigData = createCriSignature(privateKey, csr, &error) else {
+            NSLog("Unable to sign cert for \(zkc.zid.name): \(zkc.zid.id).  Error=\(error!.takeRetainedValue() as Error)")
+            return nil
+        }
+        
+        // append the sig
+        let shaBytes = SEQUENCE_OBJECT_sha256WithRSAEncryption
+        csr.append(shaBytes, count: shaBytes.count)
+        
+        var signData = Data([0x00]) // Prepend 0
+        signData.append(sigData as Data)
+        appendBITSTRING(signData, to: &csr)
+        
+        csr.insert(contentsOf: [SEQUENCE_tag] + getDERLength(csr.count), at: 0)
+        return csr
+    }
+    
+    func createCriSignature(_ privateKey:SecKey, _ cri:Data, _ error: UnsafeMutablePointer<Unmanaged<CFError>?>?) -> CFData? {
         var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
         
         var SHA1 = CC_SHA256_CTX()
@@ -63,25 +82,9 @@ class ZitiCSR : NSObject {
         CC_SHA256_Final(&digest, &SHA1)
         
         var error: Unmanaged<CFError>?
-        guard let sigData = SecKeyCreateSignature(
+        return SecKeyCreateSignature(
             privateKey, .rsaSignatureDigestPKCS1v15SHA256,
-            Data(bytes: digest) as CFData, &error) else {
-            NSLog("Unable to sign cert for \(zkc.zid.name): \(zkc.zid.id).  Error=\(error!.takeRetainedValue() as Error)")
-            return nil
-        }
-        
-        var csr = Data()
-        csr.append(cri)
-        
-        let shaBytes = SEQUENCE_OBJECT_sha256WithRSAEncryption
-        csr.append(shaBytes, count: shaBytes.count)
-        
-        var signData = Data(bytes: [0x00]) // Prepend 0
-        signData.append(sigData as Data)
-        appendBITSTRING(signData, into: &csr)
-        
-        enclose(&csr, by: SEQUENCE_tag) // Enclose into SEQUENCE
-        return csr
+            Data(bytes: digest) as CFData, &error)
     }
     
     func parsePublicSecKey(publicKey: SecKey) -> (mod: Data, exp: Data) {
@@ -104,75 +107,54 @@ class ZitiCSR : NSObject {
             return nil
         }
         
-        var publicKeyInfo = Data()
-        publicKeyInfo.append(contentsOf: OBJECT_rsaEncryption)
-        enclose(&publicKeyInfo, by: SEQUENCE_tag) // Enclose into SEQUENCE
+        var publicKeyInfo = Data(OBJECT_rsaEncryption)
+        publicKeyInfo.insert(contentsOf: [SEQUENCE_tag] + getDERLength(publicKeyInfo.count), at: 0)
         
-        var publicKeyASN = Data()
         let (mod, exp) = parsePublicSecKey(publicKey: publicKey)
-        publicKeyASN.append(UInt8(0x02)) // Integer
-        appendDERLength(mod.count, into: &publicKeyASN)
+        var publicKeyASN = Data([0x02]) //  Integer
+        publicKeyASN.append(contentsOf: getDERLength(mod.count))
         publicKeyASN.append(mod)
-        
         publicKeyASN.append(UInt8(0x02)) // Integer
-        appendDERLength(exp.count, into: &publicKeyASN)
+        publicKeyASN.append(contentsOf: getDERLength(exp.count))
         publicKeyASN.append(exp)
         
-        enclose(&publicKeyASN, by: SEQUENCE_tag)
- 
-        prependByte(0x00, into: &publicKeyASN) //Prepend 0 (?)
-        appendBITSTRING(publicKeyASN, into: &publicKeyInfo)
-        
-        enclose(&publicKeyInfo, by: SEQUENCE_tag) // Enclose into SEQUENCE
+        publicKeyASN.insert(contentsOf: [0x00] + [SEQUENCE_tag] + getDERLength(publicKeyASN.count), at: 0)
+        appendBITSTRING(publicKeyASN, to: &publicKeyInfo)
+        publicKeyInfo.insert(contentsOf: [SEQUENCE_tag] + getDERLength(publicKeyInfo.count), at: 0)
         
         return publicKeyInfo
     }
     
-    private func appendSubjectItem(_ what:[UInt8], value:String, into: inout Data) {
-        var subjectItem = Data()
-        subjectItem.append(contentsOf: what)
-        appendUTF8String(string: value, into: &subjectItem)
-        enclose(&subjectItem, by: SEQUENCE_tag)
-        enclose(&subjectItem, by: SET_tag)
-        into.append(subjectItem)
+    private func appendSubjectItem(_ what:[UInt8], value:String, to: inout Data) {
+        var subjectItem = Data(what)
+        appendUTF8String(string: value, to: &subjectItem)
+        subjectItem.insert(contentsOf: [SEQUENCE_tag] + getDERLength(subjectItem.count), at: 0)
+        subjectItem.insert(contentsOf: [SET_tag] + getDERLength(subjectItem.count), at: 0)
+        to.append(subjectItem)
     }
     
-    private func appendUTF8String(string: String, into: inout Data) ->(){
+    private func appendUTF8String(string: String, to: inout Data) ->(){
         let strType:UInt8 = 0x0C //UTF8STRING
-        into.append(strType)
-        appendDERLength(string.lengthOfBytes(using: String.Encoding.utf8), into: &into)
-        into.append(string.data(using: String.Encoding.utf8)!)
+        to.append(strType)
+        to.append(contentsOf: getDERLength(string.lengthOfBytes(using: String.Encoding.utf8)))
+        to.append(string.data(using: String.Encoding.utf8)!)
     }
     
-    private func enclose(_ data: inout Data, by:UInt8){
-        var newData = Data()
-        newData.append(by)
-        appendDERLength(data.count, into: &newData)
-        newData.append(data)
-        data = newData
-    }
-    
-    private func appendDERLength(_ length: Int, into: inout Data) {
+    private func getDERLength(_ length:Int) -> [UInt8] {
+        var derLength:[UInt8] = []
         if length < 128 {
-            into.append(UInt8(length))
+            derLength = [UInt8(length)]
         } else if (length < 0x100) {
-            into.append(contentsOf: [0x81, UInt8(length & 0xFF)])
-        } else if length < 0x8000{
-            into.append(contentsOf: [0x82, UInt8((UInt(length & 0xFF00)) >> 8), UInt8(length & 0xFF)])
+            derLength = [0x81, UInt8(length & 0xFF)]
+        } else if length < 0x8000 {
+            derLength = [0x82, UInt8((UInt(length & 0xFF00)) >> 8), UInt8(length & 0xFF)]
         }
+        return derLength
     }
     
-    private func prependByte(_ byte: UInt8, into: inout Data) {
-        var newData = Data(capacity: into.count + 1)
-        newData.append(byte)
-        newData.append(into)
-        into = newData
-    }
-    
-    private func appendBITSTRING(_ data: Data, into: inout Data) {
-        let strType:UInt8 = 0x03 //BIT STRING
-        into.append(strType)
-        appendDERLength(data.count, into: &into)
-        into.append(data)
+    private func appendBITSTRING(_ data: Data, to: inout Data) {
+        to.append(0x03) //BIT STRING
+        to.append(contentsOf: getDERLength(data.count))
+        to.append(data)
     }
 }
