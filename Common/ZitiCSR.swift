@@ -62,13 +62,8 @@ class ZitiCSR : NSObject {
         }
         
         // append the sig
-        let shaBytes = SEQUENCE_OBJECT_sha256WithRSAEncryption
-        csr.append(shaBytes, count: shaBytes.count)
-        
-        var signData = Data([0x00]) // Prepend 0
-        signData.append(sigData as Data)
-        appendBITSTRING(signData, to: &csr)
-        
+        csr.append(contentsOf: SEQUENCE_OBJECT_sha256WithRSAEncryption)
+        appendBITSTRING(Data([0x00] + [UInt8](sigData as Data)), to: &csr)
         csr.insert(contentsOf: [SEQUENCE_tag] + getDERLength(csr.count), at: 0)
         return csr
     }
@@ -89,15 +84,15 @@ class ZitiCSR : NSObject {
     
     func parsePublicSecKey(publicKey: SecKey) -> (mod: Data, exp: Data) {
         let pubAttributes = SecKeyCopyAttributes(publicKey) as! [CFString:Any]
-        
         let pubData  = pubAttributes[kSecValueData] as! Data
         let keySize  = pubAttributes[kSecAttrKeySizeInBits] as! Int
-        var modulus  = pubData.subdata(in: 8..<(pubData.count - 5))
-        let exponent = pubData.subdata(in: (pubData.count - 3)..<pubData.count) // correct
+        let exponent = pubData.subdata(in: (pubData.count - 3)..<pubData.count)
+        var modulus  = pubData.subdata(in: 0..<(pubData.count - 5)) 
         
-        modulus.removeFirst((modulus.count - (keySize/8))-1)
-        if [UInt8](modulus)[0] != 0x00 {
-            modulus.removeFirst(1)
+        modulus.removeFirst(modulus.count - (keySize/8))
+        let msByte = [UInt8](modulus)[0]  // if msBit isn't 0, insert a zero byte
+        if (msByte != 0x00) && (msByte > 0x7f) {
+            modulus.insert(0x00, at: modulus.startIndex)
         }
         return (mod: modulus, exp: exponent)
     }
@@ -134,10 +129,15 @@ class ZitiCSR : NSObject {
     }
     
     private func appendUTF8String(string: String, to: inout Data) ->(){
-        let strType:UInt8 = 0x0C //UTF8STRING
-        to.append(strType)
+        to.append(0x0C) //UTF8STRING
         to.append(contentsOf: getDERLength(string.lengthOfBytes(using: String.Encoding.utf8)))
         to.append(string.data(using: String.Encoding.utf8)!)
+    }
+    
+    private func appendBITSTRING(_ data: Data, to: inout Data) {
+        to.append(0x03) //BIT STRING
+        to.append(contentsOf: getDERLength(data.count))
+        to.append(data)
     }
     
     private func getDERLength(_ length:Int) -> [UInt8] {
@@ -150,11 +150,5 @@ class ZitiCSR : NSObject {
             derLength = [0x82, UInt8((UInt(length & 0xFF00)) >> 8), UInt8(length & 0xFF)]
         }
         return derLength
-    }
-    
-    private func appendBITSTRING(_ data: Data, to: inout Data) {
-        to.append(0x03) //BIT STRING
-        to.append(contentsOf: getDERLength(data.count))
-        to.append(data)
     }
 }
