@@ -19,9 +19,9 @@ class ZitiKeychain : NSObject {
         super.init()
     }
     
-    func createPrivateKey() -> SecKey? {
+    func createKeyPair() -> (privKey:SecKey?, pubKey:SecKey?, ZitiError?) {
         guard let atag = zid.id.data(using: .utf8) else {
-            return nil
+            return (nil, nil, ZitiError("createPrivateKey: Unable to create application tag \(zid.id)"))
         }
         let privateKeyParams: [CFString: Any] = [
             kSecAttrIsPermanent: true,
@@ -40,37 +40,17 @@ class ZitiKeychain : NSObject {
         
         var error: Unmanaged<CFError>?
         guard let privateKey = SecKeyCreateRandomKey(parameters as CFDictionary, &error) else {
-            NSLog("Error \(error!.takeRetainedValue() as Error) createSecureKeyPair for \(zid.name): \(zid.id)")
-            return nil
+            return (nil, nil, ZitiError("createKeyPair: Unable to create private key for \(zid.id): \(error!.takeRetainedValue() as Error)"))
         }
-        return privateKey
+        guard let publicKey = SecKeyCopyPublicKey(privateKey) else {
+            return (nil, nil, ZitiError("createKeyPair: Unable to copy public key for \(zid.id)"))
+        }
+        return (privateKey, publicKey, nil)
     }
-    
-    func getPublicKeyData() -> Data? {
+ 
+    func getKeyPair() -> (privKey:SecKey?, pubKey:SecKey?, ZitiError?) {
         guard let atag = zid.id.data(using: .utf8) else {
-            return nil
-        }
-        let parameters:[CFString:Any] = [
-            kSecClass: kSecClassKey,
-            kSecAttrKeyType: kSecAttrKeyTypeRSA,
-            kSecAttrApplicationTag: atag,
-            kSecAttrKeyClass: kSecAttrKeyClassPublic,
-            kSecReturnData: kCFBooleanTrue]
-        var data: AnyObject?
-        let status = SecItemCopyMatching(parameters as CFDictionary, &data)
-        return status == errSecSuccess ? data as? Data : nil
-    }
-    
-    func getPublicKey() -> SecKey? {
-        guard let pk = getPrivateKey() else {
-            return nil
-        }
-        return SecKeyCopyPublicKey(pk)
-    }
-    
-    func getPrivateKey() -> SecKey? {
-        guard let atag = zid.id.data(using: .utf8) else {
-            return nil
+            return (nil, nil, ZitiError("geKeyPair: Unable to create application tag \(zid.id)"))
         }
         let parameters:[CFString:Any] = [
             kSecClass: kSecClassKey,
@@ -79,43 +59,95 @@ class ZitiKeychain : NSObject {
             kSecReturnRef: kCFBooleanTrue]
         var ref: AnyObject?
         let status = SecItemCopyMatching(parameters as CFDictionary, &ref)
-        return status == errSecSuccess ? ref as! SecKey? : nil
+        guard status == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
+            return (nil, nil, ZitiError("geKeyPair: Unable to get private key for \(zid.id): \(errStr)"))
+        }
+        let privKey = ref! as! SecKey
+        guard let pubKey = SecKeyCopyPublicKey(privKey) else {
+            return (nil, nil, ZitiError("geKeyPair: Unable to copy public key for \(zid.id)"))
+        }
+        return (privKey, pubKey, nil)
     }
     
     func keyPairExists() -> Bool {
-        return self.getPublicKey() != nil
+        let (_, _, e) = getKeyPair()
+        return e == nil
     }
     
-    func deleteKeyPair() -> OSStatus {
+    func deleteKeyPair() -> ZitiError? {
         guard let atag = zid.id.data(using: .utf8) else {
-            return errSecItemNotFound
+            return ZitiError("deleteKeyPair: Unable to create application tag \(zid.id)")
         }
         let deleteQuery:[CFString:Any] = [
             kSecClass: kSecClassKey,
-            kSecAttrApplicationTag: atag,]
-        return SecItemDelete(deleteQuery as CFDictionary)
+            kSecAttrApplicationTag: atag]
+        let status = SecItemDelete(deleteQuery as CFDictionary)
+        guard status == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
+            return ZitiError("Unable to delete key pair for \(zid.id): \(errStr)")
+        }
+        return nil
     }
     
-    // TODO: storeCertificate() DER
-    // TODO: getCertificate() DER
+    func storeCertificate(_ der:Data) -> ZitiError? {
+        guard let certificate = SecCertificateCreateWithData(nil, der as CFData) else {
+            return ZitiError("Unable to create certificate from data for \(zid.id)")
+        }
+        let parameters: [CFString: Any] = [
+            kSecClass: kSecClassCertificate,
+            kSecValueRef: certificate,
+            kSecAttrLabel: zid.id]
+        let status = SecItemAdd(parameters as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
+            return ZitiError("Unable to store certificate for \(zid.id): \(errStr)")
+        }
+        return nil
+    }
+    
+    func getCertificate() -> (Data?, ZitiError?) {
+        let params: [CFString: Any] = [
+            kSecClass: kSecClassCertificate,
+            kSecReturnRef: kCFBooleanTrue,
+            kSecAttrLabel: zid.id]
+        
+        var cert: CFTypeRef?
+        let status = SecItemCopyMatching(params as CFDictionary, &cert)
+        guard status == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
+            return (nil, ZitiError("Unable to get certificate for \(zid.id): \(errStr)"))
+        }
+        guard let certData = SecCertificateCopyData(cert as! SecCertificate) as Data? else {
+            return (nil, ZitiError("Unable to copy certificate data for \(zid.id)"))
+        }
+        return (certData, nil)
+    }
     
     func convertToPEM(_ type:String, der:Data) -> String {
         guard let str = der.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0)).addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             return ""
         }
-        
-        let multiLine = (str.count % 64 == 0);
         var pem = "-----BEGIN \(type)-----\n";
-        
         for (i, ch) in str.enumerated() {
             pem.append(ch)
             if ((i != 0) && ((i+1) % 64 == 0)) {
                 pem.append("\n")
             }
-            if ((i == str.count-1) && !multiLine) {
-                pem.append("\n")
-            }
+        }
+        if (str.count % 64) != 0 {
+            pem.append("\n")
         }
         return pem + "-----END \(type)-----\n"
+    }
+    
+    func convertToDER(_ pem:String) -> Data {
+        var der = Data()
+        pem.split(separator: "\n").forEach { line in
+            if line.starts(with: "-----") == false {
+                der.append(Data(base64Encoded: String(line)) ?? Data())
+            }
+        }
+        return der
     }
 }

@@ -10,14 +10,18 @@ import Foundation
 import CommonCrypto
 
 class ZitiCSR : NSObject {
-    private let OBJECT_commonName:[UInt8] = [0x06, 0x03, 0x55, 0x04, 0x03]
-    private let OBJECT_countryName:[UInt8] = [0x06, 0x03, 0x55, 0x04, 0x06]
-    private let OBJECT_organizationName:[UInt8] = [0x06, 0x03, 0x55, 0x04, 0x0A]
+    private let COMMON_NAME:[UInt8]  = [0x06, 0x03, 0x55, 0x04, 0x03]
+    private let ORG_NAME:[UInt8]     = [0x06, 0x03, 0x55, 0x04, 0x0A]
+    private let COUNTRY_NAME:[UInt8] = [0x06, 0x03, 0x55, 0x04, 0x06]
     private let SEQUENCE_tag:UInt8 = 0x30
     private let SET_tag:UInt8 = 0x31
+    private let INTEGER_tag:UInt8 = 0x02
+    private let UTF8STRING_tag:UInt8 = 0x0C
+    private let BITSTRING_tag:UInt8 = 0x03
+    private let RSA_NULL:[UInt8] = [0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00]
     
-    private let OBJECT_rsaEncryption:[UInt8] = [0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00]
-    let SEQUENCE_OBJECT_sha256WithRSAEncryption:[UInt8] = [0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 1, 1, 0x0B, 0x05, 0x00]
+    // including sequence tag and size
+    let SHA256_WITH_RSA:[UInt8] = [0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 1, 1, 0x0B, 0x05, 0x00]
     
     var country = "US"
     var org = "NetFoundry"
@@ -28,47 +32,36 @@ class ZitiCSR : NSObject {
         commonName = cn
     }
     
-    func createRequest(_ zkc:ZitiKeychain) -> Data? {
-        guard let privateKey = zkc.getPrivateKey() else {
-            NSLog("ZitiCSR createRequest unable to get private key for \(zkc.zid.name): \(zkc.zid.id)")
-            return nil
-        }
-        
-        guard let publicKeyInfo = buildPublicKeyInfo(zkc) else {
-            NSLog("ZitiCSR createRequest unable to build public key info for \(zkc.zid.name): \(zkc.zid.id)")
-            return nil
-        }
-        
-        // certificate request info
+    func createRequest(privKey:SecKey, pubKey:SecKey) -> (Data?, ZitiError?) {
         var csr = Data()
         let version: [UInt8] = [0x02, 0x01, 0x00] // version 0
         csr.append(version, count: version.count)
         
         var subject = Data()
-        appendSubjectItem(OBJECT_countryName, value: country, to: &subject)
-        appendSubjectItem(OBJECT_organizationName, value: org, to: &subject)
-        appendSubjectItem(OBJECT_commonName, value: commonName, to: &subject)
+        appendSubjectItem(COUNTRY_NAME, value: country, to: &subject)
+        appendSubjectItem(ORG_NAME, value: org, to: &subject)
+        appendSubjectItem(COMMON_NAME, value: commonName, to: &subject)
         subject.insert(contentsOf: [SEQUENCE_tag] + getDERLength(subject.count), at: 0)
         csr.append(subject)
-        csr.append(publicKeyInfo)
+        csr.append(buildPublicKeyInfo(publicKey:pubKey))
         csr.append(contentsOf: [0xA0, 0x00]) // Attributes
         csr.insert(contentsOf: [SEQUENCE_tag] + getDERLength(csr.count), at: 0)
         
         // hash and sign
-        var error: Unmanaged<CFError>?
-        guard let sigData = createCriSignature(privateKey, csr, &error) else {
-            NSLog("Unable to sign cert for \(zkc.zid.name): \(zkc.zid.id).  Error=\(error!.takeRetainedValue() as Error)")
-            return nil
+        var err: Unmanaged<CFError>?
+        guard let sigData = createCriSig(privKey, csr, &err) else {
+            return (nil, ZitiError("Unable to sign cert for \(commonName): \(err!.takeRetainedValue() as Error)"))
         }
         
         // append the sig
-        csr.append(contentsOf: SEQUENCE_OBJECT_sha256WithRSAEncryption)
-        appendBITSTRING(Data([0x00] + [UInt8](sigData as Data)), to: &csr)
+        csr.append(contentsOf: SHA256_WITH_RSA)
+        let bitstring = Data([0x00] + [UInt8](sigData as Data))
+        csr.append(contentsOf: [BITSTRING_tag] + getDERLength(bitstring.count) + bitstring)
         csr.insert(contentsOf: [SEQUENCE_tag] + getDERLength(csr.count), at: 0)
-        return csr
+        return (csr, nil)
     }
     
-    func createCriSignature(_ privateKey:SecKey, _ cri:Data, _ error: UnsafeMutablePointer<Unmanaged<CFError>?>?) -> CFData? {
+    private func createCriSig(_ privKey:SecKey, _ cri:Data, _ err: UnsafeMutablePointer<Unmanaged<CFError>?>?) -> CFData? {
         var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
         
         var SHA1 = CC_SHA256_CTX()
@@ -76,13 +69,12 @@ class ZitiCSR : NSObject {
         CC_SHA256_Update(&SHA1, [UInt8](cri), CC_LONG(cri.count))
         CC_SHA256_Final(&digest, &SHA1)
         
-        var error: Unmanaged<CFError>?
         return SecKeyCreateSignature(
-            privateKey, .rsaSignatureDigestPKCS1v15SHA256,
-            Data(bytes: digest) as CFData, &error)
+            privKey, .rsaSignatureDigestPKCS1v15SHA256,
+            Data(bytes: digest) as CFData, err)
     }
     
-    func parsePublicSecKey(publicKey: SecKey) -> (mod: Data, exp: Data) {
+    private func parsePublicSecKey(publicKey: SecKey) -> (mod: Data, exp: Data) {
         let pubAttributes = SecKeyCopyAttributes(publicKey) as! [CFString:Any]
         let pubData  = pubAttributes[kSecValueData] as! Data
         let keySize  = pubAttributes[kSecAttrKeySizeInBits] as! Int
@@ -97,24 +89,20 @@ class ZitiCSR : NSObject {
         return (mod: modulus, exp: exponent)
     }
     
-    private func buildPublicKeyInfo(_ zkc:ZitiKeychain) -> Data? {
-        guard let publicKey = zkc.getPublicKey() else {
-            return nil
-        }
-        
-        var publicKeyInfo = Data(OBJECT_rsaEncryption)
+    private func buildPublicKeyInfo(publicKey:SecKey) -> Data {
+        var publicKeyInfo = Data(RSA_NULL)
         publicKeyInfo.insert(contentsOf: [SEQUENCE_tag] + getDERLength(publicKeyInfo.count), at: 0)
         
         let (mod, exp) = parsePublicSecKey(publicKey: publicKey)
-        var publicKeyASN = Data([0x02]) //  Integer
+        var publicKeyASN = Data([INTEGER_tag])
         publicKeyASN.append(contentsOf: getDERLength(mod.count))
         publicKeyASN.append(mod)
-        publicKeyASN.append(UInt8(0x02)) // Integer
+        publicKeyASN.append(INTEGER_tag)
         publicKeyASN.append(contentsOf: getDERLength(exp.count))
         publicKeyASN.append(exp)
         
         publicKeyASN.insert(contentsOf: [0x00] + [SEQUENCE_tag] + getDERLength(publicKeyASN.count), at: 0)
-        appendBITSTRING(publicKeyASN, to: &publicKeyInfo)
+        publicKeyInfo.append(contentsOf: [BITSTRING_tag] + getDERLength(publicKeyASN.count) + publicKeyASN)
         publicKeyInfo.insert(contentsOf: [SEQUENCE_tag] + getDERLength(publicKeyInfo.count), at: 0)
         
         return publicKeyInfo
@@ -122,27 +110,17 @@ class ZitiCSR : NSObject {
     
     private func appendSubjectItem(_ what:[UInt8], value:String, to: inout Data) {
         var subjectItem = Data(what)
-        appendUTF8String(string: value, to: &subjectItem)
+        subjectItem.append(contentsOf: [UTF8STRING_tag] +
+            getDERLength(value.lengthOfBytes(using: String.Encoding.utf8)) +
+            value.data(using: String.Encoding.utf8)!)
         subjectItem.insert(contentsOf: [SEQUENCE_tag] + getDERLength(subjectItem.count), at: 0)
         subjectItem.insert(contentsOf: [SET_tag] + getDERLength(subjectItem.count), at: 0)
         to.append(subjectItem)
     }
     
-    private func appendUTF8String(string: String, to: inout Data) ->(){
-        to.append(0x0C) //UTF8STRING
-        to.append(contentsOf: getDERLength(string.lengthOfBytes(using: String.Encoding.utf8)))
-        to.append(string.data(using: String.Encoding.utf8)!)
-    }
-    
-    private func appendBITSTRING(_ data: Data, to: inout Data) {
-        to.append(0x03) //BIT STRING
-        to.append(contentsOf: getDERLength(data.count))
-        to.append(data)
-    }
-    
     private func getDERLength(_ length:Int) -> [UInt8] {
         var derLength:[UInt8] = []
-        if length < 128 {
+        if length < 0x80 {
             derLength = [UInt8(length)]
         } else if (length < 0x100) {
             derLength = [0x81, UInt8(length & 0xFF)]
