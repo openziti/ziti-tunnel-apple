@@ -34,6 +34,7 @@ enum ZitiEnrollmentStatus : String, Codable {
 }
 
 class ZitiIdentity : NSObject, Codable {
+    //let identity:(name:String, id:String)
     class Identity : NSObject, Codable {
         let name:String, id:String
         init(_ name:String, _ id:String) {
@@ -41,6 +42,7 @@ class ZitiIdentity : NSObject, Codable {
         }
     }
     
+    //let versions:(api:String, enrollmentApi:String)
     class Versions : NSObject, Codable {
         let api:String, enrollmentApi:String
         init(_ api:String, _ enrollmentApi:String) {
@@ -77,8 +79,8 @@ class ZitiIdentity : NSObject, Codable {
             let versions = json["versions"] as? [String:String],
             let apiVersion = versions["api"],
             let enrollmentApiVersion = versions["enrollmentApi"],
-            let enrollmentUrl = json["apiBaseUrl"] as? String,
-            let apiBaseUrl = json["enrollmentUrl"] as? String,
+            let enrollmentUrl = json["enrollmentUrl"] as? String,
+            let apiBaseUrl = json["apiBaseUrl"] as? String,
             let method = json["method"] as? String,
             let token = json["token"] as? String
         else {
@@ -142,19 +144,11 @@ class ZitiIdentity : NSObject, Codable {
     }
     
     override var debugDescription: String {
-        return "ZitiIdentity:\n" +
-            "name: \(self.name)\n" +
-            "id: \(self.id)\n" +
-            "enrolled: \(self.enrolled)\n" +
-            "enabled: \(self.enabled)\n" +
-            "exp: \(self.exp)\n" +
-            "iat: \(self.iat)\n" +
-            "apiBaseUrl: \(self.apiBaseUrl)\n" +
-            "enrollmentUrl: \(self.enrollmentUrl)\n" +
-            "method: \(self.method)\n" +
-            "token: \(self.token)\n" +
-            "apiVersion: \(self.versions.api)\n" +
-            "enrollmentApiVersion: \(self.versions.enrollmentApi)\n" +
-            "rootCa: \(self.rootCa ?? "")"
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.outputFormatting = .prettyPrinted
+        if let jsonData = try? jsonEncoder.encode(self) {
+            return String(data: jsonData, encoding: .utf8)!
+        }
+        return("Unable to json encode \(name)")
     }
 }
