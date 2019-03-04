@@ -155,6 +155,6 @@ class ZitiIdentity : NSObject, Codable {
             "token: \(self.token)\n" +
             "apiVersion: \(self.versions.api)\n" +
             "enrollmentApiVersion: \(self.versions.enrollmentApi)\n" +
-            "rootCa: \(self.rootCa)"
+            "rootCa: \(self.rootCa ?? "")"
     }
 }
