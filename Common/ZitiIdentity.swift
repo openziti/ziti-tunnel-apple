@@ -139,7 +139,45 @@ class ZitiIdentity : NSObject, NSCoding {
         aCoder.encode(enabled, forKey: "enabled")
     }
     
+    // TODO: completion handler...
     func enroll() -> Error? {
+        
+        // TODO: This is still placeholder...
+        
+        let zkc = ZitiKeychain(self)
+        var privKey:SecKey?, pubKey:SecKey?, error:ZitiError?
+        
+        if zkc.keyPairExists() == false {
+            // TODO: Should delete them and create new keys if this is the case?  Or just always create
+            // new keys and leave it to caller to clean up after themselves...
+            (privKey, pubKey, error) = zkc.createKeyPair()
+            guard error == nil else {
+                NSLog("Unable to create private key for \(name): \(id)")
+                return nil //return NSError(domain: <#T##String#>, code: <#T##Int#>, userInfo: <#T##[String : Any]?#>) // TODO: return an Error
+            }
+        } else {
+            (privKey, pubKey, error) = zkc.getKeyPair()
+            guard error == nil else {
+                NSLog("Unable to get private key for \(name): \(id)")
+                return nil //return NSError(domain: <#T##String#>, code: <#T##Int#>, userInfo: <#T##[String : Any]?#>) // TODO: return an Error
+            }
+        }
+        
+        let zcsr = ZitiCSR(self.id)
+        let (csr, _) = zcsr.createRequest(privKey: privKey!, pubKey: pubKey!)
+        guard csr != nil else {
+            NSLog("Unable to create CSR for \(name): \(id)")
+            return nil // TODO: return an Error
+        }
+        
+        // convert to PEM
+        let csrPEM = zkc.convertToPEM("CERTIFICATE REQUEST", der: csr!)
+        print(csrPEM)
+        
+        // Submit CSR
+        
+        // Store the Certificate (zkc.convertToDER, zkc.storeCertificate
+        
         return nil
     }
     
