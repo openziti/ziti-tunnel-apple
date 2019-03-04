@@ -33,7 +33,7 @@ class PacketRouter : NSObject {
     }
     
     private func routeUDP(_ udp:UDPPacket) {
-        NSLog("UDP-->: \(udp.debugDescription)")
+        //NSLog("UDP-->: \(udp.debugDescription)")
         
         // if this is a DNS request sent to us, handle it
         if self.dnsResolver.needsResolution(udp) {
@@ -83,8 +83,7 @@ class PacketRouter : NSObject {
             return
         }
         
-        NSLog("IP-->: \(ip.debugDescription)")
-        
+        //NSLog("IP-->: \(ip.debugDescription)")
         switch ip.protocolId {
         case IPProtocolId.UDP:
             if let udp = UDPPacket(ip) {

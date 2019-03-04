@@ -41,10 +41,16 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         NSLog("startTunnel")
         
-        let zitiIdentities = ZitiIdentityStore().load()
-        NSLog("GOT \(zitiIdentities.count) identities")
-        zitiIdentities.forEach { zid in
+        let (zitiIdentities,_) = ZitiIdentityStore().load()
+        NSLog("GOT \(zitiIdentities?.count ?? -1) identities")
+        zitiIdentities?.forEach { zid in
             NSLog("ZitiIdentity \(zid.name): \(zid.id)")
+            
+            if ZitiKeychain(zid).keyPairExists() {
+                NSLog("PACKET TUNNEL KEYS EXIST for \(zid.id)")
+            } else {
+                NSLog("PACKET TUNNEL KEYS do not EXIST for \(zid.name): \(zid.id)")
+            }
         }
         
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict

@@ -47,8 +47,7 @@ class DNSResolver : NSObject {
             return
         }
         
-        NSLog("DNS-->: \(dns.debugDescription)")
-        
+        //NSLog("DNS-->: \(dns.debugDescription)")
         // only resolve queries (should never see this...)
         if dns.qrFlag {
             NSLog("ATTEMPT TO RESOLVE RESPONSE MESSAGE")
@@ -106,9 +105,9 @@ class DNSResolver : NSObject {
         dnsR.responseCode = responseCode
         dnsR.udp.updateLengthsAndChecksums()
         
-        NSLog("<--DNS: \(dnsR.debugDescription)")
-        NSLog("<--UDP: \(dnsR.udp.debugDescription)")
-        NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
+        //NSLog("<--DNS: \(dnsR.debugDescription)")
+        //NSLog("<--UDP: \(dnsR.udp.debugDescription)")
+        //NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
         
         // write response to tun (returns false on error, but nothing to do if it fails...)
         if self.tunnelProvider.packetFlow.writePackets([dnsR.udp.ip.data],
