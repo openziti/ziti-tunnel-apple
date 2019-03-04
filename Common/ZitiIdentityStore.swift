@@ -84,6 +84,9 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: .forDeleting, error: nil) { url in
             do {
+                let zkc = ZitiKeychain(zId)
+                _ = zkc.deleteKeyPair()
+                _ = zkc.deleteCertificate()
                 try FileManager.default.removeItem(at: url)
             } catch {
                 zErr = ZitiError("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")

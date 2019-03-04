@@ -124,6 +124,27 @@ class ZitiKeychain : NSObject {
         return (certData, nil)
     }
     
+    func deleteCertificate() -> ZitiError? {
+        let params: [CFString: Any] = [
+            kSecClass: kSecClassCertificate,
+            kSecReturnRef: kCFBooleanTrue,
+            kSecAttrLabel: zid.id]
+        
+        var cert: CFTypeRef?
+        let copyStatus = SecItemCopyMatching(params as CFDictionary, &cert)
+        guard copyStatus == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(copyStatus, nil) as String? ?? "\(copyStatus)"
+            return ZitiError("Unable to find certificate for \(zid.id): \(errStr)")
+        }
+        
+        let deleteStatus = SecKeychainItemDelete(cert as! SecKeychainItem)
+        guard deleteStatus == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(deleteStatus, nil) as String? ?? "\(deleteStatus)"
+            return ZitiError("Unable to delete certificate for \(zid.id): \(errStr)")
+        }
+        return nil
+    }
+    
     func convertToPEM(_ type:String, der:Data) -> String {
         guard let str = der.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0)).addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             return ""
