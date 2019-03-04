@@ -22,10 +22,9 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         NSFileCoordinator.addFilePresenter(self)
     }
     
-    func load() -> [ZitiIdentity] {
+    func load() -> ([ZitiIdentity]?, ZitiError?) {
         guard self.presentedItemURL != nil else {
-            NSLog("ZitiIdentityStore.load: Invalid container URL")
-            return []
+            return (nil, ZitiError("Unable to load identities. Invalid container URL"))
         }
         
         var zIds:[ZitiIdentity] = []
@@ -40,52 +39,55 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                         let data = try Data.init(contentsOf: url)
                         if let zId = NSKeyedUnarchiver.unarchiveObject(with: data) as? ZitiIdentity {
                             zIds.append(zId)
-                            print("ZitiIdentityStore.load appended zId \(zId.name): \(zId.id)")
+                        } else {
+                            // log it and continue (don't return error and abort)
+                            NSLog("ZitiIdentityStore.load failed loading \(url.absoluteString)")
                         }
                     }
                 }
             } catch {
+                // Just log it? - don't want to reject in case other files are good...
                 NSLog("ZitiIdentityStore.load Unable to read directory URL: \(error.localizedDescription)")
             }
         }
-        return zIds
+        return (zIds, nil)
     }
     
-    func store(_ zId:ZitiIdentity) {
+    func store(_ zId:ZitiIdentity) -> ZitiError? {
         guard self.presentedItemURL != nil else {
-            NSLog("ZitiIdentityStore.store: Invalid container URL")
-            return
+            return ZitiError("ZitiIdentityStore.store: Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
         let url = self.presentedItemURL!.appendingPathComponent("\(zId.id).zid", isDirectory:false)
-        print("Storing url \(url.absoluteString)")
+        var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: [], error: nil) { url in
             let data = NSKeyedArchiver.archivedData(withRootObject: zId)
             do {
                 try data.write(to: url, options: .atomic)
             } catch {
-                NSLog("ZitiIdentityStore.store Unable to write URL: \(error.localizedDescription)")
+                zErr = ZitiError("ZitiIdentityStore.store Unable to write URL: \(error.localizedDescription)")
             }
         }
+        return zErr
     }
     
-    func remove(_ zId:ZitiIdentity) {
+    func remove(_ zId:ZitiIdentity) -> ZitiError? {
         guard self.presentedItemURL != nil else {
-            NSLog("ZitiIdentityStore.remove: Invalid container URL")
-            return
+            return ZitiError("ZitiIdentityStore.remove: Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
         let url = self.presentedItemURL!.appendingPathComponent("\(zId.id).zid", isDirectory:false)
-        print("Deleting url \(url.absoluteString)")
+        var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: .forDeleting, error: nil) { url in
             do {
                 try FileManager.default.removeItem(at: url)
             } catch {
-                NSLog("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")
+                zErr = ZitiError("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")
             }
         }
+        return zErr
     }
     
     func presentedSubitemDidChange(at url: URL) {
