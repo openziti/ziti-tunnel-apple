@@ -28,6 +28,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         }
         
         var zIds:[ZitiIdentity] = []
+        var zErr:ZitiError? = nil
         let fc = NSFileCoordinator()
         fc.coordinate(readingItemAt: presentedItemURL!, options: .withoutChanges, error: nil) { url in
             do {
@@ -47,9 +48,11 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                     }
                 }
             } catch {
-                // Just log it? - don't want to reject in case other files are good...
-                NSLog("ZitiIdentityStore.load Unable to read directory URL: \(error.localizedDescription)")
+                zErr = ZitiError("ZitiIdentityStore.load Unable to read directory URL: \(error.localizedDescription)")
             }
+        }
+        guard zErr == nil else {
+            return (nil, zErr)
         }
         return (zIds, nil)
     }

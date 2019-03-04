@@ -137,9 +137,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
-    private func dateToString(_ date:Int) -> String {
+    private func dateToString(_ date:Date) -> String {
         return DateFormatter.localizedString(
-            from: Date(timeIntervalSince1970: TimeInterval(date)),
+            from: date,
             dateStyle: .long, timeStyle: .long)
     }
     
@@ -151,11 +151,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.apiBaseUrl
-            idCreatedAtLabel.stringValue = zId.iat>0 ? dateToString(zId.iat):"unknown"
-            idEnrollStatusLabel.stringValue = zId.enrollmentStatus().rawValue
-            idExpiresAtLabel.stringValue = "(expiration: \(zId.exp>0 ? dateToString(zId.exp):"unknown")"
+            idCreatedAtLabel.stringValue = zId.iat>0 ? dateToString(zId.iatDate):"unknown"
+            idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
+            idExpiresAtLabel.stringValue = "(expiration: \(zId.exp>0 ? dateToString(zId.expDate):"unknown")"
             idExpiresAtLabel.isHidden = false
-            idEnrollBtn.isHidden = zId.enrollmentStatus() == .Pending ? false : true
+            idEnrollBtn.isHidden = zId.enrollmentStatus == .Pending ? false : true
         } else {
             box.alphaValue = 0.25
             idEnabledBtn.isEnabled = false
@@ -186,7 +186,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         initTunnelProviderManager()
         
         // Load previous identities
-        self.zitiIdentities = zidStore.load()
+        let (zids, err) = zidStore.load()
+        if err != nil && err!.errorDescription != nil {
+            NSLog(err!.errorDescription!)
+        }
+        self.zitiIdentities = zids ?? []
         self.tableView.reloadData()
         self.representedObject = 0
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
@@ -236,7 +240,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if zitiIdentities.count > 0 {
             let zId = zitiIdentities[representedObject as! Int]
             zId.enabled = sender.state == .on
-            zidStore.store(zId)
+            _ = zidStore.store(zId) // TODO: alert
         }
     }
     
@@ -255,29 +259,35 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 do {
                     let token = try String(contentsOf: panel.urls[0], encoding: .utf8)
                     let jwt = try decode(jwt: token)
-                    let ztid = ZitiIdentity(jwt.body)
+                    
+                    // parse the body
+                    guard let ztid = ZitiIdentity(jwt.body) else {
+                        throw ZitiError("Unable to parse enrollment data")
+                    }
                     
                     // only support OTT
-                    if ztid.method != "ott" {
-                        self.dialogAlert("Invalid Enrollment Metho", "Only OTT Enrollment is supported by this application")
-                        return
+                    guard ztid.method == ZitiEnrollmentMethod.ott else {
+                        throw ZitiError("Only OTT Enrollment is supported by this application")
                     }
                     
                     // alread have this one?
-                    if self.zitiIdentities.first(where:{$0.id == ztid.id}) != nil {
-                        self.dialogAlert("Duplicate Identity Not Allowed",
-                                         "Identy \(ztid.name) is already present with id \(ztid.id)")
-                        return
+                    guard self.zitiIdentities.first(where:{$0.id == ztid.id}) == nil else {
+                        throw ZitiError("Duplicate Identity Not Allowed. Identy \(ztid.name) is already present with id \(ztid.id)")
+                    }
+                    
+                    // store it
+                    let error = self.zidStore.store(ztid)
+                    guard error == nil else {
+                        throw error!
                     }
                     
                     // add it
                     self.zitiIdentities.insert(ztid, at: 0)
-                    
-                    // update stored identity
-                    self.zidStore.store(ztid)
                     self.tableView.reloadData()
                     self.representedObject = 0
                     self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
+                } catch let error as ZitiError {
+                    self.dialogAlert("Unable to add identity", error.localizedDescription)
                 } catch {
                     self.dialogAlert("JWT Error", error.localizedDescription)
                     return
@@ -309,8 +319,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         let zid = zitiIdentities[indx]
         let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
         if dialogOKCancel(question: "Are you sure?", text: text) == true {
+            let error = zidStore.remove(zid)
+            guard error == nil else {
+                dialogAlert("Unable to remove identity", error!.localizedDescription)
+                return
+            }
+            
             self.zitiIdentities.remove(at: indx)
-            zidStore.remove(zid)
             tableView.reloadData()
             if indx >= self.zitiIdentities.count {
                 representedObject = self.zitiIdentities.count - 1
@@ -319,6 +334,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
         }
+    }
+    @IBAction func onEnrollButton(_ sender: Any) {
+        let indx = representedObject as! Int
+        let zid = zitiIdentities[indx]
+        _ = zid.enroll() // TODO: Alert on error, needs to have an escaping closure
     }
 }
 
