@@ -9,7 +9,7 @@
 import Foundation
 
 // Enrollment Method Enum
-enum ZitiEnrollmentMethod : String {
+enum ZitiEnrollmentMethod : String, Codable {
     case ott, ottCa, unrecognized
     init(_ str:String) {
         switch str {
@@ -21,7 +21,7 @@ enum ZitiEnrollmentMethod : String {
 }
 
 // Enrollment Status Enum
-enum ZitiEnrollmentStatus : String {
+enum ZitiEnrollmentStatus : String, Codable {
     case Pending, Expired, Enrolled, Unknown
     init(_ str:String) {
         switch str {
@@ -33,110 +33,70 @@ enum ZitiEnrollmentStatus : String {
     }
 }
 
-// lose namespacing so we can share archive between app and extension
-@objc(ZitiIdentity)
-class ZitiIdentity : NSObject, NSCoding {
-    let exp:Int
-    let iat:Int
-    let apiBaseUrl:String
+class ZitiIdentity : NSObject, Codable {
+    class Identity : NSObject, Codable {
+        let name:String, id:String
+        init(_ name:String, _ id:String) {
+            self.name = name; self.id = id
+        }
+    }
+    
+    class Versions : NSObject, Codable {
+        let api:String, enrollmentApi:String
+        init(_ api:String, _ enrollmentApi:String) {
+            self.api = api; self.enrollmentApi = enrollmentApi
+        }
+    }
+    
+    let identity:Identity
+    var name:String { return identity.name }
+    var id:String { return identity.id }
+    let versions:Versions
     let enrollmentUrl:String
-    let method:String
-    let name:String
-    let id:String
+    let apiBaseUrl:String
+    let method:ZitiEnrollmentMethod
     let token:String
-    let apiVersion:String
-    let enrollmentApiVersion:String
-    let rootCa:String
+    let rootCa:String?
+    var exp:Int = 0
+    var expDate:Date { return Date(timeIntervalSince1970: TimeInterval(exp)) }
+    var iat:Int = 0
+    var iatDate:Date { return Date(timeIntervalSince1970: TimeInterval(iat)) }
     
-    var enrolled = false
     var enabled = false
-    
-    func enrollmentStatus() -> ZitiEnrollmentStatus {
+    var enrolled = false
+    var enrollmentStatus:ZitiEnrollmentStatus {
         if (enrolled) { return .Enrolled }
-        let now = Date()
-        let expDate = Date(timeIntervalSince1970: TimeInterval(exp))
-        if  (now > expDate) { return .Expired }
+        if (Date() > expDate) { return .Expired }
         return .Pending
     }
     
-    init(_ json:[String:Any]) {
+    init?(_ json:[String:Any]) {
+        guard let identity = json["identity"] as? [String:String],
+            let name = identity["name"],
+            let id = identity["id"],
+            let versions = json["versions"] as? [String:String],
+            let apiVersion = versions["api"],
+            let enrollmentApiVersion = versions["enrollmentApi"],
+            let enrollmentUrl = json["apiBaseUrl"] as? String,
+            let apiBaseUrl = json["enrollmentUrl"] as? String,
+            let method = json["method"] as? String,
+            let token = json["token"] as? String
+        else {
+            NSLog("ZitiIdentity - Invalid or Unsupported Enrollment JWT")
+            return nil
+        }
+        self.identity = Identity(name, id)
+        self.versions = Versions(apiVersion, enrollmentApiVersion)
+        self.enrollmentUrl = enrollmentUrl
+        self.apiBaseUrl = apiBaseUrl
+        self.method = ZitiEnrollmentMethod(method)
+        self.token = token
+        self.rootCa = json["rootCa"] as? String ?? nil
         self.exp = json["exp"] as? Int ?? 0
         self.iat = json["iat"] as? Int ?? 0
-        self.apiBaseUrl = json["apiBaseUrl"] as? String ?? ""
-        self.enrollmentUrl = json["enrollmentUrl"] as? String ?? ""
-        self.method = json["method"] as? String ?? ""
-        self.token = json["token"] as? String ?? ""
-        self.rootCa = json["rootCa"] as? String ?? ""
-        
-        // identity
-        if let identity = json["identity"] as? [String:String] {
-            self.name = identity["name"] ?? ""
-            self.id = identity["id"] ?? ""
-        } else {
-            self.name = ""
-            self.id = ""
-        }
-       
-        // versions
-        if let versions = json["versions"] as? [String:String]  {
-            self.apiVersion = versions["api"] ?? ""
-            self.enrollmentApiVersion = versions["enrollmentApi"] ?? ""
-        } else {
-            self.apiVersion = ""
-            self.enrollmentApiVersion = ""
-        }
+        self.enabled = json["enabled"] as? Bool ?? false
+        self.enrolled = json["enabled"] as? Bool ?? false
         super.init()
-    }
-    
-    init(exp:Int, iat:Int, apiBaseUrl:String, enrollmentUrl:String, method:String, name:String, id:String, token:String, apiVersion:String, enrollmentApiVersion:String, rootCa:String, enrolled:Bool, enabled:Bool) {
-
-        self.exp = exp
-        self.iat = iat
-        self.apiBaseUrl = apiBaseUrl
-        self.enrollmentUrl = enrollmentUrl
-        self.method = method
-        self.name = name
-        self.id = id
-        self.token = token
-        self.apiVersion = apiVersion
-        self.enrollmentApiVersion = enrollmentApiVersion
-        self.rootCa = rootCa
-        self.enrolled = enrolled
-        self.enabled = enabled
-    }
-    
-    required convenience init(coder aDecoder: NSCoder) {
-        let exp = aDecoder.decodeInteger(forKey: "exp")
-        let iat = aDecoder.decodeInteger(forKey: "iat")
-        let apiBaseUrl = aDecoder.decodeObject(forKey: "apiBaseUrl") as? String ?? ""
-        let enrollmentUrl = aDecoder.decodeObject(forKey: "enrollmentUrl") as? String ?? ""
-        let method = aDecoder.decodeObject(forKey: "method") as? String ?? ""
-        let name = aDecoder.decodeObject(forKey: "name") as? String ?? ""
-        let id = aDecoder.decodeObject(forKey: "id") as? String ?? ""
-        let token = aDecoder.decodeObject(forKey: "token") as? String ?? ""
-        let apiVersion = aDecoder.decodeObject(forKey: "apiVersion") as? String ?? ""
-        let enrollmentApiVersion = aDecoder.decodeObject(forKey: "enrollmentApiVersion") as! String
-        let rootCa = aDecoder.decodeObject(forKey: "rootCa") as! String
-        let enrolled = aDecoder.decodeBool(forKey: "enrolled")
-        let enabled = aDecoder.decodeBool(forKey: "enabled")
-        
-        self.init(exp: exp, iat: iat, apiBaseUrl: apiBaseUrl, enrollmentUrl: enrollmentUrl, method: method, name: name, id: id, token: token, apiVersion: apiVersion, enrollmentApiVersion: enrollmentApiVersion, rootCa: rootCa, enrolled: enrolled, enabled: enabled)
-    }
-    
-    func encode(with aCoder: NSCoder) {
-        aCoder.encode(exp, forKey: "exp")
-        aCoder.encode(iat, forKey: "iat")
-        aCoder.encode(apiBaseUrl, forKey: "apiBaseUrl")
-        aCoder.encode(enrollmentUrl, forKey: "enrollmentUrl")
-        aCoder.encode(method, forKey: "method")
-        aCoder.encode(name, forKey: "name")
-        aCoder.encode(id, forKey: "id")
-        aCoder.encode(token, forKey: "token")
-        aCoder.encode(apiVersion, forKey: "apiVersion")
-        aCoder.encode(enrollmentApiVersion, forKey: "enrollmentApiVersion")
-        aCoder.encode(rootCa, forKey: "rootCa")
-        aCoder.encode(enrolled, forKey: "enrolled")
-        aCoder.encode(enabled, forKey: "enabled")
     }
     
     // TODO: completion handler...
@@ -193,8 +153,8 @@ class ZitiIdentity : NSObject, NSCoding {
             "enrollmentUrl: \(self.enrollmentUrl)\n" +
             "method: \(self.method)\n" +
             "token: \(self.token)\n" +
-            "apiVersion: \(self.apiVersion)\n" +
-            "enrollmentApiVersion: \(self.enrollmentApiVersion)\n" +
+            "apiVersion: \(self.versions.api)\n" +
+            "enrollmentApiVersion: \(self.versions.enrollmentApi)\n" +
             "rootCa: \(self.rootCa)"
     }
 }

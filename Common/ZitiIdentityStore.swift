@@ -37,7 +37,8 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                     
                     if url.pathExtension == "zid" {
                         let data = try Data.init(contentsOf: url)
-                        if let zId = NSKeyedUnarchiver.unarchiveObject(with: data) as? ZitiIdentity {
+                        let jsonDecoder = JSONDecoder()
+                        if let zId = try? jsonDecoder.decode(ZitiIdentity.self, from: data) {
                             zIds.append(zId)
                         } else {
                             // log it and continue (don't return error and abort)
@@ -62,8 +63,9 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         let url = self.presentedItemURL!.appendingPathComponent("\(zId.id).zid", isDirectory:false)
         var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: [], error: nil) { url in
-            let data = NSKeyedArchiver.archivedData(withRootObject: zId)
             do {
+                let jsonEncoder = JSONEncoder()
+                let data = try jsonEncoder.encode(zId)
                 try data.write(to: url, options: .atomic)
             } catch {
                 zErr = ZitiError("ZitiIdentityStore.store Unable to write URL: \(error.localizedDescription)")
