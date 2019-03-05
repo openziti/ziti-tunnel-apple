@@ -101,55 +101,6 @@ class ZitiIdentity : NSObject, Codable {
         super.init()
     }
     
-    private func getKeys(_ zkc:ZitiKeychain) -> (SecKey?, SecKey?, ZitiError?) {
-        var privKey:SecKey?, pubKey:SecKey?, error:ZitiError?
-        
-        // Should we delete keys and create new one if they already exist?  Or just always create
-        // new keys and leave it to caller to clean up after themselves?  We only have the id to search
-        // on, so if we have multiple with the same id things will get goofy...
-        if zkc.keyPairExists() == false {
-            (privKey, pubKey, error) = zkc.createKeyPair()
-            guard error == nil else {
-                return (nil, nil, error)
-            }
-        } else {
-            (privKey, pubKey, error) = zkc.getKeyPair()
-            guard error == nil else {
-                return (nil, nil, error)
-            }
-        }
-        return (privKey, pubKey, nil)
-    }
-    
-    // TODO: completion handler...
-    func enroll() -> Error? {
-        
-        // Get Keys
-        let zkc = ZitiKeychain(self)
-        let (privKey, pubKey, keyErr) = getKeys(zkc)
-        guard keyErr == nil else {
-            return keyErr
-        }
-        
-        // Create CSR
-        let zcsr = ZitiCSR(self.id)
-        let (csr, crErr) = zcsr.createRequest(privKey: privKey!, pubKey: pubKey!)
-        guard crErr == nil else {
-            return crErr
-        }
-        
-        // convert to PEM
-        let csrPEM = zkc.convertToPEM("CERTIFICATE REQUEST", der: csr!)
-        print(csrPEM)
-        
-        // Submit CSR
-        
-        // Store the Certificate (zkc.convertToDER, zkc.storeCertificate, set Enrolled = true and Enabled = true,
-        //    and update the identity file?
-        
-        return nil
-    }
-    
     override var debugDescription: String {
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted
