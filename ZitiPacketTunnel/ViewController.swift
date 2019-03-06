@@ -131,6 +131,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     private func dateToString(_ date:Date) -> String {
+        guard date != Date(timeIntervalSince1970: 0) else { return "unknown" }
         return DateFormatter.localizedString(
             from: date,
             dateStyle: .long, timeStyle: .long)
@@ -140,13 +141,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if let zId = zId {
             box.alphaValue = 1.0
             idEnabledBtn.isEnabled = true
-            idEnabledBtn.state = zId.enabled ? .on : .off
+            idEnabledBtn.state = zId.isEnabled ? .on : .off
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.apiBaseUrl
-            idCreatedAtLabel.stringValue = zId.iat>0 ? dateToString(zId.iatDate):"unknown"
+            idCreatedAtLabel.stringValue = dateToString(zId.iatDate)
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
-            idExpiresAtLabel.stringValue = "(expiration: \(zId.exp>0 ? dateToString(zId.expDate):"unknown")"
+            idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.expDate))"
             idExpiresAtLabel.isHidden = zId.enrollmentStatus == .Enrolled
             idEnrollBtn.isHidden = zId.enrollmentStatus == .Pending ? false : true
             
@@ -267,9 +268,12 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     let jwt = try decode(jwt: token)
                     
                     // parse the body
-                    guard let ztid = ZitiIdentity(jwt.body) else {
+                    guard let data = try? JSONSerialization.data(withJSONObject:jwt.body),
+                        let ztid = try? JSONDecoder().decode(ZitiIdentity.self, from: data)
+                    else {
                         throw ZitiError("Unable to parse enrollment data")
                     }
+                    print("zid: \(ztid.debugDescription)")
                     
                     // only support OTT
                     guard ztid.method == ZitiEnrollmentMethod.ott else {
