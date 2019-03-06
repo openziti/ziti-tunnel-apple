@@ -37,10 +37,7 @@ class ZitiEdge : NSObject, URLSessionDelegate {
         }
         
         let (session, urlRequest) = getURLSession(
-            url:url,
-            method:POST_METHOD,
-            contentType:JSON_TYPE,
-            body:nil)
+            url:url, method:POST_METHOD, contentType:JSON_TYPE, body:nil)
         
         session.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
@@ -48,17 +45,17 @@ class ZitiEdge : NSObject, URLSessionDelegate {
                 return
             }
             
-            // TODO: make Codable class for this...
+            // Not worth making Codables for this...
             guard
                 let json = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any],
                 let dataJSON = json?["data"] as? [String: Any],
                 let sessionJSON = dataJSON["session"] as? [String:Any],
                 let token = sessionJSON["token"] as? String
             else {
-                completionHandler(ZitiError("error trying to convert data to JSON"))
-                return
+                    completionHandler(ZitiError("error trying to convert data to JSON"))
+                    return
             }
-            print("ziti-session=\(token)")
+            print("zt-session: \(token)")
             self.sessionToken = token
             completionHandler(nil)
         }.resume()
@@ -113,6 +110,9 @@ class ZitiEdge : NSObject, URLSessionDelegate {
             completionHandler(nil)
         }.resume()
     }
+    
+    // TODO: getServices
+    // TODO: getNetworkSession
     
     func handleServerTrustChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
@@ -200,15 +200,11 @@ class ZitiEdge : NSObject, URLSessionDelegate {
         }
         
         guard httpResp.statusCode == 200 else {
-            // TODO: make Codable class for edge errors
-            guard let json = try? JSONSerialization.jsonObject(with:respData, options:[]) as? [String:Any],
-                let errorJSON = json?["error"] as? [String:Any],
-                let causeMessage = errorJSON["causeMessage"] as? String
-                else {
-                    let respStr = HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)
-                    return ZitiError("HTTP response code: \(httpResp.statusCode) \(respStr)")
+            guard let edgeErrorResp = try? JSONDecoder().decode(ZitiEdgeErrorResponse.self, from: respData) else {
+                let respStr = HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)
+                return ZitiError("HTTP response code: \(httpResp.statusCode) \(respStr)")
             }
-            return ZitiError(causeMessage)
+            return ZitiError(edgeErrorResp.shortDescription(httpResp.statusCode))
         }
         return nil
     }
