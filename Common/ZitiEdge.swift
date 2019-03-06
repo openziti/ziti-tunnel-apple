@@ -19,7 +19,7 @@ fileprivate let TEXT_TYPE = "text/plain; charset=utf-8"
 fileprivate let PEM_CERTIFICATE = "CERTIFICATE"
 fileprivate let PEM_CERTIFICATE_REQUEST = "CERTIFICATE REQUEST"
 
-class ZitiEdge : NSObject, URLSessionDelegate {
+class ZitiEdge : NSObject {
     
     let zid:ZitiIdentity
     var sessionToken:String? = nil
@@ -147,33 +147,6 @@ class ZitiEdge : NSObject, URLSessionDelegate {
         completionHandler(.useCredential, URLCredential(trust: serverTrust))
     }
     
-    func handleClientCertChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        let zkc = ZitiKeychain(self.zid)
-        let (identity, err) = zkc.getSecureIdentity()
-        guard err == nil else {
-            print("...no SecIdentity for \(zid.name) - will perform default handling")
-            completionHandler(.performDefaultHandling, nil)
-            return
-        }
-        
-        let urlCredential = URLCredential(identity: identity!, certificates: nil, persistence: .forSession)
-        completionHandler(.useCredential, urlCredential)
-    }
-
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        print("RECEIVED CHALLENGE: \(challenge.protectionSpace.authenticationMethod)")
-        switch challenge.protectionSpace.authenticationMethod {
-        case NSURLAuthenticationMethodServerTrust:
-            handleServerTrustChallenge(challenge, completionHandler:completionHandler)
-        case NSURLAuthenticationMethodClientCertificate:
-            handleClientCertChallenge(challenge, completionHandler:completionHandler)
-        default:
-            completionHandler(.performDefaultHandling, nil)
-        }
-    }
-    
     private func getURLSession(url:URL, method:String, contentType:String, body:Data?) -> (URLSession, URLRequest) {
         let session = URLSession(
             configuration: URLSessionConfiguration.default,
@@ -228,5 +201,34 @@ class ZitiEdge : NSObject, URLSessionDelegate {
             }
         }
         return (privKey, pubKey, nil)
+    }
+}
+
+extension ZitiEdge : URLSessionDelegate {
+    func handleClientCertChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        let zkc = ZitiKeychain(self.zid)
+        let (identity, err) = zkc.getSecureIdentity()
+        guard err == nil else {
+            print("...no SecIdentity for \(zid.name) - will perform default handling")
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        
+        let urlCredential = URLCredential(identity: identity!, certificates: nil, persistence: .forSession)
+        completionHandler(.useCredential, urlCredential)
+    }
+    
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        print("RECEIVED CHALLENGE: \(challenge.protectionSpace.authenticationMethod)")
+        switch challenge.protectionSpace.authenticationMethod {
+        case NSURLAuthenticationMethodServerTrust:
+            handleServerTrustChallenge(challenge, completionHandler:completionHandler)
+        case NSURLAuthenticationMethodClientCertificate:
+            handleClientCertChallenge(challenge, completionHandler:completionHandler)
+        default:
+            completionHandler(.performDefaultHandling, nil)
+        }
     }
 }
