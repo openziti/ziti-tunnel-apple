@@ -90,6 +90,29 @@ class ZitiKeychain : NSObject {
         return nil
     }
     
+    func getSecureIdentity() -> (SecIdentity?, ZitiError?) {
+        let params: [CFString: Any] = [
+            kSecClass: kSecClassCertificate,
+            kSecReturnRef: kCFBooleanTrue,
+            kSecAttrLabel: zid.id]
+        
+        var cert: CFTypeRef?
+        let certStatus = SecItemCopyMatching(params as CFDictionary, &cert)
+        guard certStatus == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(certStatus, nil) as String? ?? "\(certStatus)"
+            return (nil, ZitiError("Unable to get certificate for \(zid.id): \(errStr)"))
+        }
+        
+        let certificate = cert as! SecCertificate
+        var identity: SecIdentity?
+        let status = SecIdentityCreateWithCertificate(nil, certificate, &identity)  // TODO: macos only
+        guard status == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
+            return (nil, ZitiError("Unable to get identity for \(zid.id): \(errStr)"))
+        }
+        return (identity, nil)
+    }
+    
     func storeCertificate(_ der:Data) -> ZitiError? {
         guard let certificate = SecCertificateCreateWithData(nil, der as CFData) else {
             return ZitiError("Unable to create certificate from data for \(zid.id)")
@@ -137,7 +160,7 @@ class ZitiKeychain : NSObject {
             return ZitiError("Unable to find certificate for \(zid.id): \(errStr)")
         }
         
-        let deleteStatus = SecKeychainItemDelete(cert as! SecKeychainItem)
+        let deleteStatus = SecKeychainItemDelete(cert as! SecKeychainItem) // TODO macos only
         guard deleteStatus == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(deleteStatus, nil) as String? ?? "\(deleteStatus)"
             return ZitiError("Unable to delete certificate for \(zid.id): \(errStr)")
