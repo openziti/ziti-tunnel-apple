@@ -97,15 +97,16 @@ class ZitiEdge : NSObject, URLSessionDelegate {
                 completionHandler(zErr)
                 return
             }
+            guard let certPEM = String(data: data!, encoding: .utf8) else {
+                completionHandler(ZitiError("Unable to encode PEM data"))
+                return
+            }
+            let certDER = zkc.convertToDER(certPEM)
             
-            // Grab the returned cert.  wonder how it shows?  Grab it and find out...
-            // Store the Certificate (zkc.convertToDER, zkc.storeCertificate, set Enrolled = true and Enabled = true,
-            //    and update the identity file?
-            let certPEM = String(data: data!, encoding: .utf8)
-            print(certPEM ?? "Unable to get PEM from response data")
-            let certDER = zkc.convertToDER(certPEM!) // todo: guard certPEM...
-            _ = zkc.storeCertificate(certDER) // todo: error check
-            
+            if let zStoreErr = zkc.storeCertificate(certDER) {
+                completionHandler(zStoreErr)
+                return
+            }
             self.zid.enrolled = true
             completionHandler(nil)
         }.resume()
@@ -120,13 +121,13 @@ class ZitiEdge : NSObject, URLSessionDelegate {
         guard let serverTrust = challenge.protectionSpace.serverTrust,
             let cert = SecTrustGetCertificateAtIndex(serverTrust, 0),
             let remoteCertData = CFBridgingRetain(SecCertificateCopyData(cert))
-            else {
-                print("... Could not get server cert!")
-                completionHandler(.cancelAuthenticationChallenge, nil);
-                return
+        else {
+            print("... Could not get server cert!")
+            completionHandler(.cancelAuthenticationChallenge, nil);
+            return
         }
         
-        // if we ha .rootCA check if we match. Else rely on default handling
+        // if we have .rootCA check if we match. Else rely on default handling
         guard let rootCaPEM = zid.rootCa else {
             print("...no rootCa for \(zid.name) - will perform default handling")
             completionHandler(.performDefaultHandling, nil)
