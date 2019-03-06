@@ -25,6 +25,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var idEnrollStatusLabel: NSTextField!
     @IBOutlet weak var idExpiresAtLabel: NSTextField!
     @IBOutlet weak var idEnrollBtn: NSButton!
+    @IBOutlet weak var idSpinner: NSProgressIndicator!
     
     var servicesViewController:ServicesViewController? = nil
     var zidStore = ZitiIdentityStore()
@@ -33,19 +34,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
     
     var zitiIdentities:[ZitiIdentity] = []
+    var enrollingIds:[ZitiIdentity] = []
     
     private func initTunnelProviderManager() {
         
-        //let delegate = NSApplication.shared.delegate as! AppDelegate
-
         NETunnelProviderManager.loadAllFromPreferences { (savedManagers: [NETunnelProviderManager]?, error: Error?) in
-            
-            //
-            // Find our manager (there should only be one, since we only are managing a single
-            // extension).  If error and savedManagers are both nil that means there is no previous
-            // configuration stored for this app (e.g., first time run, no Preference Profile loaded)
-            // Note self.tunnelProviderManager will never be nil.
-            //
             if let error = error {
                 NSLog(error.localizedDescription)
                 // keep going - we still might need to set default values...
@@ -154,8 +147,20 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idCreatedAtLabel.stringValue = zId.iat>0 ? dateToString(zId.iatDate):"unknown"
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
             idExpiresAtLabel.stringValue = "(expiration: \(zId.exp>0 ? dateToString(zId.expDate):"unknown")"
-            idExpiresAtLabel.isHidden = false
+            idExpiresAtLabel.isHidden = zId.enrollmentStatus == .Enrolled
             idEnrollBtn.isHidden = zId.enrollmentStatus == .Pending ? false : true
+            
+            if enrollingIds.contains(zId) {
+                idSpinner.startAnimation(nil)
+                idSpinner.isHidden = false
+                idEnrollStatusLabel.stringValue = "Enrolling"
+                idEnrollBtn.isEnabled = false
+            } else {
+                idSpinner.stopAnimation(nil)
+                idSpinner.isHidden = true
+                idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
+                idEnrollBtn.isEnabled = zId.enrollmentStatus == .Pending
+            }
         } else {
             box.alphaValue = 0.25
             idEnabledBtn.isEnabled = false
@@ -167,6 +172,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idEnrollStatusLabel.stringValue = "-"
             idExpiresAtLabel.isHidden = true
             idEnrollBtn.isHidden = true
+            idSpinner.isHidden = true
         }
         
         if let svc = servicesViewController {
@@ -335,10 +341,29 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
         }
     }
+    
     @IBAction func onEnrollButton(_ sender: Any) {
         let indx = representedObject as! Int
         let zid = zitiIdentities[indx]
-        _ = zid.enroll() // TODO: Alert on error, needs to have an escaping closure
+        enrollingIds.append(zid)
+        updateServiceUI(zId: zid)
+        ZitiEdge(zid).enroll() { zErr in
+            DispatchQueue.main.async {
+                self.enrollingIds.removeAll { $0.id == zid.id }
+                self.updateServiceUI(zId:zid)
+                guard zErr == nil else {
+                    self.dialogAlert("Unable to enroll \(zid.name)", zErr!.localizedDescription)
+                    return
+                }
+                
+                // TODO:  Maybe set to Active?  Go grab initial set of Services? (or wait for TunnelProvider to get 'em?)
+                print("ENROLLED!")
+                
+                zid.enabled = true
+                _ = self.zidStore.store(zid)
+            }
+            
+        }
     }
 }
 

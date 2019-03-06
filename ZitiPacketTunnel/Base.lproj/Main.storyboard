@@ -854,8 +854,12 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
+                                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="QnQ-VS-e1d">
+                                        <rect key="frame" x="286" y="291" width="16" height="16"/>
+                                    </progressIndicator>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="QnQ-VS-e1d" firstAttribute="centerY" secondItem="7i5-wn-QNH" secondAttribute="centerY" id="0BN-ty-lJJ"/>
                                     <constraint firstItem="6nJ-6N-aKs" firstAttribute="trailing" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.67" id="0cA-if-FVG"/>
                                     <constraint firstItem="PpN-1h-dON" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="leading" constant="20" id="6W7-eX-jLh"/>
                                     <constraint firstItem="7Rw-cE-4Xu" firstAttribute="top" secondItem="PpN-1h-dON" secondAttribute="bottom" constant="8" id="G2S-IH-JgH"/>
@@ -885,6 +889,7 @@
                                     <constraint firstItem="L6n-5i-YvX" firstAttribute="trailing" secondItem="Cv8-fk-doz" secondAttribute="centerX" multiplier="0.67" id="kaM-lY-ibF"/>
                                     <constraint firstItem="Noi-zR-vFJ" firstAttribute="leading" secondItem="Cv8-fk-doz" secondAttribute="leading" constant="20" id="lAQ-Rs-gaW"/>
                                     <constraint firstItem="N3v-mR-AwK" firstAttribute="leading" secondItem="GvT-MC-um3" secondAttribute="leading" id="lyd-U2-oP2"/>
+                                    <constraint firstItem="QnQ-VS-e1d" firstAttribute="leading" secondItem="7i5-wn-QNH" secondAttribute="trailing" constant="10" id="m7E-eP-6N7"/>
                                     <constraint firstItem="PJs-YU-hJE" firstAttribute="leading" secondItem="L6n-5i-YvX" secondAttribute="trailing" constant="10" id="mbd-bf-OHH"/>
                                     <constraint firstItem="Noi-zR-vFJ" firstAttribute="top" secondItem="hH5-Lj-q4t" secondAttribute="bottom" constant="20" id="ool-uA-mVe"/>
                                     <constraint firstAttribute="bottom" secondItem="Noi-zR-vFJ" secondAttribute="bottom" constant="20" id="qst-0N-lkG"/>
@@ -1057,6 +1062,7 @@
                         <outlet property="idLabel" destination="7Rw-cE-4Xu" id="bAY-0x-YNw"/>
                         <outlet property="idNameLabel" destination="yAm-ab-8PC" id="tl1-rY-10C"/>
                         <outlet property="idNetworkLabel" destination="u4K-4k-Eda" id="GKC-aH-D3w"/>
+                        <outlet property="idSpinner" destination="QnQ-VS-e1d" id="5wo-Ch-DTp"/>
                         <outlet property="tableView" destination="Gny-TY-peg" id="4em-sl-JaC"/>
                     </connections>
                 </viewController>
@@ -1180,7 +1186,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xf2-Ok-jb2">
-                                        <rect key="frame" x="20" y="175" width="64" height="64"/>
+                                        <rect key="frame" x="20" y="111" width="128" height="128"/>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ZitiLogo64" id="TE9-g4-Vht"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="i3q-fy-Hz3">
