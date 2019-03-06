@@ -29,6 +29,10 @@
 		5A0D1D2F222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
 		5A100A6620A4FD6100B0B99D /* IPv6Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A06F70820A1120C00E0D9A7 /* IPv6Packet.swift */; };
 		5A100A6720A4FD6300B0B99D /* IPv6Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A06F70820A1120C00E0D9A7 /* IPv6Packet.swift */; };
+		5A1B63CE222ED15F00E9C226 /* ZitiEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1B63CD222ED15F00E9C226 /* ZitiEdge.swift */; };
+		5A1B63CF222ED15F00E9C226 /* ZitiEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1B63CD222ED15F00E9C226 /* ZitiEdge.swift */; };
+		5A1B63D0222ED15F00E9C226 /* ZitiEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1B63CD222ED15F00E9C226 /* ZitiEdge.swift */; };
+		5A1B63D1222ED15F00E9C226 /* ZitiEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1B63CD222ED15F00E9C226 /* ZitiEdge.swift */; };
 		5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
 		5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
 		5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2CB209B750A00437608 /* AppDelegate.swift */; };
@@ -137,6 +141,7 @@
 		5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "ZitiPacketTunnel-macos.mobileconfig"; sourceTree = "<group>"; };
 		5A0D1D242225A87F00D01F30 /* ZitiKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiKeychain.swift; sourceTree = "<group>"; };
 		5A0D1D2B222B093F00D01F30 /* ZitiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiError.swift; sourceTree = "<group>"; };
+		5A1B63CD222ED15F00E9C226 /* ZitiEdge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiEdge.swift; sourceTree = "<group>"; };
 		5A2EA2A52097890400437608 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		5A2EA2C9209B750A00437608 /* ZitiMobilePacketTunnel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZitiMobilePacketTunnel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A2EA2CB209B750A00437608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -284,6 +289,7 @@
 				5A91B4D32224B630006C4277 /* ZitiCSR.swift */,
 				5A0D1D242225A87F00D01F30 /* ZitiKeychain.swift */,
 				5A0D1D2B222B093F00D01F30 /* ZitiError.swift */,
+				5A1B63CD222ED15F00E9C226 /* ZitiEdge.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -628,6 +634,7 @@
 				5A0D1D252225A87F00D01F30 /* ZitiKeychain.swift in Sources */,
 				5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */,
 				5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */,
+				5A1B63CE222ED15F00E9C226 /* ZitiEdge.swift in Sources */,
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
 				5A91B4D42224B630006C4277 /* ZitiCSR.swift in Sources */,
 				5A0D1D2C222B093F00D01F30 /* ZitiError.swift in Sources */,
@@ -645,6 +652,7 @@
 				5A91B4B2222091DE006C4277 /* ZitiIdentity.swift in Sources */,
 				5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */,
 				5A0D1D2D222B093F00D01F30 /* ZitiError.swift in Sources */,
+				5A1B63CF222ED15F00E9C226 /* ZitiEdge.swift in Sources */,
 				5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */,
 				5A100A6620A4FD6100B0B99D /* IPv6Packet.swift in Sources */,
 				5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */,
@@ -665,6 +673,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A1B63D0222ED15F00E9C226 /* ZitiEdge.swift in Sources */,
 				5A2EA2F0209B75B700437608 /* ProviderConfig.swift in Sources */,
 				5A91B4CB2222E19E006C4277 /* ZitiIdentity.swift in Sources */,
 				5A2EA2CE209B750A00437608 /* ViewController.swift in Sources */,
@@ -685,6 +694,7 @@
 				5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */,
 				5A2EA2F1209B75B800437608 /* ProviderConfig.swift in Sources */,
 				5A0D1D2F222B093F00D01F30 /* ZitiError.swift in Sources */,
+				5A1B63D1222ED15F00E9C226 /* ZitiEdge.swift in Sources */,
 				5A100A6720A4FD6300B0B99D /* IPv6Packet.swift in Sources */,
 				5A91B4CA2222E156006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
