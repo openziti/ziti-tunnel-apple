@@ -61,44 +61,19 @@ class ZitiIdentity : NSObject, Codable {
     let rootCa:String?
     var exp:Int = 0
     var expDate:Date { return Date(timeIntervalSince1970: TimeInterval(exp)) }
-    var iat:Int = 0
-    var iatDate:Date { return Date(timeIntervalSince1970: TimeInterval(iat)) }
+    var iat:Int? = 0
+    var iatDate:Date { return Date(timeIntervalSince1970: TimeInterval(iat ?? 0)) }
     
-    var enabled = false
-    var enrolled = false
+    var enabled:Bool? = false
+    var enrolled:Bool? = false
     var enrollmentStatus:ZitiEnrollmentStatus {
+        let enrolled = self.enrolled ?? false
         if (enrolled) { return .Enrolled }
         if (Date() > expDate) { return .Expired }
         return .Pending
     }
-    
-    init?(_ json:[String:Any]) {
-        guard let identity = json["identity"] as? [String:String],
-            let name = identity["name"],
-            let id = identity["id"],
-            let versions = json["versions"] as? [String:String],
-            let apiVersion = versions["api"],
-            let enrollmentApiVersion = versions["enrollmentApi"],
-            let enrollmentUrl = json["enrollmentUrl"] as? String,
-            let apiBaseUrl = json["apiBaseUrl"] as? String,
-            let method = json["method"] as? String,
-            let token = json["token"] as? String
-        else {
-            NSLog("ZitiIdentity - Invalid or Unsupported Enrollment JWT")
-            return nil
-        }
-        self.identity = Identity(name, id)
-        self.versions = Versions(apiVersion, enrollmentApiVersion)
-        self.enrollmentUrl = enrollmentUrl
-        self.apiBaseUrl = apiBaseUrl
-        self.method = ZitiEnrollmentMethod(method)
-        self.token = token
-        self.rootCa = json["rootCa"] as? String ?? nil
-        self.exp = json["exp"] as? Int ?? 0
-        self.iat = json["iat"] as? Int ?? 0
-        self.enabled = json["enabled"] as? Bool ?? false
-        self.enrolled = json["enabled"] as? Bool ?? false
-        super.init()
+    var isEnabled:Bool {
+        return enabled ?? false
     }
     
     override var debugDescription: String {
