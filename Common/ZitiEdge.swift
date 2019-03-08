@@ -10,7 +10,8 @@ import Foundation
 
 fileprivate let AUTH_PATH = "authenticate?method=cert"
 fileprivate let SESSION_TAG = "zt-session"
-fileprivate let SERVCES_PATH = "services"
+fileprivate let SERVCES_PATH = "services?limit=500"
+fileprivate let NETSESSIONS_PATH = "network-sessions"
 fileprivate let GET_METHOD = "GET"
 fileprivate let POST_METHOD = "POST"
 fileprivate let CONTENT_TYPE = "Content-Type"
@@ -22,17 +23,14 @@ fileprivate let PEM_CERTIFICATE_REQUEST = "CERTIFICATE REQUEST"
 class ZitiEdge : NSObject {
     
     let zid:ZitiIdentity
-    var sessionToken:String? = nil
-    
     init(_ zid:ZitiIdentity) {
         self.zid = zid
     }
     
-    // looks like this is pointless? need to ask Andrew...
     func authenticate(completionHandler: @escaping (ZitiError?) -> Void) {
-        let servicesStr = zid.apiBaseUrl + AUTH_PATH
-        guard let url = URL(string: servicesStr) else {
-            completionHandler(ZitiError("Enable to convert services URL \"\(servicesStr)\""))
+        let authStr = zid.apiBaseUrl + AUTH_PATH
+        guard let url = URL(string: authStr) else {
+            completionHandler(ZitiError("Enable to convert auth URL \"\(authStr)\""))
             return
         }
         
@@ -52,11 +50,11 @@ class ZitiEdge : NSObject {
                 let sessionJSON = dataJSON["session"] as? [String:Any],
                 let token = sessionJSON["token"] as? String
             else {
-                    completionHandler(ZitiError("error trying to convert data to JSON"))
-                    return
+                completionHandler(ZitiError("error trying to convert data to JSON"))
+                return
             }
             print("zt-session: \(token)")
-            self.sessionToken = token
+            self.zid.sessionToken = token
             completionHandler(nil)
         }.resume()
     }
@@ -87,10 +85,7 @@ class ZitiEdge : NSObject {
         // Submit CSR
         let csrPEM = zkc.convertToPEM(PEM_CERTIFICATE_REQUEST, der: csr!).data(using: String.Encoding.utf8)
         let (session, urlRequest) = getURLSession(
-            url:url,
-            method:POST_METHOD,
-            contentType:TEXT_TYPE,
-            body:csrPEM)
+            url:url, method:POST_METHOD, contentType:TEXT_TYPE, body:csrPEM)
         
         session.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
@@ -112,55 +107,66 @@ class ZitiEdge : NSObject {
         }.resume()
     }
     
-    // TODO: getServices
-    // TODO: getNetworkSession
+    func getServices(completionHandler: @escaping ([ZitiEdgeService]?, ZitiError?) -> Void) {
+        let servicesStr = zid.apiBaseUrl + SERVCES_PATH
+        guard let url = URL(string: servicesStr) else {
+            completionHandler(nil, ZitiError("Enable to convert services URL \"\(servicesStr)\""))
+            return
+        }
+        
+        let (session, urlRequest) = getURLSession(
+            url:url, method:GET_METHOD, contentType:JSON_TYPE, body:nil)
+        
+        session.dataTask(with: urlRequest) { (data, response, error) in
+            if let zErr = self.validateResponse(data, response, error) {
+                completionHandler(nil, zErr)
+                return
+            }
+            guard let resp =
+                try? JSONDecoder().decode(ZitiEdgeServiceResponse.self, from: data!) else {
+                completionHandler(nil, ZitiError("Enable to decode response for services"))
+                return
+            }
+            completionHandler(resp.data, nil)
+        }.resume()
+    }
     
-    func handleServerTrustChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        // get server's CA
-        guard let serverTrust = challenge.protectionSpace.serverTrust,
-            let cert = SecTrustGetCertificateAtIndex(serverTrust, 0),
-            let remoteCertData = CFBridgingRetain(SecCertificateCopyData(cert))
-        else {
-            print("... Could not get server cert!")
-            completionHandler(.cancelAuthenticationChallenge, nil);
+    func getNetworkSession(_ serviceId:String, completionHandler: @escaping (ZitiEdgeNetworkSession?, ZitiError?) -> Void) {
+        let sessionsStr = zid.apiBaseUrl + NETSESSIONS_PATH
+        guard let url = URL(string: sessionsStr) else {
+            completionHandler(nil, ZitiError("Enable to convert services URL \"\(sessionsStr)\""))
             return
         }
         
-        // if we have .rootCA check if we match. Else rely on default handling
-        guard let rootCaPEM = zid.rootCa else {
-            print("...no rootCa for \(zid.name) - will perform default handling")
-            completionHandler(.performDefaultHandling, nil)
-            return
-        }
+        let body = "{\"serviceId\":\\(serviceId)\"}".data(using: .utf8)
+        let (session, urlRequest) = getURLSession(
+            url:url, method:GET_METHOD, contentType:JSON_TYPE, body:body)
         
-        let zkc = ZitiKeychain(zid)
-        let localCertData = zkc.convertToDER(rootCaPEM)
-        guard remoteCertData.isEqual(to: localCertData) == true else {
-            print("... Certificates don't match!")
-            completionHandler(.cancelAuthenticationChallenge, nil);
-            return
-        }
-        
-        // looks good
-        print("...got a match for \(zid.name) - this should work :)")
-        completionHandler(.useCredential, URLCredential(trust: serverTrust))
+        session.dataTask(with: urlRequest) { (data, response, error) in
+            if let zErr = self.validateResponse(data, response, error) {
+                completionHandler(nil, zErr)
+                return
+            }
+            guard let resp =
+                try? JSONDecoder().decode(ZitiEdgeNetworkSessionResponse.self, from: data!) else {
+                    completionHandler(nil, ZitiError("Enable to decode response for services"))
+                    return
+            }
+            completionHandler(resp.data, nil)
+        }.resume()
     }
     
     private func getURLSession(url:URL, method:String, contentType:String, body:Data?) -> (URLSession, URLRequest) {
         let session = URLSession(
-            configuration: URLSessionConfiguration.default,
-            delegate: self,
-            delegateQueue:OperationQueue.main)
+            configuration: URLSessionConfiguration.default, delegate: self, delegateQueue:OperationQueue.main)
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method
         urlRequest.setValue(contentType, forHTTPHeaderField: CONTENT_TYPE)
-        if self.sessionToken != nil {
-            urlRequest.setValue(self.sessionToken, forHTTPHeaderField: SESSION_TAG)
+        if zid.sessionToken != nil {
+            urlRequest.setValue(zid.sessionToken, forHTTPHeaderField: SESSION_TAG)
         }
         urlRequest.httpBody = body
-        
         return (session, urlRequest)
     }
     
@@ -170,16 +176,22 @@ class ZitiEdge : NSObject {
             let respData = data
         else {
             return ZitiError(error?.localizedDescription ??
-                "Invalid or empty response from enrollment server")
+                "Invalid or empty response from server")
         }
         
         guard httpResp.statusCode == 200 else {
             guard let edgeErrorResp = try? JSONDecoder().decode(ZitiEdgeErrorResponse.self, from: respData) else {
                 let respStr = HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)
-                return ZitiError("HTTP response code: \(httpResp.statusCode) \(respStr)")
-            }
-            return ZitiError(edgeErrorResp.shortDescription(httpResp.statusCode))
+                return ZitiError("HTTP response code: \(httpResp.statusCode) \(respStr)", errorCode:httpResp.statusCode)
+            }            
+            return ZitiError(edgeErrorResp.shortDescription(httpResp.statusCode), errorCode:httpResp.statusCode)
         }
+        
+        // TODO: temp for dev
+        if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
+            print("Response for \(self.zid.name): \(responseStr)")
+        }
+        // end temp for dev
         return nil
     }
     
@@ -205,6 +217,20 @@ class ZitiEdge : NSObject {
 }
 
 extension ZitiEdge : URLSessionDelegate {
+    
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        print("RECEIVED CHALLENGE: \(challenge.protectionSpace.authenticationMethod)")
+        switch challenge.protectionSpace.authenticationMethod {
+        case NSURLAuthenticationMethodServerTrust:
+            handleServerTrustChallenge(challenge, completionHandler:completionHandler)
+        case NSURLAuthenticationMethodClientCertificate:
+            handleClientCertChallenge(challenge, completionHandler:completionHandler)
+        default:
+            completionHandler(.performDefaultHandling, nil)
+        }
+    }
+    
     func handleClientCertChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
         let zkc = ZitiKeychain(self.zid)
@@ -219,16 +245,35 @@ extension ZitiEdge : URLSessionDelegate {
         completionHandler(.useCredential, urlCredential)
     }
     
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        print("RECEIVED CHALLENGE: \(challenge.protectionSpace.authenticationMethod)")
-        switch challenge.protectionSpace.authenticationMethod {
-        case NSURLAuthenticationMethodServerTrust:
-            handleServerTrustChallenge(challenge, completionHandler:completionHandler)
-        case NSURLAuthenticationMethodClientCertificate:
-            handleClientCertChallenge(challenge, completionHandler:completionHandler)
-        default:
+    func handleServerTrustChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+
+        // if we have .rootCA check if we match. Else rely on default handling
+        guard let rootCaPEM = zid.rootCa else {
+            print("...no rootCa for \(zid.name) - will perform default handling")
             completionHandler(.performDefaultHandling, nil)
+            return
         }
+        
+        // get server's cert
+        guard let serverTrust = challenge.protectionSpace.serverTrust,
+            let cert = SecTrustGetCertificateAtIndex(serverTrust, 0),
+            let remoteCertData = CFBridgingRetain(SecCertificateCopyData(cert))
+            else {
+                print("... Could not get server cert!")
+                completionHandler(.cancelAuthenticationChallenge, nil);
+                return
+        }
+
+        let zkc = ZitiKeychain(zid)
+        let localCertData = zkc.convertToDER(rootCaPEM)
+        guard remoteCertData.isEqual(to: localCertData) == true else {
+            print("... Certificates don't match!")
+            completionHandler(.cancelAuthenticationChallenge, nil);
+            return
+        }
+        
+        // looks good
+        print("...got a match for \(zid.name) - this should work :)")
+        completionHandler(.useCredential, URLCredential(trust: serverTrust))
     }
 }
