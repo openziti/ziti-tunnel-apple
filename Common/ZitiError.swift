@@ -15,8 +15,9 @@ struct ZitiError : LocalizedError, CustomNSError {
     public var errorCode:Int = -1
     public var errorUserInfo:[String:Any] = [:]
     
-    init(_ errorDescription:String) {
-        NSLog(errorDescription)
+    init(_ errorDescription:String, errorCode:Int=Int(-1)) {
+        NSLog("\(errorCode) \(errorDescription)")
         self.errorDescription = errorDescription
+        self.errorCode = errorCode
     }
 }
