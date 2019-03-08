@@ -35,7 +35,7 @@ enum ZitiEnrollmentStatus : String, Codable {
 
 class ZitiIdentity : NSObject, Codable {
     //let identity:(name:String, id:String)
-    class Identity : NSObject, Codable {
+    class Identity : Codable {
         let name:String, id:String
         init(_ name:String, _ id:String) {
             self.name = name; self.id = id
@@ -43,7 +43,7 @@ class ZitiIdentity : NSObject, Codable {
     }
     
     //let versions:(api:String, enrollmentApi:String)
-    class Versions : NSObject, Codable {
+    class Versions : Codable {
         let api:String, enrollmentApi:String
         init(_ api:String, _ enrollmentApi:String) {
             self.api = api; self.enrollmentApi = enrollmentApi
@@ -53,6 +53,7 @@ class ZitiIdentity : NSObject, Codable {
     let identity:Identity
     var name:String { return identity.name }
     var id:String { return identity.id }
+    var sessionToken:String?
     let versions:Versions
     let enrollmentUrl:String
     let apiBaseUrl:String
