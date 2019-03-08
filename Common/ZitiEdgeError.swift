@@ -8,27 +8,25 @@
 
 import Foundation
 
-class ZitiEdgeErrorMeta : NSObject, Codable {
-    var apiVersion:String?
-    var apiEnrolmentVersion:String?
-}
-
-class ZitiEdgeErrorCause : NSObject, Codable {
-    var message:String?
-    var fieldName:String?
-    var fieldValue:String?
-}
-
-class ZitiEdgeError : NSObject, Codable {
-    var cause:ZitiEdgeErrorCause?
+class ZitiEdgeError : Codable {
+    class Cause : Codable {
+        var message:String?
+        var fieldName:String?
+        var fieldValue:String?
+    }
+    var cause:Cause?
     var causeMessage:String?
     var code:String?
     var message:String?
     var requestId:String?
 }
 
-class ZitiEdgeErrorResponse : NSObject, Codable {
-    var meta:ZitiEdgeErrorMeta?
+class ZitiEdgeErrorResponse : Codable {
+    class Meta : Codable {
+        var apiVersion:String?
+        var apiEnrolmentVersion:String?
+    }
+    var meta:Meta?
     var error:ZitiEdgeError?
     
     func shortDescription(_ httpStatusCode:Int) -> String {
