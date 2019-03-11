@@ -11,7 +11,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>45L2MK8H4.ZitiPacketTunnel.group</string>
+		<string>45L2MKV8H4.ZitiPacketTunnel.group</string>
 	</array>
 	<key>com.apple.security.network.client</key>
 	<true/>
