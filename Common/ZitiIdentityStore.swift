@@ -11,7 +11,7 @@ import Foundation
 class ZitiIdentityStore : NSObject, NSFilePresenter {
     
     // TODO: Get TEAMID programatically... (and will be diff on iOS)
-    static let APP_GROUP_ID = "45L2MK8H4.ZitiPacketTunnel.group"
+    static let APP_GROUP_ID = "45L2MKV8H4.ZitiPacketTunnel.group"
     
     var presentedItemURL: URL? = FileManager.default.containerURL(
         forSecurityApplicationGroupIdentifier: APP_GROUP_ID)
@@ -88,8 +88,8 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         fc.coordinate(writingItemAt: url, options: .forDeleting, error: nil) { url in
             do {
                 let zkc = ZitiKeychain(zId)
-                _ = zkc.deleteKeyPair()
                 _ = zkc.deleteCertificate()
+                _ = zkc.deleteKeyPair()
                 try FileManager.default.removeItem(at: url)
             } catch {
                 zErr = ZitiError("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")

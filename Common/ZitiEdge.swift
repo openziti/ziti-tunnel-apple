@@ -21,6 +21,7 @@ fileprivate let PEM_CERTIFICATE = "CERTIFICATE"
 fileprivate let PEM_CERTIFICATE_REQUEST = "CERTIFICATE REQUEST"
 
 class ZitiEdge : NSObject {
+    var trustSelfSigned = true // TODO
     
     let zid:ZitiIdentity
     init(_ zid:ZitiIdentity) {
@@ -102,6 +103,7 @@ class ZitiEdge : NSObject {
                 completionHandler(zStoreErr)
                 return
             }
+
             self.zid.enrolled = true
             completionHandler(nil)
         }.resume()
@@ -119,7 +121,22 @@ class ZitiEdge : NSObject {
         
         session.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
-                completionHandler(nil, zErr)
+                
+                // if 401, try auth and if ok, try getServices() again.
+                if zErr.errorCode == 401 {
+                    print("\(self.zid.name) getSessions called, receiced unauthorized response.  Attempting auth")
+                    self.authenticate { authErr in
+                        guard authErr == nil else {
+                            print("\(self.zid.name) getSessions re-auth no good")
+                            completionHandler(nil, authErr)
+                            return
+                        }
+                        print("\(self.zid.name) resubmitting getServices")
+                        self.getServices(completionHandler: completionHandler)
+                    }
+                } else {
+                    completionHandler(nil, zErr)
+                }
                 return
             }
             guard let resp =
@@ -144,12 +161,23 @@ class ZitiEdge : NSObject {
         
         session.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
-                completionHandler(nil, zErr)
+                // if 401, try auth and if ok, try getServices() again.
+                if zErr.errorCode == 401 {
+                    self.authenticate { authErr in
+                        guard authErr == nil else {
+                            completionHandler(nil, authErr)
+                            return
+                        }
+                        self.getNetworkSession(serviceId, completionHandler: completionHandler)
+                    }
+                } else {
+                    completionHandler(nil, zErr)
+                }
                 return
             }
             guard let resp =
                 try? JSONDecoder().decode(ZitiEdgeNetworkSessionResponse.self, from: data!) else {
-                    completionHandler(nil, ZitiError("Enable to decode response for services"))
+                    completionHandler(nil, ZitiError("Enable to decode response for network session"))
                     return
             }
             completionHandler(resp.data, nil)
@@ -163,9 +191,7 @@ class ZitiEdge : NSObject {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method
         urlRequest.setValue(contentType, forHTTPHeaderField: CONTENT_TYPE)
-        if zid.sessionToken != nil {
-            urlRequest.setValue(zid.sessionToken, forHTTPHeaderField: SESSION_TAG)
-        }
+        urlRequest.setValue(zid.sessionToken ?? "-1", forHTTPHeaderField: SESSION_TAG)
         urlRequest.httpBody = body
         return (session, urlRequest)
     }
@@ -188,9 +214,9 @@ class ZitiEdge : NSObject {
         }
         
         // TODO: temp for dev
-        if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
+        /*if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
             print("Response for \(self.zid.name): \(responseStr)")
-        }
+        }*/
         // end temp for dev
         return nil
     }
@@ -254,21 +280,27 @@ extension ZitiEdge : URLSessionDelegate {
             return
         }
         
+        // TODO: See https://infinum.co/the-capsized-eight/how-to-make-your-ios-apps-more-secure-with-ssl-pinning
+        
         // get server's cert
         guard let serverTrust = challenge.protectionSpace.serverTrust,
-            let cert = SecTrustGetCertificateAtIndex(serverTrust, 0),
-            let remoteCertData = CFBridgingRetain(SecCertificateCopyData(cert))
-            else {
-                print("... Could not get server cert!")
-                completionHandler(.cancelAuthenticationChallenge, nil);
-                return
+            let cert = SecTrustGetCertificateAtIndex(serverTrust, 0)
+        else {
+            print("... Could not get server cert!")
+            completionHandler(.cancelAuthenticationChallenge, nil);
+            return
         }
-
+        let remoteCertData = SecCertificateCopyData(cert) as CFTypeRef
+        
         let zkc = ZitiKeychain(zid)
         let localCertData = zkc.convertToDER(rootCaPEM)
-        guard remoteCertData.isEqual(to: localCertData) == true else {
+        guard remoteCertData.isEqual(to: localCertData) == true else { // TODO - more spphisticated compare.
             print("... Certificates don't match!")
-            completionHandler(.cancelAuthenticationChallenge, nil);
+            if trustSelfSigned == false {
+                completionHandler(.cancelAuthenticationChallenge, nil);
+            } else {
+                return completionHandler(.useCredential, URLCredential(trust: serverTrust)) // workaround for now
+            }
             return
         }
         

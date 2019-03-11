@@ -9,7 +9,7 @@
 import Foundation
 
 class ZitiKeychain : NSObject {
-    // kSecAttrAccessGroup not needed if sharing only a single keychain group.. 
+    // kSecAttrAccessGroup not needed if sharing only a single keychain group?
     static let ZITI_KEYCHAIN_GROUP = "TEAMID.ZitiKeychain"
     var keySize = 2048
     let zid:ZitiIdentity
@@ -19,24 +19,55 @@ class ZitiKeychain : NSObject {
         super.init()
     }
     
+    #if os(macOS)
+    private func getSecAccessRef() -> SecAccess? {
+        var secAccess:SecAccess?
+        
+        var app:SecTrustedApplication?
+        if SecTrustedApplicationCreateFromPath(nil, &app) != errSecSuccess { return nil }
+        
+        var ext:SecTrustedApplication?
+        let extPath = Bundle.main.builtInPlugInsPath! + "/PacketTunnelProvider.appex"
+        if SecTrustedApplicationCreateFromPath(extPath, &ext) != errSecSuccess { return nil }
+        
+        let trustedList = [app!, ext!] as NSArray?
+        if SecAccessCreate("ZitiPacketTunnel" as CFString, trustedList, &secAccess) != errSecSuccess {
+            return nil
+        }
+        return secAccess
+    }
+    #endif
+    
     func createKeyPair() -> (privKey:SecKey?, pubKey:SecKey?, ZitiError?) {
         guard let atag = zid.id.data(using: .utf8) else {
             return (nil, nil, ZitiError("createPrivateKey: Unable to create application tag \(zid.id)"))
         }
+        
         let privateKeyParams: [CFString: Any] = [
             kSecAttrIsPermanent: true,
+            kSecAttrLabel: zid.id,
             kSecAttrApplicationTag: atag]
-        let publicKeyParams: [CFString: Any] = [
-            kSecAttrIsPermanent: true as AnyObject,
-            kSecAttrApplicationTag: atag]
-        let parameters: [CFString: Any] = [
+        var parameters: [CFString: Any] = [
             kSecAttrKeyType: kSecAttrKeyTypeRSA,
             kSecAttrKeySizeInBits: keySize,
             kSecReturnRef: kCFBooleanTrue,
+            kSecAttrLabel: zid.id, //macOs
             kSecAttrIsPermanent: true, // macOs
             kSecAttrApplicationTag: atag, //macOs
-            kSecPublicKeyAttrs: publicKeyParams,
+            /*kSecPublicKeyAttrs: publicKeyParams,*/
             kSecPrivateKeyAttrs: privateKeyParams]
+        
+#if os(macOS)
+        if let secAccessRef = getSecAccessRef() {
+            parameters[kSecAttrAccess] = secAccessRef
+        } else {
+            // Just log it. All should still work, but user will be prompted to allow access
+            NSLog("createPrivateKey: Unable to to add secAttrAccess for \(zid.name)")
+        }
+#else
+        // Need keychain group on iOS - kSecAccessControl? kSecAttrAccessGroup?
+        // Need to be in privateKeyParams?
+#endif
         
         var error: Unmanaged<CFError>?
         guard let privateKey = SecKeyCreateRandomKey(parameters as CFDictionary, &error) else {
@@ -75,14 +106,20 @@ class ZitiKeychain : NSObject {
         return e == nil
     }
     
+    private func deleteKey(_ atag:Data, keyClass:Any) -> OSStatus {
+        let deleteQuery:[CFString:Any] = [
+            kSecClass: kSecClassKey,
+            kSecAttrKeyClass: keyClass,
+            kSecAttrApplicationTag: atag]
+        return SecItemDelete(deleteQuery as CFDictionary)
+    }
     func deleteKeyPair() -> ZitiError? {
         guard let atag = zid.id.data(using: .utf8) else {
             return ZitiError("deleteKeyPair: Unable to create application tag \(zid.id)")
         }
-        let deleteQuery:[CFString:Any] = [
-            kSecClass: kSecClassKey,
-            kSecAttrApplicationTag: atag]
-        let status = SecItemDelete(deleteQuery as CFDictionary)
+        
+        _ = deleteKey(atag, keyClass:kSecAttrKeyClassPublic)
+        let status = deleteKey(atag, keyClass:kSecAttrKeyClassPrivate)
         guard status == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
             return ZitiError("Unable to delete key pair for \(zid.id): \(errStr)")
@@ -91,6 +128,7 @@ class ZitiKeychain : NSObject {
     }
     
     func getSecureIdentity() -> (SecIdentity?, ZitiError?) {
+#if os(macOS)
         let params: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
             kSecReturnRef: kCFBooleanTrue,
@@ -102,14 +140,29 @@ class ZitiKeychain : NSObject {
             let errStr = SecCopyErrorMessageString(certStatus, nil) as String? ?? "\(certStatus)"
             return (nil, ZitiError("Unable to get certificate for \(zid.id): \(errStr)"))
         }
-        
         let certificate = cert as! SecCertificate
+
         var identity: SecIdentity?
         let status = SecIdentityCreateWithCertificate(nil, certificate, &identity)  // TODO: macos only
         guard status == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
             return (nil, ZitiError("Unable to get identity for \(zid.id): \(errStr)"))
         }
+#else
+        // works, and could polish up and use.  Pro: compiles on ios.  Con: wicked slow
+        let params: [CFString:Any] = [
+            kSecClass: kSecClassIdentity,
+            kSecReturnRef: kCFBooleanTrue,
+            kSecMatchSubjectContains: zid.id]
+        
+        var ref: CFTypeRef?
+        let status = SecItemCopyMatching(params as CFDictionary, &ref) // wildly slow. cache it?
+        guard status == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
+            return (nil, ZitiError("Unable to get identity for \(zid.id): \(errStr)"))
+        }
+        let identity = ref as! SecIdentity
+#endif
         return (identity, nil)
     }
     
@@ -160,7 +213,11 @@ class ZitiKeychain : NSObject {
             return ZitiError("Unable to find certificate for \(zid.id): \(errStr)")
         }
         
-        let deleteStatus = SecKeychainItemDelete(cert as! SecKeychainItem) // TODO macos only
+        let delParams: [CFString:Any] = [
+            kSecClass: kSecClassCertificate,
+            kSecValueRef: cert!,
+            kSecAttrLabel: zid.id]
+        let deleteStatus = SecItemDelete(delParams as CFDictionary)
         guard deleteStatus == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(deleteStatus, nil) as String? ?? "\(deleteStatus)"
             return ZitiError("Unable to delete certificate for \(zid.id): \(errStr)")
