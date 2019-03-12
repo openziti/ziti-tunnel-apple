@@ -201,17 +201,20 @@ class ZitiEdge : NSObject {
             let httpResp = response as? HTTPURLResponse,
             let respData = data
         else {
+            self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.unavailable)
             return ZitiError(error?.localizedDescription ??
                 "Invalid or empty response from server")
         }
         
         guard httpResp.statusCode == 200 else {
+            self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.unavailable)
             guard let edgeErrorResp = try? JSONDecoder().decode(ZitiEdgeErrorResponse.self, from: respData) else {
                 let respStr = HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)
                 return ZitiError("HTTP response code: \(httpResp.statusCode) \(respStr)", errorCode:httpResp.statusCode)
             }            
             return ZitiError(edgeErrorResp.shortDescription(httpResp.statusCode), errorCode:httpResp.statusCode)
         }
+        self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.available)
         
         // TODO: temp for dev
         /*if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {

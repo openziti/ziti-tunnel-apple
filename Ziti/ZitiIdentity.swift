@@ -8,34 +8,9 @@
 
 import Foundation
 
-// Enrollment Method Enum
-enum ZitiEnrollmentMethod : String, Codable {
-    case ott, ottCa, unrecognized
-    init(_ str:String) {
-        switch str {
-        case "ott": self = .ott
-        case "ottCa": self = .ottCa
-        default: self = .unrecognized
-        }
-    }
-}
-
-// Enrollment Status Enum
-enum ZitiEnrollmentStatus : String, Codable {
-    case Pending, Expired, Enrolled, Unknown
-    init(_ str:String) {
-        switch str {
-        case "Pending": self = .Pending
-        case "Expired": self = .Expired
-        case "Enrolled": self = .Enrolled
-        default: self = .Unknown
-        }
-    }
-}
-
 class ZitiIdentity : NSObject, Codable {
     //let identity:(name:String, id:String)
-    class Identity : Codable {
+    struct Identity : Codable {
         let name:String, id:String
         init(_ name:String, _ id:String) {
             self.name = name; self.id = id
@@ -43,10 +18,55 @@ class ZitiIdentity : NSObject, Codable {
     }
     
     //let versions:(api:String, enrollmentApi:String)
-    class Versions : Codable {
+    struct Versions : Codable {
         let api:String, enrollmentApi:String
         init(_ api:String, _ enrollmentApi:String) {
             self.api = api; self.enrollmentApi = enrollmentApi
+        }
+    }
+    
+    enum EnrollmentMethod : String, Codable {
+        case ott, ottCa, unrecognized
+        init(_ str:String) {
+            switch str {
+            case "ott": self = .ott
+            case "ottCa": self = .ottCa
+            default: self = .unrecognized
+            }
+        }
+    }
+    
+    enum EnrollmentStatus : String, Codable {
+        case Pending, Expired, Enrolled, Unknown
+        init(_ str:String) {
+            switch str {
+            case "Pending": self = .Pending
+            case "Expired": self = .Expired
+            case "Enrolled": self = .Enrolled
+            default: self = .Unknown
+            }
+        }
+    }
+    
+    //None, Available, PartiallyAvailable, Unavailable
+    enum ConnectivityStatus : String, Codable {
+        case none, available, partiallyAvailable, unavailable
+        init(_ str:String) {
+            switch str {
+            case "available": self = .available
+            case "partiallyAvailable": self = .partiallyAvailable
+            case "unavailable": self = .unavailable
+            default: self = .none
+            }
+        }
+    }
+    
+    struct EdgeStatus : Codable {
+        let lastContactAt:TimeInterval
+        let status:ConnectivityStatus
+        init(_ lastContactAt:TimeInterval, status:ConnectivityStatus) {
+            self.lastContactAt = lastContactAt
+            self.status = status
         }
     }
     
@@ -57,7 +77,7 @@ class ZitiIdentity : NSObject, Codable {
     let versions:Versions
     let enrollmentUrl:String
     let apiBaseUrl:String
-    let method:ZitiEnrollmentMethod
+    let method:EnrollmentMethod
     let token:String
     let rootCa:String?
     var exp:Int = 0
@@ -67,7 +87,7 @@ class ZitiIdentity : NSObject, Codable {
     
     var enabled:Bool? = false
     var enrolled:Bool? = false
-    var enrollmentStatus:ZitiEnrollmentStatus {
+    var enrollmentStatus:EnrollmentStatus {
         let enrolled = self.enrolled ?? false
         if (enrolled) { return .Enrolled }
         if (Date() > expDate) { return .Expired }
@@ -76,6 +96,7 @@ class ZitiIdentity : NSObject, Codable {
     var isEnabled:Bool {
         return enabled ?? false
     }
+    var edgeStatus:EdgeStatus?
     
     override var debugDescription: String {
         let jsonEncoder = JSONEncoder()
