@@ -50,13 +50,13 @@ class ZitiIdentity : NSObject, Codable {
     
     //None, Available, PartiallyAvailable, Unavailable
     enum ConnectivityStatus : String, Codable {
-        case none, available, partiallyAvailable, unavailable
+        case None, Available, PartiallyAvailable, Unavailable
         init(_ str:String) {
             switch str {
-            case "available": self = .available
-            case "partiallyAvailable": self = .partiallyAvailable
-            case "unavailable": self = .unavailable
-            default: self = .none
+            case "Available": self = .Available
+            case "PartiallyAvailable": self = .PartiallyAvailable
+            case "Unavailable": self = .Unavailable
+            default: self = .None
             }
         }
     }

@@ -772,7 +772,7 @@
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L6n-5i-YvX">
                                         <rect key="frame" x="18" y="315" width="133" height="17"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Created At:" id="PDr-UR-dXd">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Controller Status" id="PDr-UR-dXd">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -832,7 +832,7 @@
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PJs-YU-hJE">
                                         <rect key="frame" x="157" y="315" width="269" height="17"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="February 13, 2019 at 6:49:18 AM EST" id="VDm-rb-7ag">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Partially Available (23 minutes ago)" id="VDm-rb-7ag">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1054,7 +1054,7 @@
                         <outlet property="buttonsView" destination="7t0-mW-Nxn" id="1qr-BY-ifG"/>
                         <outlet property="connectButton" destination="yhe-Hc-OL2" id="w0f-1v-uce"/>
                         <outlet property="connectStatus" destination="abc-QL-VZa" id="NfN-Jq-ltE"/>
-                        <outlet property="idCreatedAtLabel" destination="PJs-YU-hJE" id="a0x-8w-EUA"/>
+                        <outlet property="idControllerStatusLabel" destination="VDm-rb-7ag" id="RHt-uF-IcD"/>
                         <outlet property="idEnabledBtn" destination="PpN-1h-dON" id="x3m-mV-Sbk"/>
                         <outlet property="idEnrollBtn" destination="7i5-wn-QNH" id="3hh-0f-vYr"/>
                         <outlet property="idEnrollStatusLabel" destination="GvT-MC-um3" id="eZg-Ub-WcB"/>

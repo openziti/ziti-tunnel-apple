@@ -21,7 +21,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var idLabel: NSTextField!
     @IBOutlet weak var idNameLabel: NSTextField!
     @IBOutlet weak var idNetworkLabel: NSTextField!
-    @IBOutlet weak var idCreatedAtLabel: NSTextField!
+    @IBOutlet weak var idControllerStatusLabel: NSTextFieldCell!
     @IBOutlet weak var idEnrollStatusLabel: NSTextField!
     @IBOutlet weak var idExpiresAtLabel: NSTextField!
     @IBOutlet weak var idEnrollBtn: NSButton!
@@ -115,6 +115,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             print("Reasserting...")
             break
         }
+        self.tableView.reloadData()
+        tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
     }
     
     override func viewDidAppear() {
@@ -139,13 +141,17 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     private func updateServiceUI(zId:ZitiIdentity?=nil) {
         if let zId = zId {
+            let controllerStatus = zId.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
+            let controllerStatusStr = controllerStatus.status.rawValue +
+                " (\(DateFormatter().timeSince(controllerStatus.lastContactAt)))"
+            
             box.alphaValue = 1.0
             idEnabledBtn.isEnabled = true
             idEnabledBtn.state = zId.isEnabled ? .on : .off
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.apiBaseUrl
-            idCreatedAtLabel.stringValue = dateToString(zId.iatDate)
+            idControllerStatusLabel.stringValue = controllerStatusStr
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
             idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.expDate))"
             idExpiresAtLabel.isHidden = zId.enrollmentStatus == .Enrolled
@@ -169,12 +175,15 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idLabel.stringValue = "-"
             idNameLabel.stringValue = "-"
             idNetworkLabel.stringValue = "-"
-            idCreatedAtLabel.stringValue = "-"
+            idControllerStatusLabel.stringValue = "-"
             idEnrollStatusLabel.stringValue = "-"
             idExpiresAtLabel.isHidden = true
             idEnrollBtn.isHidden = true
             idSpinner.isHidden = true
         }
+        
+        self.tableView.reloadData()
+        tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
         
         if let svc = servicesViewController {
             svc.updateServices(zId)
@@ -206,6 +215,37 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         NotificationCenter.default.addObserver(self, selector:
             #selector(ViewController.tunnelStatusDidChange(_:)), name:
             NSNotification.Name.NEVPNStatusDidChange, object: nil)
+        
+        // GetServices timer - fire quickly, then every X secs
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.updateServicesTimerFired() // should: auth, then update services
+            Timer.scheduledTimer(withTimeInterval: 15.0, repeats: true) { timer in
+                self.updateServicesTimerFired()
+            }
+        }
+    }
+    
+    func updateServices(_ zid:ZitiIdentity, svcs:[ZitiEdgeService]) {
+        print("...got \(svcs.count) services for \(zid.name)")
+        svcs.forEach { svc in
+            print("......\(zid.name): \(svc.name ?? "unnamed") host:\(svc.dns?.hostname ?? "na"), port:\(svc.dns?.port ?? -1)")
+        }
+    }
+    
+    func updateServicesTimerFired() {
+        zitiIdentities.forEach { zid in
+            if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
+                ZitiEdge(zid).getServices { svcs, zErr in
+                    if let services = svcs {
+                        self.updateServices(zid, svcs:services)
+                    }
+                    DispatchQueue.main.async {
+                        let currZid = self.zitiIdentities[self.representedObject as! Int]
+                        if currZid == zid { self.updateServiceUI(zId:zid) }
+                    }
+                }
+            }
+        }
     }
 
     override var representedObject: Any? {
@@ -226,8 +266,28 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     func tableViewSelectionDidChange(_ notification: Notification) {
         if (tableView.selectedRow >= 0) {
             print("tableViewSelectionDidChange " + String(tableView.selectedRow))
-            representedObject = tableView.selectedRow
+            if (representedObject as! Int) != tableView.selectedRow {
+                representedObject = tableView.selectedRow
+            }
         }
+    }
+    
+    func dialogAlert(_ msg:String, _ text:String? = nil) {
+        let alert = NSAlert()
+        alert.messageText = msg
+        alert.informativeText =  text ?? ""
+        alert.alertStyle = NSAlert.Style.critical
+        alert.runModal()
+    }
+    
+    func dialogOKCancel(question: String, text: String) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = question
+        alert.informativeText = text
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        return alert.runModal() == .alertFirstButtonReturn
     }
 
     @IBAction func onConnectButton(_ sender: NSButton) {
@@ -276,7 +336,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     print("zid: \(ztid.debugDescription)")
                     
                     // only support OTT
-                    guard ztid.method == ZitiEnrollmentMethod.ott else {
+                    guard ztid.method == .ott else {
                         throw ZitiError("Only OTT Enrollment is supported by this application")
                     }
                     
@@ -304,24 +364,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 }
             }
         }
-    }
-    
-    func dialogAlert(_ msg:String, _ text:String? = nil) {
-        let alert = NSAlert()
-        alert.messageText = msg
-        alert.informativeText =  text ?? ""
-        alert.alertStyle = NSAlert.Style.critical
-        alert.runModal()
-    }
-    
-    func dialogOKCancel(question: String, text: String) -> Bool {
-        let alert = NSAlert()
-        alert.messageText = question
-        alert.informativeText = text
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "OK")
-        alert.addButton(withTitle: "Cancel")
-        return alert.runModal() == .alertFirstButtonReturn
     }
     
     @IBAction func removeIdentityButton(_ sender: Any) {
@@ -354,19 +396,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         ZitiEdge(zid).enroll() { zErr in
             DispatchQueue.main.async {
                 self.enrollingIds.removeAll { $0.id == zid.id }
-                self.updateServiceUI(zId:zid)
                 guard zErr == nil else {
+                    _ = self.zidStore.store(zid)
+                    self.updateServiceUI(zId:zid)
                     self.dialogAlert("Unable to enroll \(zid.name)", zErr!.localizedDescription)
                     return
                 }
-                
-                // TODO:  Maybe set to Active?  Go grab initial set of Services? (or wait for TunnelProvider to get 'em?)
-                print("ENROLLED!")
-                
                 zid.enabled = true
                 _ = self.zidStore.store(zid)
+                self.updateServiceUI(zId:zid) // TODO: move to file change notify..
             }
-            
         }
     }
 }
@@ -381,11 +420,21 @@ extension ViewController: NSTableViewDelegate {
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "defaultRow"), owner: nil) as? NSTableCellView {
             
-            let zId = zitiIdentities[row]
-            cell.textField?.stringValue = zId.name
+            let zid = zitiIdentities[row]
+            cell.textField?.stringValue = zid.name
             
-            // None, Available, PartiallyAvailable, Unavailable
-            cell.imageView?.image = NSImage(named:NSImage.Name(rawValue: "NSStatusNone")) ?? nil
+            let tunnelStatus = self.tunnelProviderManager.connection.status
+            var imageName:String = "NSStatusNone"
+            if let edgeStatus = zid.edgeStatus {
+                print("\(zid.name) controller status:\(edgeStatus.status) (\(DateFormatter().timeSince(edgeStatus.lastContactAt)))")
+                switch edgeStatus.status {
+                case .Available: imageName = (tunnelStatus == .connected) ? "NSStatusAvailable" : "NSStatusPartiallyAvailable"
+                case .PartiallyAvailable: imageName = "NSStatusPartiallyAvailable"
+                case .Unavailable: imageName = "NSStatusUnavailable"
+                default: imageName = "NSStatusNone"
+                }
+            }
+            cell.imageView?.image = NSImage(named:NSImage.Name(rawValue: imageName)) ?? nil
             return cell
         }
         return nil
