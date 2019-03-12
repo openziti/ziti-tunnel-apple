@@ -8,8 +8,8 @@
 
 import Foundation
 
-class ZitiEdgeService : Codable {
-    class Dns : Codable {
+struct ZitiEdgeService : Codable {
+    struct Dns : Codable {
         var hostname:String?
         var port:Int?
     }
@@ -18,8 +18,8 @@ class ZitiEdgeService : Codable {
     var dns:Dns?
 }
 
-class ZitiEdgeServiceResponse : Codable {
-    class Meta : Codable {}
+struct ZitiEdgeServiceResponse : Codable {
+    struct Meta : Codable {}
     var meta:Meta?
     var data:[ZitiEdgeService]?
 }

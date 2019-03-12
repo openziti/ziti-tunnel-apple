@@ -8,8 +8,8 @@
 
 import Foundation
 
-class ZitiEdgeError : Codable {
-    class Cause : Codable {
+struct ZitiEdgeError : Codable {
+    struct Cause : Codable {
         var message:String?
         var fieldName:String?
         var fieldValue:String?
@@ -21,8 +21,8 @@ class ZitiEdgeError : Codable {
     var requestId:String?
 }
 
-class ZitiEdgeErrorResponse : Codable {
-    class Meta : Codable {
+struct ZitiEdgeErrorResponse : Codable {
+    struct Meta : Codable {
         var apiVersion:String?
         var apiEnrolmentVersion:String?
     }
