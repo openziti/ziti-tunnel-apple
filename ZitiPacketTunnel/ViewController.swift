@@ -141,17 +141,24 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     private func updateServiceUI(zId:ZitiIdentity?=nil) {
         if let zId = zId {
-            let controllerStatus = zId.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
-            let controllerStatusStr = controllerStatus.status.rawValue +
-                " (\(DateFormatter().timeSince(controllerStatus.lastContactAt)))"
+            let cs = zId.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
+            var csStr = ""
+            if zId.isEnrolled == false {
+                csStr = "None"
+            } else if cs.status == .PartiallyAvailable {
+                csStr = "Partially Available"
+            } else {
+                csStr = cs.status.rawValue
+            }
+            csStr += " (\(DateFormatter().timeSince(cs.lastContactAt)))"
             
             box.alphaValue = 1.0
-            idEnabledBtn.isEnabled = true
+            idEnabledBtn.isEnabled = zId.isEnrolled
             idEnabledBtn.state = zId.isEnabled ? .on : .off
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.apiBaseUrl
-            idControllerStatusLabel.stringValue = controllerStatusStr
+            idControllerStatusLabel.stringValue = csStr
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
             idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.expDate))"
             idExpiresAtLabel.isHidden = zId.enrollmentStatus == .Enrolled
@@ -186,7 +193,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
         
         if let svc = servicesViewController {
-            svc.updateServices(zId)
+            svc.zid = zId
         }
     }
    
@@ -225,25 +232,18 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
-    func updateServices(_ zid:ZitiIdentity, svcs:[ZitiEdgeService]) {
-        print("...got \(svcs.count) services for \(zid.name)")
-        svcs.forEach { svc in
-            print("......\(zid.name): \(svc.name ?? "unnamed") host:\(svc.dns?.hostname ?? "na"), port:\(svc.dns?.port ?? -1)")
-        }
-    }
-    
     func updateServicesTimerFired() {
         zitiIdentities.forEach { zid in
             if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
-                ZitiEdge(zid).getServices { svcs, zErr in
-                    if let services = svcs {
-                        self.updateServices(zid, svcs:services)
-                    }
+                ZitiEdge(zid).getServices { zErr in
                     DispatchQueue.main.async {
-                        let currZid = self.zitiIdentities[self.representedObject as! Int]
-                        if currZid == zid { self.updateServiceUI(zId:zid) }
+                        if zid == self.zitiIdentities[self.representedObject as! Int] {
+                            self.updateServiceUI(zId:zid)
+                        }
                     }
                 }
+            } else if zid == self.zitiIdentities[self.representedObject as! Int] {
+                self.updateServiceUI(zId:zid)
             }
         }
     }
@@ -256,10 +256,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
         if let tcvc = segue.destinationController as? TunnelConfigViewController {
+            tcvc.preferredContentSize = CGSize(width: 572, height: 270)
             tcvc.tunnelProviderManager = self.tunnelProviderManager
         } else if let svc = segue.destinationController as? ServicesViewController {
             servicesViewController = svc
-            //PIG set representedObj...
+            if zitiIdentities.count > 0 {
+                svc.zid = zitiIdentities[representedObject as! Int]
+            }
         }
     }
     
@@ -295,7 +298,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             do {
                 try self.tunnelProviderManager.connection.startVPNTunnel()
             } catch {
-                NSAlert(error:error).runModal()
                 dialogAlert("Tunnel Error", error.localizedDescription)
             }
         } else {
@@ -308,6 +310,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             let zId = zitiIdentities[representedObject as! Int]
             zId.enabled = sender.state == .on
             _ = zidStore.store(zId) // TODO: alert
+            updateServiceUI(zId:zId)
         }
     }
     
@@ -357,8 +360,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     self.representedObject = 0
                     self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
                 } catch let error as ZitiError {
+                    panel.orderOut(nil)
                     self.dialogAlert("Unable to add identity", error.localizedDescription)
                 } catch {
+                    panel.orderOut(nil)
                     self.dialogAlert("JWT Error", error.localizedDescription)
                     return
                 }
@@ -425,10 +430,12 @@ extension ViewController: NSTableViewDelegate {
             
             let tunnelStatus = self.tunnelProviderManager.connection.status
             var imageName:String = "NSStatusNone"
-            if let edgeStatus = zid.edgeStatus {
+            
+            if zid.isEnrolled == true, let edgeStatus = zid.edgeStatus {
                 print("\(zid.name) controller status:\(edgeStatus.status) (\(DateFormatter().timeSince(edgeStatus.lastContactAt)))")
                 switch edgeStatus.status {
-                case .Available: imageName = (tunnelStatus == .connected) ? "NSStatusAvailable" : "NSStatusPartiallyAvailable"
+                case .Available: imageName = (tunnelStatus == .connected && zid.enabled == true) ?
+                    "NSStatusAvailable" : "NSStatusPartiallyAvailable"
                 case .PartiallyAvailable: imageName = "NSStatusPartiallyAvailable"
                 case .Unavailable: imageName = "NSStatusUnavailable"
                 default: imageName = "NSStatusNone"

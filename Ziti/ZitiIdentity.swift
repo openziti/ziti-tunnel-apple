@@ -93,10 +93,10 @@ class ZitiIdentity : NSObject, Codable {
         if (Date() > expDate) { return .Expired }
         return .Pending
     }
-    var isEnabled:Bool {
-        return enabled ?? false
-    }
+    var isEnabled:Bool { return enabled ?? false }
+    var isEnrolled:Bool { return enrolled ?? false }
     var edgeStatus:EdgeStatus?
+    var services:[ZitiEdgeService]?
     
     override var debugDescription: String {
         let jsonEncoder = JSONEncoder()

@@ -44,7 +44,6 @@ class ZitiEdge : NSObject {
                 return
             }
             
-            // Not worth making Codables for this...
             guard
                 let json = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any],
                 let dataJSON = json?["data"] as? [String: Any],
@@ -109,10 +108,12 @@ class ZitiEdge : NSObject {
         }.resume()
     }
     
-    func getServices(completionHandler: @escaping ([ZitiEdgeService]?, ZitiError?) -> Void) {
+    // TODO: maybe also a Bool indicating whether or not the services have changed
+    //   (indicating should store, reconfig tunnel, etc)
+    func getServices(completionHandler: @escaping (ZitiError?) -> Void) {
         let servicesStr = zid.apiBaseUrl + SERVCES_PATH
         guard let url = URL(string: servicesStr) else {
-            completionHandler(nil, ZitiError("Enable to convert services URL \"\(servicesStr)\""))
+            completionHandler(ZitiError("Enable to convert services URL \"\(servicesStr)\""))
             return
         }
         
@@ -121,30 +122,26 @@ class ZitiEdge : NSObject {
         
         session.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
-                
-                // if 401, try auth and if ok, try getServices() again.
-                if zErr.errorCode == 401 {
-                    print("\(self.zid.name) getSessions called, receiced unauthorized response.  Attempting auth")
+                if zErr.errorCode == ZitiError.AuthRequired {
                     self.authenticate { authErr in
                         guard authErr == nil else {
-                            print("\(self.zid.name) getSessions re-auth no good")
-                            completionHandler(nil, authErr)
+                            completionHandler(authErr)
                             return
                         }
-                        print("\(self.zid.name) resubmitting getServices")
                         self.getServices(completionHandler: completionHandler)
                     }
                 } else {
-                    completionHandler(nil, zErr)
+                    completionHandler(zErr)
                 }
                 return
             }
             guard let resp =
                 try? JSONDecoder().decode(ZitiEdgeServiceResponse.self, from: data!) else {
-                completionHandler(nil, ZitiError("Enable to decode response for services"))
+                completionHandler(ZitiError("Enable to decode response for services"))
                 return
             }
-            completionHandler(resp.data, nil)
+            self.zid.services = resp.data
+            completionHandler(nil)
         }.resume()
     }
     
@@ -161,8 +158,8 @@ class ZitiEdge : NSObject {
         
         session.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
-                // if 401, try auth and if ok, try getServices() again.
-                if zErr.errorCode == 401 {
+                // if 401, try auth and if ok, try getNetworkSession() again.
+                if zErr.errorCode == ZitiError.AuthRequired {
                     self.authenticate { authErr in
                         guard authErr == nil else {
                             completionHandler(nil, authErr)
@@ -202,12 +199,16 @@ class ZitiEdge : NSObject {
             let respData = data
         else {
             self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Unavailable)
+            var errorCode = -1
+            if let nsErr = error as NSError?, nsErr.domain == NSURLErrorDomain {
+                errorCode = ZitiError.URLError
+            }
             return ZitiError(error?.localizedDescription ??
-                "Invalid or empty response from server")
+                "Invalid or empty response from server", errorCode:errorCode)
         }
         
         guard httpResp.statusCode == 200 else {
-            self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Unavailable)
+            self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.PartiallyAvailable)
             guard let edgeErrorResp = try? JSONDecoder().decode(ZitiEdgeErrorResponse.self, from: respData) else {
                 let respStr = HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)
                 return ZitiError("HTTP response code: \(httpResp.statusCode) \(respStr)", errorCode:httpResp.statusCode)

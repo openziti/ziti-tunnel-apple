@@ -1075,14 +1075,14 @@
             <objects>
                 <viewController title="ZitiPacketTunnel Config" showSeguePresentationStyle="single" id="c8W-la-m0J" customClass="TunnelConfigViewController" customModule="ZitiPacketTunnel" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Kqz-8q-KOl">
-                        <rect key="frame" x="0.0" y="0.0" width="651" height="302"/>
+                        <rect key="frame" x="0.0" y="0.0" width="572" height="262"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ifg-7P-d1D" customClass="NSBox">
-                                <rect key="frame" x="20" y="20" width="611" height="262"/>
+                                <rect key="frame" x="20" y="20" width="532" height="222"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EOS-7b-PVg">
-                                        <rect key="frame" x="143" y="222" width="88" height="17"/>
+                                        <rect key="frame" x="114" y="182" width="88" height="17"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="IPv4 Address:" id="reu-Qo-qYk">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1090,7 +1090,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="R5l-fq-71L" userLabel="Ip Address Text">
-                                        <rect key="frame" x="244" y="220" width="113" height="22"/>
+                                        <rect key="frame" x="215" y="180" width="113" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="113" id="PZT-PS-dts"/>
                                         </constraints>
@@ -1101,7 +1101,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wlj-BJ-x5U">
-                                        <rect key="frame" x="144" y="190" width="87" height="17"/>
+                                        <rect key="frame" x="115" y="150" width="87" height="17"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Subnet Mask:" id="Lla-d0-nXz">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1109,7 +1109,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6EP-Cs-i5f">
-                                        <rect key="frame" x="146" y="126" width="85" height="17"/>
+                                        <rect key="frame" x="117" y="86" width="85" height="17"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DNS Servers:" id="2vC-tH-tRF">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1117,7 +1117,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rQ4-dP-mvk" userLabel="DNS Servers Text">
-                                        <rect key="frame" x="244" y="124" width="347" height="22"/>
+                                        <rect key="frame" x="215" y="84" width="297" height="22"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="H7Y-ah-ZtE">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1125,7 +1125,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ctO-XD-KFM">
-                                        <rect key="frame" x="113" y="94" width="118" height="17"/>
+                                        <rect key="frame" x="84" y="54" width="118" height="17"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Matched Domains:" id="ar3-4g-21N">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1133,7 +1133,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="r05-Sw-HDm" userLabel="Matched Domains Text">
-                                        <rect key="frame" x="244" y="92" width="347" height="22"/>
+                                        <rect key="frame" x="215" y="52" width="297" height="22"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" id="U3b-BW-Xkl">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1141,7 +1141,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="69z-G3-tKB">
-                                        <rect key="frame" x="515" y="13" width="82" height="32"/>
+                                        <rect key="frame" x="436" y="13" width="82" height="32"/>
                                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xc7-ec-2rP">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -1154,7 +1154,7 @@ Gw
                                         </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lFO-aE-CEb">
-                                        <rect key="frame" x="435" y="13" width="82" height="32"/>
+                                        <rect key="frame" x="356" y="13" width="82" height="32"/>
                                         <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="al4-Wf-kUT">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -1164,7 +1164,7 @@ Gw
                                         </connections>
                                     </button>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="veP-3d-Bo2" userLabel="Mtu Text">
-                                        <rect key="frame" x="244" y="156" width="41" height="22"/>
+                                        <rect key="frame" x="215" y="116" width="41" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="41" id="YOH-Ia-8zZ"/>
                                         </constraints>
@@ -1175,7 +1175,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d48-wG-Ve4" userLabel="Subnet Mask Text">
-                                        <rect key="frame" x="244" y="188" width="113" height="22"/>
+                                        <rect key="frame" x="215" y="148" width="113" height="22"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="113" id="08y-Yh-Aei"/>
                                         </constraints>
@@ -1186,11 +1186,11 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xf2-Ok-jb2">
-                                        <rect key="frame" x="20" y="111" width="128" height="128"/>
+                                        <rect key="frame" x="20" y="135" width="64" height="64"/>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ZitiLogo64" id="TE9-g4-Vht"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="i3q-fy-Hz3">
-                                        <rect key="frame" x="194" y="158" width="37" height="17"/>
+                                        <rect key="frame" x="165" y="118" width="37" height="17"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="MTU:" id="AlR-Kq-tjl">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1250,7 +1250,7 @@ Gw
                 </viewController>
                 <customObject id="AAY-tP-rne" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="152" y="1530"/>
+            <point key="canvasLocation" x="112" y="1510"/>
         </scene>
         <!--Services View Controller-->
         <scene sceneID="3Cb-vg-Bcp">
@@ -1274,7 +1274,7 @@ Gw
                                     <rect key="frame" x="1" y="0.0" width="442" height="279"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="ID7-B4-Yfi" viewBased="YES" id="abm-S6-vQl">
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="ID7-B4-Yfi" viewBased="YES" id="abm-S6-vQl">
                                             <rect key="frame" x="0.0" y="0.0" width="447" height="254"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
@@ -1294,7 +1294,7 @@ Gw
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView id="nQe-3x-G6R">
+                                                        <tableCellView identifier="NameCellID" id="nQe-3x-G6R">
                                                             <rect key="frame" x="1" y="1" width="116" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
@@ -1327,7 +1327,7 @@ Gw
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView id="GVZ-e5-1IA">
+                                                        <tableCellView identifier="ProtocolCellID" id="GVZ-e5-1IA">
                                                             <rect key="frame" x="120" y="1" width="57" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
@@ -1360,7 +1360,7 @@ Gw
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView id="nNL-bg-gwz">
+                                                        <tableCellView identifier="HostnameCellID" id="nNL-bg-gwz">
                                                             <rect key="frame" x="180" y="1" width="180" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
@@ -1393,7 +1393,7 @@ Gw
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView id="nbH-9U-u7m">
+                                                        <tableCellView identifier="PortCellID" id="nbH-9U-u7m">
                                                             <rect key="frame" x="363" y="1" width="82" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
@@ -1417,7 +1417,7 @@ Gw
                                         </tableView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="C7A-EH-yEL">
+                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="0.59999999999999998" horizontal="YES" id="C7A-EH-yEL">
                                     <rect key="frame" x="1" y="263" width="442" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>

@@ -11,7 +11,7 @@ import Cocoa
 class ServicesViewController: NSViewController {
     @IBOutlet weak var tableView: NSTableView!
     
-    var zId:ZitiIdentity? {
+    var zid:ZitiIdentity? {
         get {
             return representedObject as? ZitiIdentity
         }
@@ -27,29 +27,61 @@ class ServicesViewController: NSViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        tableView.isEnabled = zId == nil ? false : true
+        tableView.isEnabled = zid == nil ? false : true
+        tableView.reloadData()
     }
     
     override var representedObject: Any? {
         didSet {
-            
+            print("Servicees table: \(zid?.name ?? "nil")")
+            tableView?.isEnabled = zid == nil ? false : true
+            tableView?.reloadData()
         }
-    }
-    
-    func updateServices(_ zId:ZitiIdentity?) {
-        print("UPDATE SERVICES..")
-        tableView.isEnabled = zId == nil ? false : true
     }
 }
 
 extension ServicesViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return 0
+        return zid?.services?.count ?? 0
     }
 }
 
 extension ServicesViewController: NSTableViewDelegate {
+    fileprivate enum CellIdentifiers {
+        static let NameCell = "NameCellID"
+        static let ProtocolCell = "ProtocolCellID"
+        static let HostnameCell = "HostnameCellID"
+        static let PortCell = "PortCellID"
+    }
+    
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        guard let svc = zid?.services?[row] else {
+            return nil
+        }
+        
+        var text = ""
+        var cellIdentifier = ""
+        
+        if tableColumn == tableView.tableColumns[0] {
+            text = svc.name ?? "-"
+            cellIdentifier = CellIdentifiers.NameCell
+        } else if tableColumn == tableView.tableColumns[1] {
+            text = "TCP"
+            cellIdentifier = CellIdentifiers.ProtocolCell
+        } else if tableColumn == tableView.tableColumns[2] {
+            text = svc.dns?.hostname ?? "-"
+            cellIdentifier = CellIdentifiers.HostnameCell
+        } else if tableColumn == tableView.tableColumns[3] {
+            text = String(svc.dns?.port ?? -1)
+            cellIdentifier = CellIdentifiers.PortCell
+        }
+        
+        if let cell = tableView.makeView(
+            withIdentifier: NSUserInterfaceItemIdentifier(rawValue: cellIdentifier), owner: nil) as? NSTableCellView {
+            cell.textField?.stringValue = text
+            return cell
+        }
+        
         return nil
     }
 }

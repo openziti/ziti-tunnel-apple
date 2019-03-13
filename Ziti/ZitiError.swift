@@ -9,7 +9,9 @@
 import Foundation
 
 struct ZitiError : LocalizedError, CustomNSError {
-    public static var errorDomain:String = "Ziti"
+    public static var errorDomain:String = "ZitiError"
+    public static let URLError = -1000
+    public static let AuthRequired = 401
     
     public var errorDescription:String?
     public var errorCode:Int = -1
