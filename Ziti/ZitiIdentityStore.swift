@@ -88,7 +88,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         fc.coordinate(writingItemAt: url, options: .forDeleting, error: nil) { url in
             do {
                 let zkc = ZitiKeychain(zId)
-                _ = zkc.deleteCertificate()
+                _ = zkc.deleteCertificate(zId.id)
                 _ = zkc.deleteKeyPair()
                 try FileManager.default.removeItem(at: url)
             } catch {

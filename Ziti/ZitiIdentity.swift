@@ -98,6 +98,21 @@ class ZitiIdentity : NSObject, Codable {
     var edgeStatus:EdgeStatus?
     var services:[ZitiEdgeService]?
     
+    func doMatch(_ left:[ZitiEdgeService]?, _ right:[ZitiEdgeService]?) -> Bool {
+        if left == nil && right == nil { return true }
+        if left == nil || right == nil { return false }
+        if left!.count != right!.count { return false }
+        for i in 0..<left!.count {
+            let svc = left![i]
+            let match = right!.first(where: { $0.id == svc.id })
+            if match == nil { return false }
+            if (match!.name != svc.name) { return false }
+            if (match!.dns?.hostname != svc.dns?.hostname) { return false }
+            if (match!.dns?.port != svc.dns?.port) { return false }
+        }
+        return true
+    }
+    
     override var debugDescription: String {
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted

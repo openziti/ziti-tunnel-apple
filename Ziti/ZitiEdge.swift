@@ -8,10 +8,10 @@
 
 import Foundation
 
-fileprivate let AUTH_PATH = "authenticate?method=cert"
+fileprivate let AUTH_PATH = "/authenticate?method=cert"
 fileprivate let SESSION_TAG = "zt-session"
-fileprivate let SERVCES_PATH = "services?limit=500"
-fileprivate let NETSESSIONS_PATH = "network-sessions"
+fileprivate let SERVCES_PATH = "/services?limit=500"
+fileprivate let NETSESSIONS_PATH = "/network-sessions"
 fileprivate let GET_METHOD = "GET"
 fileprivate let POST_METHOD = "POST"
 fileprivate let CONTENT_TYPE = "Content-Type"
@@ -29,9 +29,8 @@ class ZitiEdge : NSObject {
     }
     
     func authenticate(completionHandler: @escaping (ZitiError?) -> Void) {
-        let authStr = zid.apiBaseUrl + AUTH_PATH
-        guard let url = URL(string: authStr) else {
-            completionHandler(ZitiError("Enable to convert auth URL \"\(authStr)\""))
+        guard let url = URL(string: AUTH_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
+            completionHandler(ZitiError("Enable to convert auth URL \"\(AUTH_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
         }
         
@@ -59,6 +58,12 @@ class ZitiEdge : NSObject {
         }.resume()
     }
     
+    func getHost() -> String {
+        guard let url = URL(string: zid.apiBaseUrl) else { return "" }
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        return components?.host ?? ""
+    }
+    
     func enroll(completionHandler: @escaping (ZitiError?) -> Void) {
         // Got a URL?
         guard let url = URL(string: zid.enrollmentUrl) else {
@@ -66,8 +71,27 @@ class ZitiEdge : NSObject {
             return
         }
         
-        // Get Keys
+        // Add rootCa if available
         let zkc = ZitiKeychain(zid)
+        if let rootCaPem = zid.rootCa {
+            let host = getHost()
+            let der = zkc.convertToDER(rootCaPem)
+            
+            /* find/delete not working - attr label overwritten by common name?
+            _ = zkc.deleteCertificate(host)
+            
+            // add it...
+            let zErr = zkc.storeCertificate(der, label: host)
+            guard zErr == nil else {
+                completionHandler(zErr)
+                return
+            }
+            */
+            // do our best. if CA already trusted will be ok...
+            _ = zkc.storeCertificate(der, label: host)
+        }
+        
+        // Get Keys
         let (privKey, pubKey, keyErr) = getKeys(zkc)
         guard keyErr == nil else {
             completionHandler(keyErr)
@@ -98,7 +122,7 @@ class ZitiEdge : NSObject {
             }
             let certDER = zkc.convertToDER(certPEM)
             
-            if let zStoreErr = zkc.storeCertificate(certDER) {
+            if let zStoreErr = zkc.storeCertificate(certDER, label:zkc.zid.name) {
                 completionHandler(zStoreErr)
                 return
             }
@@ -111,9 +135,8 @@ class ZitiEdge : NSObject {
     // TODO: maybe also a Bool indicating whether or not the services have changed
     //   (indicating should store, reconfig tunnel, etc)
     func getServices(completionHandler: @escaping (ZitiError?) -> Void) {
-        let servicesStr = zid.apiBaseUrl + SERVCES_PATH
-        guard let url = URL(string: servicesStr) else {
-            completionHandler(ZitiError("Enable to convert services URL \"\(servicesStr)\""))
+        guard let url = URL(string: SERVCES_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
+            completionHandler(ZitiError("Enable to convert URL \"\(SERVCES_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
         }
         
@@ -146,9 +169,8 @@ class ZitiEdge : NSObject {
     }
     
     func getNetworkSession(_ serviceId:String, completionHandler: @escaping (ZitiEdgeNetworkSession?, ZitiError?) -> Void) {
-        let sessionsStr = zid.apiBaseUrl + NETSESSIONS_PATH
-        guard let url = URL(string: sessionsStr) else {
-            completionHandler(nil, ZitiError("Enable to convert services URL \"\(sessionsStr)\""))
+        guard let url = URL(string: NETSESSIONS_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
+            completionHandler(nil, ZitiError("Enable to convert URL \"\(NETSESSIONS_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
         }
         
@@ -252,8 +274,6 @@ extension ZitiEdge : URLSessionDelegate {
         
         print("RECEIVED CHALLENGE: \(challenge.protectionSpace.authenticationMethod)")
         switch challenge.protectionSpace.authenticationMethod {
-        case NSURLAuthenticationMethodServerTrust:
-            handleServerTrustChallenge(challenge, completionHandler:completionHandler)
         case NSURLAuthenticationMethodClientCertificate:
             handleClientCertChallenge(challenge, completionHandler:completionHandler)
         default:
@@ -266,50 +286,10 @@ extension ZitiEdge : URLSessionDelegate {
         let zkc = ZitiKeychain(self.zid)
         let (identity, err) = zkc.getSecureIdentity()
         guard err == nil else {
-            print("...no SecIdentity for \(zid.name) - will perform default handling")
             completionHandler(.performDefaultHandling, nil)
             return
         }
-        
         let urlCredential = URLCredential(identity: identity!, certificates: nil, persistence: .forSession)
         completionHandler(.useCredential, urlCredential)
-    }
-    
-    func handleServerTrustChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
-        // if we have .rootCA check if we match. Else rely on default handling
-        guard let rootCaPEM = zid.rootCa else {
-            print("...no rootCa for \(zid.name) - will perform default handling")
-            completionHandler(.performDefaultHandling, nil)
-            return
-        }
-        
-        // TODO: See https://infinum.co/the-capsized-eight/how-to-make-your-ios-apps-more-secure-with-ssl-pinning
-        
-        // get server's cert
-        guard let serverTrust = challenge.protectionSpace.serverTrust,
-            let cert = SecTrustGetCertificateAtIndex(serverTrust, 0)
-        else {
-            print("... Could not get server cert!")
-            completionHandler(.cancelAuthenticationChallenge, nil);
-            return
-        }
-        let remoteCertData = SecCertificateCopyData(cert) as CFTypeRef
-        
-        let zkc = ZitiKeychain(zid)
-        let localCertData = zkc.convertToDER(rootCaPEM)
-        guard remoteCertData.isEqual(to: localCertData) == true else { // TODO - more spphisticated compare.
-            print("... Certificates don't match!")
-            if trustSelfSigned == false {
-                completionHandler(.cancelAuthenticationChallenge, nil);
-            } else {
-                return completionHandler(.useCredential, URLCredential(trust: serverTrust)) // workaround for now
-            }
-            return
-        }
-        
-        // looks good
-        print("...got a match for \(zid.name) - this should work :)")
-        completionHandler(.useCredential, URLCredential(trust: serverTrust))
     }
 }

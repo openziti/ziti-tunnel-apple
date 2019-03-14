@@ -143,13 +143,16 @@ class ZitiKeychain : NSObject {
         let certificate = cert as! SecCertificate
 
         var identity: SecIdentity?
-        let status = SecIdentityCreateWithCertificate(nil, certificate, &identity)  // TODO: macos only
+        let status = SecIdentityCreateWithCertificate(nil, certificate, &identity)
         guard status == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
             return (nil, ZitiError("Unable to get identity for \(zid.id): \(errStr)"))
         }
 #else
         // works, and could polish up and use.  Pro: compiles on ios.  Con: wicked slow
+        // TODO: change to only happen once, then store the SecIdentity (it is calculated on the
+        // SecItemCopy, not just grabbed from the store) (same for
+        // macOS code)
         let params: [CFString:Any] = [
             kSecClass: kSecClassIdentity,
             kSecReturnRef: kCFBooleanTrue,
@@ -166,61 +169,61 @@ class ZitiKeychain : NSObject {
         return (identity, nil)
     }
     
-    func storeCertificate(_ der:Data) -> ZitiError? {
+    func storeCertificate(_ der:Data, label:String) -> ZitiError? {
         guard let certificate = SecCertificateCreateWithData(nil, der as CFData) else {
-            return ZitiError("Unable to create certificate from data for \(zid.id)")
+            return ZitiError("Unable to create certificate from data for \(label)")
         }
         let parameters: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
             kSecValueRef: certificate,
-            kSecAttrLabel: zid.id]
+            kSecAttrLabel: label]
         let status = SecItemAdd(parameters as CFDictionary, nil)
         guard status == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
-            return ZitiError("Unable to store certificate for \(zid.id): \(errStr)")
+            return ZitiError("Unable to store certificate for \(label): \(errStr)")
         }
         return nil
     }
     
-    func getCertificate() -> (Data?, ZitiError?) {
+    func getCertificate(_ label:String) -> (Data?, ZitiError?) {
         let params: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
             kSecReturnRef: kCFBooleanTrue,
-            kSecAttrLabel: zid.id]
+            kSecAttrLabel: label]
         
         var cert: CFTypeRef?
         let status = SecItemCopyMatching(params as CFDictionary, &cert)
         guard status == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
-            return (nil, ZitiError("Unable to get certificate for \(zid.id): \(errStr)"))
+            return (nil, ZitiError("Unable to get certificate for \(label): \(errStr)"))
         }
         guard let certData = SecCertificateCopyData(cert as! SecCertificate) as Data? else {
-            return (nil, ZitiError("Unable to copy certificate data for \(zid.id)"))
+            return (nil, ZitiError("Unable to copy certificate data for \(label)"))
         }
         return (certData, nil)
     }
     
-    func deleteCertificate() -> ZitiError? {
+    func deleteCertificate(_ label:String) -> ZitiError? {  //TODO: not working. kSecAttrLabel overwritten with common name?
         let params: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
             kSecReturnRef: kCFBooleanTrue,
-            kSecAttrLabel: zid.id]
+            kSecAttrLabel: label]
         
         var cert: CFTypeRef?
         let copyStatus = SecItemCopyMatching(params as CFDictionary, &cert)
         guard copyStatus == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(copyStatus, nil) as String? ?? "\(copyStatus)"
-            return ZitiError("Unable to find certificate for \(zid.id): \(errStr)")
+            return ZitiError("Unable to find certificate for \(label): \(errStr)")
         }
         
         let delParams: [CFString:Any] = [
             kSecClass: kSecClassCertificate,
             kSecValueRef: cert!,
-            kSecAttrLabel: zid.id]
+            kSecAttrLabel: label]
         let deleteStatus = SecItemDelete(delParams as CFDictionary)
         guard deleteStatus == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(deleteStatus, nil) as String? ?? "\(deleteStatus)"
-            return ZitiError("Unable to delete certificate for \(zid.id): \(errStr)")
+            return ZitiError("Unable to delete certificate for \(label): \(errStr)")
         }
         return nil
     }
