@@ -40,14 +40,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         
         NSLog("startTunnel")
+        NSLog("Bundle path: \(Bundle.main.bundlePath)")
         
         let (zitiIdentities,_) = ZitiIdentityStore().load()
         NSLog("GOT \(zitiIdentities?.count ?? -1) identities")
         zitiIdentities?.forEach { zid in
             NSLog("ZitiIdentity \(zid.name): \(zid.id)")
             
-            if ZitiKeychain(zid).keyPairExists() {
+            if ZitiKeychain().keyPairExists(zid) {
                 NSLog("PACKET TUNNEL KEYS EXIST for \(zid.id)")
+                
+                // try quick auth just for fun
+                ZitiEdge(zid).authenticate { zErr in
+                    NSLog("...auth for \(zid.name): " + (zErr != nil ? "FAILED" : "SUCCESS"))
+                }
             } else {
                 NSLog("PACKET TUNNEL KEYS do not EXIST for \(zid.name): \(zid.id)")
             }

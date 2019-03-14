@@ -20,15 +20,18 @@ fileprivate let TEXT_TYPE = "text/plain; charset=utf-8"
 fileprivate let PEM_CERTIFICATE = "CERTIFICATE"
 fileprivate let PEM_CERTIFICATE_REQUEST = "CERTIFICATE REQUEST"
 
-class ZitiEdge : NSObject {
-    var trustSelfSigned = true // TODO
+class ZitiEdge : NSObject {    
+    weak var zid:ZitiIdentity?
     
-    let zid:ZitiIdentity
     init(_ zid:ZitiIdentity) {
         self.zid = zid
     }
     
     func authenticate(completionHandler: @escaping (ZitiError?) -> Void) {
+        guard let zid = zid else {
+            completionHandler(ZitiError("Unable to authenticate invalid identity"))
+            return
+        }
         guard let url = URL(string: AUTH_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
             completionHandler(ZitiError("Enable to convert auth URL \"\(AUTH_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
@@ -53,26 +56,31 @@ class ZitiEdge : NSObject {
                 return
             }
             print("zt-session: \(token)")
-            self.zid.sessionToken = token
+            zid.sessionToken = token
             completionHandler(nil)
         }.resume()
+        session.finishTasksAndInvalidate()
     }
     
     func getHost() -> String {
+        guard let zid = zid else { return "" }
         guard let url = URL(string: zid.apiBaseUrl) else { return "" }
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         return components?.host ?? ""
     }
     
     func enroll(completionHandler: @escaping (ZitiError?) -> Void) {
-        // Got a URL?
+        guard let zid = zid else {
+            completionHandler(ZitiError("Unable to enroll invalid identity"))
+            return
+        }
         guard let url = URL(string: zid.enrollmentUrl) else {
             completionHandler(ZitiError("Enable to convert enrollment URL \"\(zid.enrollmentUrl)\""))
             return
         }
         
         // Add rootCa if available
-        let zkc = ZitiKeychain(zid)
+        let zkc = ZitiKeychain()
         if let rootCaPem = zid.rootCa {
             let host = getHost()
             let der = zkc.convertToDER(rootCaPem)
@@ -92,7 +100,7 @@ class ZitiEdge : NSObject {
         }
         
         // Get Keys
-        let (privKey, pubKey, keyErr) = getKeys(zkc)
+        let (privKey, pubKey, keyErr) = getKeys(zid)
         guard keyErr == nil else {
             completionHandler(keyErr)
             return
@@ -122,19 +130,24 @@ class ZitiEdge : NSObject {
             }
             let certDER = zkc.convertToDER(certPEM)
             
-            if let zStoreErr = zkc.storeCertificate(certDER, label:zkc.zid.name) {
+            if let zStoreErr = zkc.storeCertificate(certDER, label:zid.name) {
                 completionHandler(zStoreErr)
                 return
             }
 
-            self.zid.enrolled = true
+            zid.enrolled = true
             completionHandler(nil)
         }.resume()
+        session.finishTasksAndInvalidate()
     }
     
     // TODO: maybe also a Bool indicating whether or not the services have changed
     //   (indicating should store, reconfig tunnel, etc)
     func getServices(completionHandler: @escaping (ZitiError?) -> Void) {
+        guard let zid = zid else {
+            completionHandler(ZitiError("Unable to getServices for invalid identity"))
+            return
+        }
         guard let url = URL(string: SERVCES_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
             completionHandler(ZitiError("Enable to convert URL \"\(SERVCES_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
@@ -163,18 +176,25 @@ class ZitiEdge : NSObject {
                 completionHandler(ZitiError("Enable to decode response for services"))
                 return
             }
-            self.zid.services = resp.data
+            let same = zid.doServicesMatch(resp.data)
+            print("Services match for \(zid.name) = \(same)")
+            zid.services = resp.data
             completionHandler(nil)
         }.resume()
+        session.finishTasksAndInvalidate()
     }
     
     func getNetworkSession(_ serviceId:String, completionHandler: @escaping (ZitiEdgeNetworkSession?, ZitiError?) -> Void) {
+        guard let zid = zid else {
+            completionHandler(nil, ZitiError("Unable to getNetworkSession for invalid identity"))
+            return
+        }
         guard let url = URL(string: NETSESSIONS_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
             completionHandler(nil, ZitiError("Enable to convert URL \"\(NETSESSIONS_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
         }
         
-        let body = "{\"serviceId\":\\(serviceId)\"}".data(using: .utf8)
+        let body = "{\"serviceId\":\"\(serviceId)\"}".data(using: .utf8)
         let (session, urlRequest) = getURLSession(
             url:url, method:GET_METHOD, contentType:JSON_TYPE, body:body)
         
@@ -201,6 +221,7 @@ class ZitiEdge : NSObject {
             }
             completionHandler(resp.data, nil)
         }.resume()
+        session.finishTasksAndInvalidate()
     }
     
     private func getURLSession(url:URL, method:String, contentType:String, body:Data?) -> (URLSession, URLRequest) {
@@ -210,7 +231,7 @@ class ZitiEdge : NSObject {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method
         urlRequest.setValue(contentType, forHTTPHeaderField: CONTENT_TYPE)
-        urlRequest.setValue(zid.sessionToken ?? "-1", forHTTPHeaderField: SESSION_TAG)
+        urlRequest.setValue(zid?.sessionToken ?? "-1", forHTTPHeaderField: SESSION_TAG)
         urlRequest.httpBody = body
         return (session, urlRequest)
     }
@@ -220,7 +241,7 @@ class ZitiEdge : NSObject {
             let httpResp = response as? HTTPURLResponse,
             let respData = data
         else {
-            self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Unavailable)
+            self.zid?.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Unavailable)
             var errorCode = -1
             if let nsErr = error as NSError?, nsErr.domain == NSURLErrorDomain {
                 errorCode = ZitiError.URLError
@@ -230,36 +251,37 @@ class ZitiEdge : NSObject {
         }
         
         guard httpResp.statusCode == 200 else {
-            self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.PartiallyAvailable)
+            self.zid?.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.PartiallyAvailable)
             guard let edgeErrorResp = try? JSONDecoder().decode(ZitiEdgeErrorResponse.self, from: respData) else {
                 let respStr = HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)
                 return ZitiError("HTTP response code: \(httpResp.statusCode) \(respStr)", errorCode:httpResp.statusCode)
             }            
             return ZitiError(edgeErrorResp.shortDescription(httpResp.statusCode), errorCode:httpResp.statusCode)
         }
-        self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Available)
+        self.zid?.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Available)
         
         // TODO: temp for dev
-        /*if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
-            print("Response for \(self.zid.name): \(responseStr)")
-        }*/
+        if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
+            print("Response for \(zid?.name ?? ""): \(responseStr)")
+        }
         // end temp for dev
         return nil
     }
     
-    private func getKeys(_ zkc:ZitiKeychain) -> (SecKey?, SecKey?, ZitiError?) {
+    private func getKeys(_ zid:ZitiIdentity) -> (SecKey?, SecKey?, ZitiError?) {
         var privKey:SecKey?, pubKey:SecKey?, error:ZitiError?
         
         // Should we delete keys and create new one if they already exist?  Or just always create
         // new keys and leave it to caller to clean up after themselves?  We only have the id to search
         // on, so if we have multiple with the same id things will get goofy...
-        if zkc.keyPairExists() == false {
-            (privKey, pubKey, error) = zkc.createKeyPair()
+        let zkc = ZitiKeychain()
+        if zkc.keyPairExists(zid) == false {
+            (privKey, pubKey, error) = zkc.createKeyPair(zid)
             guard error == nil else {
                 return (nil, nil, error)
             }
         } else {
-            (privKey, pubKey, error) = zkc.getKeyPair()
+            (privKey, pubKey, error) = zkc.getKeyPair(zid)
             guard error == nil else {
                 return (nil, nil, error)
             }
@@ -272,7 +294,6 @@ extension ZitiEdge : URLSessionDelegate {
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
-        print("RECEIVED CHALLENGE: \(challenge.protectionSpace.authenticationMethod)")
         switch challenge.protectionSpace.authenticationMethod {
         case NSURLAuthenticationMethodClientCertificate:
             handleClientCertChallenge(challenge, completionHandler:completionHandler)
@@ -282,9 +303,14 @@ extension ZitiEdge : URLSessionDelegate {
     }
     
     func handleClientCertChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+
+        guard let zid = zid else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
         
-        let zkc = ZitiKeychain(self.zid)
-        let (identity, err) = zkc.getSecureIdentity()
+        let zkc = ZitiKeychain()
+        let (identity, err) = zkc.getSecureIdentity(zid)
         guard err == nil else {
             completionHandler(.performDefaultHandling, nil)
             return

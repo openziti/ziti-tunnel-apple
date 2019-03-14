@@ -1186,7 +1186,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xf2-Ok-jb2">
-                                        <rect key="frame" x="20" y="135" width="64" height="64"/>
+                                        <rect key="frame" x="20" y="71" width="128" height="128"/>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ZitiLogo64" id="TE9-g4-Vht"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="i3q-fy-Hz3">
@@ -1417,7 +1417,7 @@ Gw
                                         </tableView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="0.59999999999999998" horizontal="YES" id="C7A-EH-yEL">
+                                <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="C7A-EH-yEL">
                                     <rect key="frame" x="1" y="263" width="442" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>

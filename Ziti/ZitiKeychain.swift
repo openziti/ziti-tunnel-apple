@@ -11,13 +11,7 @@ import Foundation
 class ZitiKeychain : NSObject {
     // kSecAttrAccessGroup not needed if sharing only a single keychain group?
     static let ZITI_KEYCHAIN_GROUP = "TEAMID.ZitiKeychain"
-    var keySize = 2048
-    let zid:ZitiIdentity
-    
-    init(_ zid:ZitiIdentity) {
-        self.zid = zid
-        super.init()
-    }
+    let keySize = 2048
     
     #if os(macOS)
     private func getSecAccessRef() -> SecAccess? {
@@ -38,7 +32,7 @@ class ZitiKeychain : NSObject {
     }
     #endif
     
-    func createKeyPair() -> (privKey:SecKey?, pubKey:SecKey?, ZitiError?) {
+    func createKeyPair(_ zid:ZitiIdentity) -> (privKey:SecKey?, pubKey:SecKey?, ZitiError?) {
         guard let atag = zid.id.data(using: .utf8) else {
             return (nil, nil, ZitiError("createPrivateKey: Unable to create application tag \(zid.id)"))
         }
@@ -79,7 +73,7 @@ class ZitiKeychain : NSObject {
         return (privateKey, publicKey, nil)
     }
  
-    func getKeyPair() -> (privKey:SecKey?, pubKey:SecKey?, ZitiError?) {
+    func getKeyPair(_ zid:ZitiIdentity) -> (privKey:SecKey?, pubKey:SecKey?, ZitiError?) {
         guard let atag = zid.id.data(using: .utf8) else {
             return (nil, nil, ZitiError("geKeyPair: Unable to create application tag \(zid.id)"))
         }
@@ -101,8 +95,8 @@ class ZitiKeychain : NSObject {
         return (privKey, pubKey, nil)
     }
     
-    func keyPairExists() -> Bool {
-        let (_, _, e) = getKeyPair()
+    func keyPairExists(_ zid:ZitiIdentity) -> Bool {
+        let (_, _, e) = getKeyPair(zid)
         return e == nil
     }
     
@@ -113,7 +107,7 @@ class ZitiKeychain : NSObject {
             kSecAttrApplicationTag: atag]
         return SecItemDelete(deleteQuery as CFDictionary)
     }
-    func deleteKeyPair() -> ZitiError? {
+    func deleteKeyPair(_ zid:ZitiIdentity) -> ZitiError? {
         guard let atag = zid.id.data(using: .utf8) else {
             return ZitiError("deleteKeyPair: Unable to create application tag \(zid.id)")
         }
@@ -127,7 +121,7 @@ class ZitiKeychain : NSObject {
         return nil
     }
     
-    func getSecureIdentity() -> (SecIdentity?, ZitiError?) {
+    func getSecureIdentity(_ zid:ZitiIdentity) -> (SecIdentity?, ZitiError?) {
 #if os(macOS)
         let params: [CFString: Any] = [
             kSecClass: kSecClassCertificate,

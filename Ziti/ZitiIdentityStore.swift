@@ -77,19 +77,19 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         return zErr
     }
     
-    func remove(_ zId:ZitiIdentity) -> ZitiError? {
+    func remove(_ zid:ZitiIdentity) -> ZitiError? {
         guard self.presentedItemURL != nil else {
             return ZitiError("ZitiIdentityStore.remove: Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
-        let url = self.presentedItemURL!.appendingPathComponent("\(zId.id).zid", isDirectory:false)
+        let url = self.presentedItemURL!.appendingPathComponent("\(zid.id).zid", isDirectory:false)
         var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: .forDeleting, error: nil) { url in
             do {
-                let zkc = ZitiKeychain(zId)
-                _ = zkc.deleteCertificate(zId.id)
-                _ = zkc.deleteKeyPair()
+                let zkc = ZitiKeychain()
+                _ = zkc.deleteCertificate(zid.id)
+                _ = zkc.deleteKeyPair(zid)
                 try FileManager.default.removeItem(at: url)
             } catch {
                 zErr = ZitiError("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")

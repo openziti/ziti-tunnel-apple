@@ -27,7 +27,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var idEnrollBtn: NSButton!
     @IBOutlet weak var idSpinner: NSProgressIndicator!
     
-    var servicesViewController:ServicesViewController? = nil
+    weak var servicesViewController:ServicesViewController? = nil
     var zidStore = ZitiIdentityStore()
     
     static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
@@ -86,25 +86,20 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
-        print("Tunnel Status changed:")
         let status = self.tunnelProviderManager.connection.status
         switch status {
         case .connecting:
-            print("Connecting...")
             connectStatus.stringValue = "Connecting..."
             connectButton.title = "Turn Ziti Off"
             break
         case .connected:
-            print("Connected...")
             connectStatus.stringValue = "Connected"
             connectButton.title = "Turn Ziti Off"
             break
         case .disconnecting:
-            print("Disconnecting...")
             connectStatus.stringValue = "Disconnecting..."
             break
         case .disconnected:
-            print("Disconnected...")
             connectStatus.stringValue = "Disconnected"
             connectButton.title = "Turn Ziti On"
             break
@@ -237,8 +232,18 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
                 ZitiEdge(zid).getServices { zErr in
                     DispatchQueue.main.async {
-                        if zid == self.zitiIdentities[self.representedObject as! Int] {
+                        if zid == self.zitiIdentities[(self.representedObject ?? 0) as! Int] {
                             self.updateServiceUI(zId:zid)
+                        }
+                    }
+                    guard zErr == nil else { return }
+                    
+                    if let svcs = zid.services, svcs.count > 0 {
+                        if let svcId = svcs[0].id {
+                            ZitiEdge(zid).getNetworkSession(svcId) { ns, e in
+                                //TODO
+                                print("hello")
+                            }
                         }
                     }
                 }
@@ -268,7 +273,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     func tableViewSelectionDidChange(_ notification: Notification) {
         if (tableView.selectedRow >= 0) {
-            print("tableViewSelectionDidChange " + String(tableView.selectedRow))
             if (representedObject as! Int) != tableView.selectedRow {
                 representedObject = tableView.selectedRow
             }
@@ -336,7 +340,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     else {
                         throw ZitiError("Unable to parse enrollment data")
                     }
-                    print("zid: \(ztid.debugDescription)")
                     
                     // only support OTT
                     guard ztid.method == .ott else {
@@ -432,7 +435,6 @@ extension ViewController: NSTableViewDelegate {
             var imageName:String = "NSStatusNone"
             
             if zid.isEnrolled == true, let edgeStatus = zid.edgeStatus {
-                print("\(zid.name) controller status:\(edgeStatus.status) (\(DateFormatter().timeSince(edgeStatus.lastContactAt)))")
                 switch edgeStatus.status {
                 case .Available: imageName = (tunnelStatus == .connected && zid.enabled == true) ?
                     "NSStatusAvailable" : "NSStatusPartiallyAvailable"

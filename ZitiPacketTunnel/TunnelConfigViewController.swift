@@ -84,7 +84,6 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         let conf:ProviderConfig = ProviderConfig()
         if let error = conf.parseDictionary(dict) {
             // alert and get outta here
-            print("Error validating conf. \(error)")
             let alert = NSAlert()
             alert.messageText = "Configuration Error"
             alert.informativeText =  error.description
@@ -98,7 +97,6 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             
             self.tunnelProviderManager?.saveToPreferences { error in
                 if let error = error {
-                    print("Error saving perferences \(error)")
                     NSAlert(error:error).runModal()
                 } else {
                     if self.tunnelProviderManager!.connection.status == .connected {

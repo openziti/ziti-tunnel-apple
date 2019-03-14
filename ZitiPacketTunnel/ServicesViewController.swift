@@ -15,7 +15,6 @@ class ServicesViewController: NSViewController {
         get {
             return representedObject as? ZitiIdentity
         }
-        
         set {
             representedObject = newValue
         }
@@ -33,9 +32,11 @@ class ServicesViewController: NSViewController {
     
     override var representedObject: Any? {
         didSet {
-            print("Servicees table: \(zid?.name ?? "nil")")
             tableView?.isEnabled = zid == nil ? false : true
+            
+            let selectedRow = tableView?.selectedRow ?? 0
             tableView?.reloadData()
+            tableView?.selectRowIndexes([selectedRow], byExtendingSelection: false)
         }
     }
 }
