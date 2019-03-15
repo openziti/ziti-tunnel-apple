@@ -261,9 +261,9 @@ class ZitiEdge : NSObject {
         self.zid?.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Available)
         
         // TODO: temp for dev
-        if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
-            print("Response for \(zid?.name ?? ""): \(responseStr)")
-        }
+        //if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
+            //print("Response for \(zid?.name ?? ""): \(responseStr)")
+        //}
         // end temp for dev
         return nil
     }
@@ -308,14 +308,11 @@ extension ZitiEdge : URLSessionDelegate {
             completionHandler(.performDefaultHandling, nil)
             return
         }
-        
-        let zkc = ZitiKeychain()
-        let (identity, err) = zkc.getSecureIdentity(zid)
-        guard err == nil else {
+        guard let identity = zid.secId else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
-        let urlCredential = URLCredential(identity: identity!, certificates: nil, persistence: .forSession)
+        let urlCredential = URLCredential(identity: identity, certificates: nil, persistence: .forSession)
         completionHandler(.useCredential, urlCredential)
     }
 }

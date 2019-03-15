@@ -114,6 +114,20 @@ class ZitiIdentity : NSObject, Codable {
         return true
     }
     
+    private class Cache : Codable {
+        var secId:SecIdentity?
+        init() {}
+        required init(from decoder: Decoder) throws { }
+        func encode(to encoder: Encoder) throws { }
+    }
+    private let cache = Cache()
+    var secId:SecIdentity? {
+        if cache.secId == nil {
+            (cache.secId, _) = ZitiKeychain().getSecureIdentity(self)
+        }
+        return cache.secId
+    }
+    
     override var debugDescription: String {
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted
