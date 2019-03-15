@@ -176,8 +176,8 @@ class ZitiEdge : NSObject {
                 completionHandler(ZitiError("Enable to decode response for services"))
                 return
             }
-            let same = zid.doServicesMatch(resp.data)
-            print("Services match for \(zid.name) = \(same)")
+            //let same = zid.doServicesMatch(resp.data)
+            //print("Services match for \(zid.name) = \(same)")
             zid.services = resp.data
             completionHandler(nil)
         }.resume()
@@ -196,7 +196,7 @@ class ZitiEdge : NSObject {
         
         let body = "{\"serviceId\":\"\(serviceId)\"}".data(using: .utf8)
         let (session, urlRequest) = getURLSession(
-            url:url, method:GET_METHOD, contentType:JSON_TYPE, body:body)
+            url:url, method:POST_METHOD, contentType:JSON_TYPE, body:body)
         
         session.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
@@ -250,7 +250,7 @@ class ZitiEdge : NSObject {
                 "Invalid or empty response from server", errorCode:errorCode)
         }
         
-        guard httpResp.statusCode == 200 else {
+        guard httpResp.statusCode >= 200 && httpResp.statusCode < 300 else {
             self.zid?.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.PartiallyAvailable)
             guard let edgeErrorResp = try? JSONDecoder().decode(ZitiEdgeErrorResponse.self, from: respData) else {
                 let respStr = HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)
