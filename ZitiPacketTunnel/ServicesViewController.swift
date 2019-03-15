@@ -11,7 +11,7 @@ import Cocoa
 class ServicesViewController: NSViewController {
     @IBOutlet weak var tableView: NSTableView!
     
-    var zid:ZitiIdentity? {
+    weak var zid:ZitiIdentity? {
         get {
             return representedObject as? ZitiIdentity
         }
