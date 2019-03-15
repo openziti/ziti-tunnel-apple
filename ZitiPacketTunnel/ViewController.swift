@@ -236,16 +236,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             self.updateServiceUI(zId:zid)
                         }
                     }
-                    guard zErr == nil else { return }
-                    
-                    if let svcs = zid.services, svcs.count > 0 {
-                        if let svcId = svcs[0].id {
-                            ZitiEdge(zid).getNetworkSession(svcId) { ns, e in
-                                //TODO
-                                print("hello")
-                            }
-                        }
-                    }
                 }
             } else if zid == self.zitiIdentities[self.representedObject as! Int] {
                 self.updateServiceUI(zId:zid)
