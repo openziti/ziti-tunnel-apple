@@ -10,7 +10,7 @@ import Foundation
 
 class ZitiIdentity : NSObject, Codable {
     //let identity:(name:String, id:String)
-    struct Identity : Codable {
+    class Identity : Codable {
         let name:String, id:String
         init(_ name:String, _ id:String) {
             self.name = name; self.id = id
@@ -18,7 +18,7 @@ class ZitiIdentity : NSObject, Codable {
     }
     
     //let versions:(api:String, enrollmentApi:String)
-    struct Versions : Codable {
+    class Versions : Codable {
         let api:String, enrollmentApi:String
         init(_ api:String, _ enrollmentApi:String) {
             self.api = api; self.enrollmentApi = enrollmentApi
@@ -61,7 +61,7 @@ class ZitiIdentity : NSObject, Codable {
         }
     }
     
-    struct EdgeStatus : Codable {
+    class EdgeStatus : Codable {
         let lastContactAt:TimeInterval
         let status:ConnectivityStatus
         init(_ lastContactAt:TimeInterval, status:ConnectivityStatus) {

@@ -10,8 +10,8 @@ import Foundation
 
 fileprivate let AUTH_PATH = "/authenticate?method=cert"
 fileprivate let SESSION_TAG = "zt-session"
-fileprivate let SERVCES_PATH = "/services?limit=500"
-fileprivate let NETSESSIONS_PATH = "/network-sessions"
+fileprivate let SERVCES_PATH = "/services?limit=5000"
+fileprivate let NETSESSIONS_PATH = "/network-sessions?limit=1000"
 fileprivate let GET_METHOD = "GET"
 fileprivate let POST_METHOD = "POST"
 fileprivate let CONTENT_TYPE = "Content-Type"

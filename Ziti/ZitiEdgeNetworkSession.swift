@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ZitiEdgeNetworkSession : Codable {
+class ZitiEdgeNetworkSession : Codable {
     struct Gateway : Codable {
         var name:String?
         var hostname:String?
@@ -26,8 +26,8 @@ struct ZitiEdgeNetworkSession : Codable {
     var gateways:[Gateway]?
 }
 
-struct ZitiEdgeNetworkSessionResponse : Codable {
-    struct Meta : Codable {}
+class ZitiEdgeNetworkSessionResponse : Codable {
+    class Meta : Codable {}
     var meta:Meta?
     var data:ZitiEdgeNetworkSession?
 }
