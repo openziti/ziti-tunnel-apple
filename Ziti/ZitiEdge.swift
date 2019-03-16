@@ -164,37 +164,47 @@ class ZitiEdge : NSObject {
         }.resume()
     }
     
-    func getNetworkSession(_ serviceId:String, completionHandler: @escaping (ZitiEdgeNetworkSession?, ZitiError?) -> Void) {
+    func getNetworkSession(_ serviceId:String, completionHandler: @escaping (ZitiError?) -> Void) {
         guard let url = URL(string: NETSESSIONS_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
-            completionHandler(nil, ZitiError("Enable to convert URL \"\(NETSESSIONS_PATH)\" for \"\(zid.apiBaseUrl)\""))
+            completionHandler(ZitiError("Enable to convert URL \"\(NETSESSIONS_PATH)\" for \"\(zid.apiBaseUrl)\""))
+            return
+        }
+        guard let services = zid.services else {
+            completionHandler(
+                ZitiError("Unable to getNetworkSession for service \(serviceId). No services available to \(zid.name)"))
+            return
+        }
+        guard let service = services.first(where: { $0.id == serviceId }) else {
+            completionHandler(
+                    ZitiError("Unable to getNetworkSession for service \(serviceId). Service not found for \(zid.name)"))
             return
         }
         
         let body = "{\"serviceId\":\"\(serviceId)\"}".data(using: .utf8)
         let urlRequest = createRequest(url, method:POST_METHOD, contentType:JSON_TYPE, body:body)
-        
         urlSession.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
                 // if 401, try auth and if ok, try getNetworkSession() again.
                 if zErr.errorCode == ZitiError.AuthRequired {
                     self.authenticate { authErr in
                         guard authErr == nil else {
-                            completionHandler(nil, authErr)
+                            completionHandler(authErr)
                             return
                         }
                         self.getNetworkSession(serviceId, completionHandler: completionHandler)
                     }
                 } else {
-                    completionHandler(nil, zErr)
+                    completionHandler(zErr)
                 }
                 return
             }
             guard let resp =
                 try? JSONDecoder().decode(ZitiEdgeNetworkSessionResponse.self, from: data!) else {
-                    completionHandler(nil, ZitiError("Enable to decode response for network session"))
+                    completionHandler(ZitiError("Enable to decode response for network session"))
                     return
             }
-            completionHandler(resp.data, nil)
+            service.networkSession = resp.data
+            completionHandler(nil)
         }.resume()
     }
     

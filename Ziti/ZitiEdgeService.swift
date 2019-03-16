@@ -16,6 +16,7 @@ class ZitiEdgeService : Codable {
     var name:String?
     var id:String?
     var dns:Dns?
+    var networkSession:ZitiEdgeNetworkSession?
 }
 
 class ZitiEdgeServiceResponse : Codable {
