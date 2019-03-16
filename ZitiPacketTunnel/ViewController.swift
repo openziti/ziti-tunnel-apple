@@ -219,18 +219,18 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             NSNotification.Name.NEVPNStatusDidChange, object: nil)
         
         // GetServices timer - fire quickly, then every X secs
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        //DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.updateServicesTimerFired() // should: auth, then update services
             Timer.scheduledTimer(withTimeInterval: 15.0, repeats: true) { timer in
                 self.updateServicesTimerFired()
             }
-        }
+        //}
     }
     
     func updateServicesTimerFired() {
         zitiIdentities.forEach { zid in
             if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
-                ZitiEdge(zid).getServices { zErr in
+                zid.edge.getServices { zErr in
                     DispatchQueue.main.async {
                         if zid == self.zitiIdentities[(self.representedObject ?? 0) as! Int] {
                             self.updateServiceUI(zId:zid)
@@ -391,7 +391,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         let zid = zitiIdentities[indx]
         enrollingIds.append(zid)
         updateServiceUI(zId: zid)
-        ZitiEdge(zid).enroll() { zErr in
+        zid.edge.enroll() { zErr in
             DispatchQueue.main.async {
                 self.enrollingIds.removeAll { $0.id == zid.id }
                 guard zErr == nil else {

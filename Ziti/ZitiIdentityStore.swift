@@ -34,7 +34,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
             do {
                 let list = try FileManager.default.contentsOfDirectory(at: self.presentedItemURL!, includingPropertiesForKeys: nil, options: [])
                 try list.forEach { url in
-                    NSLog("found id \(url.absoluteString)")
+                    NSLog("found id \(url.lastPathComponent)")
                     
                     if url.pathExtension == "zid" {
                         let data = try Data.init(contentsOf: url)
@@ -43,7 +43,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                             zIds.append(zId)
                         } else {
                             // log it and continue (don't return error and abort)
-                            NSLog("ZitiIdentityStore.load failed loading \(url.absoluteString)")
+                            NSLog("ZitiIdentityStore.load failed loading \(url.lastPathComponent)")
                         }
                     }
                 }
@@ -99,10 +99,10 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     }
     
     func presentedSubitemDidChange(at url: URL) {
-        NSLog("CHANGE: \(url.absoluteString)")
+        NSLog("CHANGE: \(url.lastPathComponent)")
     }
     
     func presentedSubitemDidAppear(at url: URL) {
-        NSLog("NEW: \(url.absoluteString)")
+        NSLog("NEW: \(url.lastPathComponent)")
     }
 }

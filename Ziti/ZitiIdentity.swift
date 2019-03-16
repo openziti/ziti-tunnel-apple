@@ -116,17 +116,27 @@ class ZitiIdentity : NSObject, Codable {
     
     private class Cache : Codable {
         var secId:SecIdentity?
+        var edge:ZitiEdge?
         init() {}
         required init(from decoder: Decoder) throws { }
         func encode(to encoder: Encoder) throws { }
     }
     private let cache = Cache()
     var secId:SecIdentity? {
+        print("getting secId for \(name)")
         if cache.secId == nil {
+            print("...from cache")
             (cache.secId, _) = ZitiKeychain().getSecureIdentity(self)
         }
         return cache.secId
     }
+    
+    lazy var edge:ZitiEdge = {
+        if cache.edge == nil {
+            cache.edge = ZitiEdge(self)
+        }
+        return cache.edge!
+    }()
     
     override var debugDescription: String {
         let jsonEncoder = JSONEncoder()
@@ -135,5 +145,9 @@ class ZitiIdentity : NSObject, Codable {
             return String(data: jsonData, encoding: .utf8)!
         }
         return("Unable to json encode \(name)")
+    }
+    
+    deinit {
+        cache.edge?.finishTasksAndInvalidate()
     }
 }

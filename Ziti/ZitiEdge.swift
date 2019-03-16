@@ -21,26 +21,19 @@ fileprivate let PEM_CERTIFICATE = "CERTIFICATE"
 fileprivate let PEM_CERTIFICATE_REQUEST = "CERTIFICATE REQUEST"
 
 class ZitiEdge : NSObject {    
-    weak var zid:ZitiIdentity?
-    
+    weak var zid:ZitiIdentity!
     init(_ zid:ZitiIdentity) {
         self.zid = zid
     }
     
     func authenticate(completionHandler: @escaping (ZitiError?) -> Void) {
-        guard let zid = zid else {
-            completionHandler(ZitiError("Unable to authenticate invalid identity"))
-            return
-        }
         guard let url = URL(string: AUTH_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
             completionHandler(ZitiError("Enable to convert auth URL \"\(AUTH_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
         }
         
-        let (session, urlRequest) = getURLSession(
-            url:url, method:POST_METHOD, contentType:JSON_TYPE, body:nil)
-        
-        session.dataTask(with: urlRequest) { (data, response, error) in
+        let urlRequest = createRequest(url, method:POST_METHOD, contentType:JSON_TYPE, body:nil)
+        urlSession.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
                 completionHandler(zErr)
                 return
@@ -56,24 +49,18 @@ class ZitiEdge : NSObject {
                 return
             }
             print("zt-session: \(token)")
-            zid.sessionToken = token
+            self.zid.sessionToken = token
             completionHandler(nil)
         }.resume()
-        session.finishTasksAndInvalidate()
     }
     
     func getHost() -> String {
-        guard let zid = zid else { return "" }
         guard let url = URL(string: zid.apiBaseUrl) else { return "" }
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         return components?.host ?? ""
     }
     
     func enroll(completionHandler: @escaping (ZitiError?) -> Void) {
-        guard let zid = zid else {
-            completionHandler(ZitiError("Unable to enroll invalid identity"))
-            return
-        }
         guard let url = URL(string: zid.enrollmentUrl) else {
             completionHandler(ZitiError("Enable to convert enrollment URL \"\(zid.enrollmentUrl)\""))
             return
@@ -116,10 +103,11 @@ class ZitiEdge : NSObject {
         
         // Submit CSR
         let csrPEM = zkc.convertToPEM(PEM_CERTIFICATE_REQUEST, der: csr!).data(using: String.Encoding.utf8)
-        let (session, urlRequest) = getURLSession(
-            url:url, method:POST_METHOD, contentType:TEXT_TYPE, body:csrPEM)
+        let urlRequest = createRequest(url, method:POST_METHOD, contentType:TEXT_TYPE, body:csrPEM)
         
-        session.dataTask(with: urlRequest) { (data, response, error) in
+        // don't share session with other edge calls since we have no secId at this point
+        let enrollSession = URLSession.shared
+        enrollSession.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
                 completionHandler(zErr)
                 return
@@ -130,33 +118,25 @@ class ZitiEdge : NSObject {
             }
             let certDER = zkc.convertToDER(certPEM)
             
-            if let zStoreErr = zkc.storeCertificate(certDER, label:zid.name) {
+            if let zStoreErr = zkc.storeCertificate(certDER, label:self.zid.name) {
                 completionHandler(zStoreErr)
                 return
             }
 
-            zid.enrolled = true
+            self.zid.enrolled = true
             completionHandler(nil)
         }.resume()
-        session.finishTasksAndInvalidate()
     }
     
     // TODO: maybe also a Bool indicating whether or not the services have changed
     //   (indicating should store, reconfig tunnel, etc)
     func getServices(completionHandler: @escaping (ZitiError?) -> Void) {
-        guard let zid = zid else {
-            completionHandler(ZitiError("Unable to getServices for invalid identity"))
-            return
-        }
         guard let url = URL(string: SERVCES_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
             completionHandler(ZitiError("Enable to convert URL \"\(SERVCES_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
         }
-        
-        let (session, urlRequest) = getURLSession(
-            url:url, method:GET_METHOD, contentType:JSON_TYPE, body:nil)
-        
-        session.dataTask(with: urlRequest) { (data, response, error) in
+        let urlRequest = createRequest(url, method:GET_METHOD, contentType:JSON_TYPE, body:nil)
+        urlSession.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
                 if zErr.errorCode == ZitiError.AuthRequired {
                     self.authenticate { authErr in
@@ -178,27 +158,22 @@ class ZitiEdge : NSObject {
             }
             //let same = zid.doServicesMatch(resp.data)
             //print("Services match for \(zid.name) = \(same)")
-            zid.services = resp.data
+            self.zid.services = resp.data
+            print("got \(self.zid.services?.count ?? 0) services for \(self.zid.name)")
             completionHandler(nil)
         }.resume()
-        session.finishTasksAndInvalidate()
     }
     
     func getNetworkSession(_ serviceId:String, completionHandler: @escaping (ZitiEdgeNetworkSession?, ZitiError?) -> Void) {
-        guard let zid = zid else {
-            completionHandler(nil, ZitiError("Unable to getNetworkSession for invalid identity"))
-            return
-        }
         guard let url = URL(string: NETSESSIONS_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
             completionHandler(nil, ZitiError("Enable to convert URL \"\(NETSESSIONS_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
         }
         
         let body = "{\"serviceId\":\"\(serviceId)\"}".data(using: .utf8)
-        let (session, urlRequest) = getURLSession(
-            url:url, method:POST_METHOD, contentType:JSON_TYPE, body:body)
+        let urlRequest = createRequest(url, method:POST_METHOD, contentType:JSON_TYPE, body:body)
         
-        session.dataTask(with: urlRequest) { (data, response, error) in
+        urlSession.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
                 // if 401, try auth and if ok, try getNetworkSession() again.
                 if zErr.errorCode == ZitiError.AuthRequired {
@@ -221,19 +196,15 @@ class ZitiEdge : NSObject {
             }
             completionHandler(resp.data, nil)
         }.resume()
-        session.finishTasksAndInvalidate()
     }
     
-    private func getURLSession(url:URL, method:String, contentType:String, body:Data?) -> (URLSession, URLRequest) {
-        let session = URLSession(
-            configuration: URLSessionConfiguration.default, delegate: self, delegateQueue:OperationQueue.main)
-        
+    private func createRequest(_ url:URL, method:String, contentType:String, body:Data?) -> URLRequest {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method
         urlRequest.setValue(contentType, forHTTPHeaderField: CONTENT_TYPE)
-        urlRequest.setValue(zid?.sessionToken ?? "-1", forHTTPHeaderField: SESSION_TAG)
+        urlRequest.setValue(zid.sessionToken ?? "-1", forHTTPHeaderField: SESSION_TAG)
         urlRequest.httpBody = body
-        return (session, urlRequest)
+        return urlRequest
     }
     
     private func validateResponse(_ data:Data?, _ response:URLResponse?, _ error:Error?) -> ZitiError? {
@@ -241,7 +212,7 @@ class ZitiEdge : NSObject {
             let httpResp = response as? HTTPURLResponse,
             let respData = data
         else {
-            self.zid?.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Unavailable)
+            self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Unavailable)
             var errorCode = -1
             if let nsErr = error as NSError?, nsErr.domain == NSURLErrorDomain {
                 errorCode = ZitiError.URLError
@@ -251,14 +222,14 @@ class ZitiEdge : NSObject {
         }
         
         guard httpResp.statusCode >= 200 && httpResp.statusCode < 300 else {
-            self.zid?.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.PartiallyAvailable)
+            self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.PartiallyAvailable)
             guard let edgeErrorResp = try? JSONDecoder().decode(ZitiEdgeErrorResponse.self, from: respData) else {
                 let respStr = HTTPURLResponse.localizedString(forStatusCode: httpResp.statusCode)
                 return ZitiError("HTTP response code: \(httpResp.statusCode) \(respStr)", errorCode:httpResp.statusCode)
             }            
             return ZitiError(edgeErrorResp.shortDescription(httpResp.statusCode), errorCode:httpResp.statusCode)
         }
-        self.zid?.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Available)
+        self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Available)
         
         // TODO: temp for dev
         //if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
@@ -288,6 +259,19 @@ class ZitiEdge : NSObject {
         }
         return (privKey, pubKey, nil)
     }
+    
+    private var hasSession = false
+    private lazy var urlSession:URLSession = {
+        let session = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:OperationQueue.main)
+        hasSession = true
+        return session
+    }()
+    
+    func finishTasksAndInvalidate() {
+        if hasSession == true {
+            urlSession.finishTasksAndInvalidate()
+        }
+    }
 }
 
 extension ZitiEdge : URLSessionDelegate {
@@ -304,10 +288,6 @@ extension ZitiEdge : URLSessionDelegate {
     
     func handleClientCertChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
 
-        guard let zid = zid else {
-            completionHandler(.performDefaultHandling, nil)
-            return
-        }
         guard let identity = zid.secId else {
             completionHandler(.performDefaultHandling, nil)
             return

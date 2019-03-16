@@ -132,7 +132,7 @@ class ZitiKeychain : NSObject {
         let certStatus = SecItemCopyMatching(params as CFDictionary, &cert)
         guard certStatus == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(certStatus, nil) as String? ?? "\(certStatus)"
-            return (nil, ZitiError("Unable to get certificate for \(zid.id): \(errStr)"))
+            return (nil, ZitiError("Unable to get identity certificate for \(zid.id): \(errStr)"))
         }
         let certificate = cert as! SecCertificate
 
