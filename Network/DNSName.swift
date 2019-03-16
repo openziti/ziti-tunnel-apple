@@ -14,7 +14,6 @@ class DNSName : NSObject {
     
     init(_ data:Data, offset:Int) {
         super.init()
-        
         var count = 0
         var keepCountingBytes = true
         var done = false
@@ -22,7 +21,6 @@ class DNSName : NSObject {
         
         while !done {
             let countOrOffset:UInt8 = data[data.startIndex + currOffset]
-            
             if isAnOffset(countOrOffset) {
                 currOffset = Int(countOrOffset)
                 count = findCountAndOffset(data, offset:&currOffset)
@@ -36,7 +34,6 @@ class DNSName : NSObject {
                     self.numBytes += (count + 1)
                 }
             }
-            
             if count == 0 {
                 done = true
             } else {
@@ -64,7 +61,6 @@ class DNSName : NSObject {
     }
     
     private func findCountAndOffset(_ data:Data, offset: inout Int) -> Int {
-        
         let countOrOffset:UInt8 = data[data.startIndex + offset]
         if isAnOffset(countOrOffset) {
             // new offset is made from last 14 bits of two bytes

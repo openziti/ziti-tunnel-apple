@@ -58,44 +58,36 @@ enum IPv6NextHeader : UInt8 {
 // TODO (currently set to 0 Target membership)
 class IPv6Packet : NSObject, IPPacket {
     static let version6:UInt8 = 6
-    
     static let numFirstHeaderBytes = 40
     static let defaultHopLimit:UInt8 = 255
-    
     static let versionOffset = 0
     static let payloadLengthOffset = 4
     static let nextHeaderOffet = 6
     static let hopLimitOffset = 7
     static let sourceAddressOffset = 8
     static let destinationAddressOffset = 24
-    
     var data: Data
     
     init?(_ data: Data) {
-        if data.count < IPv6Packet.numFirstHeaderBytes {
+        guard data.count >= IPv6Packet.numFirstHeaderBytes else {
             NSLog("Invalid IPv6 Packet size \(data.count)")
             return nil
         }
-        
         self.data = data
-        
         super.init()
-        
         let minLen = Int(self.payloadLength) + IPv6Packet.numFirstHeaderBytes
-        if minLen > data.count {
+        guard minLen <= data.count else {
             NSLog("Invalid IPv6 Packet length=\(minLen), buffer size=\(data.count)")
             return nil
         }
     }
     
     init?(count:Int) {
-        if (count < IPv6Packet.numFirstHeaderBytes) {
+        guard count >= IPv6Packet.numFirstHeaderBytes else {
             NSLog("Invalid IPv6 Packet size \(count)")
             return nil
         }
-        
         self.data = Data(count: count)
-        
         super.init()
         self.version = IPv6Packet.version6
     }
@@ -133,7 +125,6 @@ class IPv6Packet : NSObject, IPPacket {
             if self.nextHeader.isExtensionHeader() {
                 NSLog("************ EXTENSION HEADER!!! *****************")
             }
-            
             switch self.nextHeader {
             case .TCP: return IPProtocolId.TCP
             case .UDP: return IPProtocolId.UDP
@@ -177,7 +168,6 @@ class IPv6Packet : NSObject, IPPacket {
             }
             return self.data[startIndx...]
         }
-        
         set {
             let startIndx = Int(IPv6Packet.numFirstHeaderBytes)
             if let nv = newValue {
@@ -209,7 +199,6 @@ class IPv6Packet : NSObject, IPPacket {
     
     override var debugDescription: String {
         var s:String = "IPv\(version), Src: \(sourceAddressString), Dest:\(destinationAddressString)\n"
-        
         s += "\n" +
             "   version: \(version)\n" +
             "   payloadLength: \(payloadLength)\n" +
@@ -217,7 +206,6 @@ class IPv6Packet : NSObject, IPPacket {
             "   hopLimit: \(hopLimit)" +
             "   sourceAddress: \(sourceAddressString)\n" +
             "   destinationAddress: \(destinationAddressString)\n"
-        
         if let payload = self.payload {
             s += IPUtils.payloadToString(payload)
         }

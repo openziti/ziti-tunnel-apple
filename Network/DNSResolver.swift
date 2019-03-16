@@ -24,9 +24,7 @@ fileprivate var dnsLookup:[(name:String, intercept:String)] = [
  */
 
 class DNSResolver : NSObject {
-    
     static let dnsPort:UInt16 = 53
-    
     let tunnelProvider:PacketTunnelProvider
     
     init(_ tunnelProvider:PacketTunnelProvider) {
@@ -42,17 +40,11 @@ class DNSResolver : NSObject {
     }
     
     func resolve(_ udp:UDPPacket) {
-        guard let dns = DNSPacket(udp) else {
-            NSLog("ATTEMPT TO RESOLVE NON DNS MESSAGE")
-            return
-        }
+        guard let dns = DNSPacket(udp) else { return }
         
         //NSLog("DNS-->: \(dns.debugDescription)")
         // only resolve queries (should never see this...)
-        if dns.qrFlag {
-            NSLog("ATTEMPT TO RESOLVE RESPONSE MESSAGE")
-            return
-        }
+        if dns.qrFlag { return }
         
         var answers:[DNSResourceRecord] = []
         var inMatchDomains = false

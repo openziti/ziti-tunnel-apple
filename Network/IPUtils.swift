@@ -16,7 +16,7 @@ class IPUtils {
             $0.pointee
         })
     }
-    
+
     static func extractUInt32(_ data:Data, from:Int) -> UInt32 {
         let byteArray = [UInt8](data.subdata(in: from..<(from+4)))
         return CFSwapInt32(UnsafePointer(byteArray).withMemoryRebound(to:UInt32.self, capacity: 1) {
@@ -57,11 +57,10 @@ class IPUtils {
     static let v6AddrNumWords = 8
     static func ipV6AddressToSting(_ addr:Data) -> String {
         var str = "::" // 'unspecified' or 'invalid'
-        
         var addrWords:[UInt16] = addr.withUnsafeBytes {
             UnsafeBufferPointer<UInt16>(start: $0, count: Int(addr.count/2)).map(UInt16.init(bigEndian:))
         }
-        
+
         let zeroSplit = addrWords.split(whereSeparator: { $0 != 0 }).max(by: {$1.count > $0.count})
         guard let z = zeroSplit else {
             return addrWords.map{String(format: "%x", $0)}.joined(separator: ":")

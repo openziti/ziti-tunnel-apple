@@ -15,19 +15,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func readPacketFlow() {
         self.packetFlow.readPacketObjects { (packets:[NEPacket]) in
-            
-            guard let pr = self.packetRouter else {
-                NSLog("PacketTunnelProvider: invalid packet router.")
-                return
-            }
-            
-            NSLog("Got \(packets.count) packets!")
-            for packet:NEPacket in packets {
-                if packet.protocolFamily == AF_INET {
-                    pr.route(packet.data)
-                } else {
-                    NSLog("...ignoring non AF_INET packet, protocolFamily=\(packet.protocolFamily)")
-                }
+            guard self.packetRouter != nil else { return }
+            for packet in packets {
+                self.packetRouter?.route(packet.data)
             }
             self.readPacketFlow()
         }
@@ -38,26 +28,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-        
         NSLog("startTunnel")
-        NSLog("Bundle path: \(Bundle.main.bundlePath)")
-        
-        let (zitiIdentities,_) = ZitiIdentityStore().load()
-        NSLog("GOT \(zitiIdentities?.count ?? -1) identities")
-        zitiIdentities?.forEach { zid in
-            NSLog("ZitiIdentity \(zid.name): \(zid.id)")
-            
-            if ZitiKeychain().keyPairExists(zid) {
-                NSLog("PACKET TUNNEL KEYS EXIST for \(zid.id)")
-                
-                // try quick auth just for fun
-                ZitiEdge(zid).authenticate { zErr in
-                    NSLog("...auth for \(zid.name): " + (zErr != nil ? "FAILED" : "SUCCESS"))
-                }
-            } else {
-                NSLog("PACKET TUNNEL KEYS do not EXIST for \(zid.name): \(zid.id)")
-            }
-        }
         
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {
@@ -89,22 +60,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
             if let error = error {
                 NSLog(error.localizedDescription)
-                // TODO: status and get outta here
+                completionHandler(error as NSError)
             }
             
             // if all good, start listening for for ziti protocol..
+            self.packetRouter = PacketRouter(tunnelProvider:self)
+            
+            // call completion handler with nil to indicate success
+            completionHandler(nil)
+            
+            //
+            // Start listening for traffic headed our way via the tun interface
+            //
+            self.readPacketFlow();
         }
-        
-        self.packetRouter = PacketRouter(tunnelProvider:self)
-        
-        // call completion handler with nil to indicate success (TODO: better approach would be make sure we
-        // get a bit further along...)
-        completionHandler(nil)
-        
-        //
-        // Start listening for traffic headed our way via the tun interface
-        //
-        readPacketFlow();
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {

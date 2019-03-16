@@ -10,7 +10,6 @@ import NetworkExtension
 import Foundation
 
 class PacketRouter : NSObject {
-    
     let tunnelProvider:PacketTunnelProvider
     let dnsResolver:DNSResolver
 

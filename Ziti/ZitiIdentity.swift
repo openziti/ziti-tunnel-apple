@@ -123,18 +123,14 @@ class ZitiIdentity : NSObject, Codable {
     }
     private let cache = Cache()
     var secId:SecIdentity? {
-        print("getting secId for \(name)")
         if cache.secId == nil {
-            print("...from cache")
             (cache.secId, _) = ZitiKeychain().getSecureIdentity(self)
         }
         return cache.secId
     }
     
     lazy var edge:ZitiEdge = {
-        if cache.edge == nil {
-            cache.edge = ZitiEdge(self)
-        }
+        if cache.edge == nil { cache.edge = ZitiEdge(self) }
         return cache.edge!
     }()
     
@@ -147,7 +143,5 @@ class ZitiIdentity : NSObject, Codable {
         return("Unable to json encode \(name)")
     }
     
-    deinit {
-        cache.edge?.finishTasksAndInvalidate()
-    }
+    deinit { cache.edge?.finishTasksAndInvalidate() }
 }

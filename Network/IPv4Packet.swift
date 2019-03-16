@@ -10,21 +10,17 @@ import Foundation
 
 struct IPv4Flags : OptionSet {
     let rawValue: UInt8
-    
     static let moreFragments = IPv4Flags(rawValue: 1 << 0)
     static let dontFragment  = IPv4Flags(rawValue: 1 << 1)
     static let reserved      = IPv4Flags(rawValue: 1 << 2)
 }
 
 class IPv4Packet : NSObject, IPPacket {
-    
     static let version4:UInt8 = 4
-    
     static let headerWordLength = 4
     static let minHeaderLength:UInt8 = 5
     static let minHeaderBytes = 20
     static let defaultTtl:UInt8 = 255
-    
     static let versionAndLengthOffset = 0
     static let totalLengthOffset = 2
     static let identificationOffset = 4
@@ -35,35 +31,19 @@ class IPv4Packet : NSObject, IPPacket {
     static let sourceAddressOffset = 12
     static let destinationAddressOffset = 16
     static let optionsOffset = 20
-    
     var data:Data
     
     init?(_ data: Data) {
-        if data.count < IPv4Packet.minHeaderBytes {
-            NSLog("Invalid IPv4 Packet size \(data.count)")
-            return nil
-        }
-
+        guard data.count >= IPv4Packet.minHeaderBytes else { return nil }
         self.data = data
-        
         super.init()
-        
-        if self.totalLength > data.count {
-            NSLog("Invalid IPv4 Packet length totalLenght=\(self.totalLength), buffer size=\(data.count)")
-            return nil
-        }
+        guard self.totalLength <= data.count else { return nil }
     }
     
     init?(count:Int) {
-        if (count < IPv4Packet.minHeaderLength) {
-            NSLog("Invalid IPv4 Packet size \(count)")
-            return nil
-        }
-        
+        guard count >= IPv4Packet.minHeaderLength else { return nil }
         self.data = Data(count: count)
-        
         super.init()
-        
         self.version = IPv4Packet.version4
         self.headerLength = IPv4Packet.minHeaderLength
     }
@@ -156,10 +136,7 @@ class IPv4Packet : NSObject, IPPacket {
     
     var options:Data? {
         get {
-            if (self.headerLength == IPv4Packet.minHeaderLength) {
-                return nil
-            }
-            
+            guard self.headerLength > IPv4Packet.minHeaderLength else { return nil }
             let nOptsBytes = Int(self.headerLength - IPv4Packet.minHeaderLength) * IPv4Packet.headerWordLength
             return data[IPv4Packet.optionsOffset...(IPv4Packet.optionsOffset + nOptsBytes)]
         }
@@ -168,9 +145,7 @@ class IPv4Packet : NSObject, IPPacket {
     var payload:Data? {
         get {
             let startIndx = Int(self.headerLength) * IPv4Packet.headerWordLength
-            if (startIndx >= self.data.count) {
-                return nil
-            }
+            guard startIndx < self.data.count else { return nil }
             return self.data[startIndx...]
         }
         
@@ -198,7 +173,6 @@ class IPv4Packet : NSObject, IPPacket {
     }
     
     func computeHeaderChecksum() -> UInt16 {
-        
         // copy the header into UInt16 array, network order
         let headerBytes = Int(self.headerLength) * IPv4Packet.headerWordLength
         var l16Header:[UInt16] = self.data[..<headerBytes].withUnsafeBytes {
@@ -225,7 +199,6 @@ class IPv4Packet : NSObject, IPPacket {
                 sum -= 0xffff
             }
         }
-        
         return UInt16(~sum & 0xffff)
     }
     
@@ -248,22 +221,14 @@ class IPv4Packet : NSObject, IPPacket {
     
     override var debugDescription: String {
         var s:String = "IPv\(version), Src: \(sourceAddressString), Dest:\(destinationAddressString)\n"
-        
         s += "\n" +
             "   version: \(version)\n" +
             "   headerLength: \(headerLength)\n" +
             "   totalLength: \(totalLength)\n" +
             "   identification: \(String(format:"0x%2x", identification)) (\(identification))\n" +
             "   flags: \(String(format:"0x%2x", flags.rawValue))"
-        
-        if flags.contains(IPv4Flags.dontFragment) {
-            s += " (Don't Fragment)"
-        }
-        
-        if flags.contains(IPv4Flags.moreFragments) {
-            s += " (More Fragments)"
-        }
-            
+        if flags.contains(IPv4Flags.dontFragment) { s += " (Don't Fragment)" }
+        if flags.contains(IPv4Flags.moreFragments) { s += " (More Fragments)" }
         s += "\n" +
             "   fragmentOffset: \(fragmentOffset)\n" +
             "   ttl: \(ttl)\n" +
@@ -272,15 +237,12 @@ class IPv4Packet : NSObject, IPPacket {
             "   computedChecksun: \(String(format:"0x%2x", computeHeaderChecksum()))\n" +
             "   sourceAddress: \(sourceAddressString)\n" +
             "   destinationAddress: \(destinationAddressString)\n"
-        
         if let opts = self.options {
             s += "   options: \(opts.map{String(format: "%02X ", $0)}.joined())"
         }
-        
         if let payload = self.payload {
             s += IPUtils.payloadToString(payload)
         }
-        
         return s
     }
 }
