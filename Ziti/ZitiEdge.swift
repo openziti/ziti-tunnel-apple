@@ -128,11 +128,9 @@ class ZitiEdge : NSObject {
         }.resume()
     }
     
-    // TODO: maybe also a Bool indicating whether or not the services have changed
-    //   (indicating should store, reconfig tunnel, etc)
-    func getServices(completionHandler: @escaping (ZitiError?) -> Void) {
+    func getServices(completionHandler: @escaping (Bool, ZitiError?) -> Void) {
         guard let url = URL(string: SERVCES_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
-            completionHandler(ZitiError("Enable to convert URL \"\(SERVCES_PATH)\" for \"\(zid.apiBaseUrl)\""))
+            completionHandler(false, ZitiError("Enable to convert URL \"\(SERVCES_PATH)\" for \"\(zid.apiBaseUrl)\""))
             return
         }
         let urlRequest = createRequest(url, method:GET_METHOD, contentType:JSON_TYPE, body:nil)
@@ -141,26 +139,28 @@ class ZitiEdge : NSObject {
                 if zErr.errorCode == ZitiError.AuthRequired {
                     self.authenticate { authErr in
                         guard authErr == nil else {
-                            completionHandler(authErr)
+                            let numServices = self.zid.services?.count ?? 0
+                            self.zid.services = nil
+                            let didChange = numServices > 0
+                            completionHandler(didChange, authErr)
                             return
                         }
                         self.getServices(completionHandler: completionHandler)
                     }
                 } else {
-                    completionHandler(zErr)
+                    completionHandler(false, zErr)
                 }
                 return
             }
             guard let resp =
                 try? JSONDecoder().decode(ZitiEdgeServiceResponse.self, from: data!) else {
-                completionHandler(ZitiError("Enable to decode response for services"))
+                completionHandler(false, ZitiError("Enable to decode response for services"))
                 return
             }
-            //let same = zid.doServicesMatch(resp.data)
-            //print("Services match for \(zid.name) = \(same)")
+            let didChange = self.zid.doServicesMatch(resp.data) == false
             self.zid.services = resp.data
-            print("got \(self.zid.services?.count ?? 0) services for \(self.zid.name)")
-            completionHandler(nil)
+            print("got \(self.zid.services?.count ?? 0) services for \(self.zid.name). didChange=\(didChange)")
+            completionHandler(didChange, nil)
         }.resume()
     }
     

@@ -230,7 +230,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     func updateServicesTimerFired() {
         zitiIdentities.forEach { zid in
             if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
-                zid.edge.getServices { zErr in
+                zid.edge.getServices { _, _ in
                     DispatchQueue.main.async {
                         if zid == self.zitiIdentities[(self.representedObject ?? 0) as! Int] {
                             self.updateServiceUI(zId:zid)
