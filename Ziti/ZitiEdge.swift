@@ -84,6 +84,9 @@ class ZitiEdge : NSObject {
             */
             // do our best. if CA already trusted will be ok...
             _ = zkc.storeCertificate(der, label: host)
+            
+            // dop rootCa from zid - no need to keep it around
+            self.zid.rootCa = nil
         }
         
         // Get Keys

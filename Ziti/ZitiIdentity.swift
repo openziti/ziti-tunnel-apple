@@ -79,7 +79,7 @@ class ZitiIdentity : NSObject, Codable {
     let apiBaseUrl:String
     let method:EnrollmentMethod
     let token:String
-    let rootCa:String?
+    var rootCa:String?
     var exp:Int = 0
     var expDate:Date { return Date(timeIntervalSince1970: TimeInterval(exp)) }
     var iat:Int? = 0
