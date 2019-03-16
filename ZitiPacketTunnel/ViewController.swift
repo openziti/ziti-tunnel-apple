@@ -63,7 +63,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     
                     let defaultProviderConf = ProviderConfig()
                     providerProtocol.providerConfiguration = defaultProviderConf.createDictionary()
-                    providerProtocol.serverAddress = defaultProviderConf.serverAddress
+                    providerProtocol.serverAddress = defaultProviderConf.ipAddress
                     providerProtocol.username = defaultProviderConf.username
                     
                     self.tunnelProviderManager.protocolConfiguration = providerProtocol
