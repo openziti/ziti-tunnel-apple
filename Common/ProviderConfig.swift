@@ -14,7 +14,7 @@ enum ProviderConfigError : Error {
     case invalidMtu
     case invalidDnsAddresses
     case invalidMatchDomains
-    
+
     var description: String {
         switch self {
         case .invalidIpAddress: return "Invalid IP Address (expect valid IPv4 address)"
@@ -38,12 +38,10 @@ class ProviderConfig : NSObject {
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "169.254.126.1"
-    var subnetMask:String = "255.255.255.0"
+    var subnetMask:String = "255.255.0.0"
     var mtu:Int = 1500
     var dnsAddresses:[String] = ["169.254.126.2"]
-    var dnsMatchDomains:[String] = [""]
-    
-    var serverAddress = "169.254.126.254"
+    var dnsMatchDomains:[String] = [""]    
     var username = "NetFoundry"
     var localizedDescription = "Ziti Packet Tunnel"
     
@@ -67,11 +65,9 @@ class ProviderConfig : NSObject {
         if !isValidIpAddress(conf[ProviderConfig.IP_KEY]) {
             return ProviderConfigError.invalidIpAddress
         }
-        
         if !isValidIpAddress(conf[ProviderConfig.SUBNET_KEY]) {
             return ProviderConfigError.invalidSubnetMask
         }
-        
         if let dns = conf[ProviderConfig.DNS_KEY] {
             let dnsArray = (dns as! String).components(separatedBy: ",")
             if dnsArray.count == 0 || dnsArray.contains { !isValidIpAddress($0) } {
@@ -80,25 +76,18 @@ class ProviderConfig : NSObject {
         } else {
             return ProviderConfigError.invalidDnsAddresses
         }
-        
         if (Int(conf[ProviderConfig.MTU_KEY] as! String) == nil) {
             return ProviderConfigError.invalidMtu
         }
-        
         return nil
     }
     
     func parseDictionary(_ conf:ProviderConfigDict) -> ProviderConfigError? {
-        
-        if let error = validateDictionaty(conf) {
-            return error
-        }
-        
+        if let error = validateDictionaty(conf) { return error }
         self.ipAddress = (conf[ProviderConfig.IP_KEY] as! String).trimmingCharacters(in: .whitespaces)
         self.subnetMask = (conf[ProviderConfig.SUBNET_KEY] as! String).trimmingCharacters(in: .whitespaces)
         self.mtu = Int(conf[ProviderConfig.MTU_KEY] as! String)!
         self.dnsAddresses = (conf[ProviderConfig.DNS_KEY] as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
-    
         self.dnsMatchDomains = [""] // all routes by default
         if let mds = conf[ProviderConfig.MATCH_DOMAINS_KEY] {
             let mdsArray = (mds as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
