@@ -72,16 +72,6 @@ class ZitiEdge : NSObject {
             let host = getHost()
             let der = zkc.convertToDER(rootCaPem)
             
-            /* find/delete not working - attr label overwritten by common name?
-            _ = zkc.deleteCertificate(host)
-            
-            // add it...
-            let zErr = zkc.storeCertificate(der, label: host)
-            guard zErr == nil else {
-                completionHandler(zErr)
-                return
-            }
-            */
             // do our best. if CA already trusted will be ok...
             _ = zkc.storeCertificate(der, label: host)
             

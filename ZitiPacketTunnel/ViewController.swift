@@ -10,7 +10,7 @@ import Cocoa
 import NetworkExtension
 import JWTDecode
 
-class ViewController: NSViewController, NSTextFieldDelegate {
+class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDelegate {
 
     @IBOutlet weak var connectButton: NSButton!
     @IBOutlet weak var connectStatus: NSTextField!
@@ -194,7 +194,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        zidStore.delegate = self
         tableView.delegate = self
         tableView.dataSource = self
 
@@ -204,7 +204,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         initTunnelProviderManager()
         
         // Load previous identities
-        let (zids, err) = zidStore.load()
+        let (zids, err) = zidStore.loadAll()
         if err != nil && err!.errorDescription != nil {
             NSLog(err!.errorDescription!)
         }
@@ -246,6 +246,18 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     override var representedObject: Any? {
         didSet {
             zitiIdentities.count == 0 ? updateServiceUI() : updateServiceUI(zId: zitiIdentities[representedObject as! Int])
+        }
+    }
+    
+    func onRemovedId(_ idString: String) {
+        print("zid \(idString) removed")
+    }
+    
+    func onNewOrChangedId(_ zid: ZitiIdentity) {
+        if let _ = zitiIdentities.first(where: { $0.id == zid.id }) {
+            print("\(zid.name):\(zid.id) changed")
+        } else {
+            print("\(zid.name):\(zid.id) new")
         }
     }
     

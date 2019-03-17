@@ -12,6 +12,7 @@ class ZitiError : LocalizedError, CustomNSError {
     public static var errorDomain:String = "ZitiError"
     public static let URLError = -1000
     public static let AuthRequired = 401
+    public static let NoSuchFile = 260
     
     public var errorDescription:String?
     public var errorCode:Int = -1
