@@ -50,6 +50,13 @@ class IPUtils {
         return data
     }
     
+    static func isValidIpV4Address(_ str:String) -> Bool {
+        let addr = str.trimmingCharacters(in: .whitespaces)
+        let parts = addr.components(separatedBy: ".")
+        let nums = parts.compactMap { Int($0) }
+        return parts.count == 4 && nums.count == 4 && nums.filter { $0 >= 0 && $0 < 256}.count == 4
+    }
+    
     private static func v6SegToStr(_ seg:Data) -> String {
         return seg.map{String(format: "%x", $0)}.joined(separator: ":")
     }
