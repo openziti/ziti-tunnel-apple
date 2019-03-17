@@ -11,7 +11,17 @@ import NetworkExtension
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     let providerConfig = ProviderConfig()
-    var packetRouter:PacketRouter? = nil
+    var packetRouter:PacketRouter?
+    var dnsResolver:DNSResolver?
+    var interceptedRoutes:[NEIPv4Route] = []
+    var zids:[ZitiIdentity] = []
+    
+    override init() {
+        NSLog("tun init")
+        super.init()
+        self.dnsResolver = DNSResolver(self)
+        self.packetRouter = PacketRouter(tunnelProvider:self, dnsResolver: dnsResolver!)
+    }
     
     func readPacketFlow() {
         self.packetFlow.readPacketObjects { (packets:[NEPacket]) in
@@ -26,31 +36,62 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     override var debugDescription: String {
         return "PacketTunnelProvider \(self)\n\(self.providerConfig)"
     }
+    
+    func loadIdentites() -> ZitiError? {
+        let zidStore = ZitiIdentityStore()
+        let (zids, zErr) = zidStore.loadAll()
+        guard zErr == nil, zids != nil else { return zErr }
+        
+        zids!.forEach { zid in
+            zid.services?.forEach { svc in
+                if let hn = svc.dns?.hostname {
+                    if IPUtils.isValidIpV4Address(hn) {
+                        let route = NEIPv4Route(destinationAddress: hn,
+                                                subnetMask: "255.255.255.255")
+                        interceptedRoutes.append(route)
+                        NSLog("Adding route for \(zid.name): \(hn)")
+                    } else {
+                        if let ipStr = dnsResolver?.addHostname(hn) {
+                            NSLog("Adding DNS hostname \(hn): \(ipStr)")
+                        } else {
+                            NSLog("Unable to add DNS hostname \(hn)")
+                        }
+                    }
+                }
+            }
+        }
+        self.zids = zids ?? []
+        return nil
+    }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         NSLog("startTunnel")
-        
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {
             NSLog("Unable to startTunnel. Invalid providerConfiguration. \(error)")
             completionHandler(error)
             return
         }
-        
         NSLog("\(self.providerConfig.debugDescription)")
         
-        let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
+        // load identities
+        // for each svc aither update intercepts or add hostname to resolver
+        if let idLoadErr = loadIdentites() {
+            completionHandler(idLoadErr)
+            return
+        }
         
+        let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [self.providerConfig.ipAddress],
                                                             subnetMasks: [self.providerConfig.subnetMask])
-        
         let includedRoute = NEIPv4Route(destinationAddress: self.providerConfig.ipAddress,
                                         subnetMask: self.providerConfig.subnetMask)
-        
-        tunnelNetworkSettings.ipv4Settings?.includedRoutes = [includedRoute]
-        
+        interceptedRoutes.append(includedRoute)
+        interceptedRoutes.forEach { r in
+            NSLog("route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
+        }
+        tunnelNetworkSettings.ipv4Settings?.includedRoutes = interceptedRoutes
         // TODO: ipv6Settings
-        
         tunnelNetworkSettings.mtu = self.providerConfig.mtu as NSNumber
         
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
@@ -63,24 +104,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 completionHandler(error as NSError)
             }
             
-            // if all good, start listening for for ziti protocol..
-            self.packetRouter = PacketRouter(tunnelProvider:self)
-            
             // call completion handler with nil to indicate success
             completionHandler(nil)
             
             //
             // Start listening for traffic headed our way via the tun interface
             //
-            self.readPacketFlow();
+            self.readPacketFlow()
         }
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         NSLog("stopTunnel")
-
         self.packetRouter = nil
-        
         completionHandler()
     }
     

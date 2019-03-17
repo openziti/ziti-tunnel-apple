@@ -13,9 +13,9 @@ class PacketRouter : NSObject {
     let tunnelProvider:PacketTunnelProvider
     let dnsResolver:DNSResolver
 
-    init(tunnelProvider:PacketTunnelProvider) {
+    init(tunnelProvider:PacketTunnelProvider, dnsResolver:DNSResolver) {
         self.tunnelProvider = tunnelProvider
-        self.dnsResolver = DNSResolver(tunnelProvider)
+        self.dnsResolver = dnsResolver
     }
     
     // TODO: when we add intercept routes we'll need to check those too...

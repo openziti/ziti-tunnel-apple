@@ -83,6 +83,8 @@
 		5A91B4D42224B630006C4277 /* ZitiCSR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4D32224B630006C4277 /* ZitiCSR.swift */; };
 		5A91B4D52224B630006C4277 /* ZitiCSR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4D32224B630006C4277 /* ZitiCSR.swift */; };
 		5AADD45C20BD91BB004D5462 /* StatusTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AADD45B20BD91BB004D5462 /* StatusTableViewCell.swift */; };
+		5AF4BEC3223EE997001F1F4D /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
+		5AF4BEC4223EE998001F1F4D /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78686208A702A0093498C /* IPv4Packet.swift */; };
 		5AF7868B208A91650093498C /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF7868D208A99640093498C /* UDPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF7868C208A99640093498C /* UDPPacket.swift */; };
@@ -319,9 +321,9 @@
 			isa = PBXGroup;
 			children = (
 				5A67F8F0209F948F00DEFE87 /* IPPacket.swift */,
+				5AF78688208A8D050093498C /* IPUtils.swift */,
 				5AF78686208A702A0093498C /* IPv4Packet.swift */,
 				5A06F70820A1120C00E0D9A7 /* IPv6Packet.swift */,
-				5AF78688208A8D050093498C /* IPUtils.swift */,
 				5AF7868C208A99640093498C /* UDPPacket.swift */,
 				5AF7868E208AACC50093498C /* DNSPacket.swift */,
 				5AF78690208FFF670093498C /* PacketRouter.swift */,
@@ -662,6 +664,7 @@
 			files = (
 				5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */,
 				5A0D1D252225A87F00D01F30 /* ZitiKeychain.swift in Sources */,
+				5AF4BEC3223EE997001F1F4D /* IPUtils.swift in Sources */,
 				5A8702D32230B4D300314199 /* ZitiEdgeNetworkSession.swift in Sources */,
 				5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */,
 				5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */,
@@ -715,6 +718,7 @@
 				5A91B4CB2222E19E006C4277 /* ZitiIdentity.swift in Sources */,
 				5A2EA2CE209B750A00437608 /* ViewController.swift in Sources */,
 				5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */,
+				5AF4BEC4223EE998001F1F4D /* IPUtils.swift in Sources */,
 				5A8702DA22372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5AADD45C20BD91BB004D5462 /* StatusTableViewCell.swift in Sources */,
 				5A0D1D272225A87F00D01F30 /* ZitiKeychain.swift in Sources */,

@@ -9,26 +9,60 @@
 import Foundation
 import NetworkExtension
 
-
-// for some quick testing (could do simple UI, will eventuall come from Ziti for names,
-// internal 'find any open' for intercepts..)
-fileprivate var dnsLookup:[(name:String, intercept:String)] = [
-    ("google.services.netfoundry.io", "74.125.201.99"),
-    ("gotcha.services.netfoundry.io", "169.254.126.101")
-]
-
-/*
- fileprivate var interceptLookup:[(name:String, intercept:String)] = [
- ("169.254.126.101", "ziti-controller-test-01.netfoundry.io")
- ]
- */
-
 class DNSResolver : NSObject {
     static let dnsPort:UInt16 = 53
     let tunnelProvider:PacketTunnelProvider
+    var hostnames:[(name:String, ip:String)] = []
     
     init(_ tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
+    }
+    
+    func getIpRange(_ ip:Data, mask:Data) -> (first:Data, broadcast:Data) {
+        var identity = Data(count:4)
+        for i in 0..<4 {
+            identity[i] = ip[i] & mask[i]
+        }
+        var first = Data(identity)
+        if first[3] < 255 { first[3] = identity[3] + 1 }
+        
+        var broadcast = Data(count:4)
+        for i in 0..<4 {
+            broadcast[i] = (ip[i] | ~mask[i])
+        }
+        return (first, broadcast)
+    }
+    
+    func addHostname(_ name:String) -> String? {
+        let ip = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.ipAddress)
+        let mask = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.subnetMask)
+        let (first, broadcast) = getIpRange(ip, mask:mask)
+        
+        var curr = Data(first)
+        repeat {
+            var inUse = false
+            let ipStr = curr.map{String(format: "%d", $0)}.joined(separator: ".")
+            
+            // skip addresses we know are in use
+            let dnsSvrs = self.tunnelProvider.providerConfig.dnsAddresses
+            if curr == ip || dnsSvrs.contains(ipStr) || hostnames.first(where:{$0.ip==ipStr}) != nil {
+                inUse = true
+            }
+            
+            // add it and get outta here
+            if inUse == false {
+                hostnames.append((name:name, ip:ipStr))
+                return ipStr
+            }
+            
+            // advance to next ip addr
+            for i in (0..<4).reversed() {
+                if curr[i] == 255 { curr[i] = 0 }
+                else { curr[i] += 1 }
+                if curr[i] > 0 { break }
+            }
+        } while curr != broadcast
+        return nil
     }
     
     func needsResolution(_ udp:UDPPacket) -> Bool {
@@ -67,13 +101,13 @@ class DNSResolver : NSObject {
             // - if no match, reject
             //
             if q.recordType == DNSRecordType.A || q.recordType == DNSRecordType.AAAA {
-                let matches = dnsLookup.filter{ return $0.0 == q.name.nameString }
+                let matches = hostnames.filter{ return $0.0 == q.name.nameString }
                 
                 if (matches.count > 0) {
                     if (q.recordType == DNSRecordType.A) {
                         responseCode = DNSResponseCode.noError
-                        matches.forEach {result in
-                            let data = IPUtils.ipV4AddressStringToData(result.intercept)
+                        matches.forEach { result in
+                            let data = IPUtils.ipV4AddressStringToData(result.ip)
                             let ans = DNSResourceRecord(result.name,
                                                         recordType:DNSRecordType.A,
                                                         recordClass:DNSRecordClass.IN,
