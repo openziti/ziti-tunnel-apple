@@ -54,11 +54,8 @@ class ProviderConfig : NSObject {
     }
     
     private func isValidIpAddress(_ obj:Any?) -> Bool {
-        if (obj == nil) { return false }
-        let addr = (obj as! String).trimmingCharacters(in: .whitespaces)
-        let parts = addr.components(separatedBy: ".")
-        let nums = parts.compactMap { Int($0) }
-        return parts.count == 4 && nums.count == 4 && nums.filter { $0 >= 0 && $0 < 256}.count == 4
+        guard let str = obj as? String else { return false }
+        return IPUtils.isValidIpV4Address(str)
     }
     
     func validateDictionaty(_ conf:ProviderConfigDict) -> ProviderConfigError? {
