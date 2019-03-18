@@ -67,7 +67,8 @@ class DNSResolver : NSObject {
     
     func needsResolution(_ udp:UDPPacket) -> Bool {
         let dnsAddresses = self.tunnelProvider.providerConfig.dnsAddresses
-        if udp.destinationPort == DNSResolver.dnsPort && dnsAddresses.contains(udp.ip.destinationAddressString) {
+        if udp.destinationPort == DNSResolver.dnsPort &&
+            dnsAddresses.contains(udp.ip.destinationAddressString) == true {
             return true
         }
         return false

@@ -10,7 +10,7 @@ import Cocoa
 import NetworkExtension
 
 class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
-    var tunnelProviderManager: NETunnelProviderManager? = nil
+    weak var vc: ViewController?
     
     @IBOutlet weak var box: NSBox!
     @IBOutlet weak var ipAddressText: NSTextField!
@@ -40,11 +40,11 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.dnsServersText.stringValue = ""
         self.matchedDomainsText.stringValue = ""
         
-        if self.tunnelProviderManager?.protocolConfiguration == nil {
+        if self.vc?.tunnelProviderManager.protocolConfiguration == nil {
             return
         }
         
-        let conf = (self.tunnelProviderManager!.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
+        let conf = (self.vc!.tunnelProviderManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         
         if let ip = conf[ProviderConfig.IP_KEY] {
             self.ipAddressText.stringValue = ip as! String
@@ -92,20 +92,14 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             return
         }
         
-        if let pc = self.tunnelProviderManager?.protocolConfiguration {
+        if let pc = self.vc?.tunnelProviderManager.protocolConfiguration {
             (pc as! NETunnelProviderProtocol).providerConfiguration = conf.createDictionary()
             
-            self.tunnelProviderManager?.saveToPreferences { error in
+            self.vc?.tunnelProviderManager.saveToPreferences { error in
                 if let error = error {
                     NSAlert(error:error).runModal()
                 } else {
-                    if self.tunnelProviderManager!.connection.status == .connected {
-                        let alert = NSAlert()
-                        alert.messageText = "Configuration Saved"
-                        alert.informativeText =  "Will take affect on tunnel re-start"
-                        alert.alertStyle = NSAlert.Style.informational
-                        alert.runModal()
-                    }
+                    self.vc?.restartTunnel()
                     self.saveButton.isEnabled = false
                     self.dismissViewController(self)
                 }

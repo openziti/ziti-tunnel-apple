@@ -9,12 +9,14 @@
 import Foundation
 
 enum IPProtocolId : UInt8 {
+    case ICMP = 1
     case TCP = 6
     case UDP = 17
     case other
     
     init(_ byte:UInt8) {
         switch byte {
+        case  1: self = .ICMP
         case  6: self = .TCP
         case 17: self = .UDP
         default: self = .other

@@ -150,7 +150,21 @@ class ZitiEdge : NSObject {
                 completionHandler(false, ZitiError("Enable to decode response for services"))
                 return
             }
-            let didChange = self.zid.doServicesMatch(resp.data) == false
+            
+            // update the returned services with any cached netSession data
+            var misMatch = false
+            self.zid.services?.forEach { svc in
+                if let match = resp.data?.first(where: { $0.id == svc.id}) {
+                    match.networkSession = svc.networkSession
+                } else {
+                    misMatch = true
+                }
+            }
+            var didChange = misMatch
+            if misMatch == false {
+                // deeper comparison...
+                didChange = self.zid.doServicesMatch(resp.data) == false
+            }
             self.zid.services = resp.data
             print("got \(self.zid.services?.count ?? 0) services for \(self.zid.name). didChange=\(didChange)")
             completionHandler(didChange, nil)

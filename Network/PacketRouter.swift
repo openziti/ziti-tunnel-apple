@@ -58,10 +58,6 @@ class PacketRouter : NSObject {
                 NSLog("Unable to create IPv4Packet from data")
                 return nil
             }
-            guard inV4Subnet(v4Packet) else {
-                NSLog("...dropping v4 Packet (not in subnet)") // (e.g., SSDP broadcast messages)
-                return nil
-            }
             ip = v4Packet
         case 6:
             guard let v6Packet = IPv6Packet(data) else {
@@ -91,7 +87,7 @@ class PacketRouter : NSObject {
         case IPProtocolId.TCP:
             NSLog("route TCP: TODO...")
         default:
-            NSLog("No route for protocol \(ip.protocolId)")
+            NSLog("No support for protocol \(ip.protocolId)")
         }
     }
 }

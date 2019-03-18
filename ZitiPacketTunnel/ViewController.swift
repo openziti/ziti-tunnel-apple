@@ -11,7 +11,6 @@ import NetworkExtension
 import JWTDecode
 
 class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDelegate {
-
     @IBOutlet weak var connectButton: NSButton!
     @IBOutlet weak var connectStatus: NSTextField!
     @IBOutlet weak var tableView: NSTableView!
@@ -27,12 +26,11 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     @IBOutlet weak var idEnrollBtn: NSButton!
     @IBOutlet weak var idSpinner: NSProgressIndicator!
     
+    static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     weak var servicesViewController:ServicesViewController? = nil
     var zidStore = ZitiIdentityStore()
-    
-    static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
-    
+    var tunnelRestarting = false
     var zitiIdentities:[ZitiIdentity] = []
     var enrollingIds:[ZitiIdentity] = []
     
@@ -86,29 +84,43 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     }
     
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
-        let status = self.tunnelProviderManager.connection.status
-        switch status {
-        case .connecting:
-            connectStatus.stringValue = "Connecting..."
-            connectButton.title = "Turn Ziti Off"
-            break
-        case .connected:
-            connectStatus.stringValue = "Connected"
-            connectButton.title = "Turn Ziti Off"
-            break
-        case .disconnecting:
-            connectStatus.stringValue = "Disconnecting..."
-            break
-        case .disconnected:
-            connectStatus.stringValue = "Disconnected"
-            connectButton.title = "Turn Ziti On"
-            break
-        case .invalid:
-            print("Invalid")
-            break
-        case .reasserting:
-            print("Reasserting...")
-            break
+        let status = tunnelProviderManager.connection.status
+        if tunnelRestarting == true {
+            connectStatus.stringValue = "Reasserting..."
+            connectButton.isEnabled = false
+            if status == .disconnected {
+                tunnelRestarting = false
+                do {
+                    try self.tunnelProviderManager.connection.startVPNTunnel()
+                } catch {
+                    dialogAlert("Tunnel Error", error.localizedDescription)
+                }
+            }
+        } else {
+            connectButton.isEnabled = true
+            switch status {
+            case .connecting:
+                connectStatus.stringValue = "Connecting..."
+                connectButton.title = "Turn Ziti Off"
+                break
+            case .connected:
+                connectStatus.stringValue = "Connected"
+                connectButton.title = "Turn Ziti Off"
+                break
+            case .disconnecting:
+                connectStatus.stringValue = "Disconnecting..."
+                break
+            case .disconnected:
+                connectStatus.stringValue = "Disconnected"
+                connectButton.title = "Turn Ziti On"
+                break
+            case .invalid:
+                print("Invalid")
+                break
+            case .reasserting:
+                print("Reasserting...")
+                break
+            }
         }
         self.tableView.reloadData()
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
@@ -219,12 +231,12 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             NSNotification.Name.NEVPNStatusDidChange, object: nil)
         
         // GetServices timer - fire quickly, then every X secs
-        //DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.updateServicesTimerFired() // should: auth, then update services
             Timer.scheduledTimer(withTimeInterval: 15.0, repeats: true) { timer in
                 self.updateServicesTimerFired()
             }
-        //}
+        }
     }
     
     func updateServicesTimerFired() {
@@ -237,8 +249,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                         }
                     }
                 }
-            } else if zid == self.zitiIdentities[self.representedObject as! Int] {
-                self.updateServiceUI(zId:zid)
+            } else if zid == zitiIdentities[self.representedObject as! Int] {
+                updateServiceUI(zId:zid)
             }
         }
     }
@@ -254,17 +266,29 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        if let _ = zitiIdentities.first(where: { $0.id == zid.id }) {
+        if let match = zitiIdentities.first(where: { $0.id == zid.id }) {
             print("\(zid.name):\(zid.id) changed")
+            if match.doServicesMatch(zid.services) == false {
+                print("...services updated")
+                match.services = zid.services
+                restartTunnel()
+            }
+            
+            if zitiIdentities.count > 0, match == zitiIdentities[(representedObject ?? 0) as! Int] {
+                updateServiceUI(zId:zid)
+            }
         } else {
             print("\(zid.name):\(zid.id) new")
         }
+        
+        // Also TODO: add support for showning netSessions when present
+        print(zid.debugDescription)
     }
     
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
         if let tcvc = segue.destinationController as? TunnelConfigViewController {
             tcvc.preferredContentSize = CGSize(width: 572, height: 270)
-            tcvc.tunnelProviderManager = self.tunnelProviderManager
+            tcvc.vc = self
         } else if let svc = segue.destinationController as? ServicesViewController {
             servicesViewController = svc
             if zitiIdentities.count > 0 {
@@ -299,6 +323,15 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         return alert.runModal() == .alertFirstButtonReturn
     }
 
+    func restartTunnel() {
+        let tunnelStatus = tunnelProviderManager.connection.status
+        if tunnelStatus != .disconnected {
+            print("restarting tunnel")
+            tunnelRestarting = true
+            tunnelProviderManager.connection.stopVPNTunnel()
+        }
+    }
+
     @IBAction func onConnectButton(_ sender: NSButton) {
         if (sender.title == "Turn Ziti On") {
             do {
@@ -315,8 +348,9 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         if zitiIdentities.count > 0 {
             let zId = zitiIdentities[representedObject as! Int]
             zId.enabled = sender.state == .on
-            _ = zidStore.store(zId) // TODO: alert
+            _ = zidStore.store(zId)
             updateServiceUI(zId:zId)
+            restartTunnel()
         }
     }
     
@@ -414,7 +448,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 }
                 zid.enabled = true
                 _ = self.zidStore.store(zid)
-                self.updateServiceUI(zId:zid) // TODO: move to file change notify..
+                self.updateServiceUI(zId:zid)
             }
         }
     }

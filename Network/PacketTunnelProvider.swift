@@ -43,19 +43,26 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         guard zErr == nil, zids != nil else { return zErr }
         
         zids!.forEach { zid in
-            zid.services?.forEach { svc in
-                if let hn = svc.dns?.hostname {
-                    if IPUtils.isValidIpV4Address(hn) {
-                        let route = NEIPv4Route(destinationAddress: hn,
-                                                subnetMask: "255.255.255.255")
-                        interceptedRoutes.append(route)
-                        NSLog("Adding route for \(zid.name): \(hn)")
-                    } else {
-                        if let ipStr = dnsResolver?.addHostname(hn) {
-                            NSLog("Adding DNS hostname \(hn): \(ipStr)")
+            if zid.isEnabled == true {
+                zid.services?.forEach { svc in
+                    if let hn = svc.dns?.hostname {
+                        if IPUtils.isValidIpV4Address(hn) {
+                            let route = NEIPv4Route(destinationAddress: hn,
+                                                    subnetMask: "255.255.255.255")
+                            interceptedRoutes.append(route)
+                            NSLog("Adding route for \(zid.name): \(hn)")
                         } else {
-                            NSLog("Unable to add DNS hostname \(hn)")
+                            if let ipStr = dnsResolver?.addHostname(hn) {
+                                NSLog("Adding DNS hostname \(hn): \(ipStr)")
+                            } else {
+                                NSLog("Unable to add DNS hostname \(hn)")
+                            }
                         }
+                    }
+                    // 0 any netSessions and update store
+                    if let _ = svc.networkSession {
+                        svc.networkSession = nil
+                        _ = zidStore.store(zid)
                     }
                 }
             }
@@ -118,6 +125,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         NSLog("stopTunnel")
         self.packetRouter = nil
         completionHandler()
+        // sometimes crashs on restarts.  gonna force exit here..
+        exit(EXIT_SUCCESS)
     }
     
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?) {
