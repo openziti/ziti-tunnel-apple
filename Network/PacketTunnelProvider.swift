@@ -89,6 +89,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
         
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
+        let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
+        dnsSettings.matchDomains = self.providerConfig.dnsMatchDomains
+        tunnelNetworkSettings.dnsSettings = dnsSettings
+        
+        // add dnsServer routes if configured outside of configured subnet
+        let net = IPUtils.ipV4AddressStringToData(providerConfig.ipAddress)
+        let mask = IPUtils.ipV4AddressStringToData(providerConfig.subnetMask)
+        dnsSettings.servers.forEach { svr in
+            let dest = IPUtils.ipV4AddressStringToData(svr)
+            if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
+                interceptedRoutes.append(NEIPv4Route(destinationAddress: svr, subnetMask: "255.255.255.255"))
+            }
+        }
+        
         tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [self.providerConfig.ipAddress],
                                                             subnetMasks: [self.providerConfig.subnetMask])
         let includedRoute = NEIPv4Route(destinationAddress: self.providerConfig.ipAddress,
@@ -100,10 +114,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         tunnelNetworkSettings.ipv4Settings?.includedRoutes = interceptedRoutes
         // TODO: ipv6Settings
         tunnelNetworkSettings.mtu = self.providerConfig.mtu as NSNumber
-        
-        let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
-        dnsSettings.matchDomains = self.providerConfig.dnsMatchDomains
-        tunnelNetworkSettings.dnsSettings = dnsSettings
         
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
             if let error = error {

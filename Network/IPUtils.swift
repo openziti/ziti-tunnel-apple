@@ -57,6 +57,15 @@ class IPUtils {
         return parts.count == 4 && nums.count == 4 && nums.filter { $0 >= 0 && $0 < 256}.count == 4
     }
     
+    static func inV4Subnet(_ dest:Data, network:Data, mask:Data) -> Bool {
+        for (dest, (network, mask)) in zip(dest, zip(network, mask)) {
+            if (dest & mask) != (network & mask) {
+                return false
+            }
+        }
+        return true
+    }
+    
     private static func v6SegToStr(_ seg:Data) -> String {
         return seg.map{String(format: "%x", $0)}.joined(separator: ":")
     }

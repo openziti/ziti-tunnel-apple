@@ -18,19 +18,6 @@ class PacketRouter : NSObject {
         self.dnsResolver = dnsResolver
     }
     
-    // TODO: when we add intercept routes we'll need to check those too...
-    private func inV4Subnet(_ ip:IPv4Packet) -> Bool {
-        let ipAddressData = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.ipAddress)
-        let subnetMaskData = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.subnetMask)
-        
-        for (dest, (ip, mask)) in zip(ip.destinationAddress, zip(ipAddressData, subnetMaskData)) {
-            if (dest & mask) != (ip & mask) {
-                return false
-            }
-        }
-        return true
-    }
-    
     private func routeUDP(_ udp:UDPPacket) {
         //NSLog("UDP-->: \(udp.debugDescription)")
         
