@@ -34,16 +34,59 @@ class IPUtils {
         data.append(contentsOf: withUnsafeBytes(of: &swapped) { Array($0) })
     }
     
+    static func updateUInt32(_ data: inout Data, at:Int, value:UInt32) {
+        var swapped = CFSwapInt32(value)
+        data.replaceSubrange(at..<(at+4), with: withUnsafeBytes(of: &swapped) { Array($0) })
+    }
+    
     static func appendUInt32(_ data: inout Data, value:UInt32) {
         var swapped = CFSwapInt32(value)
         data.append(contentsOf: withUnsafeBytes(of: &swapped) { Array($0) })
+    }
+    
+    static func UInt8FromPayload(_ payload:Data?, _ offset:Int) -> UInt8 {
+        if let payload = payload {
+            return payload[payload.startIndex + offset]
+        }
+        return 0
+    }
+    
+    static func UInt8ToPayload(_ payload:Data?, _ source: inout Data, _ offset:Int, _ newValue:UInt8) {
+        if let payload = payload {
+            source[payload.startIndex + offset] = newValue
+        }
+    }
+    
+    static func UInt16FromPayload(_ payload:Data?, _ offset:Int) -> UInt16 {
+        if let payload = payload {
+            return IPUtils.extractUInt16(payload, from: payload.startIndex + offset)
+        }
+        return 0
+    }
+    
+    static func UInt16ToPayload(_ payload:Data?, _ source: inout Data, _ offset:Int, _ newValue:UInt16) {
+        if let payload = payload {
+            IPUtils.updateUInt16(&source, at:payload.startIndex + offset, value:newValue)
+        }
+    }
+    
+    static func UInt32FromPayload(_ payload:Data?, _ offset:Int) -> UInt32 {
+        if let payload = payload {
+            return IPUtils.extractUInt32(payload, from: payload.startIndex + offset)
+        }
+        return 0
+    }
+    
+    static func UInt32ToPayload(_ payload:Data?, _ source: inout Data, _ offset:Int, _ newValue:UInt32) {
+        if let payload = payload {
+            IPUtils.updateUInt32(&source, at:payload.startIndex + offset, value:newValue)
+        }
     }
     
     static func ipV4AddressStringToData(_ ipString:String) -> Data {
         var data = Data()
         let ipParts:[String] = ipString.components(separatedBy: ".")
         ipParts.forEach { part in
-            // f'ing swift strings.  punting to obj-c...
             let b = UInt8((part as NSString).integerValue)
             data.append(b)
         }

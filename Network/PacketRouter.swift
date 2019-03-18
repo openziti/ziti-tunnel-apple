@@ -26,8 +26,12 @@ class PacketRouter : NSObject {
             dnsResolver.resolve(udp)
         } else {
             // TODO: --> Ziti
-            NSLog("...TODO: --> looks meant for Ziti")
+            NSLog("...UDP --> meant for Ziti? UDP not yet supported")
         }
+    }
+    
+    private func routeTCP(_ tcp:TCPPacket) {
+        NSLog("TCP-->: \(tcp.debugDescription)")
     }
     
     private func createIPPacket(_ data:Data) -> IPPacket? {
@@ -72,7 +76,9 @@ class PacketRouter : NSObject {
                 routeUDP(udp)
             }
         case IPProtocolId.TCP:
-            NSLog("route TCP: TODO...")
+            if let tcp = TCPPacket(ip) {
+                routeTCP(tcp)
+            }
         default:
             NSLog("No support for protocol \(ip.protocolId)")
         }

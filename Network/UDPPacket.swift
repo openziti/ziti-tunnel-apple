@@ -40,72 +40,24 @@ class UDPPacket : NSObject {
     }
     
     var sourcePort:UInt16 {
-        get {
-            if let ipPayload = self.ip.payload {
-                return IPUtils.extractUInt16(ipPayload,
-                    from: ipPayload.startIndex + UDPPacket.sourePortOffset)
-            }
-            return 0
-        }
-        set {
-            if let ipPayload = self.ip.payload {
-                IPUtils.updateUInt16(&ip.data,
-                    at: ipPayload.startIndex + UDPPacket.sourePortOffset,
-                    value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(self.ip.payload, UDPPacket.sourePortOffset) }
+        set { IPUtils.UInt16ToPayload(self.ip.payload, &ip.data, UDPPacket.sourePortOffset, newValue) }
     }
     
     var destinationPort:UInt16 {
-        get {
-            if let ipPayload = self.ip.payload {
-                return IPUtils.extractUInt16(ipPayload,
-                    from: ipPayload.startIndex + UDPPacket.destinationPortOffset)
-            }
-            return 0
-        }
-        set {
-            if let ipPayload = self.ip.payload {
-                IPUtils.updateUInt16(&ip.data,
-                    at: ipPayload.startIndex + UDPPacket.destinationPortOffset,
-                    value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(self.ip.payload, UDPPacket.destinationPortOffset) }
+        set { IPUtils.UInt16ToPayload(self.ip.payload, &ip.data,
+                                      UDPPacket.destinationPortOffset, newValue) }
     }
     
     var length:UInt16 {
-        get {
-            if let ipPayload = self.ip.payload {
-                return IPUtils.extractUInt16(ipPayload,
-                    from: ipPayload.startIndex + UDPPacket.lengthOffset)
-            }
-            return 0
-        }
-        set {
-            if let ipPayload = self.ip.payload {
-                IPUtils.updateUInt16(&ip.data,
-                    at: ipPayload.startIndex + UDPPacket.lengthOffset,
-                    value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(self.ip.payload, UDPPacket.lengthOffset) }
+        set { IPUtils.UInt16ToPayload(self.ip.payload, &ip.data, UDPPacket.lengthOffset, newValue) }
     }
     
     var checksum:UInt16 {
-        get {
-            if let ipPayload = self.ip.payload {
-                return IPUtils.extractUInt16(ipPayload,
-                            from: ipPayload.startIndex + UDPPacket.checksumOffset)
-            }
-            return 0
-        }
-        
-        set {
-            if let ipPayload = self.ip.payload {
-                IPUtils.updateUInt16(&ip.data,
-                    at: ipPayload.startIndex + UDPPacket.checksumOffset,
-                    value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(self.ip.payload, UDPPacket.checksumOffset) }
+        set { IPUtils.UInt16ToPayload(self.ip.payload, &ip.data, UDPPacket.checksumOffset, newValue) }
     }
     
     var payload:Data? {

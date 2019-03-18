@@ -138,21 +138,8 @@ class DNSPacket : NSObject {
     }
     
     var id:UInt16 {
-        get {
-            if let payload = udp.payload {
-               return IPUtils.extractUInt16(payload,
-                        from: payload.startIndex + DNSPacket.idOffset)
-            }
-            return 0
-        }
-        
-        set {
-            if let payload = udp.payload {
-                IPUtils.updateUInt16(&udp.ip.data,
-                                     at: payload.startIndex + DNSPacket.idOffset,
-                                     value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(udp.payload, DNSPacket.idOffset) }
+        set { IPUtils.UInt16ToPayload(udp.payload, &udp.ip.data, DNSPacket.idOffset, newValue) }
     }
     
     var qrFlag:Bool {
@@ -270,67 +257,23 @@ class DNSPacket : NSObject {
     }
     
     var questionCount:UInt16 {
-        get {
-            if let payload = udp.payload {
-                return IPUtils.extractUInt16(payload, from: payload.startIndex + DNSPacket.questionCountOffset)
-            }
-            return 0
-        }
-        set {
-            if let payload = udp.payload {
-                IPUtils.updateUInt16(&udp.ip.data,
-                                     at: payload.startIndex+DNSPacket.questionCountOffset,
-                                     value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(udp.payload, DNSPacket.questionCountOffset) }
+        set { IPUtils.UInt16ToPayload(udp.payload, &udp.ip.data, DNSPacket.questionCountOffset, newValue) }
     }
     
     var answerRecordCount:UInt16 {
-        get {
-            if let payload = udp.payload {
-                return IPUtils.extractUInt16(payload, from: payload.startIndex + DNSPacket.answerRecordCountOffset)
-            }
-            return 0
-        }
-        set {
-            if let payload = udp.payload {
-                IPUtils.updateUInt16(&udp.ip.data,
-                                     at: payload.startIndex + DNSPacket.answerRecordCountOffset,
-                                     value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(udp.payload, DNSPacket.answerRecordCountOffset) }
+        set { IPUtils.UInt16ToPayload(udp.payload, &udp.ip.data, DNSPacket.answerRecordCountOffset, newValue) }
     }
     
     var authorityRecordCount:UInt16 {
-        get {
-            if let payload = udp.payload {
-                return IPUtils.extractUInt16(payload, from: payload.startIndex + DNSPacket.authorityRecordCountOffset)
-            }
-            return 0
-        }
-        set {
-            if let payload = udp.payload {
-                IPUtils.updateUInt16(&udp.ip.data,
-                                     at: payload.startIndex + DNSPacket.authorityRecordCountOffset,
-                                     value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(udp.payload, DNSPacket.authorityRecordCountOffset) }
+        set { IPUtils.UInt16ToPayload(udp.payload, &udp.ip.data, DNSPacket.authorityRecordCountOffset, newValue) }
     }
     
     var additionalRecordCount:UInt16 {
-        get {
-            if let payload = udp.payload {
-                return IPUtils.extractUInt16(payload, from: payload.startIndex + DNSPacket.additionalRecordCountOffset)
-            }
-            return 0
-        }
-        set {
-            if let payload = udp.payload {
-                IPUtils.updateUInt16(&udp.ip.data,
-                                     at: payload.startIndex + DNSPacket.additionalRecordCountOffset,
-                                     value: newValue)
-            }
-        }
+        get { return IPUtils.UInt16FromPayload(udp.payload, DNSPacket.additionalRecordCountOffset) }
+        set { IPUtils.UInt16ToPayload(udp.payload, &udp.ip.data, DNSPacket.additionalRecordCountOffset, newValue) }
     }
     
     private func getResourceRecords(recordStartIndx:Int, recordCount:Int) -> [DNSResourceRecord] {
