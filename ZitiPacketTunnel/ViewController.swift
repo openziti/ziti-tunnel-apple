@@ -249,7 +249,9 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                         }
                         if didChange {
                             _ = self?.zidStore.store(zid)
-                            self?.restartTunnel()
+                            if zid.isEnabled {
+                                self?.restartTunnel()
+                            }
                         }
                     }
                 }
@@ -434,41 +436,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         }
     }
     
-    @IBAction func onEnrollButton(_ sender: Any) {
-        let indx = representedObject as! Int
-        let zid = zitiIdentities[indx]
-        enrollingIds.append(zid)
-        updateServiceUI(zId: zid)
-        
-        // Do this here since we might need to prompt for updating keychain
-        // to trust self-signed certs
-        if let rootCaPem = zid.rootCa {
-            let zkc = ZitiKeychain()
-            let host = zid.edge.getHost()
-            let der = zkc.convertToDER(rootCaPem)
-            
-            // do our best. if CA already trusted will be ok...
-            // evalTrust=true, look for ZitiError.response code to see if
-            // we should attempt to address...
-            let (cert, _) = zkc.storeCertificate(der, label: host)
-            if let cert = cert {
-                if zkc.evalTrustForCertificate(cert) == .recoverableTrustFailure {
-                    if dialogOKCancel(question: "Trust Certificate for \(host)?",
-                        text: "A root CA was specified for this enrollment that is not currently trusted. Click OK to update your keychain.\n(You may be prompted for your credentials for Keychain Access)") {
-                        if zkc.addTrustForCertificate(cert) == errSecSuccess {
-                            print("added trust for \(host)")
-                            let result = zkc.evalTrustForCertificate(cert)
-                            print("added trust for \(host), result=\(result.rawValue)")
-                        }
-                    }
-                }
-                zid.rootCa = nil
-            }
-            
-            // dop rootCa from zid - no need to keep it around
-            //zid.rootCa = nil
-        }
-    
+    func doEnroll(_ zid:ZitiIdentity) {
         zid.edge.enroll() { zErr in
             DispatchQueue.main.async {
                 self.enrollingIds.removeAll { $0.id == zid.id }
@@ -482,6 +450,55 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 _ = self.zidStore.store(zid)
                 self.updateServiceUI(zId:zid)
             }
+        }
+    }
+    
+    @IBAction func onEnrollButton(_ sender: Any) {
+        let indx = representedObject as! Int
+        let zid = zitiIdentities[indx]
+        enrollingIds.append(zid)
+        updateServiceUI(zId: zid)
+        
+        // Add rootCa to keychain here since we might need to prompt for updating keychain.
+        // evaluating trust can be lengthy, and has to be done in the background. Actual
+        // enrollment in that case will happen in an escaping callbak.  Otherwise will do
+        // the enroll here (which is already iasync)
+        var stillNeedToEnroll = true
+        if let rootCaPem = zid.rootCa {
+            let zkc = ZitiKeychain()
+            let host = zid.edge.getHost()
+            let der = zkc.convertToDER(rootCaPem)
+            
+            // do our best. if CA already trusted will be ok...
+            let (cert, _) = zkc.storeCertificate(der, label: host)
+            
+            if let cert = cert {
+                zid.rootCa = nil
+                stillNeedToEnroll = false
+                let status = zkc.evalTrustForCertificate(cert) { secTrust, result in
+                    if result == .recoverableTrustFailure {
+                        DispatchQueue.main.sync {
+                            if self.dialogOKCancel(question: "Trust Certificate for \(host)?",
+                                text: "A Root CA was specified for this enrollment that is not currently trusted. Click OK to update your keychain.\n(You may be prompted for your credentials for Keychain Access)") {
+                                
+                                if zkc.addTrustForCertificate(cert) == errSecSuccess {
+                                    print("added trust for \(host)")
+                                    //let result = zkc.evalTrustForCertificate(cert)
+                                    //print("added trust for \(host), result=\(result.rawValue)")
+                                }
+                            }
+                        }
+                    }
+                    self.doEnroll(zid)
+                }
+                if status != errSecSuccess {
+                    stillNeedToEnroll = true
+                }
+            }
+        }
+        
+        if stillNeedToEnroll {
+            doEnroll(zid)
         }
     }
 }

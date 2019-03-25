@@ -170,18 +170,14 @@ class ZitiKeychain : NSObject {
     }
 #endif
     
-    func evalTrustForCertificate(_ certificate:SecCertificate) -> SecTrustResultType {
+    func evalTrustForCertificate(_ certificate:SecCertificate, _ result: @escaping SecTrustCallback) -> OSStatus {
         var secTrust:SecTrust?
         let policy = SecPolicyCreateBasicX509()
         let stcStatus = SecTrustCreateWithCertificates(certificate, policy, &secTrust)
-        if stcStatus == errSecSuccess && secTrust != nil {
-            var secTrustResult:SecTrustResultType = .unspecified
-            let steStatus = SecTrustEvaluate(secTrust!, &secTrustResult) // TODO: deprecated, need to switch to SecTrustEvaluateAsync call
-            if steStatus == errSecSuccess {
-                return secTrustResult
-            }
-        }
-        return .invalid
+        if stcStatus != errSecSuccess { return stcStatus }
+        guard secTrust != nil else { return errSecBadReq }
+        let sceStatus = SecTrustEvaluateAsync(secTrust!, DispatchQueue(label: "evalTrustForCertificate"), result)
+        return sceStatus
     }
     
     func storeCertificate(_ der:Data, label:String) -> (SecCertificate?, ZitiError?) {
