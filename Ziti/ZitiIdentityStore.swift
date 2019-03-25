@@ -41,8 +41,8 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                 }
                 let list = try FileManager.default.contentsOfDirectory(at: self.presentedItemURL!, includingPropertiesForKeys: nil, options: [])
                 try list.forEach { url in
-                    NSLog("found id \(url.lastPathComponent)")
                     if url.pathExtension == "zid" {
+                        NSLog("found id \(url.lastPathComponent)")
                         let data = try Data.init(contentsOf: url)
                         let jsonDecoder = JSONDecoder()
                         if let zId = try? jsonDecoder.decode(ZitiIdentity.self, from: data) {

@@ -24,7 +24,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     func readPacketFlow() {
-        self.packetFlow.readPacketObjects { (packets:[NEPacket]) in
+        packetFlow.readPacketObjects { (packets:[NEPacket]) in
             guard self.packetRouter != nil else { return }
             for packet in packets {
                 self.packetRouter?.route(packet.data)
@@ -33,46 +33,116 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
     
+    func writePacket(_ data:Data) {
+        //NSLog("Writing packet on thread = \(Thread.current)")
+        if packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber]) == false {
+            NSLog("Error writing packet to TUN")
+        }
+    }
+    
     override var debugDescription: String {
         return "PacketTunnelProvider \(self)\n\(self.providerConfig)"
     }
     
-    func loadIdentites() -> ZitiError? {
+    func getNetSessionSync(_ zEdge:ZitiEdge, _ zid:ZitiIdentity, _ svc:ZitiEdgeService,
+                           timeOutSecs:TimeInterval=TimeInterval(10.0)) -> Bool {
+        
+        if let svcId = svc.id {
+            let cond = NSCondition()
+            cond.lock()
+            NSLog("... blocking creating session for \(zid.name):\(svc.name ?? svcId)")
+            var updated = false
+            zEdge.getNetworkSession(svcId) { _ in updated = true; cond.signal() }
+            while !updated {
+                if !cond.wait(until: Date(timeIntervalSinceNow: timeOutSecs)) {
+                    NSLog("... timed out waiting to create network session")
+                    svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Unavailable)
+                    break
+                }
+            }
+            cond.unlock()
+            if !updated {
+                svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Unavailable)
+            }
+            NSLog("...  block complete for \(zid.name):\(svc.name ?? svcId), session=\(svc.networkSession != nil)")
+            return updated
+        }
+        return false
+    }
+    
+    // add hostnames to dns, routes to intercept, and set interceptIp
+    //   skip any where we failed contacting controller for netSession since otherwise
+    //   we won't know what to do with 'em when we see packets (or, if they eventually
+    //   arrive while we are seeing packets we could have a race condition)
+    private func updateHostsAndIntercepts(_ zid:ZitiIdentity, _ svc:ZitiEdgeService) {
+        if let hn = svc.dns?.hostname, svc.networkSession != nil {
+            let port = svc.dns?.port ?? 80
+            if IPUtils.isValidIpV4Address(hn) {
+                let route = NEIPv4Route(destinationAddress: hn,
+                                        subnetMask: "255.255.255.255")
+                interceptedRoutes.append(route)
+                svc.dns?.interceptIp = "\(hn)"
+                NSLog("Adding route for \(zid.name): \(hn) (port \(port))")
+            } else {
+                // See if we already have this DNS name
+                if let currIPs = dnsResolver?.findRecordsByName(hn), currIPs.count > 0 {
+                    svc.dns?.interceptIp = "\(currIPs.first!.ip)"
+                    NSLog("Using DNS hostname \(hn): \(currIPs.first!.ip) (port \(port))")
+                } else if let ipStr = dnsResolver?.addHostname(hn) {
+                    svc.dns?.interceptIp = "\(ipStr)"
+                    NSLog("Adding DNS hostname \(hn): \(ipStr) (port \(port))")
+                } else {
+                    NSLog("Unable to add DNS hostname \(hn) for \(zid.name)")
+                    svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Unavailable)
+                }
+            }
+        }
+    }
+    
+    private func loadIdentites() -> ZitiError? {
         let zidStore = ZitiIdentityStore()
         let (zids, zErr) = zidStore.loadAll()
         guard zErr == nil, zids != nil else { return zErr }
         
         zids!.forEach { zid in
             if zid.isEnabled == true {
+                let zEdge = ZitiEdge(zid)
                 zid.services?.forEach { svc in
-                    if let hn = svc.dns?.hostname {
-                        if IPUtils.isValidIpV4Address(hn) {
-                            let route = NEIPv4Route(destinationAddress: hn,
-                                                    subnetMask: "255.255.255.255")
-                            interceptedRoutes.append(route)
-                            NSLog("Adding route for \(zid.name): \(hn)")
-                        } else {
-                            if let ipStr = dnsResolver?.addHostname(hn) {
-                                NSLog("Adding DNS hostname \(hn): \(ipStr)")
-                            } else {
-                                NSLog("Unable to add DNS hostname \(hn)")
-                            }
-                        }
+                    // If no networkSession for svc, go get one (synchronously)
+                    svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Available)
+                    if svc.networkSession == nil {
+                        _ = getNetSessionSync(zEdge, zid, svc)
                     }
-                    // 0 any netSessions and update store
-                    if let _ = svc.networkSession {
-                        svc.networkSession = nil
-                        _ = zidStore.store(zid)
-                    }
+                    
+                    // add hostnames to dns, routes to intercept, and set interceptIp
+                    updateHostsAndIntercepts(zid, svc)
+                    
+                    // update the store (continue even if it somehow fails - store method will log any errors)
+                    _ = zidStore.store(zid)
                 }
             }
         }
         self.zids = zids ?? []
         return nil
     }
+    
+    func getServiceForIntercept(_ ip:String) -> (ZitiIdentity?, ZitiEdgeService?) {
+        let splits = ip.split(separator: ":")
+        if splits.count != 2 { return (nil, nil) }
+        let ipStr = String(splits[0])
+        let port = Int(splits[1])
+        for zid in zids {
+            if let svc = zid.services?.first(where: { $0.dns?.interceptIp == ipStr && $0.dns?.port == port }) {
+                return (zid, svc)
+            }
+        }
+        return (nil, nil)
+    }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         NSLog("startTunnel")
+        NSLog("startTunnel: \(Thread.current): \(OperationQueue.current?.underlyingQueue?.label ?? "None")")
+
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {
             NSLog("Unable to startTunnel. Invalid providerConfiguration. \(error)")
@@ -134,8 +204,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         NSLog("stopTunnel")
         self.packetRouter = nil
-        completionHandler()
-        // sometimes crashs on restarts.  gonna force exit here..
+        completionHandler() // TODO: escaping, so escape and shutdown all TCPSession and the tunneler...
+        // sometimes slow on restarts.  gonna force exit here..
         exit(EXIT_SUCCESS)
     }
     

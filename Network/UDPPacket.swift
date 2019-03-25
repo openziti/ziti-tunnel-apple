@@ -28,9 +28,9 @@ class UDPPacket : NSObject {
     init(_ refPacket:UDPPacket, payload:Data?) {
         self.ip = refPacket.ip.createFromRefPacket(refPacket.ip)
         super.init()
+        self.payload = payload
         self.sourcePort = refPacket.destinationPort
         self.destinationPort = refPacket.sourcePort
-        self.payload = payload
         
         if let ipPayload = ip.payload {
             self.length = UInt16(ipPayload.count)

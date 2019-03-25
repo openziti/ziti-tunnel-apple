@@ -37,11 +37,11 @@ class ProviderConfig : NSObject {
     static var MATCH_DOMAINS_KEY = "matchDomains"
     
     // some defaults in case .mobileconfig not used
-    var ipAddress:String = "169.254.1.1"
+    var ipAddress:String = "169.254.0.1"
     var subnetMask:String = "255.252.0.0"
-    var mtu:Int = 1500
-    var dnsAddresses:[String] = ["169.254.1.2"]
-    var dnsMatchDomains:[String] = [""]    
+    var mtu:Int = 16000
+    var dnsAddresses:[String] = ["169.254.0.2"]
+    var dnsMatchDomains:[String] = [""]
     var username = "NetFoundry"
     var localizedDescription = "Ziti Packet Tunnel"
     

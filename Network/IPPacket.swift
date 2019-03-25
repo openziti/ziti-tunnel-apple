@@ -27,7 +27,7 @@ enum IPProtocolId : UInt8 {
 protocol IPPacket  {
     var data:Data { get set }
     var version:UInt8 { get }
-    var protocolId:IPProtocolId { get }
+    var protocolId:IPProtocolId { get set }
     var sourceAddress : Data { get set }
     var sourceAddressString: String { get }
     var destinationAddress:Data { get set }

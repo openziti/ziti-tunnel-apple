@@ -156,6 +156,8 @@ class ZitiEdge : NSObject {
             self.zid.services?.forEach { svc in
                 if let match = resp.data?.first(where: { $0.id == svc.id}) {
                     match.networkSession = svc.networkSession
+                    match.status = svc.status
+                    match.dns?.interceptIp = svc.dns?.interceptIp
                 } else {
                     misMatch = true
                 }
@@ -309,7 +311,7 @@ extension ZitiEdge : URLSessionDelegate {
             completionHandler(.performDefaultHandling, nil)
             return
         }
-        let urlCredential = URLCredential(identity: identity, certificates: nil, persistence: .forSession)
+        let urlCredential = URLCredential(identity: identity, certificates: nil, persistence:.permanent) //.forSession) 
         completionHandler(.useCredential, urlCredential)
     }
 }

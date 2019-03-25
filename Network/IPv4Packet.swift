@@ -20,7 +20,7 @@ class IPv4Packet : NSObject, IPPacket {
     static let headerWordLength = 4
     static let minHeaderLength:UInt8 = 5
     static let minHeaderBytes = 20
-    static let defaultTtl:UInt8 = 255
+    static let defaultTtl:UInt8 = 64
     static let versionAndLengthOffset = 0
     static let totalLengthOffset = 2
     static let identificationOffset = 4
@@ -46,6 +46,9 @@ class IPv4Packet : NSObject, IPPacket {
         super.init()
         self.version = IPv4Packet.version4
         self.headerLength = IPv4Packet.minHeaderLength
+        self.identification = self.genIdentificationNumber()
+        self.flags = IPv4Flags.dontFragment
+        self.ttl = IPv4Packet.defaultTtl
     }
     
     func createFromRefPacket(_ refPacket: IPPacket) -> IPPacket {
@@ -178,28 +181,8 @@ class IPv4Packet : NSObject, IPPacket {
         var l16Header:[UInt16] = self.data[..<headerBytes].withUnsafeBytes {
             UnsafeBufferPointer<UInt16>(start: $0, count: Int(headerBytes/2)).map(UInt16.init(bigEndian:))
         }
-        
-        // zero out the checksum in copied header
         l16Header[IPv4Packet.headerChecksumOffset/2] = 0x0000
-        
-        // 0 is prev result, 1 is UInt16, return next result
-        var sum:UInt32 = l16Header.reduce(0x0000ffff) { (prevSum, curr) in
-            var newSum:UInt32 = prevSum + UInt32(curr)
-            if newSum > 0xffff {
-                newSum -= 0xffff
-            }
-            return newSum
-        }
-        
-        // untested.., (should never execute for any of the hecksums computed here)
-        if (headerBytes % 2) != 0 {
-            let lastWord = UInt16(self.data[Int(headerBytes-1)]) << 8
-            sum += UInt32(lastWord) //byte order?
-            if sum > 0xffff {
-                sum -= 0xffff
-            }
-        }
-        return UInt16(~sum & 0xffff)
+        return IPUtils.computeChecksum(l16Header)
     }
     
     func updateHeaderChecksum() {

@@ -123,11 +123,9 @@ class DNSPacket : NSObject {
     }
     
     init(_ refPacket:DNSPacket, questions:[DNSQuestion]?, answers:[DNSResourceRecord]?) {
-        self.udp = UDPPacket(refPacket.udp, payload:Data(count:12))
+        self.udp = UDPPacket(refPacket.udp, payload:Data(count:DNSPacket.numHeaderBytes))
         super.init()
         self.id = refPacket.id
-        self.udp.sourcePort = refPacket.udp.destinationPort
-        self.udp.destinationPort = refPacket.udp.sourcePort
         self.qrFlag = true
         self.opCode = DNSOpCode.query
         self.recursionDesiredFlag = refPacket.recursionDesiredFlag
@@ -305,7 +303,7 @@ class DNSPacket : NSObject {
                 udp.ip.data.removeSubrange(startIndx..<endIndx)
             }
             if newBytes.count > 0 {
-                udp.ip.data.insert(contentsOf:newBytes, at: startIndx)
+                udp.ip.data.insert(contentsOf:newBytes, at:startIndx)
             }
         }
     }

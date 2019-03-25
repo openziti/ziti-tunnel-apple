@@ -131,6 +131,9 @@ class IPv6Packet : NSObject, IPPacket {
             default: return IPProtocolId.other
             }
         }
+        set {
+            //TODO
+        }
     }
     
     var sourceAddress : Data {

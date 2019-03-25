@@ -10,6 +10,27 @@ import Foundation
 
 // convenience..
 class IPUtils {
+    static func isBitSet(_ bits:UInt8, _ bit:UInt8) -> Bool {
+        return ((bits >> bit) & 0x01) == 0x01
+    }
+    
+    static func setBit(_ bits: inout UInt8, _ bit:UInt8, _ val:Bool) {
+        let mask = (0x80 >> (7 - bit))
+        if val { bits = bits | mask }
+        else { bits = bits & ~mask }
+    }
+    
+    static func computeChecksum(_ pseudo:[UInt16]) -> UInt16 {
+        let sum:UInt32 = pseudo.reduce(0x0000ffff) { (prevSum, curr) in
+            var newSum:UInt32 = prevSum + UInt32(curr)
+            if newSum > 0xffff {
+                newSum -= 0xffff
+            }
+            return newSum
+        }
+        return UInt16(~sum & 0xffff)
+    }
+    
     static func extractUInt16(_ data:Data, from:Int) -> UInt16 {
         let byteArray = [UInt8](data.subdata(in: from..<(from+2)))
         return CFSwapInt16(UnsafePointer(byteArray).withMemoryRebound(to:UInt16.self, capacity: 1) {

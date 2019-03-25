@@ -18,6 +18,14 @@ class DNSResolver : NSObject {
         self.tunnelProvider = tunnelProvider
     }
     
+    func findRecordsByName(_ name:String) -> [(name:String, ip:String)] {
+        return hostnames.filter{ return $0.name == name }
+    }
+    
+    func findRecordsByIp(_ ip:String) -> [(name:String, ip:String)] {
+        return hostnames.filter{ return $0.ip == ip }
+    }
+    
     func getIpRange(_ ip:Data, mask:Data) -> (first:Data, broadcast:Data) {
         var identity = Data(count:4)
         for i in 0..<4 {
@@ -102,7 +110,7 @@ class DNSResolver : NSObject {
             // - if no match, reject
             //
             if q.recordType == DNSRecordType.A || q.recordType == DNSRecordType.AAAA {
-                let matches = hostnames.filter{ return $0.0 == q.name.nameString }
+                let matches = findRecordsByName(q.name.nameString)
                 
                 if (matches.count > 0) {
                     if (q.recordType == DNSRecordType.A) {
@@ -135,12 +143,8 @@ class DNSResolver : NSObject {
         //NSLog("<--DNS: \(dnsR.debugDescription)")
         //NSLog("<--UDP: \(dnsR.udp.debugDescription)")
         //NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
-        
-        // write response to tun (returns false on error, but nothing to do if it fails...)
-        if self.tunnelProvider.packetFlow.writePackets([dnsR.udp.ip.data],
-                                                       withProtocols: [AF_INET as NSNumber]) == false {
-            NSLog("### Faild writing DNS response packet")
-        }
+ 
+        tunnelProvider.writePacket(dnsR.udp.ip.data)
     }
     
     private func inMatchDomains(_ qName:String) -> Bool {

@@ -25,9 +25,31 @@ class ServicesViewController: NSViewController {
         
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.target = self
+        tableView.doubleAction = #selector(tableViewDoubleClick(_:))
         
         tableView.isEnabled = zid == nil ? false : true
         tableView.reloadData()
+    }
+    
+    @objc func tableViewDoubleClick(_ sender:AnyObject) {
+        guard tableView.selectedRow >= 0, let svc = zid?.services?[tableView.selectedRow] else { return }
+        
+        print("\nTODO: modal view, button to clear net session and restart")
+        print("name: \(svc.name ?? "")")
+        print("status: \(svc.status?.status ?? .None) (\(DateFormatter().timeSince(svc.status?.lastUpdatedAt ?? 0)))")
+        print("hostname: \(svc.dns?.hostname ?? "")")
+        print("current ip: \(svc.dns?.interceptIp ?? "")")
+        print("port: \(svc.dns?.port ?? 0)")
+        
+        if let gws = svc.networkSession?.gateways {
+            gws.forEach { gw in
+                print("gateway: \(gw.name ?? ""): \(gw.hostname ?? "")")
+                gw.urls?.forEach { url in
+                    print("   \(url.key): \(url.value)")
+                }
+            }
+        }
     }
     
     override var representedObject: Any? {

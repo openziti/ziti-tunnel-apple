@@ -268,11 +268,9 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     func onNewOrChangedId(_ zid: ZitiIdentity) {
         if let match = zitiIdentities.first(where: { $0.id == zid.id }) {
             print("\(zid.name):\(zid.id) changed")
-            if match.doServicesMatch(zid.services) == false {
-                print("...services updated")
-                match.services = zid.services
-                restartTunnel()
-            }
+            
+            // always take new service from tunneler...
+            match.services = zid.services
             
             if zitiIdentities.count > 0, match == zitiIdentities[(representedObject ?? 0) as! Int] {
                 updateServiceUI(zId:zid)
@@ -282,7 +280,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         }
         
         // Also TODO: add support for showning netSessions when present
-        print(zid.debugDescription)
+        //print(zid.debugDescription)
     }
     
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
