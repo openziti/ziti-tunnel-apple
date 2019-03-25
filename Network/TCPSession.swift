@@ -32,7 +32,6 @@ class TCPSession : NSObject {
     var rcvAckNum:UInt32 = 0
     var sendOldestUnAcked:UInt32 = 0 // UInt32.random(in: 0..<UInt32.max)
     var sendAckNum:UInt32 = 0
-    
     let seqCond = NSCondition()
     
     typealias TCPSendCallback = ((TCPPacket?) -> Void)
@@ -52,31 +51,29 @@ class TCPSession : NSObject {
     }
     
     func tcpReceive(_ pkt:TCPPacket) -> TCPSession.State {
-        // seqCond.lock()
+        seqCond.lock()
         rcvWindow = pkt.windowSize
-        if pkt.hasFlags(TCPFlags.ACK.rawValue) {
+        if pkt.ACK {
             rcvAckNum = pkt.acknowledgmentNumber
-            // seqCond.signal()
+            seqCond.signal()
         }
-        if pkt.hasFlags(TCPFlags.SYN.rawValue) {
+        if pkt.SYN {
             (sendAckNum,_) = pkt.sequenceNumber.addingReportingOverflow(1) // +1 for syn received
         }
-        if pkt.hasFlags(TCPFlags.FIN.rawValue) {
+        if pkt.FIN {
             (sendAckNum,_) = sendAckNum.addingReportingOverflow(1)
         }
         
         switch state {
         case .LISTEN where pkt.SYN:
             state = .SYN_RCVD
-            // attempt to connect to Ziti, pass in onWrite
-            // if connect, send ACK=true, else send RST=true
+            // TODO: establish connection to Ziti
             sourceAddr = pkt.ip.sourceAddress
             sourcePort = pkt.sourcePort
             destAddr = pkt.ip.destinationAddress
             destPort = pkt.destinationPort
             rcvWinScale = parseWinScale(pkt.options)
-            //sendOldestUnAcked = UInt32.random(in: 0..<UInt32.max)
-            
+            sendOldestUnAcked = UInt32.random(in: 0..<UInt32.max)
             tcpSend(nil, TCPFlags.SYN.rawValue|TCPFlags.ACK.rawValue, makeSynOpts())
         case .SYN_RCVD where pkt.RST:
             state = .LISTEN
@@ -84,14 +81,57 @@ class TCPSession : NSObject {
             state = .ESTABLISHED
         case .ESTABLISHED:
             if pkt.FIN {
-                // TODO
+                // Connection terminated by local application
+                state = .CLOSE_WAIT
+                tcpSend(nil, TCPFlags.ACK.rawValue)
             } else {
-                NSLog("Established todo: handle these \(pkt.payload?.count ?? 0) bytes")
+                // Data Transfer
+                let count = UInt32(pkt.payload?.count ?? 0)
+                if count > 0 {
+                    (sendAckNum,_) = sendAckNum.addingReportingOverflow(count)  // todo: check on slices
+                    tcpSend(nil, TCPFlags.ACK.rawValue)
+                    seqCond.unlock()
+                    // TODO: send payload to Ziti
+                    return state
+                }
             }
+        case .LAST_ACK where pkt.ACK:
+            state = .Closed
+        case .FIN_WAIT_1: // Connection terminated by Ziti
+            if pkt.FIN && pkt.ACK {
+                state = .TIME_WAIT
+                tcpSend(nil, TCPFlags.ACK.rawValue)
+            } else if pkt.FIN {
+                state = .CLOSING
+                tcpSend(nil, TCPFlags.ACK.rawValue)
+            } else if pkt.ACK {
+                state = .FIN_WAIT_2
+            }
+        case .FIN_WAIT_2 where pkt.FIN:
+            state = .TIME_WAIT
+            tcpSend(nil, TCPFlags.ACK.rawValue)
+        case .CLOSING where pkt.ACK:
+            state = .TIME_WAIT
+        case .TIME_WAIT where pkt.FIN:
+            tcpSend(nil, TCPFlags.ACK.rawValue)
         default:
-            NSLog("Unexpected TCP state transistion for \(key)")
+            NSLog("\(key) Unexpected TCP state transistion for \(key)")
             onTCPSend(nil) // TODO: better way
         }
+        
+        if state == .Closed {
+            NSLog("\(key) Received packet on closed session")
+            onTCPSend(nil)
+            return state
+        } else if state == .CLOSING {
+            NSLog("\(key) closing")
+        } else if state == .CLOSE_WAIT {
+            state = .LAST_ACK
+            tcpSend(nil, TCPFlags.FIN.rawValue) // TODO: check
+            seqCond.unlock()
+            onTCPSend(nil)
+        }
+        seqCond.unlock()
         return state
     }
     
@@ -119,10 +159,9 @@ class TCPSession : NSObject {
         pkt?.updateLengthsAndChecksums()
         
         var inc = UInt32(payload?.count ?? 0)
-        if flags & (TCPFlags.SYN.rawValue|TCPFlags.FIN.rawValue) != 0 {
+        if pkt?.SYN ?? false || pkt?.FIN ?? false {
             (inc,_) = inc.addingReportingOverflow(1)
         }
-        // TODO: not too sure about this...
         (sendOldestUnAcked,_) = sendOldestUnAcked.addingReportingOverflow(inc)
         
         onTCPSend(pkt)
