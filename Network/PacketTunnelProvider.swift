@@ -80,7 +80,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             if IPUtils.isValidIpV4Address(hn) {
                 let route = NEIPv4Route(destinationAddress: hn,
                                         subnetMask: "255.255.255.255")
-                interceptedRoutes.append(route)
+                
+                // only add if haven't already..
+                if interceptedRoutes.first(where: { $0.destinationAddress == route.destinationAddress }) == nil {
+                    interceptedRoutes.append(route)
+                }
                 svc.dns?.interceptIp = "\(hn)"
                 NSLog("Adding route for \(zid.name): \(hn) (port \(port))")
             } else {
