@@ -242,10 +242,14 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     func updateServicesTimerFired() {
         zitiIdentities.forEach { zid in
             if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
-                zid.edge.getServices { _, _ in
+                zid.edge.getServices { [weak self] didChange, _ in
                     DispatchQueue.main.async {
-                        if zid == self.zitiIdentities[(self.representedObject ?? 0) as! Int] {
-                            self.updateServiceUI(zId:zid)
+                        if zid == self?.zitiIdentities[(self?.representedObject ?? 0) as! Int] {
+                            self?.updateServiceUI(zId:zid)
+                        }
+                        if didChange {
+                            _ = self?.zidStore.store(zid)
+                            self?.restartTunnel()
                         }
                     }
                 }
@@ -435,6 +439,36 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         let zid = zitiIdentities[indx]
         enrollingIds.append(zid)
         updateServiceUI(zId: zid)
+        
+        // Do this here since we might need to prompt for updating keychain
+        // to trust self-signed certs
+        if let rootCaPem = zid.rootCa {
+            let zkc = ZitiKeychain()
+            let host = zid.edge.getHost()
+            let der = zkc.convertToDER(rootCaPem)
+            
+            // do our best. if CA already trusted will be ok...
+            // evalTrust=true, look for ZitiError.response code to see if
+            // we should attempt to address...
+            let (cert, _) = zkc.storeCertificate(der, label: host)
+            if let cert = cert {
+                if zkc.evalTrustForCertificate(cert) == .recoverableTrustFailure {
+                    if dialogOKCancel(question: "Trust Certificate for \(host)?",
+                        text: "A root CA was specified for this enrollment that is not currently trusted. Click OK to update your keychain.\n(You may be prompted for your credentials for Keychain Access)") {
+                        if zkc.addTrustForCertificate(cert) == errSecSuccess {
+                            print("added trust for \(host)")
+                            let result = zkc.evalTrustForCertificate(cert)
+                            print("added trust for \(host), result=\(result.rawValue)")
+                        }
+                    }
+                }
+                zid.rootCa = nil
+            }
+            
+            // dop rootCa from zid - no need to keep it around
+            //zid.rootCa = nil
+        }
+    
         zid.edge.enroll() { zErr in
             DispatchQueue.main.async {
                 self.enrollingIds.removeAll { $0.id == zid.id }

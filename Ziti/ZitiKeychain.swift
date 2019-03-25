@@ -163,9 +163,30 @@ class ZitiKeychain : NSObject {
         return (identity, nil)
     }
     
-    func storeCertificate(_ der:Data, label:String) -> ZitiError? {
+#if os(macOS)
+    // Will prompt for user creds to access keychain
+    func addTrustForCertificate(_ certificate:SecCertificate) -> OSStatus {
+        return SecTrustSettingsSetTrustSettings(certificate, SecTrustSettingsDomain.user, nil) // macOS only
+    }
+#endif
+    
+    func evalTrustForCertificate(_ certificate:SecCertificate) -> SecTrustResultType {
+        var secTrust:SecTrust?
+        let policy = SecPolicyCreateBasicX509()
+        let stcStatus = SecTrustCreateWithCertificates(certificate, policy, &secTrust)
+        if stcStatus == errSecSuccess && secTrust != nil {
+            var secTrustResult:SecTrustResultType = .unspecified
+            let steStatus = SecTrustEvaluate(secTrust!, &secTrustResult) // TODO: deprecated, need to switch to SecTrustEvaluateAsync call
+            if steStatus == errSecSuccess {
+                return secTrustResult
+            }
+        }
+        return .invalid
+    }
+    
+    func storeCertificate(_ der:Data, label:String) -> (SecCertificate?, ZitiError?) {
         guard let certificate = SecCertificateCreateWithData(nil, der as CFData) else {
-            return ZitiError("Unable to create certificate from data for \(label)")
+            return (nil, ZitiError("Unable to create certificate from data for \(label)"))
         }
         let parameters: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
@@ -174,9 +195,9 @@ class ZitiKeychain : NSObject {
         let status = SecItemAdd(parameters as CFDictionary, nil)
         guard status == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
-            return ZitiError("Unable to store certificate for \(label): \(errStr)")
+            return (nil, ZitiError("Unable to store certificate for \(label): \(errStr)"))
         }
-        return nil
+        return (certificate, nil)
     }
     
     func getCertificate(_ label:String) -> (Data?, ZitiError?) {

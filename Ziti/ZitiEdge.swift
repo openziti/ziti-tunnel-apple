@@ -76,7 +76,7 @@ class ZitiEdge : NSObject {
             _ = zkc.storeCertificate(der, label: host)
             
             // dop rootCa from zid - no need to keep it around
-            self.zid.rootCa = nil
+            // self.zid.rootCa = nil
         }
         
         // Get Keys
@@ -111,7 +111,8 @@ class ZitiEdge : NSObject {
             }
             let certDER = zkc.convertToDER(certPEM)
             
-            if let zStoreErr = zkc.storeCertificate(certDER, label:self.zid.name) {
+            let (_, zStoreErr) = zkc.storeCertificate(certDER, label:self.zid.name)
+            if zStoreErr != nil {
                 completionHandler(zStoreErr)
                 return
             }
