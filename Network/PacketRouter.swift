@@ -33,7 +33,7 @@ class PacketRouter : NSObject {
     
     private func routeTCP(_ pkt:TCPPacket) {
         //NSLog("Router routing curr thread = \(Thread.current)")
-        NSLog("TCP-->: \(pkt.debugDescription)")
+        //NSLog("TCP-->: \(pkt.debugDescription)")
         
         let intercept = "\(pkt.ip.destinationAddressString):\(pkt.destinationPort)"
         let (zidR, svcR) = tunnelProvider.getServiceForIntercept(intercept)
@@ -48,19 +48,20 @@ class PacketRouter : NSObject {
         
         var tcpSession:TCPSession
         let key = "TCP:\(pkt.ip.sourceAddressString):\(pkt.sourcePort)->\(zid.name):\(svcName)"
-        NSLog("Router, \(key) identity:\(zid.id)\n service identity:\(svc.id ?? "unknown")")
+        //NSLog("Router, \(key) identity:\(zid.id)\n service identity:\(svc.id ?? "unknown")")
         if let foundSession = tcpSessions[key] {
             tcpSession = foundSession
         } else {
             let mtu = tunnelProvider.providerConfig.mtu
+            NSLog("Router new session:\(key) identity:\(zid.id)\n service identity:\(svc.id ?? "unknown")")
             tcpSession = TCPSession(key, zid, svc, mtu) { [weak self] respPkt in
                 guard let respPkt = respPkt else {
                     // remove connection
-                    NSLog("Router nil packet write, removing con: \(key)")
+                    NSLog("Router closing con: \(key)")
                     self?.tcpSessions.removeValue(forKey: key)
                     return
                 }
-                NSLog("<--TCP: \(respPkt.debugDescription)")
+                //NSLog("<--TCP: \(respPkt.debugDescription)")
                 self?.tunnelProvider.writePacket(respPkt.ip.data)
             }
             tcpSessions[key] = tcpSession
