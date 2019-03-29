@@ -1,5 +1,5 @@
 //
-//  TCPSession.swift
+//  TCPClientConn
 //  ZitiPacketTunnel
 //
 //  Created by David Hart on 3/19/19.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class TCPSession : NSObject {
+class TCPClientConn : NSObject {
     enum State : String {
         case LISTEN, SYN_RCVD, ESTABLISHED, CLOSE_WAIT, LAST_ACK, FIN_WAIT_1, FIN_WAIT_2, CLOSING, TIME_WAIT, Closed
     }
@@ -34,14 +34,18 @@ class TCPSession : NSObject {
     var sendAckNum:UInt32 = 0
     let seqCond = NSCondition()
     
+    weak var ptp:PacketTunnelProvider!
+    var ziti:ZitiClientProtocol? = nil
+    
     typealias TCPSendCallback = ((TCPPacket?) -> Void)
     var onTCPSend:TCPSendCallback
     
-    init(_ key:String, _ zid:ZitiIdentity, _ svc:ZitiEdgeService, _ mtu:Int, onTCPSend:@escaping TCPSendCallback) {
+    init(_ key:String, _ zid:ZitiIdentity, _ svc:ZitiEdgeService, _ ptp:PacketTunnelProvider, onTCPSend:@escaping TCPSendCallback) {
         self.key = key
         self.zid = zid
         self.svc = svc
-        self.mtu = mtu
+        self.ptp = ptp
+        self.mtu = ptp.providerConfig.mtu
         self.onTCPSend = onTCPSend
         NSLog("init \(key)")
     }
@@ -50,7 +54,7 @@ class TCPSession : NSObject {
         NSLog("deinit \(key)")
     }
     
-    func tcpReceive(_ pkt:TCPPacket) -> TCPSession.State {
+    func tcpReceive(_ pkt:TCPPacket) -> TCPClientConn.State {
         seqCond.lock()
         rcvWindow = pkt.windowSize
         if pkt.ACK {
@@ -67,7 +71,32 @@ class TCPSession : NSObject {
         switch state {
         case .LISTEN where pkt.SYN:
             state = .SYN_RCVD
-            // TODO: establish connection to Ziti
+            let mss = mtu - Int(IPv4Packet.minHeaderBytes + TCPPacket.minHeaderBytes)
+            ziti = TCPProxyConn(mss:mss)
+            let zsStarted = ziti?.start { [weak self] payload, nBytes in
+                //NSLog("Read \(nBytes) from Ziti, Thread \(Thread.current)")
+                if nBytes <= 0 {
+                    // 0 = eo-buffer
+                    NSLog("Ziti-side server close or error.  Sending FIN/ACK ")
+                    
+                    // TODO: should go someplace else first to figure out window scale...
+                    self?.seqCond.lock()
+                    self?.tcpSend(nil, TCPFlags.FIN.rawValue|TCPFlags.ACK.rawValue)
+                    self?.seqCond.unlock()
+                } else {
+                    // TODO: should go someplace else first to figure out window scale...
+                    self?.seqCond.lock()
+                    self?.tcpSend(payload, TCPFlags.ACK.rawValue)
+                    self?.seqCond.unlock()
+                }
+            }
+            if zsStarted ?? false == false {
+                NSLog("Unable to start Ziti for connection \(key)")
+                onTCPSend(nil)
+                seqCond.unlock()
+                state = .Closed
+                return state
+            }
             sourceAddr = pkt.ip.sourceAddress
             sourcePort = pkt.sourcePort
             destAddr = pkt.ip.destinationAddress
@@ -91,7 +120,10 @@ class TCPSession : NSObject {
                     (sendAckNum,_) = sendAckNum.addingReportingOverflow(count)  // todo: check on slices
                     tcpSend(nil, TCPFlags.ACK.rawValue)
                     seqCond.unlock()
-                    // TODO: send payload to Ziti
+                    if ziti?.write(payload: pkt.payload!) ?? -1 == -1 {
+                        NSLog("\(key) Unable to write \(count) bytes")
+                        onTCPSend(nil)
+                    }
                     return state
                 }
             }
@@ -115,20 +147,21 @@ class TCPSession : NSObject {
         case .TIME_WAIT where pkt.FIN:
             tcpSend(nil, TCPFlags.ACK.rawValue)
         default:
-            NSLog("\(key) Unexpected TCP state transistion for \(key)")
-            onTCPSend(nil) // TODO: better way
+            NSLog("\(key) Unexpected TCP state transistion for \(key). State=\(state)")
+            ziti?.close()
+            onTCPSend(nil)
         }
         
         if state == .Closed {
             NSLog("\(key) Received packet on closed session")
+            ziti?.close()
             onTCPSend(nil)
-            return state
         } else if state == .CLOSING {
             NSLog("\(key) closing")
         } else if state == .CLOSE_WAIT {
             state = .LAST_ACK
-            tcpSend(nil, TCPFlags.FIN.rawValue) // TODO: check
-            seqCond.unlock()
+            tcpSend(nil, TCPFlags.FIN.rawValue | TCPFlags.ACK.rawValue) // added ACK
+            ziti?.close()
             onTCPSend(nil)
         }
         seqCond.unlock()

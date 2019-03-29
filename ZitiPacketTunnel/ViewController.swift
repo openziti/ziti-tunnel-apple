@@ -476,10 +476,12 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 zid.rootCa = nil
                 stillNeedToEnroll = false
                 let status = zkc.evalTrustForCertificate(cert) { secTrust, result in
-                    if result == .recoverableTrustFailure {
+                    if result == .recoverableTrustFailure { // TODO: change ZitiEdge to just trust this bad boy...
+                        let summary = SecCertificateCopySubjectSummary(cert)
                         DispatchQueue.main.sync {
-                            if self.dialogOKCancel(question: "Trust Certificate for \(host)?",
-                                text: "A Root CA was specified for this enrollment that is not currently trusted. Click OK to update your keychain.\n(You may be prompted for your credentials for Keychain Access)") {
+                            if self.dialogOKCancel(question: "Trust Certificate from\n\"\(summary != nil ? summary! as String : host)\"?",
+                                text: "Click OK to update your keychain.\n" +
+                                    "(You may be prompted for your credentials for Keychain Access)") {
                                 
                                 if zkc.addTrustForCertificate(cert) == errSecSuccess {
                                     print("added trust for \(host)")
@@ -519,9 +521,9 @@ extension ViewController: NSTableViewDelegate {
             let tunnelStatus = self.tunnelProviderManager.connection.status
             var imageName:String = "NSStatusNone"
             
-            if zid.isEnrolled == true, let edgeStatus = zid.edgeStatus {
+            if zid.isEnrolled == true, zid.isEnabled == true, let edgeStatus = zid.edgeStatus {
                 switch edgeStatus.status {
-                case .Available: imageName = (tunnelStatus == .connected && zid.enabled == true) ?
+                case .Available: imageName = (tunnelStatus == .connected) ?
                     "NSStatusAvailable" : "NSStatusPartiallyAvailable"
                 case .PartiallyAvailable: imageName = "NSStatusPartiallyAvailable"
                 case .Unavailable: imageName = "NSStatusUnavailable"

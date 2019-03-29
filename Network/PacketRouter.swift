@@ -12,7 +12,9 @@ import Foundation
 class PacketRouter : NSObject {
     let tunnelProvider:PacketTunnelProvider
     let dnsResolver:DNSResolver
-    var tcpSessions:[String:TCPSession] = [:]
+    
+    let tcpConnsLock = NSRecursiveLock()
+    var tcpConns:[String:TCPClientConn] = [:]
 
     init(tunnelProvider:PacketTunnelProvider, dnsResolver:DNSResolver) {
         self.tunnelProvider = tunnelProvider
@@ -40,37 +42,53 @@ class PacketRouter : NSObject {
         guard let zid = zidR, let svc = svcR, let svcName = svc.name else {
             // TODO: find better approach for matched IP but not port
             //    Possibility (for DNS based): store the original IP before intercepting DNS, proxy to it
-            //    For non-DNS - hmmm. Raw sockets? need additional privs.. some way to force packet to en0 ala iptables
-            //       if iptables like filters can be setup programatically/relyably this would work for DNS or IP...
+            //    For non-DNS - hmmm... wonder what happens if I send to intercepted IP. Prob flood myself...
             NSLog("Router: no service found for \(intercept). Dropping packet")
             return
         }
         
-        var tcpSession:TCPSession
+        var tcpConn:TCPClientConn
         let key = "TCP:\(pkt.ip.sourceAddressString):\(pkt.sourcePort)->\(zid.name):\(svcName)"
-        //NSLog("Router, \(key) identity:\(zid.id)\n service identity:\(svc.id ?? "unknown")")
-        if let foundSession = tcpSessions[key] {
-            tcpSession = foundSession
-        } else {
-            let mtu = tunnelProvider.providerConfig.mtu
-            NSLog("Router new session:\(key) identity:\(zid.id)\n service identity:\(svc.id ?? "unknown")")
-            tcpSession = TCPSession(key, zid, svc, mtu) { [weak self] respPkt in
-                guard let respPkt = respPkt else {
-                    // remove connection
-                    NSLog("Router closing con: \(key)")
-                    self?.tcpSessions.removeValue(forKey: key)
-                    return
-                }
-                //NSLog("<--TCP: \(respPkt.debugDescription)")
-                self?.tunnelProvider.writePacket(respPkt.ip.data)
-            }
-            tcpSessions[key] = tcpSession
-        }
         
-        let state = tcpSession.tcpReceive(pkt)
-        if state == TCPSession.State.TIME_WAIT || state == TCPSession.State.Closed {
+        tcpConnsLock.lock()
+        if let foundConn = tcpConns[key] {
+            tcpConn = foundConn
+        } else {
+            if pkt.SYN {
+                NSLog("Router new session:\(key)\nidentity:\(zid.id), service identity:\(svc.id ?? "unknown")")
+                
+                // Callback is escaping and will run either in this thread or in another
+                tcpConn = TCPClientConn(key, zid, svc, tunnelProvider) { [weak self] respPkt in
+                    guard let respPkt = respPkt else {
+                        // remove connection
+                        NSLog("Router closing con: \(key)")
+                        self?.tcpConnsLock.lock()
+                        self?.tcpConns.removeValue(forKey: key)
+                        self?.tcpConnsLock.unlock()
+                        return
+                    }
+                    //NSLog("<--TCP: \(respPkt.debugDescription)")
+                    self?.tunnelProvider.writePacket(respPkt.ip.data)
+                }
+                tcpConns[key] = tcpConn
+            } else if pkt.FIN && pkt.ACK {
+                NSLog("FIN ACK for \(key)")
+                tcpConnsLock.unlock()
+                return
+            } else {
+                NSLog("Unexpected packet for key \(key)") //"\n\(pkt.debugDescription)")
+                tcpConnsLock.unlock()
+                return
+            }
+        }
+        tcpConnsLock.unlock()
+        
+        let state = tcpConn.tcpReceive(pkt)
+        if state == TCPClientConn.State.TIME_WAIT || state == TCPClientConn.State.Closed {
             NSLog("Router removing con on state \(state): \(key)")
-            tcpSessions.removeValue(forKey: key)
+            tcpConnsLock.lock()
+            tcpConns.removeValue(forKey: key)
+            tcpConnsLock.unlock()
         }
     }
 

@@ -198,7 +198,7 @@ class IPv4Packet : NSObject, IPPacket {
     private static var identificationCounter:UInt16 = 0
     func genIdentificationNumber() -> UInt16 {
         let newId = IPv4Packet.identificationCounter % UInt16.max
-        IPv4Packet.identificationCounter += 1
+        (IPv4Packet.identificationCounter,_) = IPv4Packet.identificationCounter.addingReportingOverflow(1)
         return newId
     }
     

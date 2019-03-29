@@ -87,10 +87,12 @@
 		5AF4BEC4223EE998001F1F4D /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
 		5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
-		5AF4BECA2241046F001F1F4D /* TCPSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC92241046F001F1F4D /* TCPSession.swift */; };
-		5AF4BECB2241046F001F1F4D /* TCPSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC92241046F001F1F4D /* TCPSession.swift */; };
-		5AF4BECD2246F271001F1F4D /* ZitiConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BECC2246F271001F1F4D /* ZitiConnection.swift */; };
-		5AF4BECE2246F271001F1F4D /* ZitiConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BECC2246F271001F1F4D /* ZitiConnection.swift */; };
+		5AF4BECA2241046F001F1F4D /* TCPClientConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */; };
+		5AF4BECB2241046F001F1F4D /* TCPClientConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */; };
+		5AF4BECD2246F271001F1F4D /* TCPProxyConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */; };
+		5AF4BECE2246F271001F1F4D /* TCPProxyConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */; };
+		5AF4BED4224C4508001F1F4D /* ZitiClientProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */; };
+		5AF4BED5224C4508001F1F4D /* ZitiClientProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */; };
 		5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78686208A702A0093498C /* IPv4Packet.swift */; };
 		5AF7868B208A91650093498C /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF7868D208A99640093498C /* UDPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF7868C208A99640093498C /* UDPPacket.swift */; };
@@ -189,8 +191,9 @@
 		5A91B4D32224B630006C4277 /* ZitiCSR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiCSR.swift; sourceTree = "<group>"; };
 		5AADD45B20BD91BB004D5462 /* StatusTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusTableViewCell.swift; sourceTree = "<group>"; };
 		5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPPacket.swift; sourceTree = "<group>"; };
-		5AF4BEC92241046F001F1F4D /* TCPSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPSession.swift; sourceTree = "<group>"; };
-		5AF4BECC2246F271001F1F4D /* ZitiConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiConnection.swift; sourceTree = "<group>"; };
+		5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPClientConn.swift; sourceTree = "<group>"; };
+		5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPProxyConn.swift; sourceTree = "<group>"; };
+		5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiClientProtocol.swift; sourceTree = "<group>"; };
 		5AF78686208A702A0093498C /* IPv4Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Packet.swift; sourceTree = "<group>"; };
 		5AF78688208A8D050093498C /* IPUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPUtils.swift; sourceTree = "<group>"; };
 		5AF7868C208A99640093498C /* UDPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPPacket.swift; sourceTree = "<group>"; };
@@ -341,8 +344,9 @@
 				5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */,
 				5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */,
 				5AF7868C208A99640093498C /* UDPPacket.swift */,
-				5AF4BEC92241046F001F1F4D /* TCPSession.swift */,
-				5AF4BECC2246F271001F1F4D /* ZitiConnection.swift */,
+				5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */,
+				5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */,
+				5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -710,17 +714,18 @@
 				5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */,
 				5AF7868D208A99640093498C /* UDPPacket.swift in Sources */,
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
-				5AF4BECA2241046F001F1F4D /* TCPSession.swift in Sources */,
+				5AF4BECA2241046F001F1F4D /* TCPClientConn.swift in Sources */,
 				5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
 				5AF78691208FFF670093498C /* PacketRouter.swift in Sources */,
 				5A91B4C82222E154006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */,
+				5AF4BED4224C4508001F1F4D /* ZitiClientProtocol.swift in Sources */,
 				5AF786932090967F0093498C /* DNSName.swift in Sources */,
 				5AF78695209096CD0093498C /* DNSResourceRecord.swift in Sources */,
 				5A0D1D262225A87F00D01F30 /* ZitiKeychain.swift in Sources */,
 				5AF7868F208AACC50093498C /* DNSPacket.swift in Sources */,
-				5AF4BECD2246F271001F1F4D /* ZitiConnection.swift in Sources */,
+				5AF4BECD2246F271001F1F4D /* TCPProxyConn.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -763,17 +768,18 @@
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
 				5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */,
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,
-				5AF4BECB2241046F001F1F4D /* TCPSession.swift in Sources */,
+				5AF4BECB2241046F001F1F4D /* TCPClientConn.swift in Sources */,
 				5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */,
 				5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */,
 				5A2EA2F2209B75C400437608 /* IPv4Packet.swift in Sources */,
 				5A2EA2F4209B75CD00437608 /* DNSPacket.swift in Sources */,
 				5A2EA2F5209B75D100437608 /* PacketRouter.swift in Sources */,
+				5AF4BED5224C4508001F1F4D /* ZitiClientProtocol.swift in Sources */,
 				5A2EA2F6209B75D500437608 /* DNSName.swift in Sources */,
 				5A2EA2F7209B75DA00437608 /* DNSResourceRecord.swift in Sources */,
 				5A0D1D282225A87F00D01F30 /* ZitiKeychain.swift in Sources */,
 				5A2EA2F3209B75C800437608 /* UDPPacket.swift in Sources */,
-				5AF4BECE2246F271001F1F4D /* ZitiConnection.swift in Sources */,
+				5AF4BECE2246F271001F1F4D /* TCPProxyConn.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

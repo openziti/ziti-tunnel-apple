@@ -45,14 +45,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     func getNetSessionSync(_ zEdge:ZitiEdge, _ zid:ZitiIdentity, _ svc:ZitiEdgeService,
-                           timeOutSecs:TimeInterval=TimeInterval(10.0)) -> Bool {
+                           timeOutSecs:TimeInterval=TimeInterval(3.0)) -> Bool {
         
         if let svcId = svc.id {
             let cond = NSCondition()
             cond.lock()
             NSLog("... blocking creating session for \(zid.name):\(svc.name ?? svcId)")
             var updated = false
-            zEdge.getNetworkSession(svcId) { _ in updated = true; cond.signal() }
+            zEdge.getNetworkSession(svcId) { _ in updated = true; cond.signal() } // escaping to other thread...
             while !updated {
                 if !cond.wait(until: Date(timeIntervalSinceNow: timeOutSecs)) {
                     NSLog("... timed out waiting to create network session")
@@ -136,7 +136,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let ipStr = String(splits[0])
         let port = Int(splits[1])
         for zid in zids {
-            if let svc = zid.services?.first(where: { $0.dns?.interceptIp == ipStr && $0.dns?.port == port }) {
+            if zid.isEnabled, let svc = zid.services?.first(where: { $0.dns?.interceptIp == ipStr && $0.dns?.port == port }) {
                 return (zid, svc)
             }
         }
