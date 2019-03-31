@@ -66,9 +66,11 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
         }
         
         //NSLog("TCPProxyConn attempting to write \(payload.count) bytes on thread \(Thread.current)")
-        let n = payload.withUnsafeBytes { outputStream.write($0, maxLength: payload.count) }
+        // TODO: better to copy the payload so slicing doensn't get us in trouble, but check perf impact
+        let payloadCopy = payload.subdata(in: payload.startIndex..<payload.endIndex)
+        let n = payloadCopy.withUnsafeBytes { outputStream.write($0, maxLength: payloadCopy.count) }
         if outputStream.streamStatus == .writing { // should never happen since inside of a lock, but sometimes it does
-            NSLog("** done writing \(n) of \(payload.count), \(outputStream.streamStatus.rawValue) on \(Thread.current)")
+            NSLog("** done writing \(n) of \(payloadCopy.count), \(outputStream.streamStatus.rawValue) on \(Thread.current)")
         }
         writeCond.unlock()
         
