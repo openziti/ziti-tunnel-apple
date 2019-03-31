@@ -41,6 +41,26 @@ class DNSResolver : NSObject {
         return (first, broadcast)
     }
     
+    // Called before tunnel starts to save off the resolvedIp address if there is one
+    // We can then proxy non-intercpted ports to this IP address
+    private func getResolvedIp(_ hostname:String) -> String? {
+        let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
+        CFHostStartInfoResolution(host, .addresses, nil)
+        var success:DarwinBoolean = false
+        if let addresses = CFHostGetAddressing(host, &success)?.takeUnretainedValue() as NSArray? {
+            for case let addr as NSData in addresses {
+                var hn = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                if getnameinfo(addr.bytes.assumingMemoryBound(to: sockaddr.self), socklen_t(addr.length),
+                               &hn, socklen_t(hn.count), nil, 0, NI_NUMERICHOST) == 0 {
+                    // keep as loop for now - may need to come back to this and filter out non IPv4 results
+                    let ipStr = String(cString: hn)
+                    return ipStr
+                }
+            }
+        }
+        return nil
+    }
+    
     func addHostname(_ name:String) -> String? {
         let ip = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.ipAddress)
         let mask = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.subnetMask)
@@ -49,18 +69,19 @@ class DNSResolver : NSObject {
         var curr = Data(first)
         repeat {
             var inUse = false
-            let ipStr = curr.map{String(format: "%d", $0)}.joined(separator: ".")
+            let fakeIpStr = curr.map{String(format: "%d", $0)}.joined(separator: ".")
             
             // skip addresses we know are in use
             let dnsSvrs = self.tunnelProvider.providerConfig.dnsAddresses
-            if curr == ip || dnsSvrs.contains(ipStr) || hostnames.first(where:{$0.ip==ipStr}) != nil {
+            if curr == ip || dnsSvrs.contains(fakeIpStr) || hostnames.first(where:{$0.ip==fakeIpStr}) != nil {
                 inUse = true
             }
             
             // add it and get outta here
             if inUse == false {
-                hostnames.append((name:name, ip:ipStr))
-                return ipStr
+                //let realIpStr = getResolvedIp(name)
+                hostnames.append((name:name, ip:fakeIpStr))
+                return fakeIpStr
             }
             
             // advance to next ip addr
