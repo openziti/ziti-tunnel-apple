@@ -496,7 +496,8 @@ class TCPPacket : NSObject {
         }
         
         if let payload = self.payload {
-            s += IPUtils.payloadToString(payload)
+            let max = payload.startIndex + (payload.count < 1000 ? payload.count : 1000)
+            s += IPUtils.payloadToString(payload.subdata(in: payload.startIndex..<max))
         }
         return s;
     }

@@ -16,6 +16,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     var interceptedRoutes:[NEIPv4Route] = []
     var zids:[ZitiIdentity] = []
     
+    let writeLock = NSLock()
+    
     override init() {
         NSLog("tun init")
         super.init()
@@ -35,9 +37,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func writePacket(_ data:Data) {
         //NSLog("Writing packet on thread = \(Thread.current)")
+        writeLock.lock() // TODO: this really needed?
         if packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber]) == false {
             NSLog("Error writing packet to TUN")
         }
+        writeLock.unlock()
     }
     
     override var debugDescription: String {
@@ -113,6 +117,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 let zEdge = ZitiEdge(zid)
                 zid.services?.forEach { svc in
                     // If no networkSession for svc, go get one (synchronously)
+                    // TODO: If service status is 'unavailable', but we have netSession aleady, what should we do?
+                    //      - prob should either remove it and try to request a new one, or skip this entire zid...
                     svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Available)
                     if svc.networkSession == nil {
                         _ = getNetSessionSync(zEdge, zid, svc)

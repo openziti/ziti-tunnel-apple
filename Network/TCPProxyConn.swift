@@ -31,7 +31,7 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
         close()
     }
     
-    func start(_ onDataAvailable: @escaping DataAvailableCallback) -> Bool {
+    func connect(_ onDataAvailable: @escaping DataAvailableCallback) -> Bool {
         self.onDataAvailable = onDataAvailable
         Stream.getStreamsToHost(withName: "127.0.0.1", port: 7777, inputStream: &inputStream, outputStream: &outputStream)
         guard inputStream != nil && outputStream != nil else {
@@ -51,21 +51,29 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
     func write(payload:Data) -> Int {
         
         // TODO: change this to queue data until connected
+        // target global serial queue, Interactiv
+        guard let outputStream = outputStream  else { return -1 }
         writeCond.lock()
-        while outputStream?.streamStatus ?? .notOpen != .open {
-            if !writeCond.wait(until: Date(timeIntervalSinceNow: 1.0)) {
-                NSLog("TCProxy conn timed out waiting for output stream to open")
+        let okFlags = Stream.Status.open.rawValue | Stream.Status.writing.rawValue
+        while outputStream.streamStatus.rawValue & okFlags == 0 {
+            NSLog("*** outstream stat: \(outputStream.streamStatus.rawValue) on \(Thread.current)")
+            if !writeCond.wait(until: Date(timeIntervalSinceNow: 3.0)) { // TODO: ridic timeout...
+                NSLog("*** TCProxy conn timed out waiting for output stream to open, thread \(Thread.current)")
                 writeCond.unlock()
                 return -1
             }
+            NSLog("*** loop outstream stat: \(outputStream.streamStatus.rawValue) on \(Thread.current)")
+        }
+        
+        //NSLog("TCPProxyConn attempting to write \(payload.count) bytes on thread \(Thread.current)")
+        let n = payload.withUnsafeBytes { outputStream.write($0, maxLength: payload.count) }
+        if outputStream.streamStatus == .writing { // should never happen since inside of a lock, but sometimes it does
+            NSLog("** done writing \(n) of \(payload.count), \(outputStream.streamStatus.rawValue) on \(Thread.current)")
         }
         writeCond.unlock()
-        //NSLog("TCPProxyConn attempting to write \(payload.count) bytes on thread \(Thread.current)")
-        let n = payload.withUnsafeBytes { outputStream?.write($0, maxLength: payload.count) }
-        let nBytes = n != nil ? n! : -1
-        //NSLog("TCPProxyConn wrote \(nBytes) bytes")
         
-        return nBytes
+        //NSLog("TCPProxyConn wrote \(nBytes) bytes")
+        return n
     }
     
     func close() {
@@ -81,11 +89,11 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
         inputStream!.open()
         outputStream!.open()
         
-        NSLog("Starting runloop for \(Thread.current)")
+        NSLog("*** Starting runloop for \(Thread.current)")
         while !Thread.current.isCancelled {
             RunLoop.current.run(until: Date(timeIntervalSinceNow: TimeInterval(0.5)))
         }
-        NSLog("Ending runloop for \(Thread.current)")
+        NSLog("*** Ending runloop for \(Thread.current)")
     }
 }
 
@@ -100,13 +108,19 @@ extension TCPProxyConn : StreamDelegate {
     
     private func doRead(_ stream:InputStream) {
         let buf = UnsafeMutablePointer<UInt8>.allocate(capacity: mss)
-        let nBytes = stream.read(buf, maxLength: mss)
-        if nBytes > 0 {
-            let data = Data(bytesNoCopy: buf, count: nBytes, deallocator: .custom {buf,_ in buf.deallocate()})
-            onDataAvailable?(data, nBytes)
-        } else {
-            // 0 == eob, -1 == error. stream.streamError? contains more info...
-            onDataAvailable?(nil, nBytes)
+        var i = 0
+        while stream.hasBytesAvailable {
+            let nBytes = stream.read(buf, maxLength: mss)
+            NSLog("\(i)<<< Read \(nBytes) of possible \(mss)")
+            if nBytes > 0 {
+                let data = Data(bytesNoCopy: buf, count: nBytes, deallocator: .none)
+                onDataAvailable?(data, nBytes)
+            } else {
+                // 0 == eob, -1 == error. stream.streamError? contains more info...
+                onDataAvailable?(nil, nBytes)
+            }
+            i = i + 1
         }
+        buf.deallocate()
     }
 }

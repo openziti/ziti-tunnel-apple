@@ -18,7 +18,7 @@ protocol ZitiClientProtocol {
     var onDataAvailable:DataAvailableCallback? { get set }
     
     init(mss:Int)
-    func start(_ onDataAvailable: @escaping DataAvailableCallback) -> Bool
+    func connect(_ onDataAvailable: @escaping DataAvailableCallback) -> Bool
     func write(payload:Data) -> Int
     func close()
 }

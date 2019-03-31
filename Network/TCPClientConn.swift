@@ -73,19 +73,26 @@ class TCPClientConn : NSObject {
             state = .SYN_RCVD
             let mss = mtu - Int(IPv4Packet.minHeaderBytes + TCPPacket.minHeaderBytes)
             ziti = TCPProxyConn(mss:mss)
-            let zsStarted = ziti?.start { [weak self] payload, nBytes in
-                //NSLog("Read \(nBytes) from Ziti, Thread \(Thread.current)")
+            let zsStarted = ziti?.connect { [weak self] payload, nBytes in
+                NSLog("Read \(nBytes) from Ziti, Thread \(Thread.current)")
+                let key = self?.key ?? "<no-key>"
                 if nBytes <= 0 {
                     // 0 = eo-buffer
-                    NSLog("Ziti-side server close or error.  Sending FIN/ACK ")
+                    NSLog("\(key) Ziti-side server close or error.  Sending FIN/ACK ")
                     
-                    // TODO: should go someplace else first to figure out window scale...
                     self?.seqCond.lock()
                     self?.tcpSend(nil, TCPFlags.FIN.rawValue|TCPFlags.ACK.rawValue)
                     self?.seqCond.unlock()
                 } else {
-                    // TODO: should go someplace else first to figure out window scale...
+                    // Should never happen...
+                    if (nBytes > mss) {
+                        NSLog("\(key) Received \(nBytes), greater than max expected of \(mss).  TODO!")
+                    }
+                    
                     self?.seqCond.lock()
+                    if !(self?.waitForClientAcks(count: UInt32(nBytes)) ?? false) {
+                        NSLog("\(key) Timed out waiting for client ACKs.  TODO...")
+                    }
                     self?.tcpSend(payload, TCPFlags.ACK.rawValue)
                     self?.seqCond.unlock()
                 }
@@ -119,6 +126,7 @@ class TCPClientConn : NSObject {
                 if count > 0 {
                     (sendAckNum,_) = sendAckNum.addingReportingOverflow(count)  // todo: check on slices
                     tcpSend(nil, TCPFlags.ACK.rawValue)
+                    //NSLog("\(key) ACKd \(count) bytes, sendAckNum=\(sendAckNum)")
                     seqCond.unlock()
                     if ziti?.write(payload: pkt.payload!) ?? -1 == -1 {
                         NSLog("\(key) Unable to write \(count) bytes")
@@ -202,6 +210,22 @@ class TCPClientConn : NSObject {
     
     override var debugDescription: String {
         return "\(key) \(state)"
+    }
+    
+    // check peer's receive window and wait for it to open if necessary
+    private func waitForClientAcks(count:UInt32) -> Bool {
+        while ((sendOldestUnAcked + count) - rcvAckNum) > (UInt32(rcvWindow) << rcvWinScale) {
+            if rcvWindow == 0 {
+                NSLog("\(key) Window closed.")
+                return true //?
+            }
+            NSLog("\(key) Waiting for client to ACK byte \(sendOldestUnAcked)")
+            if !seqCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(5.0))) {
+                NSLog("\(key) Timed-out waiting for client to ACK byte \(sendOldestUnAcked)")
+                return false
+            }
+        }
+        return true
     }
     
     private func parseWinScale(_ options:TCPOptions?) -> UInt8 {

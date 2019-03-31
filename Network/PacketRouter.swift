@@ -76,7 +76,7 @@ class PacketRouter : NSObject {
                 tcpConnsLock.unlock()
                 return
             } else {
-                NSLog("Unexpected packet for key \(key)") //"\n\(pkt.debugDescription)")
+                NSLog("Unexpected packet for key \(key)\n\(pkt.debugDescription)")
                 tcpConnsLock.unlock()
                 return
             }
