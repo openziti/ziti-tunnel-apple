@@ -37,28 +37,35 @@ class PacketRouter : NSObject {
         //NSLog("Router routing curr thread = \(Thread.current)")
         //NSLog("TCP-->: \(pkt.debugDescription)")
         
-        let intercept = "\(pkt.ip.destinationAddressString):\(pkt.destinationPort)"
-        let (zidR, svcR) = tunnelProvider.getServiceForIntercept(intercept)
-        guard let zid = zidR, let svc = svcR, let svcName = svc.name else {
-            // TODO: find better approach for matched IP but not port
-            //    Possibility (for DNS based): store the original IP before intercepting DNS, proxy to it
-            //    For non-DNS - hmmm... wonder what happens if I send to intercepted IP. Prob flood myself...
-            NSLog("Router: no service found for \(intercept). Dropping packet")
-            return
-        }
-        
         var tcpConn:TCPClientConn
-        let key = "TCP:\(pkt.ip.sourceAddressString):\(pkt.sourcePort)->\(zid.name):\(svcName)"
+        let key = "TCP:\(pkt.ip.sourceAddressString):\(pkt.sourcePort)->\(pkt.ip.destinationAddressString):\(pkt.destinationPort)"
         
         tcpConnsLock.lock()
         if let foundConn = tcpConns[key] {
             tcpConn = foundConn
         } else {
             if pkt.SYN {
-                NSLog("Router new session:\(key)\nidentity:\(zid.id), service identity:\(svc.id ?? "unknown")")
+                var zitiConn:ZitiClientProtocol? = nil
                 
+                // meant for Ziti?
+                let intercept = "\(pkt.ip.destinationAddressString):\(pkt.destinationPort)"
+                let (zidR, svcR) = tunnelProvider.getServiceForIntercept(intercept)
+                if let zid = zidR, let svc = svcR {
+                    zitiConn = ZitiConn(key, zid, svc)
+                } else {
+                    // if not for Ziti, can we proxy it to orginal IP address?
+                    let dnsRecs = dnsResolver.findRecordsByIp(pkt.ip.destinationAddressString)
+                    for i in 0..<dnsRecs.count {
+                        if let realIp = dnsRecs[i].realIp {
+                            zitiConn = TCPProxyConn(key, realIp, pkt.destinationPort)
+                            break
+                        }
+                    }
+                }
+                NSLog("Router new session:\(key)")
+
                 // Callback is escaping and will run either in this thread or in another
-                tcpConn = TCPClientConn(key, zid, svc, tunnelProvider) { [weak self] respPkt in
+                tcpConn = TCPClientConn(key, zitiConn, tunnelProvider.providerConfig.mtu) { [weak self] respPkt in
                     guard let respPkt = respPkt else {
                         // remove connection
                         NSLog("Router closing con: \(key)")

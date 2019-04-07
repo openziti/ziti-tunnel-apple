@@ -12,17 +12,17 @@ import NetworkExtension
 class DNSResolver : NSObject {
     static let dnsPort:UInt16 = 53
     let tunnelProvider:PacketTunnelProvider
-    var hostnames:[(name:String, ip:String)] = []
+    var hostnames:[(name:String, ip:String, realIp:String?)] = []
     
     init(_ tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
     }
     
-    func findRecordsByName(_ name:String) -> [(name:String, ip:String)] {
+    func findRecordsByName(_ name:String) -> [(name:String, ip:String, realIp:String?)] {
         return hostnames.filter{ return $0.name == name }
     }
     
-    func findRecordsByIp(_ ip:String) -> [(name:String, ip:String)] {
+    func findRecordsByIp(_ ip:String) -> [(name:String, ip:String, realIp:String?)] {
         return hostnames.filter{ return $0.ip == ip }
     }
     
@@ -43,7 +43,7 @@ class DNSResolver : NSObject {
     
     // Called before tunnel starts to save off the resolvedIp address if there is one
     // We can then proxy non-intercpted ports to this IP address
-    private func getResolvedIp(_ hostname:String) -> String? {
+    private func resolveHostname(_ hostname:String) -> String? {
         let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
         CFHostStartInfoResolution(host, .addresses, nil)
         var success:DarwinBoolean = false
@@ -79,8 +79,9 @@ class DNSResolver : NSObject {
             
             // add it and get outta here
             if inUse == false {
-                //let realIpStr = getResolvedIp(name)
-                hostnames.append((name:name, ip:fakeIpStr))
+                let realIpStr = resolveHostname(name)
+                NSLog("Real IP for \(name) = \(realIpStr ?? "nil")")
+                hostnames.append((name:name, ip:fakeIpStr, realIp:realIpStr))
                 return fakeIpStr
             }
             

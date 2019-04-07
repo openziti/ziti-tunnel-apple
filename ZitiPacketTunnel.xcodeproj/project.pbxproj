@@ -63,6 +63,8 @@
 		5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AD0221F937D00051475 /* ServicesViewController.swift */; };
 		5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
+		5A85A91B225A6EB2004A29F2 /* ZitiConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */; };
+		5A85A91C225A6EB2004A29F2 /* ZitiConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */; };
 		5A8702CE2230B24B00314199 /* ZitiEdgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8702CD2230B24B00314199 /* ZitiEdgeService.swift */; };
 		5A8702CF2230B24B00314199 /* ZitiEdgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8702CD2230B24B00314199 /* ZitiEdgeService.swift */; };
 		5A8702D02230B24B00314199 /* ZitiEdgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8702CD2230B24B00314199 /* ZitiEdgeService.swift */; };
@@ -184,6 +186,7 @@
 		5A379ACB221EDB1400051475 /* ZitiIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentity.swift; sourceTree = "<group>"; };
 		5A379AD0221F937D00051475 /* ServicesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesViewController.swift; sourceTree = "<group>"; };
 		5A67F8F0209F948F00DEFE87 /* IPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPPacket.swift; sourceTree = "<group>"; };
+		5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiConn.swift; sourceTree = "<group>"; };
 		5A8702CD2230B24B00314199 /* ZitiEdgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiEdgeService.swift; sourceTree = "<group>"; };
 		5A8702D22230B4D300314199 /* ZitiEdgeNetworkSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiEdgeNetworkSession.swift; sourceTree = "<group>"; };
 		5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+timeAgo.swift"; sourceTree = "<group>"; };
@@ -347,6 +350,7 @@
 				5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */,
 				5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */,
 				5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */,
+				5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -714,6 +718,7 @@
 				5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */,
 				5AF7868D208A99640093498C /* UDPPacket.swift in Sources */,
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
+				5A85A91B225A6EB2004A29F2 /* ZitiConn.swift in Sources */,
 				5AF4BECA2241046F001F1F4D /* TCPClientConn.swift in Sources */,
 				5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
@@ -768,6 +773,7 @@
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
 				5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */,
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,
+				5A85A91C225A6EB2004A29F2 /* ZitiConn.swift in Sources */,
 				5AF4BECB2241046F001F1F4D /* TCPClientConn.swift in Sources */,
 				5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */,
 				5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */,

@@ -18,8 +18,7 @@ class TCPClientConn : NSObject {
         }
     }
     let key:String
-    let zid:ZitiIdentity
-    let svc:ZitiEdgeService
+    var zitiConn:ZitiClientProtocol?
     let mtu:Int
     
     var sourceAddr:Data = Data([0,0,0,0])
@@ -34,18 +33,13 @@ class TCPClientConn : NSObject {
     var sendAckNum:UInt32 = 0
     let seqCond = NSCondition()
     
-    weak var ptp:PacketTunnelProvider!
-    var ziti:ZitiClientProtocol? = nil
-    
     typealias TCPSendCallback = ((TCPPacket?) -> Void)
     var onTCPSend:TCPSendCallback
     
-    init(_ key:String, _ zid:ZitiIdentity, _ svc:ZitiEdgeService, _ ptp:PacketTunnelProvider, onTCPSend:@escaping TCPSendCallback) {
+    init(_ key:String, _ zitiConn:ZitiClientProtocol?, _ mtu:Int, onTCPSend:@escaping TCPSendCallback) {
         self.key = key
-        self.zid = zid
-        self.svc = svc
-        self.ptp = ptp
-        self.mtu = ptp.providerConfig.mtu
+        self.zitiConn = zitiConn
+        self.mtu = mtu
         self.onTCPSend = onTCPSend
         NSLog("init \(key)")
     }
@@ -55,10 +49,21 @@ class TCPClientConn : NSObject {
     }
     
     func tcpReceive(_ pkt:TCPPacket) -> TCPClientConn.State {
+        
+        //
+        if pkt.RST {
+            NSLog("\(key) RST received. Closing")
+            zitiConn?.close()
+            state = .Closed
+            return state
+        }
+        
+        //
         seqCond.lock()
         rcvWindow = pkt.windowSize
         if pkt.ACK {
             rcvAckNum = pkt.acknowledgmentNumber
+            //NSLog("--- updated rcvAckNum: \(rcvAckNum) \(key)")
             seqCond.signal()
         }
         if pkt.SYN {
@@ -70,47 +75,64 @@ class TCPClientConn : NSObject {
         
         switch state {
         case .LISTEN where pkt.SYN:
-            state = .SYN_RCVD
-            let mss = mtu - Int(IPv4Packet.minHeaderBytes + TCPPacket.minHeaderBytes)
-            ziti = TCPProxyConn(mss:mss)
-            let zsStarted = ziti?.connect { [weak self] payload, nBytes in
-                NSLog("Read \(nBytes) from Ziti, Thread \(Thread.current)")
-                let key = self?.key ?? "<no-key>"
-                if nBytes <= 0 {
-                    // 0 = eo-buffer
-                    NSLog("\(key) Ziti-side server close or error.  Sending FIN/ACK ")
-                    
-                    self?.seqCond.lock()
-                    self?.tcpSend(nil, TCPFlags.FIN.rawValue|TCPFlags.ACK.rawValue)
-                    self?.seqCond.unlock()
-                } else {
-                    // Should never happen...
-                    if (nBytes > mss) {
-                        NSLog("\(key) Received \(nBytes), greater than max expected of \(mss).  TODO!")
-                    }
-                    
-                    self?.seqCond.lock()
-                    if !(self?.waitForClientAcks(count: UInt32(nBytes)) ?? false) {
-                        NSLog("\(key) Timed out waiting for client ACKs.  TODO...")
-                    }
-                    self?.tcpSend(payload, TCPFlags.ACK.rawValue)
-                    self?.seqCond.unlock()
-                }
-            }
-            if zsStarted ?? false == false {
-                NSLog("Unable to start Ziti for connection \(key)")
-                onTCPSend(nil)
-                seqCond.unlock()
-                state = .Closed
-                return state
-            }
             sourceAddr = pkt.ip.sourceAddress
             sourcePort = pkt.sourcePort
             destAddr = pkt.ip.destinationAddress
             destPort = pkt.destinationPort
             rcvWinScale = parseWinScale(pkt.options)
             sendOldestUnAcked = UInt32.random(in: 0..<UInt32.max)
-            tcpSend(nil, TCPFlags.SYN.rawValue|TCPFlags.ACK.rawValue, makeSynOpts())
+            
+            if zitiConn == nil {
+                NSLog("No connection available for \(key)")
+                state = .Closed
+                tcpSend(nil, TCPFlags.ACK.rawValue|TCPFlags.RST.rawValue)
+            } else {
+            
+                state = .SYN_RCVD
+                let mss = mtu - Int(IPv4Packet.minHeaderBytes + TCPPacket.minHeaderBytes)
+                let zsStarted = zitiConn?.connect { [weak self] payload, nBytes in
+                    //NSLog("Read \(nBytes) from Ziti, Thread \(Thread.current)")
+                    let key = self?.key ?? "<no-key>"
+                    if nBytes <= 0 {
+                        // 0 = eo-buffer
+                        NSLog("\(key) Ziti-side read close or error.  Sending FIN/ACK ")
+                        
+                        self?.seqCond.lock()
+                        // TODO: figure this close sequence out so its consistant...
+                        self?.tcpSend(nil, TCPFlags.FIN.rawValue|TCPFlags.ACK.rawValue) // doesn't always work (e.g., iperf only if we onTCPSend(nil) - bad idea from this thread (ziti reads happens in their own thread)
+                        self?.zitiConn?.close()
+                        self?.seqCond.unlock()
+     
+                    } else {
+                        let n = nBytes
+                        var i = 0
+                        var chunkLen:Int
+                        while i < n {
+                            if i + mss > n {
+                                chunkLen = n % mss
+                            } else {
+                                chunkLen = mss
+                            }
+                            let chunk = payload!.subdata(in: i..<(i+chunkLen))
+                            self?.seqCond.lock()
+                            if !(self?.waitForClientAcks(count: UInt32(nBytes)) ?? false) {
+                                NSLog("xxxxxxx \(key) Failed waiting for client ACKs.  TODO...")
+                            }
+                            self?.tcpSend(chunk, TCPFlags.ACK.rawValue)
+                            //NSLog("   sent \(i+chunk.count) of \(n) bytes")
+                            self?.seqCond.unlock()
+                            i += mss
+                        }
+                    }
+                }
+                if zsStarted ?? false == false {
+                    NSLog("Unable to start Ziti for connection \(key)")
+                    state = .Closed
+                    tcpSend(nil, TCPFlags.ACK.rawValue|TCPFlags.RST.rawValue)
+                } else {
+                    tcpSend(nil, TCPFlags.SYN.rawValue|TCPFlags.ACK.rawValue, makeSynOpts())
+                }
+            }
         case .SYN_RCVD where pkt.RST:
             state = .LISTEN
         case .SYN_RCVD where pkt.ACK:
@@ -124,11 +146,11 @@ class TCPClientConn : NSObject {
                 // Data Transfer
                 let count = UInt32(pkt.payload?.count ?? 0)
                 if count > 0 {
-                    (sendAckNum,_) = sendAckNum.addingReportingOverflow(count)  // todo: check on slices
+                    (sendAckNum,_) = sendAckNum.addingReportingOverflow(count)
                     tcpSend(nil, TCPFlags.ACK.rawValue)
                     //NSLog("\(key) ACKd \(count) bytes, sendAckNum=\(sendAckNum)")
                     seqCond.unlock()
-                    if ziti?.write(payload: pkt.payload!) ?? -1 == -1 {
+                    if zitiConn?.write(payload: pkt.payload!) ?? -1 == -1 {
                         NSLog("\(key) Unable to write \(count) bytes")
                         onTCPSend(nil)
                     }
@@ -156,20 +178,20 @@ class TCPClientConn : NSObject {
             tcpSend(nil, TCPFlags.ACK.rawValue)
         default:
             NSLog("\(key) Unexpected TCP state transistion for \(key). State=\(state)")
-            ziti?.close()
+            zitiConn?.close()
             onTCPSend(nil)
         }
         
         if state == .Closed {
             NSLog("\(key) Received packet on closed session")
-            ziti?.close()
+            zitiConn?.close()
             onTCPSend(nil)
         } else if state == .CLOSING {
             NSLog("\(key) closing")
         } else if state == .CLOSE_WAIT {
             state = .LAST_ACK
             tcpSend(nil, TCPFlags.FIN.rawValue | TCPFlags.ACK.rawValue) // added ACK
-            ziti?.close()
+            zitiConn?.close()
             onTCPSend(nil)
         }
         seqCond.unlock()
@@ -214,16 +236,19 @@ class TCPClientConn : NSObject {
     
     // check peer's receive window and wait for it to open if necessary
     private func waitForClientAcks(count:UInt32) -> Bool {
-        while ((sendOldestUnAcked + count) - rcvAckNum) > (UInt32(rcvWindow) << rcvWinScale) {
+        
+        //NSLog("xxxxxxx WFCA oldest unAck=\(sendOldestUnAcked), last rcvAck=\(rcvAckNum), diff=\(Int(rcvAckNum)-Int(sendOldestUnAcked)) winXscale=\((Int(rcvWindow) << rcvWinScale))")
+        while ((Int(sendOldestUnAcked) + Int(count)) - Int(rcvAckNum)) > (Int(rcvWindow) << rcvWinScale) {
             if rcvWindow == 0 {
-                NSLog("\(key) Window closed.")
+                NSLog("xxxxxxxx \(key) Window closed.")
                 return true //?
             }
-            NSLog("\(key) Waiting for client to ACK byte \(sendOldestUnAcked)")
+            NSLog("xxxxxxxx \(key) Waiting for client to ACK byte \(sendOldestUnAcked)")
             if !seqCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(5.0))) {
-                NSLog("\(key) Timed-out waiting for client to ACK byte \(sendOldestUnAcked)")
+                NSLog("xxxxxxxx \(key) Timed-out waiting for client to ACK byte \(sendOldestUnAcked)")
                 return false
             }
+            NSLog("xxxxxxxx \(key) Done waiting for client to ACK byte \(sendOldestUnAcked)")
         }
         return true
     }

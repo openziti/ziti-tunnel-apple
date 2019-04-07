@@ -8,18 +8,33 @@
 
 import NetworkExtension
 
+extension sockaddr {
+    public init(port: in_port_t, address: String? = nil) {
+        var addr = sockaddr_in()
+        addr.sin_family = sa_family_t(AF_INET)
+        addr.sin_port = port.bigEndian
+        
+        if let address = address {
+            let r = inet_pton(AF_INET, address, &addr.sin_addr)
+            assert(r == 1, "\(address) is not converted.")
+        }
+        
+        self = withUnsafePointer(to: &addr) {
+            UnsafePointer<sockaddr>(OpaquePointer($0)).pointee
+        }
+    }
+}
+
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     let providerConfig = ProviderConfig()
     var packetRouter:PacketRouter?
     var dnsResolver:DNSResolver?
     var interceptedRoutes:[NEIPv4Route] = []
-    var zids:[ZitiIdentity] = []
-    
+    var zids:[ZitiIdentity] = []    
     let writeLock = NSLock()
     
     override init() {
-        NSLog("tun init")
         super.init()
         self.dnsResolver = DNSResolver(self)
         self.packetRouter = PacketRouter(tunnelProvider:self, dnsResolver: dnsResolver!)
@@ -37,7 +52,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func writePacket(_ data:Data) {
         //NSLog("Writing packet on thread = \(Thread.current)")
-        writeLock.lock() // TODO: this really needed?
+        writeLock.lock() // Confirmed this is really needed...
         if packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber]) == false {
             NSLog("Error writing packet to TUN")
         }
@@ -150,7 +165,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-        NSLog("startTunnel")
         NSLog("startTunnel: \(Thread.current): \(OperationQueue.current?.underlyingQueue?.label ?? "None")")
 
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
@@ -200,6 +214,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 NSLog(error.localizedDescription)
                 completionHandler(error as NSError)
             }
+            
+            // packetFlow FD
+            let fd = (self.packetFlow.value(forKeyPath: "socket.fileDescriptor") as? Int32) ?? -1
+            if fd < 0 {
+                NSLog("Unable to get tun fd")
+            }
+            
+            var ifnameSz = socklen_t(IFNAMSIZ)
+            let ifnamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: Int(ifnameSz))
+            ifnamePtr.initialize(repeating: 0, count: Int(ifnameSz))
+            var ifname:String?
+            if getsockopt(fd, 2 /* SYSPROTO_CONTROL */, 2 /* UTUN_OPT_IFNAME */, ifnamePtr, &ifnameSz) == 0 {
+                ifname = String(cString: ifnamePtr)
+            }
+            ifnamePtr.deallocate()
+            NSLog("Tunnel interface is \(ifname ?? "unknown")")
             
             // call completion handler with nil to indicate success
             completionHandler(nil)

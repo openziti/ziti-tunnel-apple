@@ -62,16 +62,15 @@ class ZitiCSR : NSObject {
     }
     
     private func createCriSig(_ privKey:SecKey, _ cri:Data, _ err: UnsafeMutablePointer<Unmanaged<CFError>?>?) -> CFData? {
-        var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        var md = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        var ctx = CC_SHA256_CTX()
         
-        var SHA1 = CC_SHA256_CTX()
-        CC_SHA256_Init(&SHA1)
-        CC_SHA256_Update(&SHA1, [UInt8](cri), CC_LONG(cri.count))
-        CC_SHA256_Final(&digest, &SHA1)
-        
+        CC_SHA256_Init(&ctx)
+        CC_SHA256_Update(&ctx, [UInt8](cri), CC_LONG(cri.count))
+        CC_SHA256_Final(&md, &ctx)
         return SecKeyCreateSignature(
             privKey, .rsaSignatureDigestPKCS1v15SHA256,
-            Data(bytes: digest) as CFData, err)
+            Data(bytes: md) as CFData, err)
     }
     
     private func parsePublicSecKey(publicKey: SecKey) -> (mod: Data, exp: Data) {

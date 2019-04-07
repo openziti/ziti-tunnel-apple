@@ -10,20 +10,23 @@ import NetworkExtension
 import Foundation
 
 class TCPProxyConn : NSObject, ZitiClientProtocol {
+    let key:String
+    let ip:String
+    let port:UInt16
+    
     var thread:Thread?
     let writeCond = NSCondition() // TODO: change this to a queue...
     var inputStream: InputStream?
     var outputStream: OutputStream?
-    let mss:Int
+    let maxReadLen:Int = Int(UInt16.max / 15960) * 15960 // TODO: should be configurable based on windowSize/Scale, mult of mss
     
-    typealias DataAvailableCallback = ((Data?, Int) -> Void)
     var onDataAvailable: DataAvailableCallback? = nil
     
-    required init(mss:Int) {
-        self.mss = mss
-        super.init()
-        self.thread = Thread(target: self, selector: #selector(TCPProxyConn.doRunLoop), object: nil)
-        NSLog("init TCPProxyConn")
+    init(_ key:String, _ ip:String, _ port:UInt16) {
+        self.key = key
+        self.ip = ip
+        self.port = port
+        NSLog("init TCPProxyConn \(key), \(ip):\(port)")
     }
     
     deinit {
@@ -33,15 +36,15 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
     
     func connect(_ onDataAvailable: @escaping DataAvailableCallback) -> Bool {
         self.onDataAvailable = onDataAvailable
-        Stream.getStreamsToHost(withName: "127.0.0.1", port: 7777, inputStream: &inputStream, outputStream: &outputStream)
+        Stream.getStreamsToHost(withName: ip, port: Int(port), inputStream: &inputStream, outputStream: &outputStream)
         guard inputStream != nil && outputStream != nil else {
-            NSLog("Unable to create socket")
+            NSLog("TCPProxyConn Unable to connect to \(ip):\(port)")
             return false
         }
         inputStream!.delegate = self
         outputStream!.delegate = self
-        
-        thread?.name = "TCPProxyConn" // TODO
+        self.thread = Thread(target: self, selector: #selector(TCPProxyConn.doRunLoop), object: nil)
+        thread?.name = key
         thread?.start()
         
         return true
@@ -109,11 +112,9 @@ extension TCPProxyConn : StreamDelegate {
     }
     
     private func doRead(_ stream:InputStream) {
-        let buf = UnsafeMutablePointer<UInt8>.allocate(capacity: mss)
-        var i = 0
-        while stream.hasBytesAvailable {
-            let nBytes = stream.read(buf, maxLength: mss)
-            NSLog("\(i)<<< Read \(nBytes) of possible \(mss)")
+        let buf = UnsafeMutablePointer<UInt8>.allocate(capacity: maxReadLen)
+        //while stream.hasBytesAvailable {
+            let nBytes = stream.read(buf, maxLength: maxReadLen)
             if nBytes > 0 {
                 let data = Data(bytesNoCopy: buf, count: nBytes, deallocator: .none)
                 onDataAvailable?(data, nBytes)
@@ -121,8 +122,7 @@ extension TCPProxyConn : StreamDelegate {
                 // 0 == eob, -1 == error. stream.streamError? contains more info...
                 onDataAvailable?(nil, nBytes)
             }
-            i = i + 1
-        }
+       // }
         buf.deallocate()
     }
 }
