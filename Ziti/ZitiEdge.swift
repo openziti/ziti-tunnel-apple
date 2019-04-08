@@ -40,7 +40,7 @@ class ZitiEdge : NSObject {
             }
             
             guard
-                let json = try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any],
+                let json = ((try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]) as [String : Any]??),
                 let dataJSON = json?["data"] as? [String: Any],
                 let sessionJSON = dataJSON["session"] as? [String:Any],
                 let token = sessionJSON["token"] as? String

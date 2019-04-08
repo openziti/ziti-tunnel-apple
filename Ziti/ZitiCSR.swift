@@ -70,7 +70,7 @@ class ZitiCSR : NSObject {
         CC_SHA256_Final(&md, &ctx)
         return SecKeyCreateSignature(
             privKey, .rsaSignatureDigestPKCS1v15SHA256,
-            Data(bytes: md) as CFData, err)
+            Data(md) as CFData, err)
     }
     
     private func parsePublicSecKey(publicKey: SecKey) -> (mod: Data, exp: Data) {

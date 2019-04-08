@@ -69,7 +69,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     }
         
     // Occurs whenever you input first symbol after focus is here
-    override func controlTextDidBeginEditing(_ obj: Notification) {
+    func controlTextDidBeginEditing(_ obj: Notification) {
         self.saveButton.isEnabled = true
     }
     
@@ -101,13 +101,13 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
                 } else {
                     self.vc?.restartTunnel()
                     self.saveButton.isEnabled = false
-                    self.dismissViewController(self)
+                    self.dismiss(self)
                 }
             }
         }
     }
     
     @IBAction func onCancelButton(_ sender: Any) {
-        self.dismissViewController(self)
+        self.dismiss(self)
     }
 }

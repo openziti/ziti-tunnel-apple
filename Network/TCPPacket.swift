@@ -458,9 +458,10 @@ class TCPPacket : NSObject {
             IPUtils.appendUInt16(&psuedo, value: lastWord)
         }
         
-        var ui16Array:[UInt16] = psuedo[..<psuedo.count].withUnsafeBytes {
-            UnsafeBufferPointer<UInt16>(start: $0, count: Int(psuedo.count/2)).map(UInt16.init(bigEndian:))
+        var ui16Array:[UInt16] = psuedo[..<psuedo.count].withUnsafeBytes{ urbp in
+            urbp.bindMemory(to: UInt16.self).map(UInt16.init(bigEndian:))
         }
+        
         // zero out checksum
         ui16Array[hdrSize/2 + TCPPacket.checksumOffset/2] = 0x0000
         

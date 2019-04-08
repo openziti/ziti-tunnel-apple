@@ -41,11 +41,11 @@ class TCPClientConn : NSObject {
         self.zitiConn = zitiConn
         self.mtu = mtu
         self.onTCPSend = onTCPSend
-        NSLog("init \(key)")
+        NSLog("TCPClientConn init \(key)")
     }
     
     deinit {
-        NSLog("deinit \(key)")
+        NSLog("TCPClientConn deinit \(key)")
     }
     
     func tcpReceive(_ pkt:TCPPacket) -> TCPClientConn.State {

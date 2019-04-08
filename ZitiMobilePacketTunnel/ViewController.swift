@@ -53,7 +53,7 @@ class ViewController: UIViewController {
                     
                     let defaultProviderConf = ProviderConfig()
                     providerProtocol.providerConfiguration = defaultProviderConf.createDictionary()
-                    providerProtocol.serverAddress = defaultProviderConf.serverAddress
+                    providerProtocol.serverAddress = defaultProviderConf.ipAddress
                     providerProtocol.username = defaultProviderConf.username
                     
                     self.tunnelProviderManager.protocolConfiguration = providerProtocol
@@ -82,34 +82,30 @@ class ViewController: UIViewController {
     }
     
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
-        print("Tunnel Status changed:")
         let status = self.tunnelProviderManager.connection.status
         switch status {
         case .connecting:
-            print("Connecting...")
             connectStatus.text = "Connecting..."
             break
         case .connected:
-            print("Connected...")
             connectStatus.text = "Connected"
             connectSwitch.isOn = true
             break
         case .disconnecting:
-            print("Disconnecting...")
             connectStatus.text = "Disconnecting..."
             break
         case .disconnected:
-            print("Disconnected...")
             connectStatus.text = "Disconnected"
             connectSwitch.isOn = false
             break
         case .invalid:
-            print("Invalid")
             connectSwitch.isOn = false
             break
         case .reasserting:
-            print("Reasserting...")
             break
+        @unknown default:
+            connectStatus.text = "Unknown"
+            connectSwitch.isOn = false
         }
     }
     

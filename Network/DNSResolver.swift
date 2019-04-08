@@ -58,7 +58,7 @@ class DNSResolver : NSObject {
                 }
             }
         }
-        return nil
+        return "127.0.0.1" //TODO temp hack, should be nil
     }
     
     func addHostname(_ name:String) -> String? {

@@ -137,10 +137,10 @@ class IPUtils {
     static let v6AddrNumWords = 8
     static func ipV6AddressToSting(_ addr:Data) -> String {
         var str = "::" // 'unspecified' or 'invalid'
-        var addrWords:[UInt16] = addr.withUnsafeBytes {
-            UnsafeBufferPointer<UInt16>(start: $0, count: Int(addr.count/2)).map(UInt16.init(bigEndian:))
+        var addrWords:[UInt16] = addr.withUnsafeBytes{ urbp in
+            urbp.bindMemory(to: UInt16.self).map(UInt16.init(bigEndian:))
         }
-
+        
         let zeroSplit = addrWords.split(whereSeparator: { $0 != 0 }).max(by: {$1.count > $0.count})
         guard let z = zeroSplit else {
             return addrWords.map{String(format: "%x", $0)}.joined(separator: ":")

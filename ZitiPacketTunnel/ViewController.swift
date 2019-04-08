@@ -120,6 +120,9 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             case .reasserting:
                 print("Reasserting...")
                 break
+            @unknown default:
+                print("Unknown...")
+                break
             }
         }
         self.tableView.reloadData()
@@ -530,7 +533,7 @@ extension ViewController: NSTableViewDelegate {
                 default: imageName = "NSStatusNone"
                 }
             }
-            cell.imageView?.image = NSImage(named:NSImage.Name(rawValue: imageName)) ?? nil
+            cell.imageView?.image = NSImage(named:imageName) ?? nil
             return cell
         }
         return nil

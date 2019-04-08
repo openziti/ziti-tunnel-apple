@@ -44,7 +44,7 @@ class ZitiKeychain : NSObject {
         var parameters: [CFString: Any] = [
             kSecAttrKeyType: kSecAttrKeyTypeRSA,
             kSecAttrKeySizeInBits: keySize,
-            kSecReturnRef: kCFBooleanTrue,
+            kSecReturnRef: kCFBooleanTrue as Any,
             kSecAttrLabel: zid.id, //macOs
             kSecAttrIsPermanent: true, // macOs
             kSecAttrApplicationTag: atag, //macOs
@@ -81,7 +81,7 @@ class ZitiKeychain : NSObject {
             kSecClass: kSecClassKey,
             kSecAttrKeyClass: kSecAttrKeyClassPrivate,
             kSecAttrApplicationTag: atag,
-            kSecReturnRef: kCFBooleanTrue]
+            kSecReturnRef: kCFBooleanTrue as Any]
         var ref: AnyObject?
         let status = SecItemCopyMatching(parameters as CFDictionary, &ref)
         guard status == errSecSuccess else {
@@ -125,7 +125,7 @@ class ZitiKeychain : NSObject {
 #if os(macOS)
         let params: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
-            kSecReturnRef: kCFBooleanTrue,
+            kSecReturnRef: kCFBooleanTrue as Any,
             kSecAttrLabel: zid.id]
         
         var cert: CFTypeRef?
@@ -199,7 +199,7 @@ class ZitiKeychain : NSObject {
     func getCertificate(_ label:String) -> (Data?, ZitiError?) {
         let params: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
-            kSecReturnRef: kCFBooleanTrue,
+            kSecReturnRef: kCFBooleanTrue as Any,
             kSecAttrLabel: label]
         
         var cert: CFTypeRef?
@@ -217,7 +217,7 @@ class ZitiKeychain : NSObject {
     func deleteCertificate(_ label:String) -> ZitiError? {  //TODO: not working. kSecAttrLabel overwritten with common name?
         let params: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
-            kSecReturnRef: kCFBooleanTrue,
+            kSecReturnRef: kCFBooleanTrue as Any,
             kSecAttrLabel: label]
         
         var cert: CFTypeRef?

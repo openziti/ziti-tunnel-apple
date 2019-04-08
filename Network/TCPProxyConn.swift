@@ -30,7 +30,7 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
     }
     
     deinit {
-        NSLog("deinit TCPProxyConn")
+        NSLog("deinit TCPProxyConn \(key), \(ip):\(port)")
         close()
     }
     
@@ -69,11 +69,9 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
         }
         
         //NSLog("TCPProxyConn attempting to write \(payload.count) bytes on thread \(Thread.current)")
-        // TODO: better to copy the payload so slicing doensn't get us in trouble, but check perf impact
-        let payloadCopy = payload.subdata(in: payload.startIndex..<payload.endIndex)
-        let n = payloadCopy.withUnsafeBytes { outputStream.write($0, maxLength: payloadCopy.count) }
+        let n = outputStream.write([UInt8](payload[payload.startIndex..<payload.endIndex]), maxLength: payload.count)
         if outputStream.streamStatus == .writing { // should never happen since inside of a lock, but sometimes it does
-            NSLog("** done writing \(n) of \(payloadCopy.count), \(outputStream.streamStatus.rawValue) on \(Thread.current)")
+            NSLog("** done writing \(n) of \(payload.count), \(outputStream.streamStatus.rawValue) on \(Thread.current)")
         }
         writeCond.unlock()
         
@@ -88,8 +86,8 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
     }
     
     @objc private func doRunLoop() {
-        inputStream!.schedule(in: .current, forMode: .commonModes)
-        outputStream!.schedule(in: .current, forMode: .commonModes)
+        inputStream!.schedule(in: .current, forMode: RunLoop.Mode.common)
+        outputStream!.schedule(in: .current, forMode: RunLoop.Mode.common)
         
         inputStream!.open()
         outputStream!.open()

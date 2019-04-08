@@ -178,8 +178,8 @@ class IPv4Packet : NSObject, IPPacket {
     func computeHeaderChecksum() -> UInt16 {
         // copy the header into UInt16 array, network order
         let headerBytes = Int(self.headerLength) * IPv4Packet.headerWordLength
-        var l16Header:[UInt16] = self.data[..<headerBytes].withUnsafeBytes {
-            UnsafeBufferPointer<UInt16>(start: $0, count: Int(headerBytes/2)).map(UInt16.init(bigEndian:))
+        var l16Header:[UInt16] = data[..<headerBytes].withUnsafeBytes{ urbp in
+            urbp.bindMemory(to: UInt16.self).map(UInt16.init(bigEndian:))
         }
         l16Header[IPv4Packet.headerChecksumOffset/2] = 0x0000
         return IPUtils.computeChecksum(l16Header)
