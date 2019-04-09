@@ -29,59 +29,10 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     weak var servicesViewController:ServicesViewController? = nil
     var zidStore = ZitiIdentityStore()
-    var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
+    var tunnelProviderManager = NETunnelProviderManager()
     var tunnelRestarting = false
     var zitiIdentities:[ZitiIdentity] = []
     var enrollingIds:[ZitiIdentity] = []
-    
-    private func initTunnelProviderManager() {
-        
-        NETunnelProviderManager.loadAllFromPreferences { (savedManagers: [NETunnelProviderManager]?, error: Error?) in
-            if let error = error {
-                NSLog(error.localizedDescription)
-                // keep going - we still might need to set default values...
-            }
-            
-            if let savedManagers = savedManagers {
-                if savedManagers.count > 0 {
-                    self.tunnelProviderManager = savedManagers[0]
-                }
-            }
-            
-            self.tunnelProviderManager.loadFromPreferences(completionHandler: { (error:Error?) in
-                if let error = error {
-                    NSLog(error.localizedDescription)
-                }
-                
-                // This shouldn't happen unless first time run and no profile preference has been
-                // imported, but handy for development...
-                if self.tunnelProviderManager.protocolConfiguration == nil {
-                    let providerProtocol = NETunnelProviderProtocol()
-                    providerProtocol.providerBundleIdentifier = ViewController.providerBundleIdentifier
-                    
-                    let defaultProviderConf = ProviderConfig()
-                    providerProtocol.providerConfiguration = defaultProviderConf.createDictionary()
-                    providerProtocol.serverAddress = defaultProviderConf.ipAddress
-                    providerProtocol.username = defaultProviderConf.username
-                    
-                    self.tunnelProviderManager.protocolConfiguration = providerProtocol
-                    self.tunnelProviderManager.localizedDescription = defaultProviderConf.localizedDescription
-                    self.tunnelProviderManager.isEnabled = true
-                    
-                    self.tunnelProviderManager.saveToPreferences(completionHandler: { (error:Error?) in
-                        if let error = error {
-                            NSLog(error.localizedDescription)
-                        } else {
-                            print("Saved successfully")
-                        }
-                    })
-                }
-                
-                // update the Connect Button label
-                self.tunnelStatusDidChange(nil)
-            })
-        }
-    }
     
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
         let status = tunnelProviderManager.connection.status
@@ -216,7 +167,12 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         box.borderType = NSBorderType.lineBorder
         
         // init the manager
-        initTunnelProviderManager()
+        ProviderConfig.loadFromPreferences(ViewController.providerBundleIdentifier) { tpm, error in
+            DispatchQueue.main.async {
+                self.tunnelProviderManager = tpm
+                self.tunnelStatusDidChange(nil)
+            }
+        }
         
         // Load previous identities
         let (zids, err) = zidStore.loadAll()

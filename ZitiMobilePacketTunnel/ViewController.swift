@@ -15,71 +15,7 @@ class ViewController: UIViewController {
     
     static let providerBundleIdentifier = "com.ampifyllc.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
     
-    var tunnelProviderManager: NETunnelProviderManager = NETunnelProviderManager()
-    
-    private func initTunnelProviderManager() {
-        
-        NETunnelProviderManager.loadAllFromPreferences { (savedManagers: [NETunnelProviderManager]?, error: Error?) in
-            
-            //
-            // Find our manager (there should only be one, since we only are managing a single
-            // extension).  If error and savedManagers are both nil that means there is no previous
-            // configuration stored for this app (e.g., first time run, no Preference Profile loaded)
-            // Note self.tunnelProviderManager will never be nil.
-            //
-            if let error = error {
-                NSLog(error.localizedDescription)
-                // keep going - we still might need to set default values...
-            }
-            
-            if let savedManagers = savedManagers {
-                if savedManagers.count > 0 {
-                    self.tunnelProviderManager = savedManagers[0]
-                }
-            }
-            
-            self.tunnelProviderManager.loadFromPreferences(completionHandler: { (error:Error?) in
-                
-                if let error = error {
-                    NSLog(error.localizedDescription)
-                }
-                
-                // This shouldn't happen unless first time run and no profile preference has been
-                // imported, but handy for development...
-                if self.tunnelProviderManager.protocolConfiguration == nil {
-                    
-                    let providerProtocol = NETunnelProviderProtocol()
-                    providerProtocol.providerBundleIdentifier = ViewController.providerBundleIdentifier
-                    
-                    let defaultProviderConf = ProviderConfig()
-                    providerProtocol.providerConfiguration = defaultProviderConf.createDictionary()
-                    providerProtocol.serverAddress = defaultProviderConf.ipAddress
-                    providerProtocol.username = defaultProviderConf.username
-                    
-                    self.tunnelProviderManager.protocolConfiguration = providerProtocol
-                    self.tunnelProviderManager.localizedDescription = defaultProviderConf.localizedDescription
-                    self.tunnelProviderManager.isEnabled = true
-                    
-                    self.tunnelProviderManager.saveToPreferences(completionHandler: { (error:Error?) in
-                        if let error = error {
-                            NSLog(error.localizedDescription)
-                        } else {
-                            print("Saved successfully")
-                        }
-                    })
-                }
-                
-                self.updateConfigControls()
-                
-                // update the Connect Button label
-                self.tunnelStatusDidChange(nil)
-            })
-        }
-    }
-    
-    private func updateConfigControls() {
-        
-    }
+    var tunnelProviderManager = NETunnelProviderManager()
     
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
         let status = self.tunnelProviderManager.connection.status
@@ -121,8 +57,8 @@ class ViewController: UIViewController {
                     title:"Ziti PT Error",
                     message: error.localizedDescription,
                     preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
                 self.present(alert, animated: true, completion: nil)
-
             }
         } else {
             self.tunnelProviderManager.connection.stopVPNTunnel()
@@ -133,7 +69,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        initTunnelProviderManager()
+        // init the manager
+        ProviderConfig.loadFromPreferences(ViewController.providerBundleIdentifier) { tpm, error in
+            DispatchQueue.main.async {
+                self.tunnelProviderManager = tpm
+                self.tunnelStatusDidChange(nil)
+            }
+        }
         
         NotificationCenter.default.addObserver(self, selector:
             #selector(ViewController.tunnelStatusDidChange(_:)), name:

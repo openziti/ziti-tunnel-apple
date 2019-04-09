@@ -149,7 +149,7 @@ class ZitiKeychain : NSObject {
         // macOS code)
         let params: [CFString:Any] = [
             kSecClass: kSecClassIdentity,
-            kSecReturnRef: kCFBooleanTrue,
+            kSecReturnRef: kCFBooleanTrue! as Any,
             kSecMatchSubjectContains: zid.id]
         
         var ref: CFTypeRef?
