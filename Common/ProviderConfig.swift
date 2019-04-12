@@ -96,60 +96,6 @@ class ProviderConfig : NSObject {
         return nil
     }
     
-    static func loadFromPreferences(_ bid:String, completionHandler: @escaping (NETunnelProviderManager, Error?) -> Void) {
-        var tunnelProviderManager = NETunnelProviderManager()
-        
-        NETunnelProviderManager.loadAllFromPreferences { (savedManagers: [NETunnelProviderManager]?, error: Error?) in
-            if let error = error {
-                NSLog(error.localizedDescription)
-                // keep going - we still might need to set default values...
-            }
-            
-            if let savedManagers = savedManagers {
-                if savedManagers.count > 0 {
-                    tunnelProviderManager = savedManagers[0]
-                }
-            }
-            
-            tunnelProviderManager.loadFromPreferences { error in
-                
-                if let error = error {
-                    NSLog(error.localizedDescription)
-                }
-                
-                // This shouldn't happen unless first time run and no profile preference has been
-                // imported, but handy for development...
-                if tunnelProviderManager.protocolConfiguration == nil {
-                    
-                    let providerProtocol = NETunnelProviderProtocol()
-                    providerProtocol.providerBundleIdentifier = bid
-                    
-                    let defaultProviderConf = ProviderConfig()
-                    providerProtocol.providerConfiguration = defaultProviderConf.createDictionary()
-                    providerProtocol.serverAddress = defaultProviderConf.ipAddress
-                    providerProtocol.username = defaultProviderConf.username
-                    
-                    tunnelProviderManager.protocolConfiguration = providerProtocol
-                    tunnelProviderManager.localizedDescription = defaultProviderConf.localizedDescription
-                    tunnelProviderManager.isEnabled = true
-                    
-                    tunnelProviderManager.saveToPreferences { error in
-                        if let error = error {
-                            NSLog(error.localizedDescription)
-                        } else {
-                            NSLog("Saved successfully. Re-loading preferences")
-                            // ios hack per apple forums (else NEVPNErrorDomain Code=1)
-                            tunnelProviderManager.loadFromPreferences { error in
-                                NSLog("re-loaded preferences, error=\(error != nil)")
-                            }
-                        }
-                    }
-                }
-                completionHandler(tunnelProviderManager, nil)
-            }
-        }
-    }
-    
     override var debugDescription: String {
         return "ProviderConfig \(self)\n" +
             "ipAddress: \(self.ipAddress)\n" +

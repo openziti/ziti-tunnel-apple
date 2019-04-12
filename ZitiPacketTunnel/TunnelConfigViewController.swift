@@ -40,11 +40,10 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.dnsServersText.stringValue = ""
         self.matchedDomainsText.stringValue = ""
         
-        if self.vc?.tunnelProviderManager.protocolConfiguration == nil {
-            return
-        }
-        
-        let conf = (self.vc!.tunnelProviderManager.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
+        guard
+            let pp = vc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
+            let conf = pp.providerConfiguration
+        else { return }
         
         if let ip = conf[ProviderConfig.IP_KEY] {
             self.ipAddressText.stringValue = ip as! String
@@ -92,14 +91,14 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             return
         }
         
-        if let pc = self.vc?.tunnelProviderManager.protocolConfiguration {
+        if let pc = self.vc?.tunnelMgr.tpm?.protocolConfiguration {
             (pc as! NETunnelProviderProtocol).providerConfiguration = conf.createDictionary()
             
-            self.vc?.tunnelProviderManager.saveToPreferences { error in
+            self.vc?.tunnelMgr.tpm?.saveToPreferences { error in
                 if let error = error {
                     NSAlert(error:error).runModal()
                 } else {
-                    self.vc?.restartTunnel()
+                    self.vc?.tunnelMgr.restartTunnel()
                     self.saveButton.isEnabled = false
                     self.dismiss(self)
                 }

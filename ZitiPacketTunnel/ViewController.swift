@@ -29,52 +29,38 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     weak var servicesViewController:ServicesViewController? = nil
     var zidStore = ZitiIdentityStore()
-    var tunnelProviderManager = NETunnelProviderManager()
-    var tunnelRestarting = false
+    var tunnelMgr = TunnelMgr()
     var zitiIdentities:[ZitiIdentity] = []
     var enrollingIds:[ZitiIdentity] = []
     
-    @objc func tunnelStatusDidChange(_ notification: Notification?) {
-        let status = tunnelProviderManager.connection.status
-        if tunnelRestarting == true {
+    func tunnelStatusDidChange(_ status:NEVPNStatus) {
+        connectButton.isEnabled = true
+        switch status {
+        case .connecting:
+            connectStatus.stringValue = "Connecting..."
+            connectButton.title = "Turn Ziti Off"
+            break
+        case .connected:
+            connectStatus.stringValue = "Connected"
+            connectButton.title = "Turn Ziti Off"
+            break
+        case .disconnecting:
+            connectStatus.stringValue = "Disconnecting..."
+            break
+        case .disconnected:
+            connectStatus.stringValue = "Disconnected"
+            connectButton.title = "Turn Ziti On"
+            break
+        case .invalid:
+            print("Invalid")
+            break
+        case .reasserting:
             connectStatus.stringValue = "Reasserting..."
             connectButton.isEnabled = false
-            if status == .disconnected {
-                tunnelRestarting = false
-                do {
-                    try self.tunnelProviderManager.connection.startVPNTunnel()
-                } catch {
-                    dialogAlert("Tunnel Error", error.localizedDescription)
-                }
-            }
-        } else {
-            connectButton.isEnabled = true
-            switch status {
-            case .connecting:
-                connectStatus.stringValue = "Connecting..."
-                connectButton.title = "Turn Ziti Off"
-                break
-            case .connected:
-                connectStatus.stringValue = "Connected"
-                connectButton.title = "Turn Ziti Off"
-                break
-            case .disconnecting:
-                connectStatus.stringValue = "Disconnecting..."
-                break
-            case .disconnected:
-                connectStatus.stringValue = "Disconnected"
-                connectButton.title = "Turn Ziti On"
-                break
-            case .invalid:
-                print("Invalid")
-                break
-            case .reasserting:
-                print("Reasserting...")
-                break
-            @unknown default:
-                print("Unknown...")
-                break
-            }
+            break
+        @unknown default:
+            print("Unknown...")
+            break
         }
         self.tableView.reloadData()
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
@@ -111,7 +97,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             } else {
                 csStr = cs.status.rawValue
             }
-            csStr += " (\(DateFormatter().timeSince(cs.lastContactAt)))"
+            csStr += " (as of \(DateFormatter().timeSince(cs.lastContactAt)))"
             
             box.alphaValue = 1.0
             idEnabledBtn.isEnabled = zId.isEnrolled
@@ -167,12 +153,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         box.borderType = NSBorderType.lineBorder
         
         // init the manager
-        ProviderConfig.loadFromPreferences(ViewController.providerBundleIdentifier) { tpm, error in
-            DispatchQueue.main.async {
-                self.tunnelProviderManager = tpm
-                self.tunnelStatusDidChange(nil)
-            }
-        }
+        tunnelMgr.onTunnelStatusChanged = self.tunnelStatusDidChange
+        tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier)
         
         // Load previous identities
         let (zids, err) = zidStore.loadAll()
@@ -183,11 +165,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         self.tableView.reloadData()
         self.representedObject = 0
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
-        
-        // Get notified when tunnel status changes
-        NotificationCenter.default.addObserver(self, selector:
-            #selector(ViewController.tunnelStatusDidChange(_:)), name:
-            NSNotification.Name.NEVPNStatusDidChange, object: nil)
         
         // GetServices timer - fire quickly, then every X secs
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -209,7 +186,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                         if didChange {
                             _ = self?.zidStore.store(zid)
                             if zid.isEnabled {
-                                self?.restartTunnel()
+                                self?.tunnelMgr.restartTunnel()
                             }
                         }
                     }
@@ -286,24 +263,15 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         return alert.runModal() == .alertFirstButtonReturn
     }
 
-    func restartTunnel() {
-        let tunnelStatus = tunnelProviderManager.connection.status
-        if tunnelStatus != .disconnected {
-            print("restarting tunnel")
-            tunnelRestarting = true
-            tunnelProviderManager.connection.stopVPNTunnel()
-        }
-    }
-
     @IBAction func onConnectButton(_ sender: NSButton) {
         if (sender.title == "Turn Ziti On") {
             do {
-                try self.tunnelProviderManager.connection.startVPNTunnel()
+                try tunnelMgr.startTunnel()
             } catch {
                 dialogAlert("Tunnel Error", error.localizedDescription)
             }
         } else {
-            self.tunnelProviderManager.connection.stopVPNTunnel()
+            tunnelMgr.stopTunnel()
         }
     }
     
@@ -313,7 +281,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             zId.enabled = sender.state == .on
             _ = zidStore.store(zId)
             updateServiceUI(zId:zId)
-            restartTunnel()
+            tunnelMgr.restartTunnel()
         }
     }
     
@@ -421,7 +389,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         // Add rootCa to keychain here since we might need to prompt for updating keychain.
         // evaluating trust can be lengthy, and has to be done in the background. Actual
         // enrollment in that case will happen in an escaping callbak.  Otherwise will do
-        // the enroll here (which is already iasync)
+        // the enroll here (which is already async)
         var stillNeedToEnroll = true
         if let rootCaPem = zid.rootCa {
             let zkc = ZitiKeychain()
@@ -435,7 +403,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 zid.rootCa = nil
                 stillNeedToEnroll = false
                 let status = zkc.evalTrustForCertificate(cert) { secTrust, result in
-                    if result == .recoverableTrustFailure { // TODO: change ZitiEdge to just trust this bad boy...
+                    if result == .recoverableTrustFailure { // TODO: change ZitiEdge to just trust this bad boy?
                         let summary = SecCertificateCopySubjectSummary(cert)
                         DispatchQueue.main.sync {
                             if self.dialogOKCancel(question: "Trust Certificate from\n\"\(summary != nil ? summary! as String : host)\"?",
@@ -477,7 +445,7 @@ extension ViewController: NSTableViewDelegate {
             let zid = zitiIdentities[row]
             cell.textField?.stringValue = zid.name
             
-            let tunnelStatus = self.tunnelProviderManager.connection.status
+            let tunnelStatus = tunnelMgr.status
             var imageName:String = "NSStatusNone"
             
             if zid.isEnrolled == true, zid.isEnabled == true, let edgeStatus = zid.edgeStatus {
