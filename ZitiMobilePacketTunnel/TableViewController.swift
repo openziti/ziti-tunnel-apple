@@ -8,7 +8,6 @@
 
 import UIKit
 import NetworkExtension
-import JWTDecode
 
 class StatusCell: UITableViewCell {
     @IBOutlet weak var connectStatus: UILabel!
@@ -68,8 +67,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
     
     static let providerBundleIdentifier = "com.ampifyllc.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
     var tunnelMgr = TunnelMgr()
-    var zidStore = ZitiIdentityStore()
-    var zids:[ZitiIdentity] = []
+    var zidMgr = ZidMgr()
+    var servicePoller = ServicePoller()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,47 +82,31 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
         }
         
         // Load previous identities
-        let (zids, err) = zidStore.loadAll()
-        if err != nil && err!.errorDescription != nil {
-            NSLog(err!.errorDescription!)
+        if let err = zidMgr.loadZids() {
+            NSLog(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
-        self.zids = zids ?? []
         tableView.reloadData()
         
-        // GetServices timer - fire quickly, then every X secs
         // TODO: for ios will prob need to do this from tunnel (maybe based on setting(s) configured in app??)
+        servicePoller.zidMgr = zidMgr
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.updateServicesTimerFired() // should: auth, then update services
-            Timer.scheduledTimer(withTimeInterval: 15.0, repeats: true) { timer in
-                self.updateServicesTimerFired()
+            self.servicePoller.startPolling { didChange, zid in
+                DispatchQueue.main.async {
+                    /* TODO
+                     if zid == self?.zids[(self?.representedObject ?? 0) as! Int] {
+                     self?.updateServiceUI(zId:zid)
+                     }*/
+                    if didChange {
+                        _ = self.zidMgr.zidStore.store(zid)
+                        if zid.isEnabled {
+                            self.tunnelMgr.restartTunnel()
+                        }
+                    }
+                }
             }
         }
     }
     
-    func updateServicesTimerFired() {
-        zids.forEach { zid in
-            if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
-                zid.edge.getServices { [weak self] didChange, _ in
-                    DispatchQueue.main.async {
-                        /* TODO
-                        if zid == self?.zids[(self?.representedObject ?? 0) as! Int] {
-                            self?.updateServiceUI(zId:zid)
-                        }*/
-                        if didChange {
-                            _ = self?.zidStore.store(zid)
-                            if zid.isEnabled {
-                                self?.tunnelMgr.restartTunnel()
-                            }
-                        }
-                    }
-                }
-            /* TODO
-            } else if zid == zids[self.representedObject as! Int] {
-                updateServiceUI(zId:zid) */
-            }
-        }
-    }
-
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -133,7 +116,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 1 {
-            nRows = zids.count
+            nRows = zidMgr.zids.count
         } else if section == 3 {
             nRows = 4
         }
@@ -152,7 +135,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
             }
         } else if indexPath.section == 1 {
             cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_CELL", for: indexPath)
-            let zid = zids[indexPath.row]
+            let zid = zidMgr.zids[indexPath.row]
             cell?.textLabel?.text = zid.name
             cell?.detailTextLabel?.text = zid.id
             cell?.imageView?.image = UIImage(named: "NSStatusNone")
@@ -177,14 +160,14 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
             return "" // Ziti Connections"
-        } else if section == 1 && zids.count > 0 {
+        } else if section == 1 && zidMgr.zids.count > 0 {
             return "Identities"
         }
         return nil
     }
     
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        if section == 1 && zids.count == 0 {
+        if section == 1 && zidMgr.zids.count == 0 {
             return "No identities have been configured. Select Add Identity below to add one."
         } else if section == 2 {
             return "Begin enrollment process of new identity via Enrollment JWT provided by adminstrator"
@@ -217,35 +200,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
             defer {
                 url.stopAccessingSecurityScopedResource()
             }
-            
-            let token = try String(contentsOf: url, encoding: .utf8)
-            let jwt = try decode(jwt: token)
-            
-            // parse the body
-            guard let data = try? JSONSerialization.data(withJSONObject:jwt.body),
-                let ztid = try? JSONDecoder().decode(ZitiIdentity.self, from: data)
-                else {
-                    throw ZitiError("Unable to parse enrollment data")
-            }
-            
-            // only support OTT
-            guard ztid.method == .ott else {
-                throw ZitiError("Only OTT Enrollment is supported by this application")
-            }
-            
-            // alread have this one?
-            guard zids.first(where:{$0.id == ztid.id}) == nil else {
-                throw ZitiError("Duplicate Identity Not Allowed. Identy \(ztid.name) is already present with id \(ztid.id)")
-            }
-            
-            // store it
-            let error = self.zidStore.store(ztid)
-            guard error == nil else {
-                throw error!
-            }
-            
-            // add it
-            zids.insert(ztid, at: 0)
+            try zidMgr.insertFromJWT(url, at: 0)
             tableView.reloadData()
             // TODO: segue to identity screen for this zid
         } catch let error as ZitiError {

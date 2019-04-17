@@ -22,9 +22,7 @@ class TunnelMgr: NSObject {
         }
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+    deinit { NotificationCenter.default.removeObserver(self) }
     
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
     func loadFromPreferences(_ bid:String, completionHandler: LoadCompletionHandler? = nil) {
@@ -116,7 +114,7 @@ class TunnelMgr: NSObject {
                     NSLog(error.localizedDescription)
                 } else {
                     NSLog("Saved successfully. Re-loading preferences")
-                    // ios hack per apple forums (else NEVPNErrorDomain Code=1)
+                    // ios hack per apple forums (else NEVPNErrorDomain Code=1 on starting tunnel)
                     tpm.loadFromPreferences { [weak tpm] error in
                         NSLog("Re-loaded preferences, error=\(error != nil). Attempting to start")
                         do {

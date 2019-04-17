@@ -8,7 +8,6 @@
 
 import Cocoa
 import NetworkExtension
-import JWTDecode
 
 class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDelegate {
     @IBOutlet weak var connectButton: NSButton!
@@ -28,10 +27,10 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     
     static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
     weak var servicesViewController:ServicesViewController? = nil
-    var zidStore = ZitiIdentityStore()
     var tunnelMgr = TunnelMgr()
-    var zitiIdentities:[ZitiIdentity] = []
+    var zidMgr = ZidMgr()
     var enrollingIds:[ZitiIdentity] = []
+    var servicePoller = ServicePoller()
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
         connectButton.isEnabled = true
@@ -146,7 +145,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
    
     override func viewDidLoad() {
         super.viewDidLoad()
-        zidStore.delegate = self
+        zidMgr.zidStore.delegate = self
         tableView.delegate = self
         tableView.dataSource = self
 
@@ -157,49 +156,35 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier)
         
         // Load previous identities
-        let (zids, err) = zidStore.loadAll()
-        if err != nil && err!.errorDescription != nil {
-            NSLog(err!.errorDescription!)
+        if let err = zidMgr.loadZids() {
+            NSLog(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
-        self.zitiIdentities = zids ?? []
-        self.tableView.reloadData()
-        self.representedObject = 0
+        
+        tableView.reloadData()
+        representedObject = 0
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
         
-        // GetServices timer - fire quickly, then every X secs
+        servicePoller.zidMgr = zidMgr
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.updateServicesTimerFired() // should: auth, then update services
-            Timer.scheduledTimer(withTimeInterval: 15.0, repeats: true) { timer in
-                self.updateServicesTimerFired()
-            }
-        }
-    }
-    
-    func updateServicesTimerFired() {
-        zitiIdentities.forEach { zid in
-            if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
-                zid.edge.getServices { [weak self] didChange, _ in
-                    DispatchQueue.main.async {
-                        if zid == self?.zitiIdentities[(self?.representedObject ?? 0) as! Int] {
-                            self?.updateServiceUI(zId:zid)
-                        }
-                        if didChange {
-                            _ = self?.zidStore.store(zid)
-                            if zid.isEnabled {
-                                self?.tunnelMgr.restartTunnel()
-                            }
+            self.servicePoller.startPolling { didChange, zid in
+                DispatchQueue.main.async {
+                    if zid == self.zidMgr.zids[self.representedObject as! Int] {
+                        self.updateServiceUI(zId:zid)
+                    }
+                    if didChange {
+                        _ = self.zidMgr.zidStore.store(zid)
+                        if zid.isEnabled {
+                            self.tunnelMgr.restartTunnel()
                         }
                     }
                 }
-            } else if zid == zitiIdentities[self.representedObject as! Int] {
-                updateServiceUI(zId:zid)
             }
         }
     }
 
     override var representedObject: Any? {
         didSet {
-            zitiIdentities.count == 0 ? updateServiceUI() : updateServiceUI(zId: zitiIdentities[representedObject as! Int])
+            zidMgr.zids.count == 0 ? updateServiceUI() : updateServiceUI(zId: zidMgr.zids[representedObject as! Int])
         }
     }
     
@@ -208,13 +193,13 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        if let match = zitiIdentities.first(where: { $0.id == zid.id }) {
+        if let match = zidMgr.zids.first(where: { $0.id == zid.id }) {
             print("\(zid.name):\(zid.id) changed")
             
             // always take new service from tunneler...
             match.services = zid.services
             
-            if zitiIdentities.count > 0, match == zitiIdentities[(representedObject ?? 0) as! Int] {
+            if zidMgr.zids.count > 0, match == zidMgr.zids[(representedObject ?? 0) as! Int] {
                 updateServiceUI(zId:zid)
             }
         } else {
@@ -231,8 +216,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             tcvc.vc = self
         } else if let svc = segue.destinationController as? ServicesViewController {
             servicesViewController = svc
-            if zitiIdentities.count > 0 {
-                svc.zid = zitiIdentities[representedObject as! Int]
+            if zidMgr.zids.count > 0 {
+                svc.zid = zidMgr.zids[representedObject as! Int]
             }
         }
     }
@@ -276,10 +261,10 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     }
     
     @IBAction func onEnableServiceBtn(_ sender: NSButton) {
-        if zitiIdentities.count > 0 {
-            let zId = zitiIdentities[representedObject as! Int]
+        if zidMgr.zids.count > 0 {
+            let zId = zidMgr.zids[representedObject as! Int]
             zId.enabled = sender.state == .on
-            _ = zidStore.store(zId)
+            _ = zidMgr.zidStore.store(zId)
             updateServiceUI(zId:zId)
             tunnelMgr.restartTunnel()
         }
@@ -298,34 +283,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         panel.beginSheetModal(for: window) { (result) in
             if result == NSApplication.ModalResponse.OK {
                 do {
-                    let token = try String(contentsOf: panel.urls[0], encoding: .utf8)
-                    let jwt = try decode(jwt: token)
-                    
-                    // parse the body
-                    guard let data = try? JSONSerialization.data(withJSONObject:jwt.body),
-                        let ztid = try? JSONDecoder().decode(ZitiIdentity.self, from: data)
-                    else {
-                        throw ZitiError("Unable to parse enrollment data")
-                    }
-                    
-                    // only support OTT
-                    guard ztid.method == .ott else {
-                        throw ZitiError("Only OTT Enrollment is supported by this application")
-                    }
-                    
-                    // alread have this one?
-                    guard self.zitiIdentities.first(where:{$0.id == ztid.id}) == nil else {
-                        throw ZitiError("Duplicate Identity Not Allowed. Identy \(ztid.name) is already present with id \(ztid.id)")
-                    }
-                    
-                    // store it
-                    let error = self.zidStore.store(ztid)
-                    guard error == nil else {
-                        throw error!
-                    }
-                    
-                    // add it
-                    self.zitiIdentities.insert(ztid, at: 0)
+                    try self.zidMgr.insertFromJWT(panel.urls[0], at: 0)
                     self.tableView.reloadData()
                     self.representedObject = 0
                     self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
@@ -343,19 +301,19 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     
     @IBAction func removeIdentityButton(_ sender: Any) {
         let indx = representedObject as! Int
-        let zid = zitiIdentities[indx]
+        let zid = zidMgr.zids[indx]
         let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
         if dialogOKCancel(question: "Are you sure?", text: text) == true {
-            let error = zidStore.remove(zid)
+            let error = zidMgr.zidStore.remove(zid)
             guard error == nil else {
                 dialogAlert("Unable to remove identity", error!.localizedDescription)
                 return
             }
             
-            self.zitiIdentities.remove(at: indx)
+            self.zidMgr.zids.remove(at: indx)
             tableView.reloadData()
-            if indx >= self.zitiIdentities.count {
-                representedObject = self.zitiIdentities.count - 1
+            if indx >= self.zidMgr.zids.count {
+                representedObject = self.zidMgr.zids.count - 1
             } else {
                 representedObject = indx
             }
@@ -368,13 +326,13 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             DispatchQueue.main.async {
                 self.enrollingIds.removeAll { $0.id == zid.id }
                 guard zErr == nil else {
-                    _ = self.zidStore.store(zid)
+                    _ = self.zidMgr.zidStore.store(zid)
                     self.updateServiceUI(zId:zid)
                     self.dialogAlert("Unable to enroll \(zid.name)", zErr!.localizedDescription)
                     return
                 }
                 zid.enabled = true
-                _ = self.zidStore.store(zid)
+                _ = self.zidMgr.zidStore.store(zid)
                 self.updateServiceUI(zId:zid)
             }
         }
@@ -382,7 +340,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     
     @IBAction func onEnrollButton(_ sender: Any) {
         let indx = representedObject as! Int
-        let zid = zitiIdentities[indx]
+        let zid = zidMgr.zids[indx]
         enrollingIds.append(zid)
         updateServiceUI(zId: zid)
         
@@ -434,7 +392,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
 
 extension ViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return self.zitiIdentities.count
+        return zidMgr.zids.count
     }
 }
 
@@ -442,7 +400,7 @@ extension ViewController: NSTableViewDelegate {
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "defaultRow"), owner: nil) as? NSTableCellView {
             
-            let zid = zitiIdentities[row]
+            let zid = zidMgr.zids[row]
             cell.textField?.stringValue = zid.name
             
             let tunnelStatus = tunnelMgr.status
