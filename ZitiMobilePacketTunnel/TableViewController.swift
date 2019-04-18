@@ -138,7 +138,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
             let zid = zidMgr.zids[indexPath.row]
             cell?.textLabel?.text = zid.name
             cell?.detailTextLabel?.text = zid.id
-            cell?.imageView?.image = UIImage(named: "NSStatusNone")
+            //cell?.imageView?.image = UIImage(named: "NSStatusNone")
             //cell?.imageView based on zid status
         } else if indexPath.section == 2 {
             cell = tableView.dequeueReusableCell(withIdentifier: "ADD_IDENTITY_CELL", for: indexPath)
