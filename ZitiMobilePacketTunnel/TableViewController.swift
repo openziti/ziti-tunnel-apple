@@ -72,6 +72,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.isEditing = true
+        tableView.allowsSelectionDuringEditing = true
 
         // init the manager
         tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
@@ -108,16 +110,30 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
     }
     
     // MARK: - Table view data source
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
+            return true
+        }
+        return false
+    }
+    
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
+            return .insert
+        }
+        return .none
+    }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
+        return 3
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 1 {
-            nRows = zidMgr.zids.count
-        } else if section == 3 {
+            nRows = zidMgr.zids.count + 1
+        } else if section == 2 {
             nRows = 4
         }
         return nRows
@@ -134,14 +150,20 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
                 tunnelMgr.onTunnelStatusChanged = statusCell.tunnelStatusDidChange
             }
         } else if indexPath.section == 1 {
-            cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_CELL", for: indexPath)
-            let zid = zidMgr.zids[indexPath.row]
-            cell?.textLabel?.text = zid.name
-            cell?.detailTextLabel?.text = zid.id
-            //cell?.imageView?.image = UIImage(named: "NSStatusNone")
-            //cell?.imageView based on zid status
-        } else if indexPath.section == 2 {
-            cell = tableView.dequeueReusableCell(withIdentifier: "ADD_IDENTITY_CELL", for: indexPath)
+            if indexPath.row == zidMgr.zids.count {
+                cell = tableView.dequeueReusableCell(withIdentifier: "ADD_IDENTITY_CELL", for: indexPath)
+                //let btn = UIButton(type: .contactAdd)
+                //btn.isUserInteractionEnabled = false
+                //cell?.accessoryView = btn // For now.  Lookes better with green insert button...
+            } else {
+                cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_CELL", for: indexPath)
+                let zid = zidMgr.zids[indexPath.row]
+                cell?.tag = indexPath.row
+                cell?.textLabel?.text = zid.name
+                cell?.detailTextLabel?.text = zid.id
+                //cell?.imageView?.image = UIImage(named: "NSStatusNone")
+                //cell?.imageView based on zid status
+            }
         } else {
             // feedback, help, advanced, about
             if indexPath.row == 0 {
@@ -160,24 +182,24 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
             return "" // Ziti Connections"
-        } else if section == 1 && zidMgr.zids.count > 0 {
+        } else if section == 1 {
             return "Identities"
         }
         return nil
     }
     
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+    /*override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if section == 1 && zidMgr.zids.count == 0 {
             return "No identities have been configured. Select Add Identity below to add one."
         } else if section == 2 {
             return "Begin enrollment process of new identity via Enrollment JWT provided by adminstrator"
         } 
         return nil
-    }
+    }*/
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Selected row at \(indexPath)")
-        if indexPath.section == 2 && indexPath.row == 0 {
+        if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
             print("selected Identity row")
             let dp = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .open)
             dp.modalPresentationStyle = .formSheet
@@ -218,6 +240,12 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let avc = segue.destination as? AdvancedViewController {
             avc.tvc = self
+        } else if let ivc = segue.destination as? IdentityViewController {
+            ivc.tvc = self
+            if let ip = tableView.indexPathForSelectedRow {
+                let cell = tableView.cellForRow(at: ip)
+                ivc.zid = zidMgr.zids[cell?.tag ?? 0]
+            }
         }
     }
 }

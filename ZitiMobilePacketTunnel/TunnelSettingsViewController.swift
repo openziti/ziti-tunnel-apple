@@ -21,6 +21,7 @@ class TunnelSettingsCell: UITableViewCell {
 
 class TunnelSettingsViewController: UITableViewController {
     weak var tvc:TableViewController?
+    var saveBtn:UIBarButtonItem?
     
     var ip:String = "0.0.0.0"
     var mask:String = "255.0.0.0"
@@ -44,8 +45,9 @@ class TunnelSettingsViewController: UITableViewController {
             }
         }
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(onSave))
-        navigationItem.rightBarButtonItem?.isEnabled = false
+        saveBtn = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(onSave))
+        navigationItem.rightBarButtonItem = saveBtn
+        saveBtn?.isEnabled = false
     }
     
     @objc func onSave() {
@@ -120,7 +122,7 @@ class TunnelSettingsViewController: UITableViewController {
                     settingsCell.value.text = ip
                     settingsCell.onChanged = { [weak self] sc in
                         self?.ip = sc.value.text ?? ""
-                        self?.navigationItem.rightBarButtonItem?.isEnabled = self?.validate() ?? false
+                        self?.saveBtn?.isEnabled = self?.validate() ?? false
                     }
                     settingsCell.value.becomeFirstResponder()
                 } else if indexPath.row == 1 {
@@ -128,37 +130,25 @@ class TunnelSettingsViewController: UITableViewController {
                     settingsCell.value.text = mask
                     settingsCell.onChanged = { [weak self] sc in
                         self?.mask = sc.value.text ?? ""
-                        self?.navigationItem.rightBarButtonItem?.isEnabled = self?.validate() ?? false
+                        self?.saveBtn?.isEnabled = self?.validate() ?? false
                     }
                 } else if indexPath.row == 2 {
                     settingsCell.label.text = "MTU"
                     settingsCell.value.text = mtu
                     settingsCell.onChanged = { [weak self] sc in
                         self?.mtu = sc.value.text ?? ""
-                        self?.navigationItem.rightBarButtonItem?.isEnabled = self?.validate() ?? false
+                        self?.saveBtn?.isEnabled = self?.validate() ?? false
                     }
                 } else {
                     settingsCell.label.text = "DNS Server"
                     settingsCell.value.text = dns
                     settingsCell.onChanged = { [weak self] sc in
                         self?.dns = sc.value.text ?? ""
-                        self?.navigationItem.rightBarButtonItem?.isEnabled = self?.validate() ?? false
+                        self?.saveBtn?.isEnabled = self?.validate() ?? false
                     }
                 }
             }
         //}
         return cell! // Don't let this happen!
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
