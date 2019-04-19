@@ -41,7 +41,12 @@ class IdentityViewController: UITableViewController {
     }
     
     func onEnabledValueChanged(_ enabled:Bool) {
-        print("TODO: switch is \(enabled)")
+        if let zid = self.zid {
+            zid.enabled = enabled
+            _ = tvc?.zidMgr.zidStore.store(zid)
+            tableView.reloadData()
+            tvc?.tunnelMgr.restartTunnel()
+        }
     }
     
     func onForgetIdentity() {
@@ -68,8 +73,73 @@ class IdentityViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    func doEnroll(_ zid:ZitiIdentity) {
+        zid.edge.enroll() { zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    _ = self.tvc?.zidMgr.zidStore.store(zid)
+                    self.tableView.reloadData()
+                    
+                    let alert = UIAlertController(
+                        title:"Unable to enroll \(zid.name)",
+                        message: zErr!.localizedDescription,
+                        preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction(
+                        title: NSLocalizedString("OK", comment: "Default action"),
+                        style: .default))
+                    self.present(alert, animated: true, completion: nil)
+                    return
+                }
+                zid.enabled = true
+                _ = self.tvc?.zidMgr.zidStore.store(zid)
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
     func onEnroll() {
-        print("TODO: Enroll \(zid?.name ?? "")")
+        guard let zid = self.zid else { return }
+        
+        var stillNeedToEnroll = true
+        if let rootCaPem = zid.rootCa {
+            let zkc = ZitiKeychain()
+            let host = zid.edge.getHost()
+            let der = zkc.convertToDER(rootCaPem)
+            
+            // do our best. if CA already trusted will be ok...
+            let (cert, _) = zkc.storeCertificate(der, label: host)
+            
+            if let cert = cert {
+                zid.rootCa = nil
+                stillNeedToEnroll = false
+                let status = zkc.evalTrustForCertificate(cert) { secTrust, result in
+                    if result == .recoverableTrustFailure {
+                        let summary = SecCertificateCopySubjectSummary(cert)
+                        DispatchQueue.main.sync {
+                            let alert = UIAlertController(
+                                title:"Trust Certificate from\n\"\(summary != nil ? summary! as String : host)\"?",
+                                message: "Trust this certificate in General -> About -> Certificate Trust Settings",
+                                preferredStyle: .alert)
+                            
+                            alert.addAction(UIAlertAction(
+                                title: NSLocalizedString("OK", comment: "Default action"),
+                                style: .default))
+                            self.present(alert, animated: true, completion: nil)
+                        }
+                    } else {
+                        self.doEnroll(zid)
+                    }
+                }
+                if status != errSecSuccess {
+                    stillNeedToEnroll = true
+                }
+            }
+        }
+        
+        if stillNeedToEnroll {
+            doEnroll(zid)
+        }
     }
 
     // MARK: - Table view data source
