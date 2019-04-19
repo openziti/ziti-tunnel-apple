@@ -143,10 +143,9 @@ class ZitiKeychain : NSObject {
             return (nil, ZitiError("Unable to get identity for \(zid.id): \(errStr)"))
         }
 #else
-        // works, and could polish up and use.  Pro: compiles on ios.  Con: wicked slow
-        // TODO: change to only happen once, then store the SecIdentity (it is calculated on the
-        // SecItemCopy, not just grabbed from the store) (same for
-        // macOS code)
+        // works.  Pro: compiles on ios.  Con: wicked slow
+        // Changed to only happen once per session, then store the SecIdentity (it is calculated on the
+        // SecItemCopy, not just grabbed from the store) 
         let params: [CFString:Any] = [
             kSecClass: kSecClassIdentity,
             kSecReturnRef: kCFBooleanTrue! as Any,
@@ -189,7 +188,7 @@ class ZitiKeychain : NSObject {
             kSecValueRef: certificate,
             kSecAttrLabel: label]
         let status = SecItemAdd(parameters as CFDictionary, nil)
-        guard status == errSecSuccess else {
+        guard status == errSecSuccess || status == errSecDuplicateItem else {
             let errStr = SecCopyErrorMessageString(status, nil) as String? ?? "\(status)"
             return (nil, ZitiError("Unable to store certificate for \(label): \(errStr)"))
         }
@@ -254,6 +253,25 @@ class ZitiKeychain : NSObject {
             pem.append("\n")
         }
         return pem + "-----END \(type)-----\n"
+    }
+    
+    func extractPEMs(_ type:String, allText:String) -> [String] {
+        var pems:[String] = []
+        let start = "-----BEGIN \(type)-----"
+        let end = "-----END \(type)-----"
+        
+        if !allText.contains(start) { return pems }
+        
+        var pem:String? = nil
+        allText.split(separator: "\n").forEach { line in
+            if pem != nil { pem = pem! + line + "\n" }
+            if line == start { pem = "" }
+            if line == end && pem != nil {
+                pems.append(pem!)
+                pem = nil
+            }
+        }
+        return pems
     }
     
     func convertToDER(_ pem:String) -> Data {

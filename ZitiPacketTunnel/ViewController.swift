@@ -349,8 +349,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         // enrollment in that case will happen in an escaping callbak.  Otherwise will do
         // the enroll here (which is already async)
         var stillNeedToEnroll = true
-        if let rootCaPem = zid.rootCa {
-            let zkc = ZitiKeychain()
+        let zkc = ZitiKeychain()
+        if let rootCa = zid.rootCa, let rootCaPem = zkc.extractPEMs("CERTIFICATE", allText: rootCa).last { //TODO: hack.  figure out if should find Root and use that, or should I add them all, add trust for root...
             let host = zid.edge.getHost()
             let der = zkc.convertToDER(rootCaPem)
             

@@ -68,7 +68,7 @@ class ZitiEdge : NSObject {
         
         // Add rootCa if available
         let zkc = ZitiKeychain()
-        if let rootCaPem = zid.rootCa {
+        if let rootCa = zid.rootCa, let rootCaPem = zkc.extractPEMs("CERTIFICATE", allText: rootCa).last { //TODO: hack.  {
             let host = getHost()
             let der = zkc.convertToDER(rootCaPem)
             
@@ -312,7 +312,7 @@ extension ZitiEdge : URLSessionDelegate {
             completionHandler(.performDefaultHandling, nil)
             return
         }
-        let urlCredential = URLCredential(identity: identity, certificates: nil, persistence:.permanent) //.forSession) 
+        let urlCredential = URLCredential(identity: identity, certificates: nil, persistence:.permanent) //.forSession)
         completionHandler(.useCredential, urlCredential)
     }
 }

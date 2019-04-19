@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SafariServices
 
 class IdentityEnabledCell: UITableViewCell {
     weak var ivc:IdentityViewController?
@@ -102,10 +103,12 @@ class IdentityViewController: UITableViewController {
         guard let zid = self.zid else { return }
         
         var stillNeedToEnroll = true
-        if let rootCaPem = zid.rootCa {
-            let zkc = ZitiKeychain()
+        let zkc = ZitiKeychain()
+        if let rootCa = zid.rootCa, let rootCaPem = zkc.extractPEMs("CERTIFICATE", allText: rootCa).last { //TODO: hack. {
             let host = zid.edge.getHost()
             let der = zkc.convertToDER(rootCaPem)
+            
+            print(zkc.convertToPEM("CERTIFICATE", der: der))
             
             // do our best. if CA already trusted will be ok...
             let (cert, _) = zkc.storeCertificate(der, label: host)
@@ -116,6 +119,9 @@ class IdentityViewController: UITableViewController {
                 let status = zkc.evalTrustForCertificate(cert) { secTrust, result in
                     if result == .recoverableTrustFailure {
                         let summary = SecCertificateCopySubjectSummary(cert)
+                        
+                        // hoo-boy.  to install cert, need to either install a profile, open cert as email attachment,
+                        // or open in safari.  Good times.  Will try safari per https://nafejeries.wordpress.com/2015/07/11/programmatically-deploy-digital-certificates-to-the-ios-system-certificate-store/
                         DispatchQueue.main.sync {
                             let alert = UIAlertController(
                                 title:"Trust Certificate from\n\"\(summary != nil ? summary! as String : host)\"?",
