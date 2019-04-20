@@ -169,14 +169,43 @@ class ZitiKeychain : NSObject {
     }
 #endif
     
-    func evalTrustForCertificate(_ certificate:SecCertificate, _ result: @escaping SecTrustCallback) -> OSStatus {
+    func evalTrustForCertificates(_ certificates:[SecCertificate], _ result: @escaping SecTrustCallback) -> OSStatus {
         var secTrust:SecTrust?
         let policy = SecPolicyCreateBasicX509()
-        let stcStatus = SecTrustCreateWithCertificates(certificate, policy, &secTrust)
+        let stcStatus = SecTrustCreateWithCertificates(certificates as CFTypeRef, policy, &secTrust)
         if stcStatus != errSecSuccess { return stcStatus }
         guard secTrust != nil else { return errSecBadReq }
         let sceStatus = SecTrustEvaluateAsync(secTrust!, DispatchQueue(label: "evalTrustForCertificate"), result)
         return sceStatus
+    }
+    
+    typealias ProcessCaPoolCallback = ([SecCertificate], SecTrust?, SecTrustResultType) -> Void
+    func processCaPool(_ caPoolPems:[String], label:String, _ handler: @escaping ProcessCaPoolCallback) -> OSStatus {
+        guard caPoolPems.count > 0 else {
+            handler([], nil, .proceed)
+            return errSecSuccess
+        }
+        
+        // Add all to keychain (ignore errors, eg already in keychain)
+        let zkc = ZitiKeychain()
+        for i in 0..<caPoolPems.count {
+            let der = zkc.convertToDER(caPoolPems[i])
+            (_, _) = zkc.storeCertificate(der, label: label + ".\(i)")
+        }
+        
+        let caPoolCerts = zkc.PEMstoCerts(caPoolPems)
+        guard caPoolCerts.count > 0 else {
+            handler([], nil, .invalid)
+            return errSecSuccess
+        }
+        
+        let status = zkc.evalTrustForCertificates(caPoolCerts) { secTrust, result in
+            handler(caPoolCerts, secTrust, result)
+        }
+        if status != errSecSuccess {
+            handler(caPoolCerts, nil, .otherError)
+        }
+        return status
     }
     
     func storeCertificate(_ der:Data, label:String) -> (SecCertificate?, ZitiError?) {
@@ -255,23 +284,32 @@ class ZitiKeychain : NSObject {
         return pem + "-----END \(type)-----\n"
     }
     
-    func extractPEMs(_ type:String, allText:String) -> [String] {
+    func extractPEMs(_ caPool:String) -> [String] {
         var pems:[String] = []
-        let start = "-----BEGIN \(type)-----"
-        let end = "-----END \(type)-----"
-        
-        if !allText.contains(start) { return pems }
+        let start = "-----BEGIN CERTIFICATE-----"
+        let end = "-----END CERTIFICATE-----"
         
         var pem:String? = nil
-        allText.split(separator: "\n").forEach { line in
+        caPool.split(separator: "\n").forEach { line in
             if pem != nil { pem = pem! + line + "\n" }
-            if line == start { pem = "" }
+            if line == start { pem = String(line) + "\n" }
             if line == end && pem != nil {
                 pems.append(pem!)
                 pem = nil
             }
         }
         return pems
+    }
+    
+    func PEMstoCerts(_ pems:[String]) -> [SecCertificate] {
+        var certs:[SecCertificate] = []
+        pems.forEach { pem in
+            let der = convertToDER(pem)
+            if let cert = SecCertificateCreateWithData(nil, der as CFData) {
+                certs.append(cert)
+            }
+        }
+        return certs
     }
     
     func convertToDER(_ pem:String) -> Data {

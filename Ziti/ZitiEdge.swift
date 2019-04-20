@@ -66,19 +66,6 @@ class ZitiEdge : NSObject {
             return
         }
         
-        // Add rootCa if available
-        let zkc = ZitiKeychain()
-        if let rootCa = zid.rootCa, let rootCaPem = zkc.extractPEMs("CERTIFICATE", allText: rootCa).last { //TODO: hack.  {
-            let host = getHost()
-            let der = zkc.convertToDER(rootCaPem)
-            
-            // do our best. if CA already trusted will be ok...
-            _ = zkc.storeCertificate(der, label: host)
-            
-            // dop rootCa from zid - no need to keep it around
-            // self.zid.rootCa = nil
-        }
-        
         // Get Keys
         let (privKey, pubKey, keyErr) = getKeys(zid)
         guard keyErr == nil else {
@@ -95,6 +82,7 @@ class ZitiEdge : NSObject {
         }
         
         // Submit CSR
+        let zkc = ZitiKeychain()
         let csrPEM = zkc.convertToPEM(PEM_CERTIFICATE_REQUEST, der: csr!).data(using: String.Encoding.utf8)
         let urlRequest = createRequest(url, method:POST_METHOD, contentType:TEXT_TYPE, body:csrPEM)
         

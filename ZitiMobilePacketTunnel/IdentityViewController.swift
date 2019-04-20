@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import SafariServices
+import MessageUI
 
 class IdentityEnabledCell: UITableViewCell {
     weak var ivc:IdentityViewController?
@@ -32,7 +32,7 @@ class EnrollIdentityCell: UITableViewCell {
     }
 }
 
-class IdentityViewController: UITableViewController {
+class IdentityViewController: UITableViewController, MFMailComposeViewControllerDelegate {
     
     weak var tvc:TableViewController?
     var zid:ZitiIdentity?
@@ -70,7 +70,7 @@ class IdentityViewController: UITableViewController {
                 self.tvc?.tableView.reloadData()
         }))
         
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "Default action"), style: .default))
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "Cancel"), style: .cancel))
         present(alert, animated: true, completion: nil)
     }
     
@@ -102,50 +102,68 @@ class IdentityViewController: UITableViewController {
     func onEnroll() {
         guard let zid = self.zid else { return }
         
-        var stillNeedToEnroll = true
         let zkc = ZitiKeychain()
-        if let rootCa = zid.rootCa, let rootCaPem = zkc.extractPEMs("CERTIFICATE", allText: rootCa).last { //TODO: hack. {
-            let host = zid.edge.getHost()
-            let der = zkc.convertToDER(rootCaPem)
-            
-            print(zkc.convertToPEM("CERTIFICATE", der: der))
-            
-            // do our best. if CA already trusted will be ok...
-            let (cert, _) = zkc.storeCertificate(der, label: host)
-            
-            if let cert = cert {
-                zid.rootCa = nil
-                stillNeedToEnroll = false
-                let status = zkc.evalTrustForCertificate(cert) { secTrust, result in
-                    if result == .recoverableTrustFailure {
-                        let summary = SecCertificateCopySubjectSummary(cert)
-                        
-                        // hoo-boy.  to install cert, need to either install a profile, open cert as email attachment,
-                        // or open in safari.  Good times.  Will try safari per https://nafejeries.wordpress.com/2015/07/11/programmatically-deploy-digital-certificates-to-the-ios-system-certificate-store/
-                        DispatchQueue.main.sync {
-                            let alert = UIAlertController(
-                                title:"Trust Certificate from\n\"\(summary != nil ? summary! as String : host)\"?",
-                                message: "Trust this certificate in General -> About -> Certificate Trust Settings",
-                                preferredStyle: .alert)
-                            
-                            alert.addAction(UIAlertAction(
-                                title: NSLocalizedString("OK", comment: "Default action"),
-                                style: .default))
-                            self.present(alert, animated: true, completion: nil)
-                        }
-                    } else {
-                        self.doEnroll(zid)
-                    }
+        let host = zid.edge.getHost()
+        let caPoolPems = zid.rootCa != nil ? zkc.extractPEMs(zid.rootCa!) : []
+        let status = zkc.processCaPool(caPoolPems, label:host) { certs, secTrust, result in
+            if result == .recoverableTrustFailure {
+                let summary = certs.first != nil ? SecCertificateCopySubjectSummary(certs.first!) : host as CFString
+                
+                // hoo-boy. To install cert, need to either install a profile. Via MDM, by opening cert as email
+                // attachment, opening in safari, or opening in iCloud Drive.  Good times.  TODO: write JIRA ticket
+                // to have Root CA emailed along with the JWT
+                // See: https://nafejeries.wordpress.com/2015/07/11/programmatically-deploy-digital-certificates-to-the-ios-system-certificate-store/
+                
+                DispatchQueue.main.sync {
+                    let alert = UIAlertController(
+                        title:"Trust Certificate from\n\"\(summary != nil ? summary! as String : host)\"?",
+                        message: "Download certificates by E-mailing to yourself. Once downloaded, select the file to create a Profile in Settings (Settings -> Profile Downloaded). Once Profile is installed, trust this certificate via Settings -> General -> About -> Certificate Trust Settings",
+                        preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction(
+                        title: NSLocalizedString("Email", comment: "Default action"),
+                        style: .default,
+                        handler: { _ in
+                            if MFMailComposeViewController.canSendMail() {
+                                let mail = MFMailComposeViewController()
+                                mail.mailComposeDelegate = self
+                                mail.setSubject("Certificate Chain")
+                                mail.setToRecipients(["you@yoursite.com"])
+                                mail.setMessageBody("<p>Select attached certificates to download and create a Profiles in Settings (Settings -> Profile Downloaded).</p><p>Once Profile is installed for Root CA, trust this certificate via Settings -> General -> About -> Certificate Trust Settings</p>", isHTML: true)
+                                /*
+                                 // didn't work (Apple only installs first cert.  We need to trust the root).
+                                let pemData = caPoolPems.joined().data(using: .utf8)! // Safe to force unwrap .utf8
+                                mail.addAttachmentData(pemData, mimeType: "application/pem-certificate-chain", fileName: "certificate-chain.pem")
+                                */
+                                for i in 0..<certs.count {
+                                    let summary = SecCertificateCopySubjectSummary(certs[i])
+                                    let fn = String(summary ?? "certificate" as CFString) + ".pem"
+                                    let pemData = caPoolPems[i].data(using: .utf8)! // Safe to force unwrap .utf8
+                                    mail.addAttachmentData(pemData, mimeType: "application/pem-certificate-chain", fileName: fn)
+                                }
+                                
+                                self.present(mail, animated: true)
+                            } else {
+                                print("Mail view controller not available")
+                                // TODO: show failure alert
+                            }
+                        }))
+                    alert.addAction(UIAlertAction(
+                        title: NSLocalizedString("Cancel", comment: "Cancel"),
+                        style: .cancel))
+                    self.present(alert, animated: true, completion: nil)
                 }
-                if status != errSecSuccess {
-                    stillNeedToEnroll = true
-                }
+            } else {
+                self.doEnroll(zid)
             }
         }
-        
-        if stillNeedToEnroll {
+        if status != errSecSuccess {
             doEnroll(zid)
         }
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true)
     }
 
     // MARK: - Table view data source

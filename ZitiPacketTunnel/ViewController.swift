@@ -345,46 +345,30 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         updateServiceUI(zId: zid)
         
         // Add rootCa to keychain here since we might need to prompt for updating keychain.
-        // evaluating trust can be lengthy, and has to be done in the background. Actual
-        // enrollment in that case will happen in an escaping callbak.  Otherwise will do
-        // the enroll here (which is already async)
-        var stillNeedToEnroll = true
+        // evaluating trust can be lengthy, and has to be done in the background.
         let zkc = ZitiKeychain()
-        if let rootCa = zid.rootCa, let rootCaPem = zkc.extractPEMs("CERTIFICATE", allText: rootCa).last { //TODO: hack.  figure out if should find Root and use that, or should I add them all, add trust for root...
-            let host = zid.edge.getHost()
-            let der = zkc.convertToDER(rootCaPem)
-            
-            // do our best. if CA already trusted will be ok...
-            let (cert, _) = zkc.storeCertificate(der, label: host)
-            
-            if let cert = cert {
-                zid.rootCa = nil
-                stillNeedToEnroll = false
-                let status = zkc.evalTrustForCertificate(cert) { secTrust, result in
-                    if result == .recoverableTrustFailure { // TODO: change ZitiEdge to just trust this bad boy?
-                        let summary = SecCertificateCopySubjectSummary(cert)
-                        DispatchQueue.main.sync {
-                            if self.dialogOKCancel(question: "Trust Certificate from\n\"\(summary != nil ? summary! as String : host)\"?",
-                                text: "Click OK to update your keychain.\n" +
-                                    "(You may be prompted for your credentials for Keychain Access)") {
-                                
-                                if zkc.addTrustForCertificate(cert) == errSecSuccess {
-                                    print("added trust for \(host)")
-                                    //let result = zkc.evalTrustForCertificate(cert)
-                                    //print("added trust for \(host), result=\(result.rawValue)")
-                                }
-                            }
+        let host = zid.edge.getHost()
+        let caPoolPems = zid.rootCa != nil ? zkc.extractPEMs(zid.rootCa!) : []
+        let status = zkc.processCaPool(caPoolPems, label:host) { certs, secTrust, result in
+            if result == .recoverableTrustFailure {
+                let summary = certs.first != nil ? SecCertificateCopySubjectSummary(certs.first!) : host as CFString
+                DispatchQueue.main.sync {
+                    if self.dialogOKCancel(
+                        question: "Trust Certificate for\n\"\(summary != nil ? summary! as String : host)\"?",
+                        text: "Click OK to update your keychain.\n" +
+                        "(You may be prompted for your credentials for Keychain Access)") {
+                        
+                        // Apple APIs suck for parsing certificate info.  Rather than tracing back to root,
+                        // add trust for each (ignoring non-success on intermendiate certs)
+                        certs.forEach { cert in
+                            _ = zkc.addTrustForCertificate(cert)
                         }
                     }
-                    self.doEnroll(zid)
-                }
-                if status != errSecSuccess {
-                    stillNeedToEnroll = true
                 }
             }
+            self.doEnroll(zid)
         }
-        
-        if stillNeedToEnroll {
+        if status != errSecSuccess {
             doEnroll(zid)
         }
     }
