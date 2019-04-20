@@ -25,7 +25,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     @IBOutlet weak var idEnrollBtn: NSButton!
     @IBOutlet weak var idSpinner: NSProgressIndicator!
     
-    static let providerBundleIdentifier = "com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider"
+    static let providerBundleIdentifier = "io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider"
     weak var servicesViewController:ServicesViewController? = nil
     var tunnelMgr = TunnelMgr()
     var zidMgr = ZidMgr()

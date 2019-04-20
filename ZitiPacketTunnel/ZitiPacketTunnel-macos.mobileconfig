@@ -47,10 +47,10 @@
 				<key>RemoteAddress</key>
 				<string>169.254.1.1</string>
 				<key>ProviderBundleIdentifier</key>
-				<string>com.ampifyllc.ZitiPacketTunnel.PacketTunnelProvider</string>
+				<string>io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider</string>
 			</dict>
 			<key>VPNSubType</key>
-			<string>com.ampifyllc.ZitiPacketTunnel</string>
+			<string>io.netfoundry.ZitiPacketTunnel</string>
 			<key>VPNType</key>
 			<string>VPN</string>
 			<key>VendorConfig</key>
@@ -75,7 +75,7 @@
 	<key>PayloadIdentifier</key>
 	<string>my-test-profile.257208F3-DF1A-47D6-9B4A-738AFA864891</string>
 	<key>PayloadOrganization</key>
-	<string>AmpifyLLC</string>
+	<string>NetFoundry Inc</string>
 	<key>PayloadRemovalDisallowed</key>
 	<false/>
 	<key>PayloadType</key>

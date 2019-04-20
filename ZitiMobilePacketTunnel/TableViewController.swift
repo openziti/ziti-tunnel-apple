@@ -65,7 +65,7 @@ class StatusCell: UITableViewCell {
 
 class TableViewController: UITableViewController, UIDocumentPickerDelegate {
     
-    static let providerBundleIdentifier = "com.ampifyllc.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
+    static let providerBundleIdentifier = "io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
     var tunnelMgr = TunnelMgr()
     var zidMgr = ZidMgr()
     var servicePoller = ServicePoller()

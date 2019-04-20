@@ -17,9 +17,9 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     
     // TODO: Get TEAMID programatically... (and will be diff on iOS)
     #if os(macOS)
-    static let APP_GROUP_ID = "45L2MKV8H4.ZitiPacketTunnel.group"
+    static let APP_GROUP_ID = "MN5S649TXM.ZitiPacketTunnel.group"
     #else
-    static let APP_GROUP_ID = "group.com.ampifyllc.ZitiMobilePacketTunnel"
+    static let APP_GROUP_ID = "group.io.netfoundry.ZitiMobilePacketTunnel"
     #endif
     
     var presentedItemURL: URL? = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: APP_GROUP_ID)
