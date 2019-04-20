@@ -358,10 +358,11 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                         text: "Click OK to update your keychain.\n" +
                         "(You may be prompted for your credentials for Keychain Access)") {
                         
-                        // Apple APIs suck for parsing certificate info.  Rather than tracing back to root,
-                        // add trust for each (ignoring non-success on intermendiate certs)
+                        // Add any rootCa
                         certs.forEach { cert in
-                            _ = zkc.addTrustForCertificate(cert)
+                            if zkc.isRootCa(cert) {
+                                _ = zkc.addTrustForCertificate(cert)
+                            }
                         }
                     }
                 }

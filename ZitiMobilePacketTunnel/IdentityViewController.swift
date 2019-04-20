@@ -136,10 +136,12 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                                 mail.addAttachmentData(pemData, mimeType: "application/pem-certificate-chain", fileName: "certificate-chain.pem")
                                 */
                                 for i in 0..<certs.count {
-                                    let summary = SecCertificateCopySubjectSummary(certs[i])
-                                    let fn = String(summary ?? "certificate" as CFString) + ".pem"
-                                    let pemData = caPoolPems[i].data(using: .utf8)! // Safe to force unwrap .utf8
-                                    mail.addAttachmentData(pemData, mimeType: "application/pem-certificate-chain", fileName: fn)
+                                    if zkc.isRootCa(certs[i]) {
+                                        let summary = SecCertificateCopySubjectSummary(certs[i])
+                                        let fn = String(summary ?? "certificate" as CFString) + ".pem"
+                                        let pemData = caPoolPems[i].data(using: .utf8)! // Safe to force unwrap .utf8
+                                        mail.addAttachmentData(pemData, mimeType: "application/pem-certificate-chain", fileName: fn)
+                                    }
                                 }
                                 
                                 self.present(mail, animated: true)

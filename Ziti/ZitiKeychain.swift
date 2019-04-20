@@ -169,6 +169,16 @@ class ZitiKeychain : NSObject {
     }
 #endif
     
+    func isRootCa(_ cert:SecCertificate) -> Bool {
+        if let issuer = SecCertificateCopyNormalizedIssuerSequence(cert),
+            let subject = SecCertificateCopyNormalizedSubjectSequence(cert) {
+            if (issuer as NSData).isEqual(to: (subject as NSData) as Data) {
+                return true
+            }
+        }
+        return false
+    }
+    
     func evalTrustForCertificates(_ certificates:[SecCertificate], _ result: @escaping SecTrustCallback) -> OSStatus {
         var secTrust:SecTrust?
         let policy = SecPolicyCreateBasicX509()
