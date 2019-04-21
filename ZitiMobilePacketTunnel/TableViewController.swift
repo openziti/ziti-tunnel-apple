@@ -8,6 +8,7 @@
 
 import UIKit
 import NetworkExtension
+import SafariServices
 
 class StatusCell: UITableViewCell {
     @IBOutlet weak var connectStatus: UILabel!
@@ -48,7 +49,6 @@ class StatusCell: UITableViewCell {
             do {
                 try tvc?.tunnelMgr.startTunnel()
             } catch {
-                print(error)
                 let alert = UIAlertController(
                     title:"Ziti Connect Error",
                     message: error.localizedDescription,
@@ -69,6 +69,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
     var tunnelMgr = TunnelMgr()
     var zidMgr = ZidMgr()
     var servicePoller = ServicePoller()
+    weak var ivc:IdentityViewController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,10 +95,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.servicePoller.startPolling { didChange, zid in
                 DispatchQueue.main.async {
-                    /* TODO
-                     if zid == self?.zids[(self?.representedObject ?? 0) as! Int] {
-                     self?.updateServiceUI(zId:zid)
-                     }*/
+                    self.ivc?.tableView.reloadData()
                     if didChange {
                         _ = self.zidMgr.zidStore.store(zid)
                         if zid.isEnabled {
@@ -154,7 +152,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
                 cell = tableView.dequeueReusableCell(withIdentifier: "ADD_IDENTITY_CELL", for: indexPath)
                 //let btn = UIButton(type: .contactAdd)
                 //btn.isUserInteractionEnabled = false
-                //cell?.accessoryView = btn // For now.  Lookes better with green insert button...
+                //cell?.accessoryView = btn // Lookes better with green insert button...
             } else {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_CELL", for: indexPath)
                 let zid = zidMgr.zids[indexPath.row]
@@ -187,25 +185,20 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
         }
         return nil
     }
-    
-    /*override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        if section == 1 && zidMgr.zids.count == 0 {
-            return "No identities have been configured. Select Add Identity below to add one."
-        } else if section == 2 {
-            return "Begin enrollment process of new identity via Enrollment JWT provided by adminstrator"
-        } 
-        return nil
-    }*/
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Selected row at \(indexPath)")
         if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
-            print("selected Identity row")
             let dp = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .open)
             dp.modalPresentationStyle = .formSheet
             dp.allowsMultipleSelection = false
             dp.delegate = self
             self.present(dp, animated: true, completion: nil)
+        } else if indexPath.section == 2 && indexPath.row == 1 {
+            if let url = URL(string: "https://netfoundry.zendesk.com/hc/en-us") { // TODO: add real help...
+                let vc = SFSafariViewController(url: url)
+                present(vc, animated: true)
+            }
         }
     }
     
@@ -224,14 +217,23 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
             }
             try zidMgr.insertFromJWT(url, at: 0)
             tableView.reloadData()
-            // TODO: segue to identity screen for this zid
+            tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
+            performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
         } catch let error as ZitiError {
-            //panel.orderOut(nil)
-            //TODO self.dialogAlert("Unable to add identity", error.localizedDescription)
+            let alert = UIAlertController(
+                title:"Unable to add identity",
+                message: error.localizedDescription,
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+            present(alert, animated: true, completion: nil)
             NSLog("Unable to add identity: \(error.localizedDescription)")
         } catch {
-            //panel.orderOut(nil)
-            //TODO: self.dialogAlert("JWT Error", error.localizedDescription)
+            let alert = UIAlertController(
+                title:"JWT Error",
+                message: error.localizedDescription,
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+            present(alert, animated: true, completion: nil)
             NSLog("JWT Error: \(error.localizedDescription)")
             return
         }
@@ -241,11 +243,16 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
         if let avc = segue.destination as? AdvancedViewController {
             avc.tvc = self
         } else if let ivc = segue.destination as? IdentityViewController {
+            self.ivc = ivc
             ivc.tvc = self
             if let ip = tableView.indexPathForSelectedRow {
                 let cell = tableView.cellForRow(at: ip)
                 ivc.zid = zidMgr.zids[cell?.tag ?? 0]
             }
         }
+    }
+    
+    @IBAction func unwindIdentity(_ sender:UIStoryboardSegue) {
+        ivc = nil
     }
 }

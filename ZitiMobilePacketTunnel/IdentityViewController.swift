@@ -128,7 +128,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                                 let mail = MFMailComposeViewController()
                                 mail.mailComposeDelegate = self
                                 mail.setSubject("Certificate Chain")
-                                mail.setToRecipients(["you@yoursite.com"])
+                                //mail.setToRecipients(["you@yoursite.com"])
                                 mail.setMessageBody("<p>Select attached certificates to download and create a Profiles in Settings (Settings -> Profile Downloaded).</p><p>Once Profile is installed for Root CA, trust this certificate via Settings -> General -> About -> Certificate Trust Settings</p>", isHTML: true)
                                 /*
                                  // didn't work (Apple only installs first cert.  We need to trust the root).
@@ -143,11 +143,15 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                                         mail.addAttachmentData(pemData, mimeType: "application/pem-certificate-chain", fileName: fn)
                                     }
                                 }
-                                
                                 self.present(mail, animated: true)
                             } else {
                                 print("Mail view controller not available")
-                                // TODO: show failure alert
+                                let alert = UIAlertController(
+                                    title:"Mail view not available",
+                                    message: "Please contact admin and request Root CA for this site to be emailed to you.",
+                                    preferredStyle: .alert)
+                                alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+                                self.present(alert, animated: true, completion: nil)
                             }
                         }))
                     alert.addAction(UIAlertAction(
@@ -215,7 +219,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.textLabel?.text = "Network"
                 cell?.detailTextLabel?.text = zid?.apiBaseUrl
             } else if indexPath.row == 2 {
-                cell?.textLabel?.text = "Controller Status"
+                cell?.textLabel?.text = "Status"
                 let cs = zid?.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
                 var csStr = ""
                 if zid?.isEnrolled ?? false == false {
