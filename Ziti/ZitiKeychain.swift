@@ -58,9 +58,6 @@ class ZitiKeychain : NSObject {
             // Just log it. All should still work, but user will be prompted to allow access
             NSLog("createPrivateKey: Unable to to add secAttrAccess for \(zid.name)")
         }
-#else
-        // Need keychain group on iOS - kSecAccessControl? kSecAttrAccessGroup?
-        // Need to be in privateKeyParams?
 #endif
         
         var error: Unmanaged<CFError>?
@@ -107,6 +104,7 @@ class ZitiKeychain : NSObject {
             kSecAttrApplicationTag: atag]
         return SecItemDelete(deleteQuery as CFDictionary)
     }
+    
     func deleteKeyPair(_ zid:ZitiIdentity) -> ZitiError? {
         guard let atag = zid.id.data(using: .utf8) else {
             return ZitiError("deleteKeyPair: Unable to create application tag \(zid.id)")
@@ -143,12 +141,16 @@ class ZitiKeychain : NSObject {
             return (nil, ZitiError("Unable to get identity for \(zid.id): \(errStr)"))
         }
 #else
-        // works.  Pro: compiles on ios.  Con: wicked slow
-        // Changed to only happen once per session, then store the SecIdentity (it is calculated on the
-        // SecItemCopy, not just grabbed from the store) 
+        // pubKey is showing up instead of private key on iOS.  Deleting pubKey first fixes it...
+        // https://forums.developer.apple.com/thread/69642
+        if let atag = zid.id.data(using: .utf8) {
+            _ = deleteKey(atag, keyClass:kSecAttrKeyClassPublic)
+        }
+        
         let params: [CFString:Any] = [
             kSecClass: kSecClassIdentity,
             kSecReturnRef: kCFBooleanTrue! as Any,
+            kSecAttrLabel: zid.id,
             kSecMatchSubjectContains: zid.id]
         
         var ref: CFTypeRef?

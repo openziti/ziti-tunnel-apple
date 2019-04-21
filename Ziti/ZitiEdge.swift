@@ -99,7 +99,7 @@ class ZitiEdge : NSObject {
             }
             let certDER = zkc.convertToDER(certPEM)
             
-            let (_, zStoreErr) = zkc.storeCertificate(certDER, label:self.zid.name)
+            let (_, zStoreErr) = zkc.storeCertificate(certDER, label:self.zid.id)
             if zStoreErr != nil {
                 completionHandler(zStoreErr)
                 return
@@ -300,7 +300,7 @@ extension ZitiEdge : URLSessionDelegate {
             completionHandler(.performDefaultHandling, nil)
             return
         }
-        let urlCredential = URLCredential(identity: identity, certificates: nil, persistence:.permanent) //.forSession)
+        let urlCredential = URLCredential(identity: identity, certificates: nil, persistence:.forSession)
         completionHandler(.useCredential, urlCredential)
     }
 }

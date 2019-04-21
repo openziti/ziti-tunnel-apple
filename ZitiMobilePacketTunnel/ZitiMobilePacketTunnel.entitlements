@@ -26,5 +26,9 @@
 	<array>
 		<string>group.io.netfoundry.ZitiMobilePacketTunnel</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)io.netfoundry.ZitiMobilePacketTunnel</string>
+	</array>
 </dict>
 </plist>
