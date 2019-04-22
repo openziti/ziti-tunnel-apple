@@ -43,8 +43,8 @@ class ProviderConfig : NSObject {
     var mtu:Int = 16000
     var dnsAddresses:[String] = ["169.254.0.2"]
     var dnsMatchDomains:[String] = [""]
-    var username = "NetFoundry"
-    var localizedDescription = "Ziti Packet Tunnel"
+    var username = "Ziti"
+    var localizedDescription = "NetFoundry"
     
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,
