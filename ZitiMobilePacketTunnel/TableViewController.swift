@@ -9,6 +9,7 @@
 import UIKit
 import NetworkExtension
 import SafariServices
+import MessageUI
 
 class StatusCell: UITableViewCell {
     @IBOutlet weak var connectStatus: UILabel!
@@ -64,7 +65,7 @@ class StatusCell: UITableViewCell {
     }
 }
 
-class TableViewController: UITableViewController, UIDocumentPickerDelegate {
+class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate {
     
     static let providerBundleIdentifier = "io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
     var tunnelMgr = TunnelMgr()
@@ -198,6 +199,35 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
         }
         return nil
     }
+    
+    func appVersion() -> String {
+        var appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown version"
+        if let appBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+            appVersion += " (\(appBuild))"
+        }
+        return appVersion
+    }
+    
+    func deviceName() -> String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let modelCode = withUnsafePointer(to: &systemInfo.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: 1) {
+                ptr in String.init(validatingUTF8: ptr)
+                
+            }
+        }
+        if modelCode != nil {
+            return String(cString: modelCode!, encoding: .utf8) ?? ""
+        } else {
+            return ""
+        }
+    }
+    
+    func osVersion() -> String {
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        return "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
+    }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Selected row at \(indexPath)")
@@ -207,6 +237,24 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
             dp.allowsMultipleSelection = false
             dp.delegate = self
             self.present(dp, animated: true, completion: nil)
+        } else if indexPath.section == 2 && indexPath.row == 0 {
+            // quick 'n dirty support email composer.  TODO: Look into Instabug
+            if MFMailComposeViewController.canSendMail() {
+                let mail = MFMailComposeViewController()
+                mail.mailComposeDelegate = self
+                mail.setSubject("Ziti Support (iOS)")
+                mail.setToRecipients(["support@netfoundry.io"])
+                mail.setMessageBody("\n\n\nVersion: \(appVersion())\nOS Version: \(osVersion())\nDevice: \(deviceName())", isHTML: false)
+                self.present(mail, animated: true)
+            } else {
+                print("Mail view controller not available")
+                let alert = UIAlertController(
+                    title:"Mail view not available",
+                    message: "Please email support@netfoundry.io for assistance",
+                    preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+                self.present(alert, animated: true, completion: nil)
+            }
         } else if indexPath.section == 2 && indexPath.row == 1 {
             // TODO: add real help...
             if let url = URL(string: "https://netfoundry.zendesk.com/hc/en-us/categories/360000991011-Docs-Guides") {
@@ -214,6 +262,10 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
                 present(vc, animated: true)
             }
         }
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true)
     }
     
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
