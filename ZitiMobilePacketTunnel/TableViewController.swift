@@ -105,6 +105,17 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
                 }
             }
         }
+        
+        /* -- not needed.  polling stops automagically when app moves to background...
+         NotificationCenter.default.addObserver(forName: NSNotification.Name.NSExtensionHostDidEnterBackground, object: nil, queue: OperationQueue.main, using: { _ in
+            print("NSExtensionHostDidEnterBackground - stop polling")
+            self.servicePoller.stopPolling()
+        })
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.NSExtensionHostWillEnterForeground, object: nil, queue: OperationQueue.main, using: { _ in
+            print("NSExtensionHostWillEnterForeground - re-start polling")
+            self.servicePoller.startPolling()
+        })*/
     }
     
     // MARK: - Table view data source
@@ -195,7 +206,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
             dp.delegate = self
             self.present(dp, animated: true, completion: nil)
         } else if indexPath.section == 2 && indexPath.row == 1 {
-            if let url = URL(string: "https://netfoundry.zendesk.com/hc/en-us") { // TODO: add real help...
+            // TODO: add real help...
+            if let url = URL(string: "https://netfoundry.zendesk.com/hc/en-us/categories/360000991011-Docs-Guides") {
                 let vc = SFSafariViewController(url: url)
                 present(vc, animated: true)
             }
@@ -252,7 +264,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
         }
     }
     
-    @IBAction func unwindIdentity(_ sender:UIStoryboardSegue) {
+    @IBAction func unwindFromIdentity(_ sender:UIStoryboardSegue) {
         ivc = nil
     }
 }
