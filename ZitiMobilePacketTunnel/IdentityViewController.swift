@@ -47,6 +47,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             _ = tvc?.zidMgr.zidStore.store(zid)
             tableView.reloadData()
             tvc?.tunnelMgr.restartTunnel()
+            tvc?.tableView.reloadData()
         }
     }
     

@@ -42,6 +42,7 @@ class StatusCell: UITableViewCell {
             connectStatus.text = "Unknown"
             connectSwitch.isOn = false
         }
+        tvc?.tableView.reloadData()
     }
     
     @IBAction func connectSwitchChanged(_ sender: Any) {
@@ -105,17 +106,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
                 }
             }
         }
-        
-        /* -- not needed.  polling stops automagically when app moves to background...
-         NotificationCenter.default.addObserver(forName: NSNotification.Name.NSExtensionHostDidEnterBackground, object: nil, queue: OperationQueue.main, using: { _ in
-            print("NSExtensionHostDidEnterBackground - stop polling")
-            self.servicePoller.stopPolling()
-        })
-        
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.NSExtensionHostWillEnterForeground, object: nil, queue: OperationQueue.main, using: { _ in
-            print("NSExtensionHostWillEnterForeground - re-start polling")
-            self.servicePoller.startPolling()
-        })*/
     }
     
     // MARK: - Table view data source
@@ -170,8 +160,20 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate {
                 cell?.tag = indexPath.row
                 cell?.textLabel?.text = zid.name
                 cell?.detailTextLabel?.text = zid.id
-                //cell?.imageView?.image = UIImage(named: "NSStatusNone")
-                //cell?.imageView based on zid status
+                
+                let tunnelStatus = tunnelMgr.status
+                var imageName:String = "StatusNone"
+                
+                if zid.isEnrolled == true, zid.isEnabled == true, let edgeStatus = zid.edgeStatus {
+                    switch edgeStatus.status {
+                    case .Available: imageName = (tunnelStatus == .connected) ?
+                        "StatusAvailable" : "StatusPartiallyAvailable"
+                    case .PartiallyAvailable: imageName = "StatusPartiallyAvailable"
+                    case .Unavailable: imageName = "StatusUnavailable"
+                    default: imageName = "StatusNone"
+                    }
+                }
+                cell?.imageView?.image = UIImage(named: imageName)
             }
         } else {
             // feedback, help, advanced, about
