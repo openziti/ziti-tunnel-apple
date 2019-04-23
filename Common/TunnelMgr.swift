@@ -9,11 +9,12 @@
 import Foundation
 import NetworkExtension
 
-// TODO: shared observer, tunnel start/stop/restart
 class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager?
     var tunnelRestarting = false
-    var onTunnelStatusChanged:((NEVPNStatus)->Void)? = nil
+    
+    typealias TunnelStateChangedCallback = ((NEVPNStatus)->Void)
+    var tsChangedCallbacks:[TunnelStateChangedCallback] = []
     
     var status:NEVPNStatus {
         get {
@@ -22,6 +23,8 @@ class TunnelMgr: NSObject {
         }
     }
     
+    static let shared = TunnelMgr()
+    private override init() {}
     deinit { NotificationCenter.default.removeObserver(self) }
     
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
@@ -82,7 +85,7 @@ class TunnelMgr: NSObject {
                 
                     tmgr.tpm = tpm
                     completionHandler?(tpm, nil)
-                    tmgr.onTunnelStatusChanged?(tpm.connection.status)
+                    tmgr.tsChangedCallbacks.forEach { cb in cb(tpm.connection.status) }
                 } else {
                     completionHandler?(nil, ZitiError("Tunnel preferencecs load fail due to retain scope"))
                 }
@@ -96,9 +99,9 @@ class TunnelMgr: NSObject {
                 tunnelRestarting = false
                 try? startTunnel() // TODO: Will I regret not handling exception?
             }
-            onTunnelStatusChanged?(.reasserting)
+            tsChangedCallbacks.forEach { cb in cb(.reasserting) }
         } else {
-            onTunnelStatusChanged?(status)
+            tsChangedCallbacks.forEach { cb in cb(status) }
         }
     }
     

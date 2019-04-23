@@ -27,7 +27,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     
     static let providerBundleIdentifier = "io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider"
     weak var servicesViewController:ServicesViewController? = nil
-    var tunnelMgr = TunnelMgr()
+    var tunnelMgr = TunnelMgr.shared
     var zidMgr = ZidMgr()
     var enrollingIds:[ZitiIdentity] = []
     var servicePoller = ServicePoller()
@@ -47,7 +47,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             connectStatus.stringValue = "Disconnecting..."
             break
         case .disconnected:
-            connectStatus.stringValue = "Disconnected"
+            connectStatus.stringValue = "Not Connected"
             connectButton.title = "Turn Ziti On"
             break
         case .invalid:
@@ -152,7 +152,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         box.borderType = NSBorderType.lineBorder
         
         // init the manager
-        tunnelMgr.onTunnelStatusChanged = self.tunnelStatusDidChange
+        tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange)
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier)
         
         // Load previous identities

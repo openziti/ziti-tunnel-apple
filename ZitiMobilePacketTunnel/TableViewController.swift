@@ -68,7 +68,7 @@ class StatusCell: UITableViewCell {
 class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate {
     
     static let providerBundleIdentifier = "io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
-    var tunnelMgr = TunnelMgr()
+    var tunnelMgr = TunnelMgr.shared
     var zidMgr = ZidMgr()
     var servicePoller = ServicePoller()
     weak var ivc:IdentityViewController?
@@ -147,7 +147,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             cell = tableView.dequeueReusableCell(withIdentifier: "STATUS_CELL", for: indexPath)
             if let statusCell = cell as? StatusCell {
                 statusCell.tvc = self
-                tunnelMgr.onTunnelStatusChanged = statusCell.tunnelStatusDidChange
+                tunnelMgr.tsChangedCallbacks.append(statusCell.tunnelStatusDidChange)
             }
         } else if indexPath.section == 1 {
             if indexPath.row == zidMgr.zids.count {
