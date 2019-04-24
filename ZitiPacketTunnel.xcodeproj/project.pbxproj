@@ -71,6 +71,7 @@
 		5A6BA261226DF2E300224F09 /* Notices.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 5A6BA25F226DF2C500224F09 /* Notices.rtf */; };
 		5A6BA263226DF65C00224F09 /* NoticesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6BA262226DF65C00224F09 /* NoticesViewController.swift */; };
 		5A6BA265226F6AB400224F09 /* MainMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6BA264226F6AB400224F09 /* MainMenuBar.swift */; };
+		5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 5A76B939226FBAE100204A46 /* Credits.rtf */; };
 		5A85A91B225A6EB2004A29F2 /* ZitiConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */; };
 		5A85A91C225A6EB2004A29F2 /* ZitiConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */; };
 		5A8702CE2230B24B00314199 /* ZitiEdgeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8702CD2230B24B00314199 /* ZitiEdgeService.swift */; };
@@ -205,6 +206,7 @@
 		5A6BA25F226DF2C500224F09 /* Notices.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Notices.rtf; sourceTree = "<group>"; };
 		5A6BA262226DF65C00224F09 /* NoticesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticesViewController.swift; sourceTree = "<group>"; };
 		5A6BA264226F6AB400224F09 /* MainMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuBar.swift; sourceTree = "<group>"; };
+		5A76B939226FBAE100204A46 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiConn.swift; sourceTree = "<group>"; };
 		5A8702CD2230B24B00314199 /* ZitiEdgeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiEdgeService.swift; sourceTree = "<group>"; };
 		5A8702D22230B4D300314199 /* ZitiEdgeNetworkSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiEdgeNetworkSession.swift; sourceTree = "<group>"; };
@@ -306,6 +308,7 @@
 		5A02AAB6206EBD7E006261C6 /* ZitiPacketTunnel */ = {
 			isa = PBXGroup;
 			children = (
+				5A76B936226FB9CC00204A46 /* bundle */,
 				5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */,
 				5A6BA264226F6AB400224F09 /* MainMenuBar.swift */,
 				5A02AABB206EBD7E006261C6 /* Assets.xcassets */,
@@ -414,6 +417,14 @@
 			isa = PBXGroup;
 			children = (
 				5A6BA25F226DF2C500224F09 /* Notices.rtf */,
+			);
+			path = bundle;
+			sourceTree = "<group>";
+		};
+		5A76B936226FB9CC00204A46 /* bundle */ = {
+			isa = PBXGroup;
+			children = (
+				5A76B939226FBAE100204A46 /* Credits.rtf */,
 			);
 			path = bundle;
 			sourceTree = "<group>";
@@ -637,6 +648,7 @@
 				5A0AA17320791EA000338D46 /* ZitiPacketTunnel-macos.mobileconfig in Resources */,
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
+				5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
