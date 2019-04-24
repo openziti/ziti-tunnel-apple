@@ -21,6 +21,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     private override init() {
         statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
         super.init()
+                
         let menu = NSMenu()
         tunStatusItem = newMenuItem(title:"Status:", action:#selector(MainMenuBar.noop(_:)))
         menu.addItem(tunStatusItem)
@@ -35,6 +36,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
         menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))
         statusItem.menu = menu
+        
         getMainWindow()?.delegate = self
         TunnelMgr.shared.tsChangedCallbacks.append(self.tunnelStatusDidChange)
     }
@@ -74,23 +76,6 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         let mi = NSMenuItem(title:title, action:action, keyEquivalent:keyEquivalent)
         mi.target = self
         return mi
-    }
-    
-    func updateMenu() -> NSMenu {
-        let menu = NSMenu()
-        tunStatusItem = newMenuItem(title:"Status:", action:#selector(MainMenuBar.noop(_:)))
-        menu.addItem(tunStatusItem)
-        tunConnectItem = newMenuItem(title:"Connect", action:#selector(MainMenuBar.connect(_:)))
-        menu.addItem(tunConnectItem)
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(newMenuItem(title: "Manage Tunnels", action: #selector(MainMenuBar.showPanel(_:))))
-        showDocItem = newMenuItem(title: "Show In Dock", action: #selector(MainMenuBar.showInDock(_:)))
-        showDocItem.state = .on
-        menu.addItem(showDocItem)
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
-        menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))        
-        return menu
     }
     
     func getMainWindow() -> NSWindow? {
