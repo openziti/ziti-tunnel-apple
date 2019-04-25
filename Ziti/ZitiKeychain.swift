@@ -181,12 +181,12 @@ class ZitiKeychain : NSObject {
         return false
     }
     
-    func haveSameSubject(_ cert1:SecCertificate, _ cert2:SecCertificate) -> Bool {
-        if let subject1 = SecCertificateCopyNormalizedSubjectSequence(cert1),
-            let subject2 = SecCertificateCopyNormalizedSubjectSequence(cert2) {
-            if (subject1 as NSData).isEqual(to: (subject2 as NSData) as Data) {
-                return true
-            }
+    func certsMatch(_ cert1:SecCertificate, _ cert2:SecCertificate) -> Bool {
+        let data1 = SecCertificateCopyData(cert1)
+        let data2 = SecCertificateCopyData(cert2)
+        if (data1 as NSData).isEqual(to: (data2 as NSData) as Data) {
+            print("Matched cert: \(cert1):\n\(data1)")
+            return true
         }
         return false
     }

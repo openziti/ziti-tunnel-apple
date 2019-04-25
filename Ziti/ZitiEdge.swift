@@ -87,7 +87,7 @@ class ZitiEdge : NSObject {
         let urlRequest = createRequest(url, method:POST_METHOD, contentType:TEXT_TYPE, body:csrPEM)
         
         // don't share session with other edge calls since we have no secId at this point
-        let enrollSession = URLSession.shared
+        let enrollSession = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:OperationQueue.main)
         enrollSession.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
                 completionHandler(zErr)
@@ -108,6 +108,7 @@ class ZitiEdge : NSObject {
             self.zid.enrolled = true
             completionHandler(nil)
         }.resume()
+        enrollSession.finishTasksAndInvalidate()
     }
     
     func getServices(completionHandler: @escaping (Bool, ZitiError?) -> Void) {
@@ -321,22 +322,32 @@ extension ZitiEdge : URLSessionDelegate {
             return
         }
         
+        
+        //
+        // TODO: need to re-visit this...
+        // https://tools.ietf.org/html/rfc5246#section-7.4.2
+        // certificate_list This is a sequence (chain) of certificates. The sender's certificate MUST come first in the list. Each following certificate MUST directly certify the one preceding it. Because certificate validation requires that root keys be distributed independently, the self-signed certificate that specifies the root certificate authority MAY be omitted from the chain, under the assumption that the remote end must already possess it in order to validate it in any case.
+        //
+        // Rely on SecTrustEvaluateAsync to verify certs were signed with correct private key
         let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue.main) { secTrust, result in
-            if result == .proceed {
+            if result == .proceed || result == .unspecified {
                 completionHandler(.useCredential, URLCredential(trust:secTrust))
-            } else if result == .recoverableTrustFailure || result == .unspecified {
+            } else if result == .recoverableTrustFailure {
                 var recovered = false
                 let zkc = ZitiKeychain()
+                
+                // TODO: this is the part that needs work...
+                //    improvment on below: validate the chain is as described above,
+                //    that index 0 chains all the way to the last one
+                //    if last is a root CA, verify that we have it.
+                //    if last is not a root CA, verify that we have it and that the signer was root CA in our rootCa
                 for i in 0..<SecTrustGetCertificateCount(secTrust) {
                     if let cert = SecTrustGetCertificateAtIndex(secTrust, i) {
-                        if zkc.isRootCa(cert) {
-                            // now loop thru rootCa pool, see if we match any roots...
-                            for caCert in zkc.PEMstoCerts(zkc.extractPEMs(rootCa)) {
-                                if zkc.isRootCa(caCert) && zkc.haveSameSubject(cert, caCert) {
-                                    recovered = true
-                                    completionHandler(.useCredential, URLCredential(trust: secTrust))
-                                    break
-                                }
+                        for caCert in zkc.PEMstoCerts(zkc.extractPEMs(rootCa)) {
+                            if zkc.certsMatch(cert, caCert) {
+                                recovered = true
+                                completionHandler(.useCredential, URLCredential(trust: secTrust))
+                                break
                             }
                         }
                     }
