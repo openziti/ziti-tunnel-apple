@@ -321,7 +321,12 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         }
     }
     
-    func doEnroll(_ zid:ZitiIdentity) {
+    @IBAction func onEnrollButton(_ sender: Any) {
+        let indx = representedObject as! Int
+        let zid = zidMgr.zids[indx]
+        enrollingIds.append(zid)
+        updateServiceUI(zId: zid)
+        
         zid.edge.enroll() { zErr in
             DispatchQueue.main.async {
                 self.enrollingIds.removeAll { $0.id == zid.id }
@@ -335,42 +340,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 _ = self.zidMgr.zidStore.store(zid)
                 self.updateServiceUI(zId:zid)
             }
-        }
-    }
-    
-    @IBAction func onEnrollButton(_ sender: Any) {
-        let indx = representedObject as! Int
-        let zid = zidMgr.zids[indx]
-        enrollingIds.append(zid)
-        updateServiceUI(zId: zid)
-        
-        // Add rootCa to keychain here since we might need to prompt for updating keychain.
-        // evaluating trust can be lengthy, and has to be done in the background.
-        let zkc = ZitiKeychain()
-        let host = zid.edge.getHost()
-        let caPoolPems = zid.rootCa != nil ? zkc.extractPEMs(zid.rootCa!) : []
-        let status = zkc.processCaPool(caPoolPems, label:host) { certs, secTrust, result in
-            if result == .recoverableTrustFailure {
-                let summary = certs.first != nil ? SecCertificateCopySubjectSummary(certs.first!) : host as CFString
-                DispatchQueue.main.sync {
-                    if self.dialogOKCancel(
-                        question: "Trust Certificate for\n\"\(summary != nil ? summary! as String : host)\"?",
-                        text: "Click OK to update your keychain.\n" +
-                        "(You may be prompted for your credentials for Keychain Access)") {
-                        
-                        // Add any rootCa
-                        certs.forEach { cert in
-                            if zkc.isRootCa(cert) {
-                                _ = zkc.addTrustForCertificate(cert)
-                            }
-                        }
-                    }
-                }
-            }
-            self.doEnroll(zid)
-        }
-        if status != errSecSuccess {
-            doEnroll(zid)
         }
     }
 }

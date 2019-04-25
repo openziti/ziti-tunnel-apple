@@ -181,6 +181,16 @@ class ZitiKeychain : NSObject {
         return false
     }
     
+    func haveSameSubject(_ cert1:SecCertificate, _ cert2:SecCertificate) -> Bool {
+        if let subject1 = SecCertificateCopyNormalizedSubjectSequence(cert1),
+            let subject2 = SecCertificateCopyNormalizedSubjectSequence(cert2) {
+            if (subject1 as NSData).isEqual(to: (subject2 as NSData) as Data) {
+                return true
+            }
+        }
+        return false
+    }
+    
     func evalTrustForCertificates(_ certificates:[SecCertificate], _ result: @escaping SecTrustCallback) -> OSStatus {
         var secTrust:SecTrust?
         let policy = SecPolicyCreateBasicX509()
@@ -189,35 +199,6 @@ class ZitiKeychain : NSObject {
         guard secTrust != nil else { return errSecBadReq }
         let sceStatus = SecTrustEvaluateAsync(secTrust!, DispatchQueue(label: "evalTrustForCertificate"), result)
         return sceStatus
-    }
-    
-    typealias ProcessCaPoolCallback = ([SecCertificate], SecTrust?, SecTrustResultType) -> Void
-    func processCaPool(_ caPoolPems:[String], label:String, _ handler: @escaping ProcessCaPoolCallback) -> OSStatus {
-        guard caPoolPems.count > 0 else {
-            handler([], nil, .proceed)
-            return errSecSuccess
-        }
-        
-        // Add all to keychain (ignore errors, eg already in keychain)
-        let zkc = ZitiKeychain()
-        for i in 0..<caPoolPems.count {
-            let der = zkc.convertToDER(caPoolPems[i])
-            (_, _) = zkc.storeCertificate(der, label: label + ".\(i)")
-        }
-        
-        let caPoolCerts = zkc.PEMstoCerts(caPoolPems)
-        guard caPoolCerts.count > 0 else {
-            handler([], nil, .invalid)
-            return errSecSuccess
-        }
-        
-        let status = zkc.evalTrustForCertificates(caPoolCerts) { secTrust, result in
-            handler(caPoolCerts, secTrust, result)
-        }
-        if status != errSecSuccess {
-            handler(caPoolCerts, nil, .otherError)
-        }
-        return status
     }
     
     func storeCertificate(_ der:Data, label:String) -> (SecCertificate?, ZitiError?) {

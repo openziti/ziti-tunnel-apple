@@ -54,8 +54,8 @@ class ZitiEdge : NSObject {
         }.resume()
     }
     
-    func getHost() -> String {
-        guard let url = URL(string: zid.apiBaseUrl) else { return "" }
+    func getHost(_ urlString:String) -> String {
+        guard let url = URL(string: urlString) else { return "" }
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         return components?.host ?? ""
     }
@@ -287,10 +287,76 @@ extension ZitiEdge : URLSessionDelegate {
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
         switch challenge.protectionSpace.authenticationMethod {
+        case NSURLAuthenticationMethodServerTrust:
+            handleServerTrustChallenge(challenge, completionHandler:completionHandler)
         case NSURLAuthenticationMethodClientCertificate:
             handleClientCertChallenge(challenge, completionHandler:completionHandler)
         default:
             completionHandler(.performDefaultHandling, nil)
+        }
+    }
+    
+    private func isExpectedHost(_ host:String) -> Bool {
+        let apiHost = getHost(zid.apiBaseUrl)
+        let enrollHost = getHost(zid.enrollmentUrl)
+        return host == apiHost || host == enrollHost
+    }
+    
+    func handleServerTrustChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        
+        guard let rootCa = zid.rootCa else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        
+        guard let serverTrust = challenge.protectionSpace.serverTrust else {
+            NSLog("ServerTrustChallenge: ServerTrust not available. Performming default handling.")
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        
+        if isExpectedHost(challenge.protectionSpace.host) == false {
+            NSLog("Rejecting server challend for unexpected host \(challenge.protectionSpace.host)")
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        
+        let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue.main) { secTrust, result in
+            if result == .proceed {
+                completionHandler(.useCredential, URLCredential(trust:secTrust))
+            } else if result == .recoverableTrustFailure || result == .unspecified {
+                var recovered = false
+                let zkc = ZitiKeychain()
+                for i in 0..<SecTrustGetCertificateCount(secTrust) {
+                    if let cert = SecTrustGetCertificateAtIndex(secTrust, i) {
+                        if zkc.isRootCa(cert) {
+                            // now loop thru rootCa pool, see if we match any roots...
+                            for caCert in zkc.PEMstoCerts(zkc.extractPEMs(rootCa)) {
+                                if zkc.isRootCa(caCert) && zkc.haveSameSubject(cert, caCert) {
+                                    recovered = true
+                                    completionHandler(.useCredential, URLCredential(trust: secTrust))
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    if recovered { break }
+                }
+                if !recovered {
+                    // Will (very) likely fail, but give default handling a chance..
+                    NSLog("Unable to validate server trust. Performing default handling.")
+                    completionHandler(.performDefaultHandling, nil)
+                }
+            } else {
+                // reject
+                NSLog("Non-recoverable error evaluating server trust. Rejecting.")
+                completionHandler(.cancelAuthenticationChallenge, nil)
+            }
+        }
+        
+        if steStatus != errSecSuccess {
+            NSLog("Unable to evaluate server trust. Rejecting")
+            completionHandler(.cancelAuthenticationChallenge, nil)
         }
     }
     
