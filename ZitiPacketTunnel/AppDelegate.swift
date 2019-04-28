@@ -13,12 +13,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var menuBar:MainMenuBar? = nil
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Override point for customization after application launch.
         menuBar = MainMenuBar.shared
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
     }
 }
 

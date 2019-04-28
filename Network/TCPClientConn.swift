@@ -91,7 +91,7 @@ class TCPClientConn : NSObject {
                 state = .SYN_RCVD
                 let mss = mtu - Int(IPv4Packet.minHeaderBytes + TCPPacket.minHeaderBytes)
                 let zsStarted = zitiConn?.connect { [weak self] payload, nBytes in
-                    //NSLog("Read \(nBytes) from Ziti, Thread \(Thread.current)")
+                    NSLog("Read \(nBytes) from Ziti, Thread \(Thread.current)")
                     let key = self?.key ?? "<no-key>"
                     if nBytes <= 0 {
                         // 0 = eo-buffer

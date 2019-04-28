@@ -34,8 +34,8 @@ class ServicePoller : NSObject {
         
         if timer?.isValid ?? false { timer?.invalidate() }
         pollOnce()
-        timer = Timer.scheduledTimer(withTimeInterval: 15.0, repeats: true) { _ in
-            self.pollOnce()
+        timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { [weak self] _ in
+            self?.pollOnce()
         }
     }
     

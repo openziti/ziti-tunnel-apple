@@ -8,6 +8,28 @@
 
 import Foundation
 
+// version of identity needed by ziti-sdk-c
+class ZitiCId : NSObject, Codable {
+    class Identity : Codable {
+        let key:String, cert:String, ca:String?
+        init(_ key:String, _ cert:String, _ ca:String?) {
+            self.key = key
+            self.cert = cert
+            self.ca = ca
+        }
+    }
+    
+    let ztAPI:String
+    let versions:ZitiIdentity.Versions
+    let id:Identity
+    
+    init(_ ztAPI:String, _ versions:ZitiIdentity.Versions, _ id:Identity) {
+        self.ztAPI = ztAPI
+        self.versions = versions
+        self.id = id
+    }
+}
+
 class ZitiIdentity : NSObject, Codable {
     //let identity:(name:String, id:String)
     class Identity : Codable {
@@ -112,6 +134,26 @@ class ZitiIdentity : NSObject, Codable {
             if (match!.dns?.port != svc.dns?.port) { return false }
         }
         return true
+    }
+    
+    func toCId() -> ZitiCId? {
+        let zkc = ZitiKeychain()
+        
+        let (privK, _, _) = zkc.getKeyPair(self)
+        guard privK != nil else { return nil }
+        let key = "pem:\(zkc.getKeyPEM(privK!))"
+        guard key.count > 4 else { return nil }
+        
+        let (certDER, _) = zkc.getCertificate(self.id)
+        guard certDER != nil else { return nil }
+        let certPEM = "pem:\(zkc.convertToPEM("CERTIFICATE", der: certDER!))"
+        
+        var ca:String? = nil
+        if rootCa != nil {
+            let pems = zkc.extractPEMs(rootCa!)
+            ca = "pem:\(pems.joined())"
+        }
+        return ZitiCId(apiBaseUrl, versions, ZitiCId.Identity(key, certPEM, ca))
     }
     
     private class Cache : Codable {

@@ -95,6 +95,24 @@
 		5A91B4D52224B630006C4277 /* ZitiCSR.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4D32224B630006C4277 /* ZitiCSR.swift */; };
 		5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
 		5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
+		5ABA5ECA22727AEE00B2221D /* libuv_a.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC422727AEE00B2221D /* libuv_a.a */; };
+		5ABA5ECB22727AEE00B2221D /* libuv_mbed.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC522727AEE00B2221D /* libuv_mbed.a */; };
+		5ABA5ECC22727AEE00B2221D /* libziti.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC622727AEE00B2221D /* libziti.a */; };
+		5ABA5ECD22727AEE00B2221D /* libmbedcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC722727AEE00B2221D /* libmbedcrypto.a */; };
+		5ABA5ECE22727AEE00B2221D /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC822727AEE00B2221D /* libmbedtls.a */; };
+		5ABA5ECF22727AEE00B2221D /* libmbedx509.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC922727AEE00B2221D /* libmbedx509.a */; };
+		5ABA5ED022727B6400B2221D /* libziti.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC622727AEE00B2221D /* libziti.a */; };
+		5ABA5ED122727B6400B2221D /* libuv_mbed.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC522727AEE00B2221D /* libuv_mbed.a */; };
+		5ABA5ED222727B6400B2221D /* libuv_a.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC422727AEE00B2221D /* libuv_a.a */; };
+		5ABA5ED322727B6400B2221D /* libmbedcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC722727AEE00B2221D /* libmbedcrypto.a */; };
+		5ABA5ED422727B6400B2221D /* libmbedx509.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC922727AEE00B2221D /* libmbedx509.a */; };
+		5ABA5ED522727B6400B2221D /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC822727AEE00B2221D /* libmbedtls.a */; };
+		5ABA5ED7227338FA00B2221D /* libprotobuf-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5ED6227338FA00B2221D /* libprotobuf-c.a */; };
+		5ABA5ED82273394200B2221D /* libprotobuf-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5ED6227338FA00B2221D /* libprotobuf-c.a */; };
+		5ABA5EDA2274D2EB00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
+		5ABA5EDB2274D2EB00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
+		5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
+		5ABA5EDD2274D2EC00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5AF4BEC3223EE997001F1F4D /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF4BEC4223EE998001F1F4D /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
@@ -214,6 +232,16 @@
 		5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentityStore.swift; sourceTree = "<group>"; };
 		5A91B4D32224B630006C4277 /* ZitiCSR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiCSR.swift; sourceTree = "<group>"; };
 		5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelMgr.swift; sourceTree = "<group>"; };
+		5ABA5EBE22727A2B00B2221D /* PacketTunnelProvider-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PacketTunnelProvider-Bridging-Header.h"; sourceTree = "<group>"; };
+		5ABA5EBF22727A2B00B2221D /* MobilePacketTunnelProvider-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MobilePacketTunnelProvider-Bridging-Header.h"; sourceTree = "<group>"; };
+		5ABA5EC422727AEE00B2221D /* libuv_a.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuv_a.a; path = "../ziti-sdk-c/build/deps/uv-mbed/libuv/libuv_a.a"; sourceTree = "<group>"; };
+		5ABA5EC522727AEE00B2221D /* libuv_mbed.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuv_mbed.a; path = "../ziti-sdk-c/build/deps/uv-mbed/libuv_mbed.a"; sourceTree = "<group>"; };
+		5ABA5EC622727AEE00B2221D /* libziti.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti.a; path = "../ziti-sdk-c/build/library/libziti.a"; sourceTree = "<group>"; };
+		5ABA5EC722727AEE00B2221D /* libmbedcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedcrypto.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedcrypto.a"; sourceTree = "<group>"; };
+		5ABA5EC822727AEE00B2221D /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedtls.a"; sourceTree = "<group>"; };
+		5ABA5EC922727AEE00B2221D /* libmbedx509.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedx509.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedx509.a"; sourceTree = "<group>"; };
+		5ABA5ED6227338FA00B2221D /* libprotobuf-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libprotobuf-c.a"; path = "../ziti-sdk-c/build/lib/libprotobuf-c.a"; sourceTree = "<group>"; };
+		5ABA5ED92274D2EB00B2221D /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPPacket.swift; sourceTree = "<group>"; };
 		5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPClientConn.swift; sourceTree = "<group>"; };
 		5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPProxyConn.swift; sourceTree = "<group>"; };
@@ -253,6 +281,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ABA5ED7227338FA00B2221D /* libprotobuf-c.a in Frameworks */,
+				5ABA5ECB22727AEE00B2221D /* libuv_mbed.a in Frameworks */,
+				5ABA5ECA22727AEE00B2221D /* libuv_a.a in Frameworks */,
+				5ABA5ECE22727AEE00B2221D /* libmbedtls.a in Frameworks */,
+				5ABA5ECF22727AEE00B2221D /* libmbedx509.a in Frameworks */,
+				5ABA5ECD22727AEE00B2221D /* libmbedcrypto.a in Frameworks */,
+				5ABA5ECC22727AEE00B2221D /* libziti.a in Frameworks */,
 				5A02AADC206EBE85006261C6 /* NetworkExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -270,6 +305,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ABA5ED82273394200B2221D /* libprotobuf-c.a in Frameworks */,
+				5ABA5ED122727B6400B2221D /* libuv_mbed.a in Frameworks */,
+				5ABA5ED222727B6400B2221D /* libuv_a.a in Frameworks */,
+				5ABA5ED522727B6400B2221D /* libmbedtls.a in Frameworks */,
+				5ABA5ED422727B6400B2221D /* libmbedx509.a in Frameworks */,
+				5ABA5ED322727B6400B2221D /* libmbedcrypto.a in Frameworks */,
+				5ABA5ED022727B6400B2221D /* libziti.a in Frameworks */,
 				5A2EA2ED209B756400437608 /* NetworkExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -335,6 +377,13 @@
 		5A02AAD8206EBE3C006261C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5ABA5ED6227338FA00B2221D /* libprotobuf-c.a */,
+				5ABA5EC722727AEE00B2221D /* libmbedcrypto.a */,
+				5ABA5EC822727AEE00B2221D /* libmbedtls.a */,
+				5ABA5EC922727AEE00B2221D /* libmbedx509.a */,
+				5ABA5EC422727AEE00B2221D /* libuv_a.a */,
+				5ABA5EC522727AEE00B2221D /* libuv_mbed.a */,
+				5ABA5EC622727AEE00B2221D /* libziti.a */,
 				5A2EA2EC209B756400437608 /* NetworkExtension.framework */,
 				5A02AADB206EBE85006261C6 /* NetworkExtension.framework */,
 				4A55A7BA433FB826387BBA51 /* Pods_MobilePacketTunnelProvider.framework */,
@@ -357,6 +406,8 @@
 				5A379ACB221EDB1400051475 /* ZitiIdentity.swift */,
 				5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */,
 				5A0D1D242225A87F00D01F30 /* ZitiKeychain.swift */,
+				5ABA5EBE22727A2B00B2221D /* PacketTunnelProvider-Bridging-Header.h */,
+				5ABA5EBF22727A2B00B2221D /* MobilePacketTunnelProvider-Bridging-Header.h */,
 			);
 			path = Ziti;
 			sourceTree = "<group>";
@@ -437,6 +488,7 @@
 				5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */,
 				5A051F5D22620B7100B11CB2 /* ServicePoller.swift */,
 				5A051F602264183500B11CB2 /* ZidMgr.swift */,
+				5ABA5ED92274D2EB00B2221D /* Logger.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -765,6 +817,7 @@
 				5A0D1D252225A87F00D01F30 /* ZitiKeychain.swift in Sources */,
 				5AF4BEC3223EE997001F1F4D /* IPUtils.swift in Sources */,
 				5A051F612264183500B11CB2 /* ZidMgr.swift in Sources */,
+				5ABA5EDA2274D2EB00B2221D /* Logger.swift in Sources */,
 				5A8702D32230B4D300314199 /* ZitiEdgeNetworkSession.swift in Sources */,
 				5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */,
 				5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */,
@@ -792,6 +845,7 @@
 				5A91B4B2222091DE006C4277 /* ZitiIdentity.swift in Sources */,
 				5A1B63D4222FE51700E9C226 /* ZitiEdgeError.swift in Sources */,
 				5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */,
+				5ABA5EDB2274D2EB00B2221D /* Logger.swift in Sources */,
 				5A0D1D2D222B093F00D01F30 /* ZitiError.swift in Sources */,
 				5A1B63CF222ED15F00E9C226 /* ZitiEdge.swift in Sources */,
 				5A8702CF2230B24B00314199 /* ZitiEdgeService.swift in Sources */,
@@ -830,6 +884,7 @@
 				5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */,
 				5AF4BEC4223EE998001F1F4D /* IPUtils.swift in Sources */,
 				5A8702DA22372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
+				5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */,
 				5A0D1D272225A87F00D01F30 /* ZitiKeychain.swift in Sources */,
 				5A91B4C92222E155006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */,
@@ -854,6 +909,7 @@
 				5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */,
 				5A1B63D6222FE51700E9C226 /* ZitiEdgeError.swift in Sources */,
 				5A2EA2F1209B75B800437608 /* ProviderConfig.swift in Sources */,
+				5ABA5EDD2274D2EC00B2221D /* Logger.swift in Sources */,
 				5A0D1D2F222B093F00D01F30 /* ZitiError.swift in Sources */,
 				5A1B63D1222ED15F00E9C226 /* ZitiEdge.swift in Sources */,
 				5A8702D12230B24B00314199 /* ZitiEdgeService.swift in Sources */,
@@ -1078,17 +1134,25 @@
 		5A02AAD5206EBDD5006261C6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
+				HEADER_SEARCH_PATHS = (
+					"../ziti-sdk-c/includes",
+					"../ziti-sdk-c/deps/uv-mbed/libuv/include",
+				);
 				INFOPLIST_FILE = PacketTunnelProvider/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build/**";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Ziti/PacketTunnelProvider-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -1096,18 +1160,25 @@
 		5A02AAD6206EBDD5006261C6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
+				HEADER_SEARCH_PATHS = (
+					"../ziti-sdk-c/includes",
+					"../ziti-sdk-c/deps/uv-mbed/libuv/include",
+				);
 				INFOPLIST_FILE = PacketTunnelProvider/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build/**";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Ziti/PacketTunnelProvider-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -1160,6 +1231,7 @@
 		5A2EA2E9209B754500437608 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1172,6 +1244,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Ziti/MobilePacketTunnelProvider-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1180,6 +1254,7 @@
 		5A2EA2EA209B754500437608 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1192,6 +1267,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Ziti/MobilePacketTunnelProvider-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;

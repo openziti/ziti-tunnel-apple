@@ -163,8 +163,24 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
         return (nil, nil)
     }
+    
+    var versionString:String {
+        get {
+            var appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown version"
+            if let appBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+                appVersion += " (\(appBuild))"
+            }
+            let verStr = String(cString: ziti_get_version(0)!)
+            let gitBranch = String(cString: ziti_git_branch()!)
+            let gitCommit = String(cString: ziti_git_commit()!)
+            return "\(Bundle.main.bundleIdentifier ?? "Ziti") Version: \(appVersion); ziti-sdk-c version \(verStr) @\(gitBranch)(\(gitCommit))"
+        }
+    }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+        Logger.initShared("TUN")
+        NSLog(versionString)
+        
         NSLog("startTunnel: \(Thread.current): \(OperationQueue.current?.underlyingQueue?.label ?? "None")")
 
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict

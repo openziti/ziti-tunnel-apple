@@ -22,7 +22,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     static let APP_GROUP_ID = "group.io.netfoundry.ZitiMobilePacketTunnel"
     #endif
     
-    var presentedItemURL: URL? = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: APP_GROUP_ID)
+    var presentedItemURL:URL? = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: APP_GROUP_ID)
     lazy var presentedItemOperationQueue = OperationQueue.main
     var haveFilePresenter = false
     weak var delegate:ZitiIdentityStoreDelegate?
@@ -111,6 +111,29 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         return zErr
     }
     
+    func storeCId(_ zId:ZitiIdentity) -> ZitiError? {
+        guard let presentedItemURL = self.presentedItemURL else {
+            return ZitiError("ZitiIdentityStore.storeCId: Invalid container URL")
+        }
+        guard let cId = zId.toCId() else {
+            return ZitiError("ZitiIdentityStore.storeCId: Unable to create CId")
+        }
+        
+        let fc = NSFileCoordinator()
+        let url = presentedItemURL.appendingPathComponent("\(zId.id).cid", isDirectory:false)
+        var zErr:ZitiError? = nil
+        fc.coordinate(writingItemAt: url, options: [], error: nil) { url in
+            do {
+                let jsonEncoder = JSONEncoder()
+                let data = try jsonEncoder.encode(cId)
+                try data.write(to: url, options: .atomic)
+            } catch {
+                zErr = ZitiError("ZitiIdentityStore.storeCId Unable to write URL: \(error.localizedDescription)")
+            }
+        }
+        return zErr
+    }
+    
     func remove(_ zid:ZitiIdentity) -> ZitiError? {
         guard let presentedItemURL = self.presentedItemURL else {
             return ZitiError("ZitiIdentityStore.remove: Invalid container URL")
@@ -127,6 +150,25 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                 try FileManager.default.removeItem(at: url)
             } catch {
                 zErr = ZitiError("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")
+            }
+        }
+        if zErr == nil { zErr = removeCId(zid) }
+        return zErr
+    }
+    
+    func removeCId(_ zid:ZitiIdentity) -> ZitiError? {
+        guard let presentedItemURL = self.presentedItemURL else {
+            return ZitiError("ZitiIdentityStore.removeCId: Invalid container URL")
+        }
+        
+        let fc = NSFileCoordinator()
+        let url = presentedItemURL.appendingPathComponent("\(zid.id).cid", isDirectory:false)
+        var zErr:ZitiError? = nil
+        fc.coordinate(writingItemAt: url, options: .forDeleting, error: nil) { url in
+            do {
+                try FileManager.default.removeItem(at: url)
+            } catch {
+                zErr = ZitiError("ZitiIdentityStore.removeCid Unable to delete zId: \(error.localizedDescription)")
             }
         }
         return zErr

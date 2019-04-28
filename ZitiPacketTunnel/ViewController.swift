@@ -32,6 +32,16 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     var enrollingIds:[ZitiIdentity] = []
     var servicePoller = ServicePoller()
     
+    var versionString:String {
+        get {
+            var appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown version"
+            if let appBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
+                appVersion += " (\(appBuild))"
+            }
+            return "\(Bundle.main.bundleIdentifier ?? "Ziti") Version: \(appVersion)"
+        }
+    }
+    
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
         connectButton.isEnabled = true
         switch status {
@@ -145,6 +155,10 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        Logger.initShared("APP")
+        NSLog(versionString)
+        
         zidMgr.zidStore.delegate = self
         tableView.delegate = self
         tableView.dataSource = self
@@ -338,6 +352,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 }
                 zid.enabled = true
                 _ = self.zidMgr.zidStore.store(zid)
+                _ = self.zidMgr.zidStore.storeCId(zid)
                 self.updateServiceUI(zId:zid)
             }
         }

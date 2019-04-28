@@ -97,6 +97,16 @@ class ZitiKeychain : NSObject {
         return e == nil
     }
     
+    func getKeyPEM(_ key:SecKey) -> String {
+        var cfErr:Unmanaged<CFError>?
+        guard let derKey = SecKeyCopyExternalRepresentation(key, &cfErr) else {
+            NSLog("getKeyPEM: Unable to get external rep for key: \(cfErr!.takeRetainedValue() as Error)")
+            return ""
+        }
+        
+        return convertToPEM("RSA PRIVATE KEY", der: derKey as Data) // RSA PRIVATE KEY?
+    }
+    
     private func deleteKey(_ atag:Data, keyClass:Any) -> OSStatus {
         let deleteQuery:[CFString:Any] = [
             kSecClass: kSecClassKey,
