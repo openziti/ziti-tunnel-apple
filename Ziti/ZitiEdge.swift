@@ -297,12 +297,6 @@ extension ZitiEdge : URLSessionDelegate {
         }
     }
     
-    private func isExpectedHost(_ host:String) -> Bool {
-        let apiHost = getHost(zid.apiBaseUrl)
-        let enrollHost = getHost(zid.enrollmentUrl)
-        return host == apiHost || host == enrollHost
-    }
-    
     func handleServerTrustChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
         guard let rootCa = zid.rootCa else {
@@ -316,48 +310,25 @@ extension ZitiEdge : URLSessionDelegate {
             return
         }
         
-        if isExpectedHost(challenge.protectionSpace.host) == false {
-            NSLog("Rejecting server challend for unexpected host \(challenge.protectionSpace.host)")
+        // Add our rootCAs
+        let zkc = ZitiKeychain()
+        let rootCerts = zkc.PEMstoCerts(zkc.extractPEMs(rootCa))
+        let stStatus = SecTrustSetAnchorCertificates(serverTrust, rootCerts as CFArray)
+        guard stStatus == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(stStatus, nil) as String? ?? "\(stStatus)"
+            NSLog("Rejecting.  Unable to set provided anchor certs: \(errStr)")
             completionHandler(.cancelAuthenticationChallenge, nil)
             return
         }
         
-        
-        //
-        // TODO: need to re-visit this...
-        // https://tools.ietf.org/html/rfc5246#section-7.4.2
-        // certificate_list This is a sequence (chain) of certificates. The sender's certificate MUST come first in the list. Each following certificate MUST directly certify the one preceding it. Because certificate validation requires that root keys be distributed independently, the self-signed certificate that specifies the root certificate authority MAY be omitted from the chain, under the assumption that the remote end must already possess it in order to validate it in any case.
-        //
-        // Rely on SecTrustEvaluateAsync to verify certs were signed with correct private key
         let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue.main) { secTrust, result in
             if result == .proceed || result == .unspecified {
                 completionHandler(.useCredential, URLCredential(trust:secTrust))
             } else if result == .recoverableTrustFailure {
-                var recovered = false
-                let zkc = ZitiKeychain()
-                
-                // TODO: this is the part that needs work...
-                //    improvment on below: validate the chain is as described above,
-                //    that index 0 chains all the way to the last one
-                //    if last is a root CA, verify that we have it.
-                //    if last is not a root CA, verify that we have it and that the signer was root CA in our rootCa
-                for i in 0..<SecTrustGetCertificateCount(secTrust) {
-                    if let cert = SecTrustGetCertificateAtIndex(secTrust, i) {
-                        for caCert in zkc.PEMstoCerts(zkc.extractPEMs(rootCa)) {
-                            if zkc.certsMatch(cert, caCert) {
-                                recovered = true
-                                completionHandler(.useCredential, URLCredential(trust: secTrust))
-                                break
-                            }
-                        }
-                    }
-                    if recovered { break }
-                }
-                if !recovered {
-                    // Will (very) likely fail, but give default handling a chance..
-                    NSLog("Unable to validate server trust. Performing default handling.")
-                    completionHandler(.performDefaultHandling, nil)
-                }
+                // Will very likely fail, but give default handling a chance so if user manually adds the root CA
+                // to Keychain and trusts it it will succeed
+                NSLog("Unable to validate server trust, but recoverable. Performing default handling.")
+                completionHandler(.performDefaultHandling, nil)
             } else {
                 // reject
                 NSLog("Non-recoverable error evaluating server trust. Rejecting.")
