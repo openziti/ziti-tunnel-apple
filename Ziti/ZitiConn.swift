@@ -34,7 +34,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         close()
     }
     
-    static let onConn:nf_conn_cb = { nfConn, status in
+    static let on_nf_conn:nf_conn_cb = { nfConn, status in
         guard let mySelf = ZitiConn.fromContext(NF_conn_data(nfConn)) else {
             NSLog("ZitiConn.onConn WTF invalid ctx")
             //NF_close(&nfConn)
@@ -45,7 +45,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         mySelf.writeCond.signal()
     }
     
-    static let onData:nf_data_cb = { nfConn, buf, nBytes in
+    static let on_nf_data:nf_data_cb = { nfConn, buf, nBytes in
         guard nBytes > 0 && buf != nil else {
             // TODO: why sometimes to -6 and nil here? (after closing connection)
             NSLog("ZitiConn.onData Unexpected data received, len=\(nBytes), bufPtr=\(buf != nil)")
@@ -77,7 +77,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             NF_shutdown(zid.nf_context)
             return false
         }
-                
+
         // validate the service
         guard let svcName_c = svc.name?.cString(using: .utf8) else {
             NSLog("ZitiConn \(key) Unable to create C service name for \(zid.id):\(svc.name ?? "nil")")
@@ -92,7 +92,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         }
         
         // dial it
-        guard NF_dial(nfConn, svcName_c, ZitiConn.onConn, ZitiConn.onData) == ZITI_OK else {
+        guard NF_dial(nfConn, svcName_c, ZitiConn.on_nf_conn, ZitiConn.on_nf_data) == ZITI_OK else {
             NSLog("ZitiConn \(key) Unable to dial service \(zid.id):\(svc.name ?? "nil")")
             NF_shutdown(zid.nf_context)
             return false

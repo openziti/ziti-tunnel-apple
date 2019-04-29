@@ -8,24 +8,38 @@
 
 import Foundation
 
-fileprivate var nfContexts:[String:nf_context] = [:]
-
 extension ZitiIdentity {
+    var nf_context_key:String { return "\(id)_nf_context" }
+    var nf_init_cond_key:String { return "nf_init_cond" }
     
-    func startRunloop() {
+    var nf_context:nf_context? { return Thread.main.threadDictionary[nf_context_key] as? nf_context }
+    var nf_init_cond:NSCondition? { return Thread.current.threadDictionary[nf_init_cond_key] as? NSCondition }
+    
+    func startRunloop(_ blocking:Bool=true) {
         let thread = Thread(target: self, selector: #selector(ZitiIdentity.doRunLoop), object: nil)
         thread.name = "\(id)_uv_runloop"
+        let cond = blocking ? NSCondition() : nil
+        thread.threadDictionary[nf_init_cond_key] = cond
         thread.start()
+        
+        nf_init_cond?.lock()
+        while blocking && nf_context == nil {
+            let ti = TimeInterval(10.0) // give it 10 seconds (should be done in < 1/2 of that)
+            NSLog("\(name):\(id) Waiting \(ti) for SDK on_nf_init()..")
+            if let cond = cond, !cond.wait(until: Date(timeIntervalSinceNow: ti))  {
+                NSLog("** \(name):\(id) timed out waiting for on_nf_init()")
+            }
+        }
+        NSLog("\(name):\(id) Done waiting for SDK on_nf_init()...")
+        nf_init_cond?.unlock()
     }
     
-    var nf_context:nf_connection? { return nfContexts[id] }
-    
-    static let onNFInit:nf_init_cb = { nf_context, status, ctx in
+    static let on_nf_init:nf_init_cb = { nf_context, status, ctx in
         guard let mySelf = ZitiIdentity.fromContext(ctx) else {
-            NSLog("ZitiIdentity.onNFInit WTF invalid ctx")
+            NSLog("ZitiIdentity on_nf_init WTF invalid ctx")
             return
         }
-        print("onNFInit status: \(status), id: \(mySelf.id)")
+        print("on_nf_init status: \(status), id: \(mySelf.id)")
         if status != ZITI_OK {
             NSLog("\(mySelf.id) onNFInit error: \(status)")
             NF_shutdown(nf_context)
@@ -33,29 +47,31 @@ extension ZitiIdentity {
         }
         
         // save off nf_context
-        nfContexts[mySelf.id] = nf_context
+        Thread.main.threadDictionary[mySelf.nf_context_key] = nf_context
         
         // TODO: remove this...
         NF_dump(nf_context)
+        
+        // signal init condition
+        mySelf.nf_init_cond?.signal()
     }
     
-    static let onUvTimer:uv_timer_cb = { th in
+    static let on_uv_timer:uv_timer_cb = { th in
         guard let th = th, let mySelf = ZitiIdentity.fromContext(th.pointee.data) else {
             NSLog("ZitiIdentity.onUvTimer WTF invalid ctx")
             return
         }
-        NSLog("\(mySelf.name):\(mySelf.id) runloop")
+        NSLog("\(mySelf.name):\(mySelf.id) runloop alive")
         
-        /*
-        if mySelf.thread?.isCancelled ?? true {
-            NF_shutdown(mySelf.nfCtx)
-            //NF_free(mySelf.nfCtx!)
-            uv_timer_stop(th)
-            uv_loop_close(mySelf.loop)
-        }*/
+        //
+        // Could uv_timer_stop(tv), NF_shutdown(mySelf.nf_context) based on
+        // (atomic) Bool or somesuch.  But zids live for lifetime of tunnel,
+        // and tunnel currently does exit(0), not a need right now
+        //
     }
     
     @objc func doRunLoop() {
+        print("RunLoop thread = \(Thread.current)")
         var loop = uv_loop_t()
         
         // init the runloop
@@ -66,12 +82,13 @@ extension ZitiIdentity {
         
         // init NF for this identity
         let zitiConfigPath_c = getCidPath() // keep swift refernece...
-        if NF_init(zitiConfigPath_c, &loop, ZitiIdentity.onNFInit, self.toVoidPtr()) != 0 {
+        if NF_init(zitiConfigPath_c, &loop, ZitiIdentity.on_nf_init, self.toVoidPtr()) != 0 {
             NSLog("Unable to init SDK for \(name):\(id)")
             return
         }
         
-        // setup keep-alive timer
+        // setup keep-alive timer (else uv_run immediately exits since nothing gets confired
+        // on the loop until we receive a client connection
         var th = uv_timer_t()
         guard uv_timer_init(&loop, &th) == 0 else {
             NSLog("zid(\(id)) unable to init runloop timer")
@@ -79,8 +96,8 @@ extension ZitiIdentity {
         }
         th.data = self.toVoidPtr()
         
-        let timeoutMs:UInt64 = 3 * 1000
-        uv_timer_start(&th, ZitiIdentity.onUvTimer, timeoutMs, timeoutMs)
+        let timeoutMs:UInt64 = 300 * 1000 // 5 mins for now since we don't do anything useful in the callback
+        uv_timer_start(&th, ZitiIdentity.on_uv_timer, timeoutMs, timeoutMs)
         
         // start the runloop
         NSLog("Starting runloop for \(name):\(id)")
