@@ -3,3 +3,7 @@
 //
 
 #import <nf/ziti.h>
+
+const char* ziti_get_version(int verbose);
+const char* ziti_git_branch();
+const char* ziti_git_commit();

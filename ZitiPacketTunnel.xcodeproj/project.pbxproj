@@ -113,6 +113,8 @@
 		5ABA5EDB2274D2EB00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5ABA5EDD2274D2EC00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
+		5ABA5EDF22765E7500B2221D /* ZitiIdentity+nf_context.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5EDE22765E7500B2221D /* ZitiIdentity+nf_context.swift */; };
+		5ABA5EE022765E7500B2221D /* ZitiIdentity+nf_context.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5EDE22765E7500B2221D /* ZitiIdentity+nf_context.swift */; };
 		5AF4BEC3223EE997001F1F4D /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF4BEC4223EE998001F1F4D /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
@@ -242,6 +244,7 @@
 		5ABA5EC922727AEE00B2221D /* libmbedx509.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedx509.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedx509.a"; sourceTree = "<group>"; };
 		5ABA5ED6227338FA00B2221D /* libprotobuf-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libprotobuf-c.a"; path = "../ziti-sdk-c/build/lib/libprotobuf-c.a"; sourceTree = "<group>"; };
 		5ABA5ED92274D2EB00B2221D /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		5ABA5EDE22765E7500B2221D /* ZitiIdentity+nf_context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZitiIdentity+nf_context.swift"; sourceTree = "<group>"; };
 		5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPPacket.swift; sourceTree = "<group>"; };
 		5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPClientConn.swift; sourceTree = "<group>"; };
 		5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPProxyConn.swift; sourceTree = "<group>"; };
@@ -398,6 +401,8 @@
 			isa = PBXGroup;
 			children = (
 				5A91B4D32224B630006C4277 /* ZitiCSR.swift */,
+				5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */,
+				5ABA5EDE22765E7500B2221D /* ZitiIdentity+nf_context.swift */,
 				5A1B63CD222ED15F00E9C226 /* ZitiEdge.swift */,
 				5A1B63D2222FE51700E9C226 /* ZitiEdgeError.swift */,
 				5A8702D22230B4D300314199 /* ZitiEdgeNetworkSession.swift */,
@@ -430,7 +435,6 @@
 				5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */,
 				5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */,
 				5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */,
-				5A85A91A225A6EB2004A29F2 /* ZitiConn.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -859,6 +863,7 @@
 				5AF4BECA2241046F001F1F4D /* TCPClientConn.swift in Sources */,
 				5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
+				5ABA5EDF22765E7500B2221D /* ZitiIdentity+nf_context.swift in Sources */,
 				5AF78691208FFF670093498C /* PacketRouter.swift in Sources */,
 				5A91B4C82222E154006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */,
@@ -923,6 +928,7 @@
 				5AF4BECB2241046F001F1F4D /* TCPClientConn.swift in Sources */,
 				5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */,
 				5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */,
+				5ABA5EE022765E7500B2221D /* ZitiIdentity+nf_context.swift in Sources */,
 				5A2EA2F2209B75C400437608 /* IPv4Packet.swift in Sources */,
 				5A2EA2F4209B75CD00437608 /* DNSPacket.swift in Sources */,
 				5A2EA2F5209B75D100437608 /* PacketRouter.swift in Sources */,
@@ -1145,7 +1151,7 @@
 				);
 				INFOPLIST_FILE = PacketTunnelProvider/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build/**";
+				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build-macos/**";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1171,7 +1177,7 @@
 				);
 				INFOPLIST_FILE = PacketTunnelProvider/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build/**";
+				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build-macos/**";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1237,9 +1243,14 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
+				HEADER_SEARCH_PATHS = (
+					"../ziti-sdk-c/includes",
+					"../ziti-sdk-c/deps/uv-mbed/libuv/include",
+				);
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build-ios";
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1260,9 +1271,14 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
+				HEADER_SEARCH_PATHS = (
+					"../ziti-sdk-c/includes",
+					"../ziti-sdk-c/deps/uv-mbed/libuv/include",
+				);
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build-ios";
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

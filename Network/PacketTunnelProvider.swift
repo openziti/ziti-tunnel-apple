@@ -145,6 +145,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     // update the store (continue even if it somehow fails - store method will log any errors)
                     _ = zidStore.store(zid)
                 }
+                
+                // TODO: prob need to wait for run loops to actually start..
+                zid.startRunloop()
             }
         }
         self.zids = zids ?? []
