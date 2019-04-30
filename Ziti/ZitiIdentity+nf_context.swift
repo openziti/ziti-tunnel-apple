@@ -15,7 +15,7 @@ extension ZitiIdentity {
     var nf_context:nf_context? { return Thread.main.threadDictionary[nf_context_key] as? nf_context }
     var nf_init_cond:NSCondition? { return Thread.current.threadDictionary[nf_init_cond_key] as? NSCondition }
     
-    func startRunloop(_ blocking:Bool=true) {
+    func startRunloop(_ blocking:Bool=true) -> Bool {
         let thread = Thread(target: self, selector: #selector(ZitiIdentity.doRunLoop), object: nil)
         thread.name = "\(id)_uv_runloop"
         let cond = blocking ? NSCondition() : nil
@@ -24,14 +24,16 @@ extension ZitiIdentity {
         
         nf_init_cond?.lock()
         while blocking && nf_context == nil {
-            let ti = TimeInterval(10.0) // give it 10 seconds (should be done in < 1/2 of that)
+            let ti = TimeInterval(5.0) // give it a hefty amount of time
             NSLog("\(name):\(id) Waiting \(ti) for SDK on_nf_init()..")
             if let cond = cond, !cond.wait(until: Date(timeIntervalSinceNow: ti))  {
-                NSLog("** \(name):\(id) timed out waiting for on_nf_init()")
+                NSLog("** \(name):\(id) timed out waiting for on_nf_init()")                
+                return false
             }
         }
         NSLog("\(name):\(id) Done waiting for SDK on_nf_init()...")
         nf_init_cond?.unlock()
+        return true
     }
     
     static let on_nf_init:nf_init_cb = { nf_context, status, ctx in
@@ -41,8 +43,8 @@ extension ZitiIdentity {
         }
         print("on_nf_init status: \(status), id: \(mySelf.id)")
         if status != ZITI_OK {
-            NSLog("\(mySelf.id) onNFInit error: \(status)")
-            NF_shutdown(nf_context)
+            let errStr = String(cString: ziti_errorstr(status))
+            NSLog("\(mySelf.id) on_nf_init error: \(errStr)")
             return
         }
         
@@ -58,7 +60,7 @@ extension ZitiIdentity {
     
     static let on_uv_timer:uv_timer_cb = { th in
         guard let th = th, let mySelf = ZitiIdentity.fromContext(th.pointee.data) else {
-            NSLog("ZitiIdentity.onUvTimer WTF invalid ctx")
+            NSLog("ZitiIdentity.on_uv_timer WTF invalid ctx")
             return
         }
         NSLog("\(mySelf.name):\(mySelf.id) runloop alive")

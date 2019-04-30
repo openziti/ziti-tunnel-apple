@@ -127,7 +127,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let (zids, zErr) = zidStore.loadAll()
         guard zErr == nil, zids != nil else { return zErr }
         
-        zids!.forEach { zid in
+        var anyErr:ZitiError?
+        for zid in zids! {
             if zid.isEnabled == true {
                 let zEdge = ZitiEdge(zid)
                 zid.services?.forEach { svc in
@@ -146,12 +147,15 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     _ = zidStore.store(zid)
                 }
                 
-                // TODO: prob need to wait for run loops to actually start..
-                zid.startRunloop()
+                // Start C SDK's run loop
+                if !zid.startRunloop(true) {
+                    anyErr = ZitiError("Unable to start run loop for \(zid.name):\(zid.id)")
+                    break
+                }
             }
         }
         self.zids = zids ?? []
-        return nil
+        return anyErr
     }
     
     func getServiceForIntercept(_ ip:String) -> (ZitiIdentity?, ZitiEdgeService?) {
