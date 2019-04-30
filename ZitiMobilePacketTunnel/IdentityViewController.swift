@@ -96,7 +96,9 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 }
                 zid.enabled = true
                 _ = self.tvc?.zidMgr.zidStore.store(zid)
+                _ = self.tvc?.zidMgr.zidStore.storeCId(zid)
                 self.tableView.reloadData()
+                self.tvc?.tableView.reloadData()
             }
         }
     }
