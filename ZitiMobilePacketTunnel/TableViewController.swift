@@ -65,7 +65,7 @@ class StatusCell: UITableViewCell {
     }
 }
 
-class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate {
+class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate, ZitiIdentityStoreDelegate {
     
     static let providerBundleIdentifier = "io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
     var tunnelMgr = TunnelMgr.shared
@@ -77,6 +77,12 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         super.viewDidLoad()
         tableView.isEditing = true
         tableView.allowsSelectionDuringEditing = true
+        
+        Logger.initShared(Logger.APP_TAG)
+        NSLog(Version.verboseStr)
+        
+        // watch for changes to the zids
+        zidMgr.zidStore.delegate = self
 
         // init the manager
         tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
@@ -107,6 +113,26 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 }
             }
         }
+    }
+    
+    func onNewOrChangedId(_ zid: ZitiIdentity) {
+        if let match = zidMgr.zids.first(where: { $0.id == zid.id }) {
+            print("\(zid.name):\(zid.id) changed")
+            
+            // TUN will disable if unable to start for zid
+            match.edgeStatus = zid.edgeStatus
+            match.enabled = zid.enabled
+            
+            // always take new service from tunneler...
+            match.services = zid.services
+            tableView.reloadData()
+            ivc?.tableView.reloadData()
+        } else {
+            print("\(zid.name):\(zid.id) new")
+        }
+    }
+    
+    func onRemovedId(_ idString: String) {
     }
     
     // MARK: - Table view data source
@@ -200,14 +226,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         return nil
     }
     
-    func appVersion() -> String {
-        var appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown version"
-        if let appBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-            appVersion += " (\(appBuild))"
-        }
-        return appVersion
-    }
-    
     func deviceName() -> String {
         var systemInfo = utsname()
         uname(&systemInfo)
@@ -224,11 +242,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         }
     }
     
-    func osVersion() -> String {
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        return "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
-    }
-
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Selected row at \(indexPath)")
         if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
@@ -244,7 +257,15 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 mail.mailComposeDelegate = self
                 mail.setSubject("Ziti Support (iOS)")
                 mail.setToRecipients(["support@netfoundry.io"])
-                mail.setMessageBody("\n\n\nVersion: \(appVersion())\nOS Version: \(osVersion())\nDevice: \(deviceName())", isHTML: false)
+                mail.setMessageBody("\n\n\nVersion: \(Version.str)\nOS \(Version.osVersion)\nDevice: \(deviceName())", isHTML: false)
+                if let logger = Logger.shared {
+                    if let url = logger.currLog(forTag: Logger.TUN_TAG), let data = try? Data(contentsOf: url) {
+                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
+                    }
+                    if let url = logger.currLog(forTag: Logger.APP_TAG), let data = try? Data(contentsOf: url) {
+                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
+                    }
+                }
                 self.present(mail, animated: true)
             } else {
                 print("Mail view controller not available")

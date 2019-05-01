@@ -8,23 +8,6 @@
 
 import NetworkExtension
 
-extension sockaddr {
-    public init(port: in_port_t, address: String? = nil) {
-        var addr = sockaddr_in()
-        addr.sin_family = sa_family_t(AF_INET)
-        addr.sin_port = port.bigEndian
-        
-        if let address = address {
-            let r = inet_pton(AF_INET, address, &addr.sin_addr)
-            assert(r == 1, "\(address) is not converted.")
-        }
-        
-        self = withUnsafePointer(to: &addr) {
-            UnsafePointer<sockaddr>(OpaquePointer($0)).pointee
-        }
-    }
-}
-
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     let providerConfig = ProviderConfig()
@@ -127,35 +110,31 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let (zids, zErr) = zidStore.loadAll()
         guard zErr == nil, zids != nil else { return zErr }
         
-        var anyErr:ZitiError?
         for zid in zids! {
             if zid.isEnabled == true {
-                let zEdge = ZitiEdge(zid)
-                zid.services?.forEach { svc in
-                    // If no networkSession for svc, go get one (synchronously)
-                    // TODO: If service status is 'unavailable', but we have netSession aleady, what should we do?
-                    //      - prob should either remove it and try to request a new one, or skip this entire zid...
-                    svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Available)
-                    if svc.networkSession == nil {
-                        _ = getNetSessionSync(zEdge, zid, svc)
-                    }
-                    
-                    // add hostnames to dns, routes to intercept, and set interceptIp
-                    updateHostsAndIntercepts(zid, svc)
-                    
-                    // update the store (continue even if it somehow fails - store method will log any errors)
-                    _ = zidStore.store(zid)
-                }
-                
                 // Start C SDK's run loop
                 if !zid.startRunloop(true) {
-                    anyErr = ZitiError("Unable to start run loop for \(zid.name):\(zid.id)")
-                    break
+                    NSLog("Unable to start run loop for \(zid.name):\(zid.id)")
+                    zid.enabled = false
+                    zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+                } else {
+                    let zEdge = ZitiEdge(zid)
+                    zid.services?.forEach { svc in
+                        svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Available)
+                        if svc.networkSession == nil {
+                            _ = getNetSessionSync(zEdge, zid, svc)
+                        }
+                        
+                        // add hostnames to dns, routes to intercept, and set interceptIp
+                        updateHostsAndIntercepts(zid, svc)
+                    }
                 }
+                // update the store (continue even if it somehow fails - store method will log any errors)
+                _ = zidStore.store(zid)
             }
         }
         self.zids = zids ?? []
-        return anyErr
+        return nil
     }
     
     func getServiceForIntercept(_ ip:String) -> (ZitiIdentity?, ZitiEdgeService?) {
@@ -173,19 +152,15 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     var versionString:String {
         get {
-            var appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown version"
-            if let appBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-                appVersion += " (\(appBuild))"
-            }
             let verStr = String(cString: ziti_get_version(0)!)
             let gitBranch = String(cString: ziti_git_branch()!)
             let gitCommit = String(cString: ziti_git_commit()!)
-            return "\(Bundle.main.bundleIdentifier ?? "Ziti") Version: \(appVersion); ziti-sdk-c version \(verStr) @\(gitBranch)(\(gitCommit))"
+            return "\(Version.verboseStr); ziti-sdk-c version \(verStr) @\(gitBranch)(\(gitCommit))"
         }
     }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-        Logger.initShared("TUN")
+        Logger.initShared(Logger.TUN_TAG)
         NSLog(versionString)
         
         NSLog("startTunnel: \(Thread.current): \(OperationQueue.current?.underlyingQueue?.label ?? "None")")
@@ -239,19 +214,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
             
             // packetFlow FD
+            var ifname:String?
             let fd = (self.packetFlow.value(forKeyPath: "socket.fileDescriptor") as? Int32) ?? -1
             if fd < 0 {
                 NSLog("Unable to get tun fd")
+            } else {
+                var ifnameSz = socklen_t(IFNAMSIZ)
+                let ifnamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: Int(ifnameSz))
+                ifnamePtr.initialize(repeating: 0, count: Int(ifnameSz))
+                if getsockopt(fd, 2 /* SYSPROTO_CONTROL */, 2 /* UTUN_OPT_IFNAME */, ifnamePtr, &ifnameSz) == 0 {
+                    ifname = String(cString: ifnamePtr)
+                }
+                ifnamePtr.deallocate()
             }
-            
-            var ifnameSz = socklen_t(IFNAMSIZ)
-            let ifnamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: Int(ifnameSz))
-            ifnamePtr.initialize(repeating: 0, count: Int(ifnameSz))
-            var ifname:String?
-            if getsockopt(fd, 2 /* SYSPROTO_CONTROL */, 2 /* UTUN_OPT_IFNAME */, ifnamePtr, &ifnameSz) == 0 {
-                ifname = String(cString: ifnamePtr)
-            }
-            ifnamePtr.deallocate()
             NSLog("Tunnel interface is \(ifname ?? "unknown")")
             
             // call completion handler with nil to indicate success
@@ -267,8 +242,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         NSLog("stopTunnel")
         self.packetRouter = nil
-        completionHandler() // TODO: escaping, so escape and shutdown all TCPSession and the tunneler...
-        // sometimes slow on restarts.  gonna force exit here..
+        completionHandler()
+        // Just exit - there are bugs in Apple macOS, plus makes sure we're 'clean' on restart
         exit(EXIT_SUCCESS)
     }
     

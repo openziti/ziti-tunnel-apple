@@ -10,6 +10,8 @@ import Foundation
 
 class Logger {
     static var shared:Logger?
+    static let TUN_TAG = "TUN"
+    static let APP_TAG = "APP"
     
     private let tag:String
     private var timer:Timer? = nil
@@ -22,25 +24,63 @@ class Logger {
         timer?.invalidate()
     }
     
-    private func cleanup(_ appGroupUrl:URL) {
-        // delete \(tag)*.logs more than 48 hours old
+    var currLog:URL? {
+        return currLog(forTag: tag)
     }
     
-    private func updateLogger() -> Bool {
+    func currLog(forTag tag:String) -> URL? {
         guard let appGroupURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: ZitiIdentityStore.APP_GROUP_ID)  else {
-                NSLog("WTF Invalid app group URL")
-                return false
+                return nil
         }
         
-        // cleanup...
-        cleanup(appGroupURL)
-            
         let df = DateFormatter()
         df.dateFormat = "yyyy-MM-dd"
         let dateStr = df.string(from: Date())
+        return appGroupURL.appendingPathComponent("\(tag)_\(dateStr).log", isDirectory:false)
+    }
+    
+    // Delete \(tag)*.logs more than 48 hours old
+    private func cleanup() {
+        guard let appGroupURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: ZitiIdentityStore.APP_GROUP_ID)  else {
+                NSLog("currLogfile: Invalid app group URL")
+                return
+        }
         
-        let url = appGroupURL.appendingPathComponent("\(tag)_\(dateStr).log", isDirectory:false)
+        let fm = FileManager.default
+        guard let list = try? fm.contentsOfDirectory(at: appGroupURL, includingPropertiesForKeys: nil, options: []) else {
+            NSLog("Logger.cleanup Unable to search log directory to log files to clear")
+            return
+        }
+        
+        let now = Date()
+        list.forEach { url in
+            if url.lastPathComponent.starts(with: tag) && url.pathExtension == "log" {
+                if let attrs = try? fm.attributesOfItem(atPath: url.path), let iat = attrs[.creationDate] as? Date {
+                    let daysOld = ((now.timeIntervalSince(iat) / 60) / 60) / 24
+                    if daysOld > 2.0 {
+                        NSLog("Removing \(url.lastPathComponent) (is over \(Int(daysOld)) days old)")
+                        do { try fm.removeItem(at: url) }
+                        catch { NSLog("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)") }
+                    }
+                } else {
+                    NSLog("Logger.cleanup Unable to get file attributes pf \(url.lastPathComponent)")
+                }
+            }
+        }
+    }
+    
+    private func updateLogger() -> Bool {
+        guard let url = currLog else {
+            NSLog("updateLogger: Invalid log URL")
+            return false
+        }
+        
+        // cleanup all log files...
+        defer {
+            cleanup()
+        }
         
         // create empty logfile if not present
         if !FileManager.default.isWritableFile(atPath: url.path) {
@@ -75,6 +115,7 @@ class Logger {
         Logger.shared = Logger(tag)
         if Logger.shared?.updateLogger() == false {
             // Do what?  invalidate Logger? revisit when add #file #function #line stuff
+            NSLog("Unable to created shared Logger")
         }
 
         // fire timer periodically for clean-up and rolling

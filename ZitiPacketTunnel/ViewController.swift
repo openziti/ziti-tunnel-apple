@@ -32,16 +32,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     var enrollingIds:[ZitiIdentity] = []
     var servicePoller = ServicePoller()
     
-    var versionString:String {
-        get {
-            var appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown version"
-            if let appBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-                appVersion += " (\(appBuild))"
-            }
-            return "\(Bundle.main.bundleIdentifier ?? "Ziti") Version: \(appVersion)"
-        }
-    }
-    
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
         connectButton.isEnabled = true
         switch status {
@@ -156,8 +146,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Logger.initShared("APP")
-        NSLog(versionString)
+        Logger.initShared(Logger.APP_TAG)
+        NSLog(Version.verboseStr)
         
         zidMgr.zidStore.delegate = self
         tableView.delegate = self
@@ -209,6 +199,10 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     func onNewOrChangedId(_ zid: ZitiIdentity) {
         if let match = zidMgr.zids.first(where: { $0.id == zid.id }) {
             print("\(zid.name):\(zid.id) changed")
+            
+            // TUN will disable if unable to start for zid
+            match.edgeStatus = zid.edgeStatus
+            match.enabled = zid.enabled
             
             // always take new service from tunneler...
             match.services = zid.services

@@ -61,6 +61,12 @@
 		5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSResolver.swift */; };
 		5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */; };
+		5A34E95E2278F49100E221DD /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E95D2278F49100E221DD /* Version.swift */; };
+		5A34E95F2278F49100E221DD /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E95D2278F49100E221DD /* Version.swift */; };
+		5A34E9602278F49100E221DD /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E95D2278F49100E221DD /* Version.swift */; };
+		5A34E9612278F49100E221DD /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E95D2278F49100E221DD /* Version.swift */; };
+		5A34E963227916BA00E221DD /* LogsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E962227916BA00E221DD /* LogsTableViewController.swift */; };
+		5A34E96522791FCA00E221DD /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E96422791FCA00E221DD /* LogViewController.swift */; };
 		5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */; };
 		5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AD0221F937D00051475 /* ServicesViewController.swift */; };
@@ -218,6 +224,9 @@
 		5A2EA2E4209B754500437608 /* MobilePacketTunnelProvider.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobilePacketTunnelProvider.entitlements; sourceTree = "<group>"; };
 		5A2EA2EC209B756400437608 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.3.sdk/System/Library/Frameworks/NetworkExtension.framework; sourceTree = DEVELOPER_DIR; };
 		5A2EA2EF209B758800437608 /* ZitiMobilePacketTunnel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZitiMobilePacketTunnel.entitlements; sourceTree = "<group>"; };
+		5A34E95D2278F49100E221DD /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
+		5A34E962227916BA00E221DD /* LogsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsTableViewController.swift; sourceTree = "<group>"; };
+		5A34E96422791FCA00E221DD /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
 		5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelConfigViewController.swift; sourceTree = "<group>"; };
 		5A379ACB221EDB1400051475 /* ZitiIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentity.swift; sourceTree = "<group>"; };
 		5A379AD0221F937D00051475 /* ServicesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesViewController.swift; sourceTree = "<group>"; };
@@ -446,6 +455,8 @@
 				5A2EA2EF209B758800437608 /* ZitiMobilePacketTunnel.entitlements */,
 				5A2EA2CB209B750A00437608 /* AppDelegate.swift */,
 				5A2EA2CF209B750A00437608 /* Main.storyboard */,
+				5A34E96422791FCA00E221DD /* LogViewController.swift */,
+				5A34E962227916BA00E221DD /* LogsTableViewController.swift */,
 				5A6BA262226DF65C00224F09 /* NoticesViewController.swift */,
 				5A6BA25C226DE5FB00224F09 /* AboutViewController.swift */,
 				5AF9C2492268F84A009CFD71 /* IdentityViewController.swift */,
@@ -493,6 +504,7 @@
 				5A051F5D22620B7100B11CB2 /* ServicePoller.swift */,
 				5A051F602264183500B11CB2 /* ZidMgr.swift */,
 				5ABA5ED92274D2EB00B2221D /* Logger.swift */,
+				5A34E95D2278F49100E221DD /* Version.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -827,6 +839,7 @@
 				5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A8702CE2230B24B00314199 /* ZitiEdgeService.swift in Sources */,
 				5A1B63CE222ED15F00E9C226 /* ZitiEdge.swift in Sources */,
+				5A34E95E2278F49100E221DD /* Version.swift in Sources */,
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
 				5A91B4D42224B630006C4277 /* ZitiCSR.swift in Sources */,
 				5A0D1D2C222B093F00D01F30 /* ZitiError.swift in Sources */,
@@ -861,6 +874,7 @@
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
 				5A85A91B225A6EB2004A29F2 /* ZitiConn.swift in Sources */,
 				5AF4BECA2241046F001F1F4D /* TCPClientConn.swift in Sources */,
+				5A34E95F2278F49100E221DD /* Version.swift in Sources */,
 				5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
 				5ABA5EDF22765E7500B2221D /* ZitiIdentity+nf_context.swift in Sources */,
@@ -883,6 +897,7 @@
 				5A1B63D0222ED15F00E9C226 /* ZitiEdge.swift in Sources */,
 				5A2EA2F0209B75B700437608 /* ProviderConfig.swift in Sources */,
 				5A6BA263226DF65C00224F09 /* NoticesViewController.swift in Sources */,
+				5A34E96522791FCA00E221DD /* LogViewController.swift in Sources */,
 				5A91B4CB2222E19E006C4277 /* ZitiIdentity.swift in Sources */,
 				5A6BA25D226DE5FB00224F09 /* AboutViewController.swift in Sources */,
 				5A051F622264183500B11CB2 /* ZidMgr.swift in Sources */,
@@ -895,6 +910,7 @@
 				5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */,
 				5A91B4D52224B630006C4277 /* ZitiCSR.swift in Sources */,
 				5A8702D02230B24B00314199 /* ZitiEdgeService.swift in Sources */,
+				5A34E963227916BA00E221DD /* LogsTableViewController.swift in Sources */,
 				5AF9C24A2268F84A009CFD71 /* IdentityViewController.swift in Sources */,
 				5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */,
 				5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */,
@@ -902,6 +918,7 @@
 				5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */,
 				5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */,
 				5A8702D52230B4D300314199 /* ZitiEdgeNetworkSession.swift in Sources */,
+				5A34E9602278F49100E221DD /* Version.swift in Sources */,
 				5A051F5F22620B7800B11CB2 /* ServicePoller.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -926,6 +943,7 @@
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,
 				5A85A91C225A6EB2004A29F2 /* ZitiConn.swift in Sources */,
 				5AF4BECB2241046F001F1F4D /* TCPClientConn.swift in Sources */,
+				5A34E9612278F49100E221DD /* Version.swift in Sources */,
 				5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */,
 				5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */,
 				5ABA5EE022765E7500B2221D /* ZitiIdentity+nf_context.swift in Sources */,
