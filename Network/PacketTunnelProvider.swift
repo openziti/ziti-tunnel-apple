@@ -54,30 +54,27 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             cond.lock()
             NSLog("... blocking creating session for \(zid.name):\(svc.name ?? svcId)")
             var updated = false
+            svc.networkSession = nil
             zEdge.getNetworkSession(svcId) { _ in updated = true; cond.signal() } // escaping to other thread...
             while !updated {
                 if !cond.wait(until: Date(timeIntervalSinceNow: timeOutSecs)) {
-                    NSLog("... timed out waiting to create network session")
+                    NSLog("... timed out waiting to get network session")
                     svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Unavailable)
                     break
                 }
             }
             cond.unlock()
-            if !updated {
-                svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Unavailable)
-            }
+            svc.status = ZitiEdgeService.Status(
+                Date().timeIntervalSince1970, status: svc.networkSession != nil ? .Available : .PartiallyAvailable )
             NSLog("...  block complete for \(zid.name):\(svc.name ?? svcId), session=\(svc.networkSession != nil)")
             return updated
         }
         return false
     }
     
-    // add hostnames to dns, routes to intercept, and set interceptIp
-    //   skip any where we failed contacting controller for netSession since otherwise
-    //   we won't know what to do with 'em when we see packets (or, if they eventually
-    //   arrive while we are seeing packets we could have a race condition)
+    // Add hostnames to dns, routes to intercept, and set interceptIp
     private func updateHostsAndIntercepts(_ zid:ZitiIdentity, _ svc:ZitiEdgeService) {
-        if let hn = svc.dns?.hostname, svc.networkSession != nil {
+        if let hn = svc.dns?.hostname {
             let port = svc.dns?.port ?? 80
             if IPUtils.isValidIpV4Address(hn) {
                 let route = NEIPv4Route(destinationAddress: hn,
@@ -121,8 +118,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     let zEdge = ZitiEdge(zid)
                     zid.services?.forEach { svc in
                         svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Available)
-                        if svc.networkSession == nil {
-                            _ = getNetSessionSync(zEdge, zid, svc)
+                        if !getNetSessionSync(zEdge, zid, svc) {
+                            // since startRunloop is blocking, this shouln't happen...
+                            NSLog("Warning: unable to get network session for \(zid.id)")
                         }
                         
                         // add hostnames to dns, routes to intercept, and set interceptIp
