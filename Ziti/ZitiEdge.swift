@@ -12,6 +12,7 @@ fileprivate let AUTH_PATH = "/authenticate?method=cert"
 fileprivate let SESSION_TAG = "zt-session"
 fileprivate let SERVCES_PATH = "/services?limit=5000"
 fileprivate let NETSESSIONS_PATH = "/network-sessions?limit=1000"
+fileprivate let FETCH_PATH = ".well-known/est/cacerts" // rfc 7030
 fileprivate let GET_METHOD = "GET"
 fileprivate let POST_METHOD = "POST"
 fileprivate let CONTENT_TYPE = "Content-Type"
@@ -109,6 +110,31 @@ class ZitiEdge : NSObject {
             completionHandler(nil)
         }.resume()
         enrollSession.finishTasksAndInvalidate()
+    }
+    
+    // rfc 7030
+    func fetchCertificates(completionHandler: @escaping (String?, ZitiError?) -> Void) {
+        guard let url = URL(string: FETCH_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
+            completionHandler(nil, ZitiError("Enable convert URL to fetch certs from \(zid.apiBaseUrl)"))
+            return
+        }
+        
+        // don't share session with other edge calls since we have no secId at this point
+        let fetchSession = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:OperationQueue.main)
+        let urlRequest = createRequest(url, method:GET_METHOD, contentType:TEXT_TYPE, body:nil)
+        fetchSession.dataTask(with: urlRequest) { (data, response, error) in
+            if let zErr = self.validateResponse(data, response, error) {
+                completionHandler(nil, zErr)
+                return
+            }
+            
+            guard let str = String(data: data!, encoding: .utf8) else {
+                completionHandler(nil, ZitiError("Unable to create string from response data"))
+                return
+            }
+            completionHandler(str, nil)
+        }.resume()
+        fetchSession.finishTasksAndInvalidate()
     }
     
     func getServices(completionHandler: @escaping (Bool, ZitiError?) -> Void) {
