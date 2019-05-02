@@ -15,7 +15,7 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
     let port:UInt16
     
     var thread:Thread?
-    let writeCond = NSCondition() // TODO: change this to a queue...
+    let writeCond = NSCondition()
     var inputStream: InputStream?
     var outputStream: OutputStream?
     let maxReadLen:Int = Int(UInt16.max / 15960) * 15960 // TODO: should be configurable based on windowSize/Scale, mult of mss
@@ -50,22 +50,18 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
         return true
     }
     
-    //var writeQueue:[Data] = []
     func write(payload:Data) -> Int {
-        
-        // TODO: change this to queue data until connected
-        // target global serial queue, Interactiv
         guard let outputStream = outputStream  else { return -1 }
         writeCond.lock()
         let okFlags = Stream.Status.open.rawValue | Stream.Status.writing.rawValue
         while outputStream.streamStatus.rawValue & okFlags == 0 {
-            NSLog("*** outstream stat: \(outputStream.streamStatus.rawValue) on \(Thread.current)")
-            if !writeCond.wait(until: Date(timeIntervalSinceNow: 3.0)) { // TODO: ridic timeout...
+            //NSLog("*** outstream stat: \(outputStream.streamStatus.rawValue) on \(Thread.current)")
+            if !writeCond.wait(until: Date(timeIntervalSinceNow: 5.0)) { 
                 NSLog("*** TCProxy conn timed out waiting for output stream to open, thread \(Thread.current)")
                 writeCond.unlock()
                 return -1
             }
-            NSLog("*** loop outstream stat: \(outputStream.streamStatus.rawValue) on \(Thread.current)")
+            //NSLog("*** loop outstream stat: \(outputStream.streamStatus.rawValue) on \(Thread.current)")
         }
         
         //NSLog("TCPProxyConn attempting to write \(payload.count) bytes on thread \(Thread.current)")

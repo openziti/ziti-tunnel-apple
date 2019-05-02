@@ -63,8 +63,6 @@ class AdvancedViewController: UITableViewController {
         if let tsvc = segue.destination as? TunnelSettingsViewController {
             print("setting tvc in TunnelSettingsViewController")
             tsvc.tvc = tvc
-        } else {
-            print("TODO: Logs segue...")
         }
     }
 }

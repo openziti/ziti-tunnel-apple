@@ -99,7 +99,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         print("ZitiConn attempt to write \(payload.count) bytes")
         writeCond.lock()
         while !okToWrite {
-            if !writeCond.wait(until: Date(timeIntervalSinceNow: 3.0)) { // TODO: ridic timeout...
+            if !writeCond.wait(until: Date(timeIntervalSinceNow: 5.0)) {
                 NSLog("*** ZitiConn \(key) timed out waiting for ziti connection callback")
                 writeCond.unlock()
                 return -1

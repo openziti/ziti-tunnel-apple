@@ -98,7 +98,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         }
         tableView.reloadData()
         
-        // TODO: for ios will prob need to do this from tunnel (maybe based on setting(s) configured in app??)
         servicePoller.zidMgr = zidMgr
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.servicePoller.startPolling { didChange, zid in
@@ -277,7 +276,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 self.present(alert, animated: true, completion: nil)
             }
         } else if indexPath.section == 2 && indexPath.row == 1 {
-            // TODO: add real help...
             if let url = URL(string: "https://netfoundry.zendesk.com/hc/en-us/categories/360000991011-Docs-Guides") {
                 let vc = SFSafariViewController(url: url)
                 present(vc, animated: true)

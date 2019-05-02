@@ -97,7 +97,7 @@ class TunnelMgr: NSObject {
         if tunnelRestarting == true {
             if status == .disconnected {
                 tunnelRestarting = false
-                try? startTunnel() // TODO: Will I regret not handling exception?
+                try? startTunnel()
             }
             tsChangedCallbacks.forEach { cb in cb(.reasserting) }
         } else {

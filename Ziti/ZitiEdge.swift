@@ -265,12 +265,6 @@ class ZitiEdge : NSObject {
             return ZitiError(edgeErrorResp.shortDescription(httpResp.statusCode), errorCode:httpResp.statusCode)
         }
         self.zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status:.Available)
-        
-        // TODO: temp for dev
-        //if let responseStr = String(data: respData, encoding: String.Encoding.utf8) {
-            //print("Response for \(zid?.name ?? ""): \(responseStr)")
-        //}
-        // end temp for dev
         return nil
     }
     

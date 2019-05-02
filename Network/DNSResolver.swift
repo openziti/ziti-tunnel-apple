@@ -58,7 +58,11 @@ class DNSResolver : NSObject {
                 }
             }
         }
-        return "127.0.0.1" //TODO temp hack, should be nil
+        #if LOCALHOST_PROXY
+        return "127.0.0.1"
+        #else
+        return nil
+        #endif
     }
     
     func addHostname(_ name:String) -> String? {

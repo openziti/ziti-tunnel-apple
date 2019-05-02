@@ -82,6 +82,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 guard zErr == nil else {
                     _ = self.tvc?.zidMgr.zidStore.store(zid)
                     self.tableView.reloadData()
+                    self.tvc?.tableView.reloadData()
                     
                     let alert = UIAlertController(
                         title:"Unable to enroll \(zid.name)",

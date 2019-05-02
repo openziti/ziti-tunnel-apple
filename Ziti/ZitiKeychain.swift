@@ -245,7 +245,7 @@ class ZitiKeychain : NSObject {
         return (certData, nil)
     }
     
-    func deleteCertificate(_ label:String) -> ZitiError? {  //TODO: not working. kSecAttrLabel overwritten with common name?
+    func deleteCertificate(_ label:String) -> ZitiError? { 
         let params: [CFString: Any] = [
             kSecClass: kSecClassCertificate,
             kSecReturnRef: kCFBooleanTrue as Any,
