@@ -128,6 +128,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         // add hostnames to dns, routes to intercept, and set interceptIp
                         updateHostsAndIntercepts(zid, svc)
                     }
+                    zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
                 }
                 // update the store (continue even if it somehow fails - store method will log any errors)
                 _ = zidStore.store(zid)
