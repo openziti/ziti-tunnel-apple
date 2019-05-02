@@ -325,14 +325,48 @@ extension ZitiEdge : URLSessionDelegate {
     
     func handleServerTrustChallenge(_ challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
-        guard let rootCa = zid.rootCa else {
+        guard let serverTrust = challenge.protectionSpace.serverTrust else {
+            NSLog("ServerTrustChallenge: ServerTrust not available. Performming default handling.")
             completionHandler(.performDefaultHandling, nil)
             return
         }
         
-        guard let serverTrust = challenge.protectionSpace.serverTrust else {
-            NSLog("ServerTrustChallenge: ServerTrust not available. Performming default handling.")
-            completionHandler(.performDefaultHandling, nil)
+        guard let rootCa = zid.rootCa else {
+            // Should just: completionHandler(.performDefaultHandling, nil)
+            //
+            // This is to address issue with C SDK needing valid certs in order to trust a server.
+            // This can be removed once C SDK is updated to delgate trust/signing to 3rd part (i.e.,
+            // this app and extension)
+            let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue.main) { secTrust, result in
+                if result == .proceed || result == .unspecified {
+                    //Get certs from secTrust, convert to PEM, store in rootCa
+                    var newRootCa:String = ""
+                    let zkc = ZitiKeychain()
+                    for i in 0..<SecTrustGetCertificateCount(secTrust) {
+                        if let cert = SecTrustGetCertificateAtIndex(secTrust, i) {
+                            if let certData = SecCertificateCopyData(cert) as Data? {
+                                newRootCa += zkc.convertToPEM("CERTIFICATE", der: certData)
+                            }
+                        }
+                    }
+                    if newRootCa.count > 0 {
+                        print("*** Setting new rootCa ****:")
+                        print(newRootCa)
+                        self.zid.rootCa = newRootCa
+                        _ = ZitiIdentityStore().storeCId(self.zid)
+                    }
+                    completionHandler(.useCredential, URLCredential(trust:secTrust))
+                } else {
+                    // reject
+                    NSLog("Non-recoverable error evaluating server trust. Rejecting.")
+                    completionHandler(.cancelAuthenticationChallenge, nil)
+                }
+            }
+            
+            if steStatus != errSecSuccess {
+                NSLog("Unable to evaluate server trust. Rejecting")
+                completionHandler(.cancelAuthenticationChallenge, nil)
+            }
             return
         }
         
