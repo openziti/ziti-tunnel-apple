@@ -1,0 +1,920 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B60230919F44E45786DBEE874234A90 /* JWTDecode-macOS-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A832494AAB1914776FDF42B4377A1999 /* JWTDecode-macOS-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		18CB76CC57C280275A514ED2CD0B992C /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81332461DCC246A8FFBE24A228D44DE0 /* Errors.swift */; };
+		289950F86666BF599DCEB16BA2AAD50C /* JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CC1478F0CA4A22CB2D1C27F977897F /* JWT.swift */; };
+		2B13074B6A6F0EE30FEC65B62341F1D8 /* JWTDecode-iOS-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 59ED27EFC2D4E1962BA1F87A4968FACE /* JWTDecode-iOS-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		46B416F5FC150EE45F37C0273DE7911A /* Pods-ZitiPacketTunnel-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = EBD9ADFAF3800FF4118D5181E4EDE24E /* Pods-ZitiPacketTunnel-dummy.m */; };
+		54C03B0817813D7AC41B594E21E7C48B /* Pods-ZitiMobilePacketTunnel-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0BDB3E3122D8DEEB8120A601180308E7 /* Pods-ZitiMobilePacketTunnel-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5AA31EBF6C21EC0548276A9456FD14C9 /* JWTDecode-macOS-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 96863852B068C38D52C16D55EEEA9E59 /* JWTDecode-macOS-dummy.m */; };
+		6AD221687D30A8B12D1E1EC669B6416A /* A0JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2678886759CDBD7C21FE81D0AD2B0FEE /* A0JWT.swift */; };
+		7155E8F3411F222CCE946DD2FC94A2A6 /* Pods-ZitiPacketTunnel-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 0166C2116E111B50DDA9D205374B3B42 /* Pods-ZitiPacketTunnel-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		751716213279CFAE0C2AF77181AEBC97 /* JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CC1478F0CA4A22CB2D1C27F977897F /* JWT.swift */; };
+		7623D16E40934262F1F502F72B319364 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81332461DCC246A8FFBE24A228D44DE0 /* Errors.swift */; };
+		7E141811BA63C9F7319EFE5A432195BF /* A0JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2678886759CDBD7C21FE81D0AD2B0FEE /* A0JWT.swift */; };
+		7F0CD4542F7A549E008041BB81525B88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A3B95749CB04F60F62DDD9D7467DC4D /* Foundation.framework */; };
+		7F8792CC304B44918004C54ED08CD3C5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51FC1E5D1F5671E0532D52CB477AC228 /* Cocoa.framework */; };
+		89AA3D64A064A2D141F48F6A29C9250E /* JWTDecode-iOS-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A89E1D54E83923BFE08D59F2EE19B01 /* JWTDecode-iOS-dummy.m */; };
+		97ADEF36BD0A21D4E55A500F74594492 /* JWTDecode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA12419078D8C594BFB05290E608B034 /* JWTDecode.swift */; };
+		A4405B40161FFC956210F246CDA75EB3 /* JWTDecode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA12419078D8C594BFB05290E608B034 /* JWTDecode.swift */; };
+		B6D3A44633683724B90C2F9A51E6154F /* Pods-ZitiMobilePacketTunnel-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = F4CB749A1C58998111B2BA748FC27B6C /* Pods-ZitiMobilePacketTunnel-dummy.m */; };
+		CE955BF5AB3BC12A8F3AFDB3E725654F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51FC1E5D1F5671E0532D52CB477AC228 /* Cocoa.framework */; };
+		E49D4B1117AF0B74A11C995D7F530260 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A3B95749CB04F60F62DDD9D7467DC4D /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		01118203222AAE2E4A2B417E69A7A3DB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DF06CE7245C298DA97355CCA655B8156;
+			remoteInfo = "JWTDecode-iOS";
+		};
+		421F6371037A6CB5B8892A0704718B7C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8646165C38478F04F889687621C35BB1;
+			remoteInfo = "JWTDecode-macOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0166C2116E111B50DDA9D205374B3B42 /* Pods-ZitiPacketTunnel-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-ZitiPacketTunnel-umbrella.h"; sourceTree = "<group>"; };
+		0BDB3E3122D8DEEB8120A601180308E7 /* Pods-ZitiMobilePacketTunnel-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-ZitiMobilePacketTunnel-umbrella.h"; sourceTree = "<group>"; };
+		24493B37A0C9916F1147B5E8377D7F11 /* Pods-ZitiMobilePacketTunnel-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-ZitiMobilePacketTunnel-frameworks.sh"; sourceTree = "<group>"; };
+		2678886759CDBD7C21FE81D0AD2B0FEE /* A0JWT.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = A0JWT.swift; path = JWTDecode/A0JWT.swift; sourceTree = "<group>"; };
+		26D8129AEB0A78BAC1C88B8285EECBFD /* JWTDecode.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JWTDecode.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D9BB514377941C2FFB01F921B939838 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		350F8813ECDFC441BF2AA450E92D7B0A /* Pods-ZitiMobilePacketTunnel-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-ZitiMobilePacketTunnel-acknowledgements.markdown"; sourceTree = "<group>"; };
+		4519BC666A54D39B8CCD54032DCD9374 /* Pods-ZitiPacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ZitiPacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
+		4B871ACB83FDEAAD55F71BE58BA84DAA /* JWTDecode-macOS-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "JWTDecode-macOS-prefix.pch"; path = "../JWTDecode-macOS/JWTDecode-macOS-prefix.pch"; sourceTree = "<group>"; };
+		51CC1478F0CA4A22CB2D1C27F977897F /* JWT.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JWT.swift; path = JWTDecode/JWT.swift; sourceTree = "<group>"; };
+		51FC1E5D1F5671E0532D52CB477AC228 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		572DF54A14246C28EAB60D9AED325197 /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
+		59ED27EFC2D4E1962BA1F87A4968FACE /* JWTDecode-iOS-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "JWTDecode-iOS-umbrella.h"; sourceTree = "<group>"; };
+		632A10B4D0513AB3EFF707A7165D88ED /* JWTDecode-iOS.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "JWTDecode-iOS.modulemap"; sourceTree = "<group>"; };
+		68178C717A90F97493036261963627C9 /* JWTDecode-iOS.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "JWTDecode-iOS.xcconfig"; sourceTree = "<group>"; };
+		6A3B95749CB04F60F62DDD9D7467DC4D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		70A5FEA05BDA5639CFD831F7B30B24F8 /* Pods-ZitiPacketTunnel-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-ZitiPacketTunnel-frameworks.sh"; sourceTree = "<group>"; };
+		81332461DCC246A8FFBE24A228D44DE0 /* Errors.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Errors.swift; path = JWTDecode/Errors.swift; sourceTree = "<group>"; };
+		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		96863852B068C38D52C16D55EEEA9E59 /* JWTDecode-macOS-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "JWTDecode-macOS-dummy.m"; path = "../JWTDecode-macOS/JWTDecode-macOS-dummy.m"; sourceTree = "<group>"; };
+		9A89E1D54E83923BFE08D59F2EE19B01 /* JWTDecode-iOS-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "JWTDecode-iOS-dummy.m"; sourceTree = "<group>"; };
+		A5B3B264B7905E8D822B306CA59E2305 /* Pods-ZitiPacketTunnel-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-ZitiPacketTunnel-resources.sh"; sourceTree = "<group>"; };
+		A832494AAB1914776FDF42B4377A1999 /* JWTDecode-macOS-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "JWTDecode-macOS-umbrella.h"; path = "../JWTDecode-macOS/JWTDecode-macOS-umbrella.h"; sourceTree = "<group>"; };
+		A8527B0210AB5A111C199FED60D6D594 /* Pods-ZitiMobilePacketTunnel-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-ZitiMobilePacketTunnel-resources.sh"; sourceTree = "<group>"; };
+		AA12419078D8C594BFB05290E608B034 /* JWTDecode.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JWTDecode.swift; path = JWTDecode/JWTDecode.swift; sourceTree = "<group>"; };
+		ADF2A903392B4F7E091447DCF27FD42F /* Pods-ZitiMobilePacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ZitiMobilePacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
+		BA7222A3D591FD57B33E2676F8473421 /* JWTDecode-macOS.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; name = "JWTDecode-macOS.modulemap"; path = "../JWTDecode-macOS/JWTDecode-macOS.modulemap"; sourceTree = "<group>"; };
+		BB69F9F1A29F426CD052AEF4D6C4D403 /* Pods-ZitiMobilePacketTunnel-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-ZitiMobilePacketTunnel-acknowledgements.plist"; sourceTree = "<group>"; };
+		C091411666D6BC29D238CB060321C304 /* Pods-ZitiPacketTunnel.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-ZitiPacketTunnel.modulemap"; sourceTree = "<group>"; };
+		C64B7B2C6089BCE25EE3E0E7AB83AD53 /* Pods-ZitiMobilePacketTunnel.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-ZitiMobilePacketTunnel.modulemap"; sourceTree = "<group>"; };
+		C78A3494DCCB09D12644C542D718CCB3 /* JWTDecode-macOS.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "JWTDecode-macOS.xcconfig"; path = "../JWTDecode-macOS/JWTDecode-macOS.xcconfig"; sourceTree = "<group>"; };
+		D720FB408A308D496462677595A0E1F8 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = "../JWTDecode-macOS/Info.plist"; sourceTree = "<group>"; };
+		D82E90807A62DC655A0DCC2E75ADB7DA /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D8771C6BE7C94E57FB83C1C38C029166 /* Pods-ZitiPacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ZitiPacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
+		D964330A94B4C34BA5F5FFF88CE43005 /* Pods-ZitiPacketTunnel-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-ZitiPacketTunnel-acknowledgements.markdown"; sourceTree = "<group>"; };
+		DBCA87ECF642125B37EB085C5CFC1933 /* Pods_ZitiMobilePacketTunnel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZitiMobilePacketTunnel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EBD9ADFAF3800FF4118D5181E4EDE24E /* Pods-ZitiPacketTunnel-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-ZitiPacketTunnel-dummy.m"; sourceTree = "<group>"; };
+		EE50F3DCB1FC1A566434D548411934D8 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EFB1DCBDE96AD8FFB4F9AFCB724AF728 /* JWTDecode.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JWTDecode.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F32CCE545A3CEFB1D12A739D1F81B213 /* Pods-ZitiPacketTunnel-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-ZitiPacketTunnel-acknowledgements.plist"; sourceTree = "<group>"; };
+		F4CB749A1C58998111B2BA748FC27B6C /* Pods-ZitiMobilePacketTunnel-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-ZitiMobilePacketTunnel-dummy.m"; sourceTree = "<group>"; };
+		FAC3121A3E64E2F646E7646CCCB31C0D /* Pods_ZitiPacketTunnel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZitiPacketTunnel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFFCCC7A7329AB7C0ED190B1BF1E6A86 /* JWTDecode-iOS-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "JWTDecode-iOS-prefix.pch"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		28128E2D05482EB84FBA8D5B9BA8A2DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E49D4B1117AF0B74A11C995D7F530260 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8B62203B1154AB5A1CAAB2AC34E1F82 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE955BF5AB3BC12A8F3AFDB3E725654F /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF872364A8BACADE1036EF64F30C3150 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F8792CC304B44918004C54ED08CD3C5 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DDCF79ADBF28C2CFF132404F5B46C3C0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F0CD4542F7A549E008041BB81525B88 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		30959EFF2EDED2631AC2A8E5805A00E0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EFB1DCBDE96AD8FFB4F9AFCB724AF728 /* JWTDecode.framework */,
+				26D8129AEB0A78BAC1C88B8285EECBFD /* JWTDecode.framework */,
+				DBCA87ECF642125B37EB085C5CFC1933 /* Pods_ZitiMobilePacketTunnel.framework */,
+				FAC3121A3E64E2F646E7646CCCB31C0D /* Pods_ZitiPacketTunnel.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		34BE8B02178A92BA2FB4B7888ECF14F5 /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				51FC1E5D1F5671E0532D52CB477AC228 /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		3AEF7D761E8EA8419BB4A7000AB770CB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FA3AAB077231D63C079B0E9C7476D0BC /* iOS */,
+				34BE8B02178A92BA2FB4B7888ECF14F5 /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		56C51E58909762CAEF2D0B4580FB89B9 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				2D9BB514377941C2FFB01F921B939838 /* Info.plist */,
+				D720FB408A308D496462677595A0E1F8 /* Info.plist */,
+				632A10B4D0513AB3EFF707A7165D88ED /* JWTDecode-iOS.modulemap */,
+				68178C717A90F97493036261963627C9 /* JWTDecode-iOS.xcconfig */,
+				9A89E1D54E83923BFE08D59F2EE19B01 /* JWTDecode-iOS-dummy.m */,
+				FFFCCC7A7329AB7C0ED190B1BF1E6A86 /* JWTDecode-iOS-prefix.pch */,
+				59ED27EFC2D4E1962BA1F87A4968FACE /* JWTDecode-iOS-umbrella.h */,
+				BA7222A3D591FD57B33E2676F8473421 /* JWTDecode-macOS.modulemap */,
+				C78A3494DCCB09D12644C542D718CCB3 /* JWTDecode-macOS.xcconfig */,
+				96863852B068C38D52C16D55EEEA9E59 /* JWTDecode-macOS-dummy.m */,
+				4B871ACB83FDEAAD55F71BE58BA84DAA /* JWTDecode-macOS-prefix.pch */,
+				A832494AAB1914776FDF42B4377A1999 /* JWTDecode-macOS-umbrella.h */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/JWTDecode-iOS";
+			sourceTree = "<group>";
+		};
+		7A3E74A767D0A7398FB72829C093B784 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				FA971666D1691E4C1D0C7E5A05DF7B95 /* JWTDecode */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		7DB346D0F39D3F0E887471402A8071AB = {
+			isa = PBXGroup;
+			children = (
+				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
+				3AEF7D761E8EA8419BB4A7000AB770CB /* Frameworks */,
+				7A3E74A767D0A7398FB72829C093B784 /* Pods */,
+				30959EFF2EDED2631AC2A8E5805A00E0 /* Products */,
+				C5A298D900B399375B01267345838F25 /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		940024BDE198BAF1B5C393C95C1490CF /* Pods-ZitiPacketTunnel */ = {
+			isa = PBXGroup;
+			children = (
+				EE50F3DCB1FC1A566434D548411934D8 /* Info.plist */,
+				C091411666D6BC29D238CB060321C304 /* Pods-ZitiPacketTunnel.modulemap */,
+				D964330A94B4C34BA5F5FFF88CE43005 /* Pods-ZitiPacketTunnel-acknowledgements.markdown */,
+				F32CCE545A3CEFB1D12A739D1F81B213 /* Pods-ZitiPacketTunnel-acknowledgements.plist */,
+				EBD9ADFAF3800FF4118D5181E4EDE24E /* Pods-ZitiPacketTunnel-dummy.m */,
+				70A5FEA05BDA5639CFD831F7B30B24F8 /* Pods-ZitiPacketTunnel-frameworks.sh */,
+				A5B3B264B7905E8D822B306CA59E2305 /* Pods-ZitiPacketTunnel-resources.sh */,
+				0166C2116E111B50DDA9D205374B3B42 /* Pods-ZitiPacketTunnel-umbrella.h */,
+				4519BC666A54D39B8CCD54032DCD9374 /* Pods-ZitiPacketTunnel.debug.xcconfig */,
+				D8771C6BE7C94E57FB83C1C38C029166 /* Pods-ZitiPacketTunnel.release.xcconfig */,
+			);
+			name = "Pods-ZitiPacketTunnel";
+			path = "Target Support Files/Pods-ZitiPacketTunnel";
+			sourceTree = "<group>";
+		};
+		9FFBADB0E4715840CB8751F0F1848CD1 /* Pods-ZitiMobilePacketTunnel */ = {
+			isa = PBXGroup;
+			children = (
+				D82E90807A62DC655A0DCC2E75ADB7DA /* Info.plist */,
+				C64B7B2C6089BCE25EE3E0E7AB83AD53 /* Pods-ZitiMobilePacketTunnel.modulemap */,
+				350F8813ECDFC441BF2AA450E92D7B0A /* Pods-ZitiMobilePacketTunnel-acknowledgements.markdown */,
+				BB69F9F1A29F426CD052AEF4D6C4D403 /* Pods-ZitiMobilePacketTunnel-acknowledgements.plist */,
+				F4CB749A1C58998111B2BA748FC27B6C /* Pods-ZitiMobilePacketTunnel-dummy.m */,
+				24493B37A0C9916F1147B5E8377D7F11 /* Pods-ZitiMobilePacketTunnel-frameworks.sh */,
+				A8527B0210AB5A111C199FED60D6D594 /* Pods-ZitiMobilePacketTunnel-resources.sh */,
+				0BDB3E3122D8DEEB8120A601180308E7 /* Pods-ZitiMobilePacketTunnel-umbrella.h */,
+				572DF54A14246C28EAB60D9AED325197 /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */,
+				ADF2A903392B4F7E091447DCF27FD42F /* Pods-ZitiMobilePacketTunnel.release.xcconfig */,
+			);
+			name = "Pods-ZitiMobilePacketTunnel";
+			path = "Target Support Files/Pods-ZitiMobilePacketTunnel";
+			sourceTree = "<group>";
+		};
+		C5A298D900B399375B01267345838F25 /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				9FFBADB0E4715840CB8751F0F1848CD1 /* Pods-ZitiMobilePacketTunnel */,
+				940024BDE198BAF1B5C393C95C1490CF /* Pods-ZitiPacketTunnel */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		FA3AAB077231D63C079B0E9C7476D0BC /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				6A3B95749CB04F60F62DDD9D7467DC4D /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		FA971666D1691E4C1D0C7E5A05DF7B95 /* JWTDecode */ = {
+			isa = PBXGroup;
+			children = (
+				2678886759CDBD7C21FE81D0AD2B0FEE /* A0JWT.swift */,
+				81332461DCC246A8FFBE24A228D44DE0 /* Errors.swift */,
+				51CC1478F0CA4A22CB2D1C27F977897F /* JWT.swift */,
+				AA12419078D8C594BFB05290E608B034 /* JWTDecode.swift */,
+				56C51E58909762CAEF2D0B4580FB89B9 /* Support Files */,
+			);
+			path = JWTDecode;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		12163B9FF3AD22D9F11D2E59BB0341B5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7155E8F3411F222CCE946DD2FC94A2A6 /* Pods-ZitiPacketTunnel-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37EDF15698CE70355EC5AA8EA5610E10 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2B13074B6A6F0EE30FEC65B62341F1D8 /* JWTDecode-iOS-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C429B4B8DC8F457E07767CE06CAEF9CC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0B60230919F44E45786DBEE874234A90 /* JWTDecode-macOS-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CF455D6901A272823EE5CB8344836C67 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				54C03B0817813D7AC41B594E21E7C48B /* Pods-ZitiMobilePacketTunnel-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		8646165C38478F04F889687621C35BB1 /* JWTDecode-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 63706896383A129E8960BBA1A96DF431 /* Build configuration list for PBXNativeTarget "JWTDecode-macOS" */;
+			buildPhases = (
+				B4C1A12F1BAED1A99A1727ED7A421020 /* Sources */,
+				BF872364A8BACADE1036EF64F30C3150 /* Frameworks */,
+				C429B4B8DC8F457E07767CE06CAEF9CC /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "JWTDecode-macOS";
+			productName = "JWTDecode-macOS";
+			productReference = 26D8129AEB0A78BAC1C88B8285EECBFD /* JWTDecode.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B637E2BECE9AE67F034A733B5403C77B /* Pods-ZitiMobilePacketTunnel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F71ACA45F056905B35F8437C7182D17D /* Build configuration list for PBXNativeTarget "Pods-ZitiMobilePacketTunnel" */;
+			buildPhases = (
+				F2460A43E16AA8089BE64AAF46A7AC62 /* Sources */,
+				DDCF79ADBF28C2CFF132404F5B46C3C0 /* Frameworks */,
+				CF455D6901A272823EE5CB8344836C67 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E0483C5D18588F69ABF672B06FD2DEA0 /* PBXTargetDependency */,
+			);
+			name = "Pods-ZitiMobilePacketTunnel";
+			productName = "Pods-ZitiMobilePacketTunnel";
+			productReference = DBCA87ECF642125B37EB085C5CFC1933 /* Pods_ZitiMobilePacketTunnel.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		DF06CE7245C298DA97355CCA655B8156 /* JWTDecode-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC63A124B209D50D468E33BAC4B45E7A /* Build configuration list for PBXNativeTarget "JWTDecode-iOS" */;
+			buildPhases = (
+				DF445F897F0B014CE81F57C1FD526C88 /* Sources */,
+				28128E2D05482EB84FBA8D5B9BA8A2DE /* Frameworks */,
+				37EDF15698CE70355EC5AA8EA5610E10 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "JWTDecode-iOS";
+			productName = "JWTDecode-iOS";
+			productReference = EFB1DCBDE96AD8FFB4F9AFCB724AF728 /* JWTDecode.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		E4E7EEF6AF25A03B746BBEEF7E63AD38 /* Pods-ZitiPacketTunnel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 390B0AD9B4E6D1ECFB6DB49BEFB818CC /* Build configuration list for PBXNativeTarget "Pods-ZitiPacketTunnel" */;
+			buildPhases = (
+				44FAB9E553CF3A4404044A76A976081D /* Sources */,
+				B8B62203B1154AB5A1CAAB2AC34E1F82 /* Frameworks */,
+				12163B9FF3AD22D9F11D2E59BB0341B5 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				96C6939CF6C76D13C14022D4500DCD3E /* PBXTargetDependency */,
+			);
+			name = "Pods-ZitiPacketTunnel";
+			productName = "Pods-ZitiPacketTunnel";
+			productReference = FAC3121A3E64E2F646E7646CCCB31C0D /* Pods_ZitiPacketTunnel.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D41D8CD98F00B204E9800998ECF8427E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0930;
+				LastUpgradeCheck = 1020;
+				TargetAttributes = {
+					8646165C38478F04F889687621C35BB1 = {
+						LastSwiftMigration = 1020;
+					};
+					DF06CE7245C298DA97355CCA655B8156 = {
+						LastSwiftMigration = 1020;
+					};
+				};
+			};
+			buildConfigurationList = 2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7DB346D0F39D3F0E887471402A8071AB;
+			productRefGroup = 30959EFF2EDED2631AC2A8E5805A00E0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DF06CE7245C298DA97355CCA655B8156 /* JWTDecode-iOS */,
+				8646165C38478F04F889687621C35BB1 /* JWTDecode-macOS */,
+				B637E2BECE9AE67F034A733B5403C77B /* Pods-ZitiMobilePacketTunnel */,
+				E4E7EEF6AF25A03B746BBEEF7E63AD38 /* Pods-ZitiPacketTunnel */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		44FAB9E553CF3A4404044A76A976081D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46B416F5FC150EE45F37C0273DE7911A /* Pods-ZitiPacketTunnel-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B4C1A12F1BAED1A99A1727ED7A421020 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E141811BA63C9F7319EFE5A432195BF /* A0JWT.swift in Sources */,
+				18CB76CC57C280275A514ED2CD0B992C /* Errors.swift in Sources */,
+				751716213279CFAE0C2AF77181AEBC97 /* JWT.swift in Sources */,
+				5AA31EBF6C21EC0548276A9456FD14C9 /* JWTDecode-macOS-dummy.m in Sources */,
+				97ADEF36BD0A21D4E55A500F74594492 /* JWTDecode.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DF445F897F0B014CE81F57C1FD526C88 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6AD221687D30A8B12D1E1EC669B6416A /* A0JWT.swift in Sources */,
+				7623D16E40934262F1F502F72B319364 /* Errors.swift in Sources */,
+				289950F86666BF599DCEB16BA2AAD50C /* JWT.swift in Sources */,
+				89AA3D64A064A2D141F48F6A29C9250E /* JWTDecode-iOS-dummy.m in Sources */,
+				A4405B40161FFC956210F246CDA75EB3 /* JWTDecode.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2460A43E16AA8089BE64AAF46A7AC62 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6D3A44633683724B90C2F9A51E6154F /* Pods-ZitiMobilePacketTunnel-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		96C6939CF6C76D13C14022D4500DCD3E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "JWTDecode-macOS";
+			target = 8646165C38478F04F889687621C35BB1 /* JWTDecode-macOS */;
+			targetProxy = 421F6371037A6CB5B8892A0704718B7C /* PBXContainerItemProxy */;
+		};
+		E0483C5D18588F69ABF672B06FD2DEA0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "JWTDecode-iOS";
+			target = DF06CE7245C298DA97355CCA655B8156 /* JWTDecode-iOS */;
+			targetProxy = 01118203222AAE2E4A2B417E69A7A3DB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		027F3C44C403380B5F23C293B1EAA9E4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+		2AAAEE42FD896F8655B8E015A5FB9940 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = ADF2A903392B4F7E091447DCF27FD42F /* Pods-ZitiMobilePacketTunnel.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-ZitiMobilePacketTunnel/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		65658D11F9D6728E1AC6FF4ACDE42AC0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68178C717A90F97493036261963627C9 /* JWTDecode-iOS.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/JWTDecode-iOS/JWTDecode-iOS-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/JWTDecode-iOS/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/JWTDecode-iOS/JWTDecode-iOS.modulemap";
+				PRODUCT_MODULE_NAME = JWTDecode;
+				PRODUCT_NAME = JWTDecode;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		6FBE0B49E1A2D80BFC2A475462D256FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D8771C6BE7C94E57FB83C1C38C029166 /* Pods-ZitiPacketTunnel.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "Target Support Files/Pods-ZitiPacketTunnel/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MODULEMAP_FILE = "Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		79EF1BD68944ACBE35068C52AB8BEC86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4519BC666A54D39B8CCD54032DCD9374 /* Pods-ZitiPacketTunnel.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "Target Support Files/Pods-ZitiPacketTunnel/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MODULEMAP_FILE = "Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		A9B30E45B9FEB5D47310604ADC1C669C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+		AC256B1D5CD66591BE883AF12C1312EB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C78A3494DCCB09D12644C542D718CCB3 /* JWTDecode-macOS.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_PREFIX_HEADER = "Target Support Files/JWTDecode-macOS/JWTDecode-macOS-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/JWTDecode-macOS/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MODULEMAP_FILE = "Target Support Files/JWTDecode-macOS/JWTDecode-macOS.modulemap";
+				PRODUCT_MODULE_NAME = JWTDecode;
+				PRODUCT_NAME = JWTDecode;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		B74714AF1250E5905D0FEA93EC748441 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C78A3494DCCB09D12644C542D718CCB3 /* JWTDecode-macOS.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_PREFIX_HEADER = "Target Support Files/JWTDecode-macOS/JWTDecode-macOS-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/JWTDecode-macOS/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MODULEMAP_FILE = "Target Support Files/JWTDecode-macOS/JWTDecode-macOS.modulemap";
+				PRODUCT_MODULE_NAME = JWTDecode;
+				PRODUCT_NAME = JWTDecode;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		C3FE0B182D987318D45261680D7A0838 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68178C717A90F97493036261963627C9 /* JWTDecode-iOS.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/JWTDecode-iOS/JWTDecode-iOS-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/JWTDecode-iOS/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/JWTDecode-iOS/JWTDecode-iOS.modulemap";
+				PRODUCT_MODULE_NAME = JWTDecode;
+				PRODUCT_NAME = JWTDecode;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		C99F3AFB1E1098D7A6C7EC65CB58C6B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 572DF54A14246C28EAB60D9AED325197 /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-ZitiMobilePacketTunnel/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				027F3C44C403380B5F23C293B1EAA9E4 /* Debug */,
+				A9B30E45B9FEB5D47310604ADC1C669C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		390B0AD9B4E6D1ECFB6DB49BEFB818CC /* Build configuration list for PBXNativeTarget "Pods-ZitiPacketTunnel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79EF1BD68944ACBE35068C52AB8BEC86 /* Debug */,
+				6FBE0B49E1A2D80BFC2A475462D256FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		63706896383A129E8960BBA1A96DF431 /* Build configuration list for PBXNativeTarget "JWTDecode-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B74714AF1250E5905D0FEA93EC748441 /* Debug */,
+				AC256B1D5CD66591BE883AF12C1312EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC63A124B209D50D468E33BAC4B45E7A /* Build configuration list for PBXNativeTarget "JWTDecode-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3FE0B182D987318D45261680D7A0838 /* Debug */,
+				65658D11F9D6728E1AC6FF4ACDE42AC0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F71ACA45F056905B35F8437C7182D17D /* Build configuration list for PBXNativeTarget "Pods-ZitiMobilePacketTunnel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C99F3AFB1E1098D7A6C7EC65CB58C6B2 /* Debug */,
+				2AAAEE42FD896F8655B8E015A5FB9940 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+}

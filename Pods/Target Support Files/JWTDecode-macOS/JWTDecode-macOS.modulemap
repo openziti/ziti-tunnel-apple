@@ -1,0 +1,6 @@
+framework module JWTDecode {
+  umbrella header "JWTDecode-macOS-umbrella.h"
+
+  export *
+  module * { export * }
+}
