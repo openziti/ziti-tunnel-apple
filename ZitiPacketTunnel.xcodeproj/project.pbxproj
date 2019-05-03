@@ -617,6 +617,9 @@
 							com.apple.ApplicationGroups.Mac = {
 								enabled = 1;
 							};
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
 							com.apple.Keychain = {
 								enabled = 1;
 							};
@@ -634,6 +637,9 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.Mac = {
+								enabled = 1;
+							};
+							com.apple.HardenedRuntime = {
 								enabled = 1;
 							};
 							com.apple.Keychain = {
@@ -1123,6 +1129,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = MN5S649TXM;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ZitiPacketTunnel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
@@ -1145,6 +1152,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = MN5S649TXM;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ZitiPacketTunnel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
@@ -1164,6 +1172,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
+				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
 					"../ziti-sdk-c/includes",
 					"../ziti-sdk-c/deps/uv-mbed/libuv/include",
@@ -1191,6 +1200,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
+				ENABLE_HARDENED_RUNTIME = YES;
 				HEADER_SEARCH_PATHS = (
 					"../ziti-sdk-c/includes",
 					"../ziti-sdk-c/deps/uv-mbed/libuv/include",
