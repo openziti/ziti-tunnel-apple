@@ -32,14 +32,14 @@ class IPUtils {
     }
     
     static func extractUInt16(_ data:Data, from:Int) -> UInt16 {
-        let byteArray = [UInt8](data.subdata(in: from..<(from+2)))
+        let byteArray = [UInt8](data[from..<(from+2)])
         return CFSwapInt16(UnsafePointer(byteArray).withMemoryRebound(to:UInt16.self, capacity: 1) {
             $0.pointee
         })
     }
 
     static func extractUInt32(_ data:Data, from:Int) -> UInt32 {
-        let byteArray = [UInt8](data.subdata(in: from..<(from+4)))
+        let byteArray = [UInt8](data[from..<(from+4)])
         return CFSwapInt32(UnsafePointer(byteArray).withMemoryRebound(to:UInt32.self, capacity: 1) {
             $0.pointee
         })
