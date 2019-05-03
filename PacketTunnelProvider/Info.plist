@@ -30,6 +30,6 @@
 		<string>$(PRODUCT_MODULE_NAME).PacketTunnelProvider</string>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2018 David Hart. All rights reserved.</string>
+	<string>Copyright © 2019 NetFoundry. All rights reserved.</string>
 </dict>
 </plist>

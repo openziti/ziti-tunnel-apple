@@ -35,7 +35,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func writePacket(_ data:Data) {
         //NSLog("Writing packet on thread = \(Thread.current)")
-        writeLock.lock() // Confirmed this is really needed...
+        writeLock.lock()
         if packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber]) == false {
             NSLog("Error writing packet to TUN")
         }
@@ -52,21 +52,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         if let svcId = svc.id {
             let cond = NSCondition()
             cond.lock()
-            NSLog("... blocking creating session for \(zid.name):\(svc.name ?? svcId)")
             var updated = false
             svc.networkSession = nil
             zEdge.getNetworkSession(svcId) { _ in updated = true; cond.signal() } // escaping to other thread...
             while !updated {
                 if !cond.wait(until: Date(timeIntervalSinceNow: timeOutSecs)) {
-                    NSLog("... timed out waiting to get network session")
-                    svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Unavailable)
+                    NSLog("WARN: timed out waiting to get network session for \(zid.name):\(svc.name ?? svcId),")
                     break
                 }
             }
             cond.unlock()
             svc.status = ZitiEdgeService.Status(
                 Date().timeIntervalSince1970, status: svc.networkSession != nil ? .Available : .PartiallyAvailable )
-            NSLog("...  block complete for \(zid.name):\(svc.name ?? svcId), session=\(svc.networkSession != nil)")
             return updated
         }
         return false
@@ -120,7 +117,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Available)
                         if !getNetSessionSync(zEdge, zid, svc) {
                             // since startRunloop is blocking, this shouln't happen...
-                            NSLog("Warning: unable to get network session for \(zid.id)")
+                            NSLog("WARN: unable to get network session for \(zid.id)")
                         }
                         
                         // add hostnames to dns, routes to intercept, and set interceptIp
