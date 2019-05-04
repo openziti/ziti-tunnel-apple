@@ -9,7 +9,8 @@ Packet tunneling provider app and appex for macOS and iOS
 ## Creating macOS build to share with development team
 * Make sure all developer Macs are registered by UUID in NetFoundry Apple Developer account
 * Create an Archive (via Xcode), and sign it using "Organizer/Distribute App" for Development
-* ```bash
+* Run dmgbuild against the exported archive
+```bash
 $ brew install dmgbuild
 $ dmgbuild -s dmgbuild_settings.py -D app=/path/to/ZitiPacketTunnel.app "Ziti Packet Tunnel" ZitiPacketTunnel.dmg
 ```
