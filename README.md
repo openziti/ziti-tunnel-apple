@@ -1,23 +1,17 @@
-# README #
+# Ziti Packet Tunnels for macOS and iOS 
+Apple Network Extension Packet Tunnel Providers and associated UIs for macOS and iOS
 
-### What is this repository for? ###
+## Prerequisities
+* Apple Developer account and membership in NetFoundry Inc development team
+* A Mac with Xcode installed and up-to-date
+* Build of ziti-sdk-c located at ../ziti-c-sdk/build-Darwin-x86_64 and ../ziti-c-sdk/build-iOS-arm9
 
-* Investigative 'spike' on packet tunneling on macOS and iOS
-* Spike / POC
+## Creating macOS build to share with development team
+* Make sure all developer Macs are registered by UUID in NetFoundry Apple Developer account
+* Create an Archive (via Xcode), and sign it using "Organizer/Distribute App" for Development
+* ```bash
+$ brew install dmgbuild
+$ dmgbuild -s dmgbuild_settings.py -D app=/path/to/ZitiPacketTunnel.app "Ziti Packet Tunnel" ZitiPacketTunnel.dmg
+```
 
-### How do I get set up? ###
-
-* Apple XCODE 9.3+, Swift 4
-* An Apple profile for a verified company.  Evenetually this will be NetFoundry... The Entitlements required will not allow executing this code using a Personal profile.
-* Once you have a valid Team profile and can run this, you can load the ZitiPacketTunnel-macos.mobileconfig via MacOS Profiles Setting (from System Preferneces), or just run the app (will create some usable defaults)
-* The tunnel runs as a VPN service (if setup correctly you see 'Ziti Packet Tunnel' under Network Settings.
-* You can see some debug info in the MacOS Console (filter for 'ziti'), or Wireshark on tun3 after starting the tunnel
-
-### Contribution guidelines ###
-
-* None
-
-### Who do I talk to? ###
-
-* Dave Hart
-* Anybody else on the ANetFoundry dvanced Development team
+Copyright&copy; 2019. NetFoundry, Inc.
