@@ -1,9 +1,5 @@
 //
-//  Version.swift
-//  ZitiPacketTunnel
-//
-//  Created by David Hart on 4/30/19.
-//  Copyright © 2019 David Hart. All rights reserved.
+// Copyright © 2019 NetFoundry Inc. All rights reserved.
 //
 
 import Foundation

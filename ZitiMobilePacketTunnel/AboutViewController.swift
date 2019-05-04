@@ -1,9 +1,5 @@
 //
-//  AboutViewController.swift
-//  ZitiMobilePacketTunnel
-//
-//  Created by David Hart on 4/22/19.
-//  Copyright © 2019 David Hart. All rights reserved.
+// Copyright © 2019 NetFoundry Inc. All rights reserved.
 //
 
 import UIKit

@@ -2,8 +2,7 @@
 //  IPPacket.swift
 //  ZitiPacketTunnel
 //
-//  Created by David Hart on 5/6/18.
-//  Copyright © 2018 David Hart. All rights reserved.
+// Copyright © 2019 NetFoundry Inc. All rights reserved.
 //
 
 import Foundation

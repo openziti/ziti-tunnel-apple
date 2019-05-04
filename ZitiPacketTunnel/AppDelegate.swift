@@ -1,9 +1,5 @@
 //
-//  AppDelegate.swift
-//  ZitiPacketTunnel
-//
-//  Created by David Hart on 3/30/18.
-//  Copyright © 2018 David Hart. All rights reserved.
+// Copyright © 2019 NetFoundry Inc. All rights reserved.
 //
 
 import Cocoa

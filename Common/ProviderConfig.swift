@@ -1,9 +1,5 @@
 //
-//  Configuration.swift
-//  PacketTunnelProvider
-//
-//  Created by David Hart on 4/30/18.
-//  Copyright © 2018 David Hart. All rights reserved.
+// Copyright © 2019 NetFoundry Inc. All rights reserved
 //
 
 import Foundation

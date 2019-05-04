@@ -1,9 +1,5 @@
 //
-//  TunnelConfigViewController.swift
-//  ZitiPacketTunnel
-//
-//  Created by David Hart on 2/19/19.
-//  Copyright © 2019 David Hart. All rights reserved.
+// Copyright © 2019 NetFoundry Inc. All rights reserved.
 //
 
 import Cocoa
