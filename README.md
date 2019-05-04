@@ -1,5 +1,5 @@
-# Ziti Packet Tunnels for macOS and iOS 
-Apple Network Extension Packet Tunnel Providers and associated UIs for macOS and iOS
+# Ziti Packet Tunnelers for macOS and iOS 
+Packet tunneling provider app and appex for macOS and iOS
 
 ## Prerequisities
 * Apple Developer account and membership in NetFoundry Inc development team
