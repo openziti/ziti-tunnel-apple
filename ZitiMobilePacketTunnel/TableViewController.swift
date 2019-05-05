@@ -238,9 +238,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Selected row at \(indexPath)")
         if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
-            let dp = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .open)
+            let dp = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .import)
             dp.modalPresentationStyle = .formSheet
             dp.allowsMultipleSelection = false
             dp.delegate = self
@@ -290,12 +289,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         do {
             let url = urls[0]
-            if url.startAccessingSecurityScopedResource() == false {
-                throw ZitiError("Unable to access security scoped resource \(url.lastPathComponent)")
-            }
-            defer {
-                url.stopAccessingSecurityScopedResource()
-            }
             try zidMgr.insertFromJWT(url, at: 0)
             tableView.reloadData()
             tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
