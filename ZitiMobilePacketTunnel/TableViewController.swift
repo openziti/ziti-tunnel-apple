@@ -83,7 +83,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         // init the manager
         tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
             DispatchQueue.main.async {
-                print("done loading from prefs, error=\(error?.localizedDescription ?? "nil")")
                 self.tableView.reloadData()
             }
         }

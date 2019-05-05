@@ -340,8 +340,6 @@ extension ZitiEdge : URLSessionDelegate {
                         }
                     }
                     if newRootCa.count > 0 {
-                        print("*** Setting new rootCa ****:")
-                        print(newRootCa)
                         self.zid.rootCa = newRootCa
                         _ = ZitiIdentityStore().storeCId(self.zid)
                     }
