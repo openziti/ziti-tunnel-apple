@@ -74,11 +74,12 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         tableView.isEditing = true
         tableView.allowsSelectionDuringEditing = true
         
-        Logger.initShared(Logger.APP_TAG)
-        NSLog(Version.verboseStr)
-        
         // watch for changes to the zids
         zidMgr.zidStore.delegate = self
+        
+        // watch for new URLs
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onNewUrlNotification(_:)), name: NSNotification.Name(rawValue: "NewURL"), object: nil)
+
 
         // init the manager
         tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
@@ -286,8 +287,17 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        onNewUrl(urls[0])
+    }
+    
+    @objc func onNewUrlNotification(_ notification: NSNotification) {
+        if let dict = notification.userInfo as NSDictionary?, let url = dict["url"] as? URL {
+            onNewUrl(url)
+        }
+    }
+    
+    func onNewUrl(_ url:URL) {
         do {
-            let url = urls[0]
             try zidMgr.insertFromJWT(url, at: 0)
             tableView.reloadData()
             tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
