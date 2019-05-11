@@ -42,6 +42,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     static let on_nf_data:nf_data_cb = { nfConn, buf, nBytes in
         guard nBytes > 0 && buf != nil else {
+            // TODO: Sometimes these come in after we've already closed and have deinit'd. For now guard, but potential mem leak on retains
             let errStr = String(cString: ziti_errorstr(nBytes))
             NSLog("ZitiConn.onData closing: \(errStr)")
             return

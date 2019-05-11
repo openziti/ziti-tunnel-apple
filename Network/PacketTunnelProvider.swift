@@ -108,13 +108,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     zid.enabled = false
                     zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 } else {
-                    let zEdge = ZitiEdge(zid)
+                    //let zEdge = ZitiEdge(zid)
                     zid.services?.forEach { svc in
                         svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Available)
+                        /*
                         if !getNetSessionSync(zEdge, zid, svc) {
                             // since startRunloop is blocking, this shouln't happen...
                             NSLog("WARN: unable to get network session for \(zid.id)")
-                        }
+                        }*/
                         
                         // add hostnames to dns, routes to intercept, and set interceptIp
                         updateHostsAndIntercepts(zid, svc)
