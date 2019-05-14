@@ -30,7 +30,9 @@ class PacketRouter : NSObject {
     }
     
     private func routeTCP(_ data:Data) {
-        tcpRunloop.rcv(data)
+        tcpRunloop.scheduleOp { [weak self] in
+            self?.tcpRunloop.tcpStack.received(packet: data)
+        }
     }
 
     private func createIPPacket(_ data:Data) -> IPPacket? {

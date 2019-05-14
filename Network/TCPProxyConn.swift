@@ -6,6 +6,8 @@ import NetworkExtension
 import Foundation
 
 class TCPProxyConn : NSObject, ZitiClientProtocol {
+    var releaseConnection: (() -> Void)?
+    
     let key:String
     let ip:String
     let port:UInt16
@@ -30,7 +32,6 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
     
     deinit {
         NSLog("deinit TCPProxyConn \(key), \(ip):\(port)")
-        close()
     }
     
     func connect(_ onDataAvailable: @escaping DataAvailableCallback) -> Bool {
@@ -75,6 +76,7 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
         if inputStream?.streamStatus ?? .closed != .closed { inputStream?.close() }
         if outputStream?.streamStatus ?? .closed != .closed { outputStream?.close() }
         if thread?.isCancelled ?? true == false { thread?.cancel() }
+        releaseConnection?()
     }
     
     @objc private func doRunLoop() {
@@ -94,10 +96,16 @@ class TCPProxyConn : NSObject, ZitiClientProtocol {
                 if outputStream!.streamStatus == .writing { // should never happen since inside of a lock, but sometimes it does
                     NSLog("** done writing \(n) of \(d.count), \(outputStream!.streamStatus.rawValue) on \(Thread.current)")
                 }
+                
+                if n <= 0 {
+                    NSLog("\(key) no more data. closing remote")
+                    close()
+                    break
+                }
                 //NSLog("TCPProxyConn wrote \(n) bytes")
             }
             writeLock.unlock()
-            RunLoop.current.run(until: Date(timeIntervalSinceNow: TimeInterval(0.025)))
+            RunLoop.current.run(until: Date(timeIntervalSinceNow: TimeInterval(0.25)))
         }
         NSLog("*** Ending runloop for \(Thread.current)")
     }
