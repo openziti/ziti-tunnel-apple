@@ -75,7 +75,8 @@ public final class TSIPStack {
         sys_check_timeouts()
     }
     
-    func dispatch_call(_ block: @escaping () -> ()) {
+    // NF_MOD private to public
+    public func dispatch_call(_ block: @escaping () -> ()) {
         processQueue.async(execute: block)
     }
     

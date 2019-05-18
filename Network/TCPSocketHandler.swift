@@ -42,6 +42,6 @@ class TCPSocketHandler: TSTCPSocketDelegate {
     }
     
     func didWriteData(_ length: Int, from: TSTCPSocket) {
-        //NSLog("TCPSocketHandler didWriteData: \(length) bytes were written (back to TUN)")
+        print("TCPSocketHandler didWriteData: \(length) bytes were written (back to TUN)")
     }
 }

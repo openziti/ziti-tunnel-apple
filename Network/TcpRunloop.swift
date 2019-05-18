@@ -30,9 +30,14 @@ class TcpRunloop: TSIPStackDelegate {
     
     // schedule to run in run loop thread
     func scheduleOp(_ key:String?=nil, _ op: @escaping ()->Void) {
+        tcpStack.dispatch_call {
+            op()
+         }
+        /*****
         opQueueLock.lock()
         opQueue.append((key, op))
         opQueueLock.unlock()
+ */
     }
     
     private func in_addrToString(_ inaddr:in_addr) -> String {
@@ -101,7 +106,7 @@ class TcpRunloop: TSIPStackDelegate {
             // queue for sending in run loop thread
             if nBytes <= 0 || payload == nil {
                 self?.scheduleOp {
-                    print("Ziti done, closing sock")
+                    print("Ziti done, closing sock (nBytes = \(nBytes), payload? == \(payload != nil))")
                     sock?.close()
                 }
             } else {
@@ -130,7 +135,12 @@ class TcpRunloop: TSIPStackDelegate {
         
         // Run forever...
         while !(thread?.isCancelled ?? true) {
+            Thread.sleep(forTimeInterval: TimeInterval(0.250))
+            tcpStack.dispatch_call { [weak self] in
+                self?.tcpStack.checkTimeout()
+            }
             
+            /****
             // grab queue'd operations
             var currOps:[(String?, ()->Void)] = []
             opQueueLock.lock()
@@ -147,7 +157,8 @@ class TcpRunloop: TSIPStackDelegate {
             tcpStack.checkTimeout()
             
             // sleep for a bit..
-            Thread.sleep(forTimeInterval: TimeInterval(0.025))
+            Thread.sleep(forTimeInterval: TimeInterval(0.001))
+ ****/
         }
     }
 }

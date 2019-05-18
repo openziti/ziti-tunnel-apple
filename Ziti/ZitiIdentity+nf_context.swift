@@ -117,7 +117,7 @@ extension ZitiIdentity {
         }
         th.data = self.toVoidPtr()
         
-        let timeoutMs:UInt64 = 250 // 300 * 1000 // 5 mins for now since we don't do anything useful in the callback
+        let timeoutMs:UInt64 = 50 //250
         uv_timer_start(&th, ZitiIdentity.on_uv_timer, timeoutMs, timeoutMs)
         
         // start the runloop

@@ -48,16 +48,23 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         }
         
         if nBytes > 0 && buf != nil {
-            let data = Data(bytesNoCopy: buf!, count: Int(nBytes), deallocator: .none)
+            //let data = Data(bytesNoCopy: buf!, count: Int(nBytes), deallocator: .none) // TODO: CHICKEN DINNER!
+            let data = Data(bytes: buf!, count: Int(nBytes)) // bytes no copy is mem error when ziti sdk frees buff before we write
             mySelf.onDataAvailable?(data, Int(nBytes))
         } else {
-            mySelf.closeWait = true
-            
-            // give delegate a chance to clean-up
-            mySelf.onDataAvailable?(nil, Int(nBytes))
-            
             let errStr = String(cString: ziti_errorstr(nBytes))
-            NSLog("ZitiConn \"\(errStr)\".")
+            NSLog("ZitiConn \"\(errStr)\" \(mySelf.key).")
+            
+            if mySelf.closeWait {
+                print("... Ziti close complete. Releasing connection \(mySelf.key)")
+                mySelf.releaseConnection?()
+            } else {
+                mySelf.closeWait = true
+                
+                print("... Ziti closed. Notifying upstream \(mySelf.key)")
+                // give delegate a chance to clean-up
+                mySelf.onDataAvailable?(nil, Int(nBytes))
+            }
         }
     }
     
@@ -104,8 +111,11 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         }
         writeCond.unlock()
         
+        //// ** BACKPRESSURE HACK PIG TODO
+        Thread.sleep(forTimeInterval: 0.01)
+        
         zid.scheduleOp {
-            guard self.closeWait == false else { return }
+            guard self.closeWait == false else { print("closeWait drop write"); return }
             
             // TODO: figure out how to avoid the copy (making payload optional would help)
             let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: payload.count)
@@ -123,14 +133,14 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     }
     
     func close() {
-        print("scheduling ziti close")
+        print("Checking Ziti close \(key)")
         zid.scheduleOp { [weak self] in
-            print("executing ziti close")
             if self?.closeWait ?? false {
-                print("Already closing. Release connection") // TODO: still not quire right.  Should be from socketDidClose only
+                print("Ziti already closed \(self?.key ?? ""). Releasing connection")
                 self?.releaseConnection?()
             } else if let mySelf = self, mySelf.nfConn != nil {
                 NSLog("ZitiConn closing \(mySelf.key)")
+                self?.closeWait = true
                 let status = NF_close(&mySelf.nfConn)
                 if status != ZITI_OK {
                     let errStr = String(cString: ziti_errorstr(status))
