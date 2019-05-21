@@ -45,7 +45,7 @@ class ZitiEdge : NSObject {
                 completionHandler(ZitiError("error trying to convert data to JSON"))
                 return
             }
-            print("zt-session: \(token)")
+            //print("zt-session: \(token)")
             self.zid.sessionToken = token
             completionHandler(nil)
         }.resume()
@@ -180,7 +180,7 @@ class ZitiEdge : NSObject {
                 didChange = self.zid.doServicesMatch(resp.data) == false
             }
             self.zid.services = resp.data
-            print("got \(self.zid.services?.count ?? 0) services for \(self.zid.name). didChange=\(didChange)")
+            //print("got \(self.zid.services?.count ?? 0) services for \(self.zid.name). didChange=\(didChange)")
             completionHandler(didChange, nil)
         }.resume()
     }

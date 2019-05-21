@@ -191,7 +191,6 @@ class ZitiKeychain : NSObject {
         let data1 = SecCertificateCopyData(cert1)
         let data2 = SecCertificateCopyData(cert2)
         if (data1 as NSData).isEqual(to: (data2 as NSData) as Data) {
-            print("Matched cert: \(cert1):\n\(data1)")
             return true
         }
         return false

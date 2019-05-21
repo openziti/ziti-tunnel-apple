@@ -51,7 +51,7 @@ extension ZitiIdentity {
             NSLog("ZitiIdentity on_nf_init WTF invalid ctx")
             return
         }
-        print("on_nf_init status: \(status), id: \(mySelf.id)")
+        
         if status != ZITI_OK {
             let errStr = String(cString: ziti_errorstr(status))
             NSLog("\(mySelf.id) on_nf_init error: \(errStr)")
@@ -92,7 +92,6 @@ extension ZitiIdentity {
     }
     
     @objc func doRunLoop() {
-        print("RunLoop thread = \(Thread.current)")
         var loop = uv_loop_t()
         
         // init the runloop
@@ -121,8 +120,6 @@ extension ZitiIdentity {
         uv_timer_start(&th, ZitiIdentity.on_uv_timer, timeoutMs, timeoutMs)
         
         // start the runloop
-        NSLog("Starting runloop for \(name):\(id)")
-        
         _ = uv_run(&loop, UV_RUN_DEFAULT)
         
         NSLog("Exiting runloop for \(name):\(id), shutting down Ziti")
