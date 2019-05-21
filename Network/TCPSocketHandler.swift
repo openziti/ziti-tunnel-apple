@@ -7,9 +7,11 @@ import tun2socks
 
 class TCPSocketHandler: TSTCPSocketDelegate {
     var ziti:ZitiClientProtocol
+    var regulator:TransferRegulator
     
-    init(_ ziti:ZitiClientProtocol) {
+    init(_ ziti:ZitiClientProtocol, _ regulator:TransferRegulator) {
         self.ziti = ziti
+        self.regulator = regulator
         NSLog("TCPSocketHandler init")
     }
     
@@ -42,6 +44,7 @@ class TCPSocketHandler: TSTCPSocketDelegate {
     }
     
     func didWriteData(_ length: Int, from: TSTCPSocket) {
-        print("TCPSocketHandler didWriteData: \(length) bytes were written (back to TUN)")
+        //print(">>>TCPSocketHandler didWriteData: \(length) bytes were written (back to TUN)")
+        regulator.decPending(length)
     }
 }

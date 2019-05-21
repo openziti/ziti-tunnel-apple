@@ -158,7 +158,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         NSLog("startTunnel: options=\(options?.debugDescription ?? "nil")")
         
-        setenv("ZITI_LOG", "100", 1)
+        //setenv("ZITI_LOG", "100", 1)
         
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {

@@ -78,6 +78,8 @@
 		5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */; };
 		5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AD0221F937D00051475 /* ServicesViewController.swift */; };
+		5A5B33022292DB4E002A3437 /* TransferRegulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B33012292DB4E002A3437 /* TransferRegulator.swift */; };
+		5A5B33032292DB4E002A3437 /* TransferRegulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B33012292DB4E002A3437 /* TransferRegulator.swift */; };
 		5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A6BA25D226DE5FB00224F09 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6BA25C226DE5FB00224F09 /* AboutViewController.swift */; };
@@ -295,6 +297,7 @@
 		5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelConfigViewController.swift; sourceTree = "<group>"; };
 		5A379ACB221EDB1400051475 /* ZitiIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentity.swift; sourceTree = "<group>"; };
 		5A379AD0221F937D00051475 /* ServicesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesViewController.swift; sourceTree = "<group>"; };
+		5A5B33012292DB4E002A3437 /* TransferRegulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferRegulator.swift; sourceTree = "<group>"; };
 		5A67F8F0209F948F00DEFE87 /* IPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPPacket.swift; sourceTree = "<group>"; };
 		5A6BA25C226DE5FB00224F09 /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		5A6BA25F226DF2C500224F09 /* Notices.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Notices.rtf; sourceTree = "<group>"; };
@@ -514,6 +517,7 @@
 				5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */,
 				5A3664C9228452BE00193C70 /* TCPSocketHandler.swift */,
 				5A3664D722862EF400193C70 /* TcpRunloop.swift */,
+				5A5B33012292DB4E002A3437 /* TransferRegulator.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -997,6 +1001,7 @@
 				5A100A6620A4FD6100B0B99D /* IPv6Packet.swift in Sources */,
 				5A8702D42230B4D300314199 /* ZitiEdgeNetworkSession.swift in Sources */,
 				5A3664CA228452BE00193C70 /* TCPSocketHandler.swift in Sources */,
+				5A5B33022292DB4E002A3437 /* TransferRegulator.swift in Sources */,
 				5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */,
 				5AF7868D208A99640093498C /* UDPPacket.swift in Sources */,
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
@@ -1068,6 +1073,7 @@
 				5A91B4CA2222E156006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A8702D62230B4D300314199 /* ZitiEdgeNetworkSession.swift in Sources */,
 				5A3664CB228452BE00193C70 /* TCPSocketHandler.swift in Sources */,
+				5A5B33032292DB4E002A3437 /* TransferRegulator.swift in Sources */,
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
 				5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */,
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,

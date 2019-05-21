@@ -49,6 +49,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         
         if nBytes > 0 && buf != nil {
             //let data = Data(bytesNoCopy: buf!, count: Int(nBytes), deallocator: .none) // TODO: CHICKEN DINNER!
+            print("--- on_nf_data \(nBytes) bytes")
             let data = Data(bytes: buf!, count: Int(nBytes)) // bytes no copy is mem error when ziti sdk frees buff before we write
             mySelf.onDataAvailable?(data, Int(nBytes))
         } else {

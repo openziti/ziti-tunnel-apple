@@ -80,7 +80,7 @@
  */
 #ifndef MEM_SIZE
 /* NF_MOD was 512000 */
-#define MEM_SIZE                        10500000
+#define MEM_SIZE                        51200000
 #endif
 
 /**
@@ -128,7 +128,7 @@
  * bigger pool - WARNING: THIS MIGHT WASTE MEMORY but it can make a system more
  * reliable. */
 #ifndef MEM_USE_POOLS_TRY_BIGGER_POOL
-// NF_MOD
+// NF_MOD was 0
 #define MEM_USE_POOLS_TRY_BIGGER_POOL   1
 #endif
 
@@ -905,7 +905,7 @@
  * an upper limit on the MSS advertised by the remote host.
  */
 #ifndef TCP_MSS
-// NF_MOD was 1460
+// NF_MOD was 1460 15960
 #define TCP_MSS                         15960
 #endif
 
@@ -1827,6 +1827,10 @@
  ---------- Debugging options ----------
  ---------------------------------------
  */
+
+// NF_MOD was 0
+#define LWIP_DEBUG 0
+
 /**
  * LWIP_DBG_MIN_LEVEL: After masking, the value of the debug is
  * compared against this value. If it is smaller, then debugging
@@ -2003,6 +2007,7 @@
  * TCP_OUTPUT_DEBUG: Enable debugging in tcp_out.c output functions.
  */
 #ifndef TCP_OUTPUT_DEBUG
+// NF_Mod was _OFF
 #define TCP_OUTPUT_DEBUG                LWIP_DBG_OFF
 #endif
 

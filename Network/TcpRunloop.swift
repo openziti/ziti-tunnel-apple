@@ -30,14 +30,12 @@ class TcpRunloop: TSIPStackDelegate {
     
     // schedule to run in run loop thread
     func scheduleOp(_ key:String?=nil, _ op: @escaping ()->Void) {
-        tcpStack.dispatch_call {
-            op()
-         }
-        /*****
+        tcpStack.dispatch_call { op() }
+        /*******
         opQueueLock.lock()
         opQueue.append((key, op))
         opQueueLock.unlock()
- */
+ *******/
     }
     
     private func in_addrToString(_ inaddr:in_addr) -> String {
@@ -86,7 +84,8 @@ class TcpRunloop: TSIPStackDelegate {
         }
         
         // create delgate
-        let delegate = TCPSocketHandler(gotConn)
+        let regulator = TransferRegulator(Int(0xffff)) // TODO = TCP_SND_BUF
+        let delegate = TCPSocketHandler(gotConn, regulator)
         
         // keep delegate around until we know we're done with it (sock keeps a weak reference)
         tcpConnsLock.lock()
@@ -106,12 +105,20 @@ class TcpRunloop: TSIPStackDelegate {
             // queue for sending in run loop thread
             if nBytes <= 0 || payload == nil {
                 self?.scheduleOp {
-                    print("Ziti done, closing sock (nBytes = \(nBytes), payload? == \(payload != nil))")
                     sock?.close()
                 }
             } else {
-                self?.scheduleOp(key) {
-                    sock?.writeData(payload!)
+                if !regulator.wait(payload!.count, 3.0) {
+                    NSLog("TCP ziti conn timed out waiting for socket write window \(key). sock connected = \(sock?.isConnected ?? false)")
+                    self?.scheduleOp { sock?.close() }
+                } else {
+                    self?.scheduleOp(key) {
+                        if sock?.isConnected ?? false {
+                            sock?.writeData(payload!)
+                        } else {
+                            NSLog("Skipping write of \(payload!.count), \(key). already closed socket............")
+                        }
+                    }
                 }
             }
         }
@@ -136,11 +143,14 @@ class TcpRunloop: TSIPStackDelegate {
         // Run forever...
         while !(thread?.isCancelled ?? true) {
             Thread.sleep(forTimeInterval: TimeInterval(0.250))
+            
+            /* Needed?
             tcpStack.dispatch_call { [weak self] in
                 self?.tcpStack.checkTimeout()
             }
+            */
             
-            /****
+            /******
             // grab queue'd operations
             var currOps:[(String?, ()->Void)] = []
             opQueueLock.lock()
@@ -158,7 +168,7 @@ class TcpRunloop: TSIPStackDelegate {
             
             // sleep for a bit..
             Thread.sleep(forTimeInterval: TimeInterval(0.001))
- ****/
+ **********/
         }
     }
 }
