@@ -47,14 +47,14 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             connectButton.title = "Turn Ziti On"
             break
         case .invalid:
-            print("Invalid")
+            connectStatus.stringValue = "Invalid"
             break
         case .reasserting:
             connectStatus.stringValue = "Reasserting..."
             connectButton.isEnabled = false
             break
         @unknown default:
-            print("Unknown...")
+            print("Unknown tunnel status")
             break
         }
         self.tableView.reloadData()
@@ -189,12 +189,12 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     }
     
     func onRemovedId(_ idString: String) {
-        print("zid \(idString) removed")
+        //print("zid \(idString) removed")
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
         if let match = zidMgr.zids.first(where: { $0.id == zid.id }) {
-            print("\(zid.name):\(zid.id) changed")
+            NSLog("\(zid.name):\(zid.id) changed")
             
             // TUN will disable if unable to start for zid
             match.edgeStatus = zid.edgeStatus
@@ -207,7 +207,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 updateServiceUI(zId:zid)
             }
         } else {
-            print("\(zid.name):\(zid.id) new")
+            // new one
         }
         
         // Also TODO: add support for showning netSessions when present

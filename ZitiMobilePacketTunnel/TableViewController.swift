@@ -112,7 +112,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
         if let match = zidMgr.zids.first(where: { $0.id == zid.id }) {
-            print("\(zid.name):\(zid.id) changed")
+            NSLog("\(zid.name):\(zid.id) changed")
             
             // TUN will disable if unable to start for zid
             match.edgeStatus = zid.edgeStatus
@@ -123,7 +123,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             tableView.reloadData()
             ivc?.tableView.reloadData()
         } else {
-            print("\(zid.name):\(zid.id) new")
+            // new one..
         }
     }
     
@@ -262,7 +262,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 }
                 self.present(mail, animated: true)
             } else {
-                print("Mail view controller not available")
+                NSLog("Mail view controller not available")
                 let alert = UIAlertController(
                     title:"Mail view not available",
                     message: "Please email support@netfoundry.io for assistance",
