@@ -14,6 +14,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     let writeCond = NSCondition()
     var okToWrite = false
+    let regulator = TransferRegulator(0xffff0) // TODO
     
     var nfConn:nf_connection?
     var closeWait = false
@@ -49,7 +50,6 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         
         if nBytes > 0 && buf != nil {
             //let data = Data(bytesNoCopy: buf!, count: Int(nBytes), deallocator: .none) // TODO: CHICKEN DINNER!
-            print("--- on_nf_data \(nBytes) bytes")
             let data = Data(bytes: buf!, count: Int(nBytes)) // bytes no copy is mem error when ziti sdk frees buff before we write
             mySelf.onDataAvailable?(data, Int(nBytes))
         } else {
@@ -62,7 +62,6 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             } else {
                 mySelf.closeWait = true
                 
-                print("... Ziti closed. Notifying upstream \(mySelf.key)")
                 // give delegate a chance to clean-up
                 mySelf.onDataAvailable?(nil, Int(nBytes))
             }
@@ -89,7 +88,6 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             }
         
             // dial it
-            NSLog("                 DIALING")
             status = NF_dial(self.nfConn, svcName_c, ZitiConn.on_nf_conn, ZitiConn.on_nf_data)
             guard status == ZITI_OK else {
                 let errStr = String(cString: ziti_errorstr(status))
@@ -112,32 +110,35 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         }
         writeCond.unlock()
         
-        //// ** BACKPRESSURE HACK PIG TODO
-        Thread.sleep(forTimeInterval: 0.01)
-        
-        zid.scheduleOp {
-            guard self.closeWait == false else { print("closeWait drop write"); return }
-            
-            // TODO: figure out how to avoid the copy (making payload optional would help)
-            let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: payload.count)
-            ptr.initialize(from: [UInt8](payload), count: payload.count)
-            let status = NF_write(self.nfConn, ptr, payload.count)
-            ptr.deallocate()
-            
-            if status != ZITI_OK {
-                let errStr = String(cString: ziti_errorstr(status))
-                NSLog("ZitiConn \(self.key) Error writing: \(errStr)")
-                return // -1
+        if !regulator.wait(payload.count, 1.0) {
+            NSLog("Ziti conn timed out waiting for ziti write window \(key)")
+            zid.scheduleOp { self.close() }
+        } else {
+            zid.scheduleOp {
+                guard self.closeWait == false else { print("closeWait drop write"); return }
+                
+                // TODO: figure out how to avoid the copy (making payload optional would help)
+                let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: payload.count)
+                ptr.initialize(from: [UInt8](payload), count: payload.count)
+                let status = NF_write(self.nfConn, ptr, payload.count)
+                ptr.deallocate()
+                
+                // TODO: This should be in (coming soon) on_nf_write_complete callback...
+                self.regulator.decPending(payload.count)
+                
+                if status != ZITI_OK {
+                    let errStr = String(cString: ziti_errorstr(status))
+                    NSLog("ZitiConn \(self.key) Error writing: \(errStr)")
+                    return // -1
+                }
             }
         }
-        return payload.count
+        return payload.count // TODO: bogus
     }
     
     func close() {
-        print("Checking Ziti close \(key)")
         zid.scheduleOp { [weak self] in
             if self?.closeWait ?? false {
-                print("Ziti already closed \(self?.key ?? ""). Releasing connection")
                 self?.releaseConnection?()
             } else if let mySelf = self, mySelf.nfConn != nil {
                 NSLog("ZitiConn closing \(mySelf.key)")

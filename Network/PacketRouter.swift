@@ -25,7 +25,7 @@ class PacketRouter : NSObject {
             dnsResolver.resolve(udp)
         } else {
             // TODO: --> Ziti
-            NSLog("...UDP --> meant for Ziti? UDP not yet supported")
+            //NSLog("...UDP --> meant for Ziti? UDP not yet supported")
         }
     }
     

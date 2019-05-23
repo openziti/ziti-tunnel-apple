@@ -11,9 +11,9 @@ class TcpRunloop: TSIPStackDelegate {
     let tunnelProvider:PacketTunnelProvider
     let dnsResolver:DNSResolver
     
-    private var thread:Thread?
-    private let opQueueLock = NSLock()
-    private var opQueue:[(String?,()->Void)] = []
+    //private var thread:Thread?
+    //private let opQueueLock = NSLock()
+    //private var opQueue:[(String?,()->Void)] = []
     
     private var tcpConns:[String:TCPSocketHandler] = [:]
     private var tcpConnsLock = NSLock()
@@ -23,9 +23,9 @@ class TcpRunloop: TSIPStackDelegate {
         dnsResolver = dnsR
         tcpStack.delegate = self
         tcpStack.outputBlock = self.outputBlock
-        thread = Thread(target: self, selector: #selector(TcpRunloop.doRunLoop), object: nil)
-        thread?.name = "TcpIp_runloop"
-        thread?.start()
+        //thread = Thread(target: self, selector: #selector(TcpRunloop.doRunLoop), object: nil)
+        //thread?.name = "TcpIp_runloop"
+        //thread?.start()
     }
     
     // schedule to run in run loop thread
@@ -100,24 +100,23 @@ class TcpRunloop: TSIPStackDelegate {
         }
         sock.delegate = delegate
         
+        var sockConnected = true
         // connect Ziti
         let zStarted = gotConn.connect { [weak self, weak sock] payload, nBytes in
             // queue for sending in run loop thread
             if nBytes <= 0 || payload == nil {
-                self?.scheduleOp {
-                    sock?.close()
-                }
-            } else {
-                if !regulator.wait(payload!.count, 3.0) {
-                    NSLog("TCP ziti conn timed out waiting for socket write window \(key). sock connected = \(sock?.isConnected ?? false)")
-                    self?.scheduleOp { sock?.close() }
+                self?.scheduleOp { sock?.close() }
+            } else if sockConnected {
+                if !regulator.wait(payload!.count, 0.5) {
+                    NSLog("TCP ziti conn timed out waiting for socket write window \(key)")
+                    self?.scheduleOp {
+                        sock?.close()
+                        sockConnected = false
+                    }
                 } else {
                     self?.scheduleOp(key) {
-                        if sock?.isConnected ?? false {
-                            sock?.writeData(payload!)
-                        } else {
-                            NSLog("Skipping write of \(payload!.count), \(key). already closed socket............")
-                        }
+                        sockConnected = sock?.isConnected ?? false 
+                        if sockConnected { sock?.writeData(payload!) }
                     }
                 }
             }
@@ -138,17 +137,17 @@ class TcpRunloop: TSIPStackDelegate {
         }
     }
     
+/*
     @objc func doRunLoop() {
         
         // Run forever...
         while !(thread?.isCancelled ?? true) {
             Thread.sleep(forTimeInterval: TimeInterval(0.250))
             
-            /* Needed?
+            /* Needed? */
             tcpStack.dispatch_call { [weak self] in
                 self?.tcpStack.checkTimeout()
             }
-            */
             
             /******
             // grab queue'd operations
@@ -171,4 +170,5 @@ class TcpRunloop: TSIPStackDelegate {
  **********/
         }
     }
+ */
 }
