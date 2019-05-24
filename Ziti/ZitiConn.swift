@@ -56,8 +56,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             let errStr = String(cString: ziti_errorstr(nBytes))
             NSLog("ZitiConn \"\(errStr)\" \(mySelf.key).")
             
-            if mySelf.closeWait {
-                print("... Ziti close complete. Releasing connection \(mySelf.key)")
+            if mySelf.closeWait { 
                 mySelf.releaseConnection?()
             } else {
                 mySelf.closeWait = true
