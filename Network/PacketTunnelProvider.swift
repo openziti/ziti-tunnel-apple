@@ -3,10 +3,12 @@
 //
 
 import NetworkExtension
+import Network
 
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     let providerConfig = ProviderConfig()
+    let netMon = NWPathMonitor()
     var packetRouter:PacketRouter?
     var dnsResolver:DNSResolver?
     var interceptedRoutes:[NEIPv4Route] = []
@@ -208,6 +210,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 completionHandler(error as NSError)
             }
             
+            self.netMon.pathUpdateHandler = self.pathUpdateHandler
+            self.netMon.start(queue: DispatchQueue(label: "NetMon"))
+
             // packetFlow FD
             var ifname:String?
             let fd = (self.packetFlow.value(forKeyPath: "socket.fileDescriptor") as? Int32) ?? -1
@@ -252,6 +257,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         if let handler = completionHandler {
             handler(messageData)
         }
+    }
+    
+    func pathUpdateHandler(path: Network.NWPath) {
+        var ifaceStr = ""
+        for i in path.availableInterfaces {
+            ifaceStr += " \n     \(i.index): name:\(i.name), type:\(i.type)"
+        }
+        NSLog("Network Path Update:\n   Status:\(path.status), Expensive:\(path.isExpensive), Cellular:\(path.usesInterfaceType(.cellular))\n   Interfaces:\(ifaceStr)")
     }
     
     override func sleep(completionHandler: @escaping () -> Void) {
