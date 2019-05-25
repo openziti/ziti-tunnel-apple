@@ -14,7 +14,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     let writeCond = NSCondition()
     var okToWrite = false
-    let regulator = TransferRegulator(0xffff0) // TODO
+    let regulator = TransferRegulator(0xffff0) // TODO: What's right value. Start with maxWndScale << 1
     
     var nfConn:nf_connection?
     var closeWait = false
@@ -111,7 +111,9 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         
         if !regulator.wait(payload.count, 1.0) {
             NSLog("Ziti conn timed out waiting for ziti write window \(key)")
-            zid.scheduleOp { self.close() }
+            // if lose network, scheduled close doesn't happen.  Return -1 instead and leave closing to other side...
+            // zid.scheduleOp { self.close() }
+            return -1
         } else {
             zid.scheduleOp {
                 guard self.closeWait == false else { print("closeWait drop write"); return }
@@ -123,6 +125,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
                 ptr.deallocate()
                 
                 // TODO: This should be in (coming soon) on_nf_write_complete callback...
+                // at that point try calling from current thread (if try that now there is 0 throttle...)
                 self.regulator.decPending(payload.count)
                 
                 if status != ZITI_OK {

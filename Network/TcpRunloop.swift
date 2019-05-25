@@ -3,12 +3,15 @@
 //
 
 import Foundation
+import Network
 import tun2socks
 
 class TcpRunloop: TSIPStackDelegate {
     
     let tcpStack = TSIPStack.stack
     let tunnelProvider:PacketTunnelProvider
+    let netMon = NWPathMonitor()
+    var currPath:NWPath?
     let dnsResolver:DNSResolver
     
     //private var thread:Thread?
@@ -23,6 +26,9 @@ class TcpRunloop: TSIPStackDelegate {
         dnsResolver = dnsR
         tcpStack.delegate = self
         tcpStack.outputBlock = self.outputBlock
+        netMon.pathUpdateHandler = self.pathUpdateHandler
+        netMon.start(queue: tcpStack.processQueue)
+        
         //thread = Thread(target: self, selector: #selector(TcpRunloop.doRunLoop), object: nil)
         //thread?.name = "TcpIp_runloop"
         //thread?.start()
@@ -55,11 +61,14 @@ class TcpRunloop: TSIPStackDelegate {
         let srcPort = sock.sourcePort
         let dstAddr = in_addrToString(sock.destinationAddress)
         let dstPort = sock.destinationPort
+        var zitiConn:ZitiClientProtocol? = nil
         
         let key = "TCP:\(srcAddr):\(srcPort)->\(dstAddr):\(dstPort)"
-        NSLog("TCP Accepted \(key)")
-        
-        var zitiConn:ZitiClientProtocol? = nil
+        guard currPath?.status ?? .unsatisfied != .unsatisfied else {
+            NSLog("No network path avaialble for \(key). Closing...")
+            sock.close()
+            return
+        }
         
         // meant for Ziti?
         let intercept = "\(dstAddr):\(dstPort)"
@@ -76,14 +85,13 @@ class TcpRunloop: TSIPStackDelegate {
                 }
             }
         }
-
         guard let gotConn = zitiConn else {
             NSLog("No Ziti connection available for \(key).  Closing...")
-            //sock.close()
+            sock.close()
             return
         }
         
-        // create delgate
+        NSLog("TCP Accepted \(key)")        
         let regulator = TransferRegulator(Int(0xffff)) // TODO = TCP_SND_BUF
         let delegate = TCPSocketHandler(gotConn, regulator)
         
@@ -129,12 +137,23 @@ class TcpRunloop: TSIPStackDelegate {
         }
     }
     
-    // TSIPStack outputBlock (executes in run loop callback)
+    // TSIPStack outputBlock (executes in tcpStack's processQueue)
     func outputBlock(_ data:[Data], _ protocol:[NSNumber]) {
         data.forEach { pkt in
             //NSLog("tcp outputBlock - writing to packet flow..")
             tunnelProvider.writePacket(pkt)
         }
+    }
+    
+    // netMon callback, runs in tcpStack's processQueue
+    func pathUpdateHandler(path: Network.NWPath) {
+        currPath = path
+        
+        var ifaceStr = ""
+        for i in path.availableInterfaces {
+            ifaceStr += " \n     \(i.index): name:\(i.name), type:\(i.type)"
+        }
+        NSLog("Network Path Update:\n   Status:\(path.status), Expensive:\(path.isExpensive), Cellular:\(path.usesInterfaceType(.cellular))\n   Interfaces:\(ifaceStr)")
     }
     
 /*

@@ -40,7 +40,10 @@ class TCPSocketHandler: TSTCPSocketDelegate {
     }
     
     func didReadData(_ data: Data, from: TSTCPSocket) {
-        _ = ziti.write(payload: data)
+        if ziti.write(payload: data) <= 0 {
+            NSLog("Unable to write socket data to Ziti")
+            ziti.onDataAvailable?(nil, -1)
+        }
     }
     
     func didWriteData(_ length: Int, from: TSTCPSocket) {
