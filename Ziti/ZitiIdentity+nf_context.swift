@@ -28,7 +28,8 @@ extension ZitiIdentity {
             let ti = TimeInterval(5.0) // give it a hefty amount of time
             NSLog("\(name):\(id) Waiting \(ti) for SDK on_nf_init()..")
             if let cond = cond, !cond.wait(until: Date(timeIntervalSinceNow: ti))  {
-                NSLog("** \(name):\(id) timed out waiting for on_nf_init()")                
+                NSLog("** \(name):\(id) timed out waiting for on_nf_init()")
+                nf_init_cond?.unlock()
                 return false
             }
         }
@@ -65,7 +66,9 @@ extension ZitiIdentity {
         NF_dump(nf_context)
         
         // signal init condition
+        mySelf.nf_init_cond?.lock()
         mySelf.nf_init_cond?.signal()
+        mySelf.nf_init_cond?.unlock()
     }
     
     static let on_uv_timer:uv_timer_cb = { th in

@@ -14,6 +14,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     let writeCond = NSCondition()
     var okToWrite = false
+    var timedOut = false
     let regulator = TransferRegulator(0xffff0) // TODO: What's right value. Start with maxWndScale << 1
     
     var nfConn:nf_connection?
@@ -37,9 +38,18 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             NSLog("ZitiConn.onConn WTF invalid ctx")
             return
         }
-        print("ZitiConn.onConn OK to write \(mySelf.key)")
-        mySelf.okToWrite = true
+    
+        mySelf.writeCond.lock()
+        if status == ZITI_OK {
+            print("ZitiConn.onConn OK to write \(mySelf.key)")
+            mySelf.okToWrite = true
+        } else {
+            let errStr = String(cString: ziti_errorstr(status))
+            print("ZitiConn.onConn \"\(errStr)\" \(mySelf.key)")
+            mySelf.timedOut = true
+        }
         mySelf.writeCond.signal()
+        mySelf.writeCond.unlock()
     }
     
     static let on_nf_data:nf_data_cb = { nfConn, buf, nBytes in
@@ -54,11 +64,25 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             mySelf.onDataAvailable?(data, Int(nBytes))
         } else {
             let errStr = String(cString: ziti_errorstr(nBytes))
-            NSLog("ZitiConn \"\(errStr)\" \(mySelf.key).")
+            NSLog("ZitiConn.onData \"\(errStr)\" \(mySelf.key).")
             
-            if mySelf.closeWait { 
+            // Sometimes this is called while attempting to connect (the timeOut shows up here).
+            // Try to handle that gracefully...
+            var handleClose = true
+            mySelf.writeCond.lock()
+            // okToWrite means we're (presumably) blocking on a write.
+            // if not this connection will only close when other side says so...
+            if !mySelf.okToWrite {
+                mySelf.timedOut = true
+                mySelf.closeWait = true
+                handleClose = false
+                mySelf.writeCond.signal()
+            }
+            mySelf.writeCond.unlock()
+            
+            if handleClose && mySelf.closeWait {
                 mySelf.releaseConnection?()
-            } else {
+            } else if handleClose {
                 mySelf.closeWait = true
                 
                 // give delegate a chance to clean-up
@@ -100,19 +124,18 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     func write(payload:Data) -> Int {
         writeCond.lock()
-        while !okToWrite {
-            if !writeCond.wait(until: Date(timeIntervalSinceNow: 5.0)) {
-                NSLog("*** ZitiConn \(key) timed out waiting for ziti connection callback")
-                writeCond.unlock()
-                return -1
-            }
+        while !okToWrite && !timedOut {
+            writeCond.wait()
+        }
+        
+        if timedOut {
+            writeCond.unlock()
+            return -1
         }
         writeCond.unlock()
         
         if !regulator.wait(payload.count, 1.0) {
             NSLog("Ziti conn timed out waiting for ziti write window \(key)")
-            // if lose network, scheduled close doesn't happen.  Return -1 instead and leave closing to other side...
-            // zid.scheduleOp { self.close() }
             return -1
         } else {
             zid.scheduleOp {
