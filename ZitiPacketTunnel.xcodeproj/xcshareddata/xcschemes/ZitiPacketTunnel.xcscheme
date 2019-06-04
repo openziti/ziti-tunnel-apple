@@ -128,7 +128,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "SHORT_VERSION=$($PLB -c &quot;Print CFBundleShortVersionString&quot; &quot;$PLIST&quot;)&#10;BUILD_NUMBER=$($PLB -c &quot;Print CFBundleVersion&quot; &quot;$PLIST&quot;)&#10;&#10;# Tag version.&#10;cd ${PROJECT_DIR}&#10;git tag macOS-Archive-v$SHORT_VERSION-build$BUILD_NUMBER&#10;">
+               scriptText = "PLIST=&quot;${PROJECT_DIR}/${INFOPLIST_FILE}&quot;&#10;PLB=/usr/libexec/PlistBuddy&#10;SHORT_VERSION=$($PLB -c &quot;Print CFBundleShortVersionString&quot; &quot;$PLIST&quot;)&#10;BUILD_NUMBER=$($PLB -c &quot;Print CFBundleVersion&quot; &quot;$PLIST&quot;)&#10;&#10;# Tag version.&#10;cd ${PROJECT_DIR}&#10;git tag macOS-Archive-v$SHORT_VERSION-build$BUILD_NUMBER&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
