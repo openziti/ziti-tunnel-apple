@@ -53,7 +53,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     }
     
     static let on_nf_data:nf_data_cb = { nfConn, buf, nBytes in
-        guard let nfConn = nfConn, let mySelf = ZitiConn.fromContext(NF_conn_data(nfConn)) else {
+        guard let nfConn = nfConn, let ctx = NF_conn_data(nfConn), let mySelf = ZitiConn.fromContext(ctx) else {
             NSLog("ZitiConn.onData WTF invalid ctx")
             return
         }
@@ -66,28 +66,19 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             let errStr = String(cString: ziti_errorstr(nBytes))
             NSLog("ZitiConn.onData \"\(errStr)\" \(mySelf.key).")
             
-            // Sometimes this is called while attempting to connect (the timeOut shows up here).
-            // Try to handle that gracefully...
-            var handleClose = true
-            mySelf.writeCond.lock()
-            // okToWrite means we're (presumably) blocking on a write.
-            // if not this connection will only close when other side says so...
-            if !mySelf.okToWrite {
-                mySelf.timedOut = true
-                mySelf.closeWait = true
-                handleClose = false
-                mySelf.writeCond.signal()
-            }
-            mySelf.writeCond.unlock()
-            
-            if handleClose && mySelf.closeWait {
+            if mySelf.closeWait {
                 mySelf.releaseConnection?()
-            } else if handleClose {
+            } else {
                 mySelf.closeWait = true
-                
-                // give delegate a chance to clean-up
                 mySelf.onDataAvailable?(nil, Int(nBytes))
             }
+        }
+    }
+    
+    static let on_nf_write:nf_write_cb = { nfConn, status, ctx in
+        if let ctx = ctx {
+            //print("...deallocation \(ctx), status \(status)")
+            ctx.deallocate()
         }
     }
     
@@ -134,7 +125,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         }
         writeCond.unlock()
         
-        if !regulator.wait(payload.count, 1.0) {
+        if !regulator.wait(payload.count, 5.0) {
             NSLog("Ziti conn timed out waiting for ziti write window \(key)")
             return -1
         } else {
@@ -144,16 +135,16 @@ class ZitiConn : NSObject, ZitiClientProtocol {
                 // TODO: figure out how to avoid the copy (making payload optional would help)
                 let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: payload.count)
                 ptr.initialize(from: [UInt8](payload), count: payload.count)
-                let status = NF_write(self.nfConn, ptr, payload.count)
-                ptr.deallocate()
+                let status = NF_write(self.nfConn, ptr, payload.count, ZitiConn.on_nf_write, ptr)
                 
                 // TODO: This should be in (coming soon) on_nf_write_complete callback...
                 // at that point try calling from current thread (if try that now there is 0 throttle...)
                 self.regulator.decPending(payload.count)
                 
                 if status != ZITI_OK {
-                    let errStr = String(cString: ziti_errorstr(status))
-                    NSLog("ZitiConn \(self.key) Error writing: \(errStr)")
+                    // TODO: curr a bug in  SDK where return not set, getting bogus errors.  ignore for now
+                    //let errStr = String(cString: ziti_errorstr(status))
+                    //NSLog("ZitiConn \(self.key) Error writing \(payload.count) bytes. Code:\(status) Msg:\(errStr)")
                     return // -1
                 }
             }

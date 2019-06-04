@@ -20,8 +20,8 @@ class TCPSocketHandler: TSTCPSocketDelegate {
     }
     
     func localDidClose(_ socket: TSTCPSocket) {
-        NSLog("TCPSocketHandler localDidClose. Closing Ziti")
-        ziti.close()
+        NSLog("TCPSocketHandler localDidClose. Closing Socket")
+        socket.close()
     }
     
     func socketDidReset(_ socket: TSTCPSocket) {
