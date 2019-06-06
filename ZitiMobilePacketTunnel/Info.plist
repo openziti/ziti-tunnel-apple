@@ -18,26 +18,26 @@
 				<string>io.netfoundry.ziti.ott.jwt</string>
 			</array>
 		</dict>
-        <dict>
-            <key>CFBundleTypeIconFiles</key>
-            <array/>
-            <key>CFBundleTypeName</key>
-            <string>Ziti Packet Tunnel OTT</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>io.netfoundry.ziti.ott.zott</string>
-            </array>
-        </dict>
-        <dict>
-            <key>CFBundleTypeIconFiles</key>
-            <array/>
-            <key>CFBundleTypeName</key>
-            <string>Ziti Packet Tunnel OTT</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>io.netfoundry.ziti.ott.ziti</string>
-            </array>
-        </dict>
+		<dict>
+			<key>CFBundleTypeIconFiles</key>
+			<array/>
+			<key>CFBundleTypeName</key>
+			<string>Ziti Packet Tunnel OTT</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>io.netfoundry.ziti.ott.zott</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeIconFiles</key>
+			<array/>
+			<key>CFBundleTypeName</key>
+			<string>Ziti Packet Tunnel OTT</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>io.netfoundry.ziti.ott.ziti</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
@@ -52,9 +52,11 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>34</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<string>1</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -95,40 +97,40 @@
 				<string>jwt</string>
 			</dict>
 		</dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>public.item</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>Ziti Packet Tunnel OTT</string>
-            <key>UTTypeIconFiles</key>
-            <array/>
-            <key>UTTypeIdentifier</key>
-            <string>io.netfoundry.ziti.ott.zott</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>public.filename-extension</key>
-                <string>zott</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>public.item</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>Ziti Packet Tunnel OTT</string>
-            <key>UTTypeIconFiles</key>
-            <array/>
-            <key>UTTypeIdentifier</key>
-            <string>io.netfoundry.ziti.ott.ziti</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>public.filename-extension</key>
-                <string>ziti</string>
-            </dict>
-        </dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.item</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Ziti Packet Tunnel OTT</string>
+			<key>UTTypeIconFiles</key>
+			<array/>
+			<key>UTTypeIdentifier</key>
+			<string>io.netfoundry.ziti.ott.zott</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>zott</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.item</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Ziti Packet Tunnel OTT</string>
+			<key>UTTypeIconFiles</key>
+			<array/>
+			<key>UTTypeIdentifier</key>
+			<string>io.netfoundry.ziti.ott.ziti</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>ziti</string>
+			</dict>
+		</dict>
 	</array>
 </dict>
 </plist>

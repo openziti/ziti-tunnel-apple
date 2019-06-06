@@ -6,6 +6,28 @@ import Foundation
 
 class ZitiConn : NSObject, ZitiClientProtocol {
     var onDataAvailable:DataAvailableCallback?
+    var releaseConnection:(()->Void)?
+    
+    class OnWriteData {
+        let ptr:UnsafeMutablePointer<UInt8>
+        let mySelf:ZitiConn
+        let len:Int
+        init(_ ptr:UnsafeMutablePointer<UInt8>, _ len:Int, _ mySelf:ZitiConn) {
+            self.ptr = ptr
+            self.len = len
+            self.mySelf = mySelf
+        }
+        
+        static func fromContext(_ ctx:Optional<UnsafeMutableRawPointer>) -> OnWriteData? {
+            guard ctx != nil else { return nil }
+            return Unmanaged<OnWriteData>.fromOpaque(UnsafeMutableRawPointer(ctx!)).takeUnretainedValue()
+        }
+        
+        func toVoidPtr() -> UnsafeMutableRawPointer {
+            return UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+        }
+    }
+    var writeQueue:[OnWriteData] = []
     
     let key:String
     let zid:ZitiIdentity
@@ -13,8 +35,11 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     let writeCond = NSCondition()
     var okToWrite = false
+    var timedOut = false
+    let regulator = TransferRegulator(0xffff0) // TODO: What's right value. Start with maxWndScale << 1
     
     var nfConn:nf_connection?
+    var closeWait = false
     
     init(_ key:String, _ zid:ZitiIdentity, _ svc:ZitiEdgeService) {
         self.key = key
@@ -27,7 +52,6 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     deinit {
         NSLog("deinit ZitiConn \(key)")
-        close()
     }
     
     static let on_nf_conn:nf_conn_cb = { nfConn, status in
@@ -35,30 +59,65 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             NSLog("ZitiConn.onConn WTF invalid ctx")
             return
         }
-        print("ZitiConn.onConn OK to write \(mySelf.key)")
-        mySelf.okToWrite = true
+    
+        mySelf.writeCond.lock()
+        if status == ZITI_OK {
+            print("ZitiConn.onConn OK to write \(mySelf.key)")
+            mySelf.okToWrite = true
+        } else {
+            let errStr = String(cString: ziti_errorstr(status))
+            print("ZitiConn.onConn \"\(errStr)\" \(mySelf.key)")
+            mySelf.timedOut = true
+        }
         mySelf.writeCond.signal()
+        mySelf.writeCond.unlock()
     }
     
     static let on_nf_data:nf_data_cb = { nfConn, buf, nBytes in
-        guard nBytes > 0 && buf != nil else {
-            let errStr = String(cString: ziti_errorstr(nBytes))
-            NSLog("ZitiConn.onData closing: \(errStr)")
-            return
-        }
-        guard let nfConn = nfConn, let mySelf = ZitiConn.fromContext(NF_conn_data(nfConn)) else {
+        guard let nfConn = nfConn, let ctx = NF_conn_data(nfConn), let mySelf = ZitiConn.fromContext(ctx) else {
             NSLog("ZitiConn.onData WTF invalid ctx")
             return
         }
-        NSLog("ZitiConn.onData \(mySelf.key) \(nBytes) bytes")
         
         if nBytes > 0 && buf != nil {
-            let data = Data(bytesNoCopy: buf!, count: Int(nBytes), deallocator: .none)
+            //let data = Data(bytesNoCopy: buf!, count: Int(nBytes), deallocator: .none) // TODO: CHICKEN DINNER!
+            let data = Data(bytes: buf!, count: Int(nBytes)) // bytes no copy is mem error when ziti sdk frees buff before we write
             mySelf.onDataAvailable?(data, Int(nBytes))
         } else {
-            // 0 == eob, -1 == error.
-            // delgate calls close() when this happens
-            mySelf.onDataAvailable?(nil, Int(nBytes))
+            let errStr = String(cString: ziti_errorstr(nBytes))
+            NSLog("ZitiConn.onData \"\(errStr)\" \(mySelf.key).")
+            
+            if mySelf.closeWait {
+                mySelf.releaseConnection?()
+            } else {
+                mySelf.closeWait = true
+                mySelf.onDataAvailable?(nil, Int(nBytes))
+            }
+        }
+    }
+    
+    static let on_nf_write:nf_write_cb = { nfConn, status, ctx in
+        guard let ctx = ctx, let owd = OnWriteData.fromContext(ctx) else {
+            NSLog("ZitiConn on_nf_Write invalid ctx")
+            return
+        }
+       
+        if status <= 0 {
+            let errStr = String(cString: ziti_errorstr(Int32(status)))
+            NSLog("ZitiConn on_nf_write, \(owd.mySelf.key), \(status):\"\(errStr)\"")
+            
+            // TODO: what? for now, nf_close...
+            owd.mySelf.close()
+        } else {
+            if owd.mySelf.writeQueue.removeFirst() !== owd {
+                NSLog("on_nf_write - WTF-OWD mismatch")
+            }
+            
+            if owd.len != status {
+                NSLog("on_nf_write - WTF-LEN mismatch")
+            }
+            owd.ptr.deallocate()
+            owd.mySelf.regulator.decPending(owd.len)
         }
     }
     
@@ -66,66 +125,81 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         NSLog("ZitiConn connect \(key)")
         self.onDataAvailable = onDataAvailable
         
-        // init the connection
-        var status = NF_conn_init(zid.nf_context, &nfConn, self.toVoidPtr())
-        guard  status == ZITI_OK else {
-            let errStr = String(cString: ziti_errorstr(status))
-            NSLog("ZitiConn \(key) Unable to initiate connection for \(zid.id):\(svc.name ?? "nil"), \(errStr)")
-            return false
-        }
-
         // validate the service
         guard let svcName_c = svc.name?.cString(using: .utf8) else {
             NSLog("ZitiConn \(key) Unable to create C service name for \(zid.id):\(svc.name ?? "nil")")
             return false
         }
         
-        // dial it
-        status = NF_dial(nfConn, svcName_c, ZitiConn.on_nf_conn, ZitiConn.on_nf_data)
-        guard  status == ZITI_OK else {
-            let errStr = String(cString: ziti_errorstr(status))
-            NSLog("ZitiConn \(key) Unable to dial service \(zid.id):\(svc.name ?? "nil"), \(errStr)")
-            return false
-        }
+        zid.scheduleOp {
+            // init the connection
+            var status = NF_conn_init(self.zid.nf_context, &self.nfConn, self.toVoidPtr())
+            guard  status == ZITI_OK else {
+                let errStr = String(cString: ziti_errorstr(status))
+                NSLog("ZitiConn \(self.key) Unable to initiate connection for \(self.zid.id):\(self.svc.name ?? "nil"), \(errStr)")
+                return // false
+            }
         
+            // dial it
+            status = NF_dial(self.nfConn, svcName_c, ZitiConn.on_nf_conn, ZitiConn.on_nf_data)
+            guard status == ZITI_OK else {
+                let errStr = String(cString: ziti_errorstr(status))
+                NSLog("ZitiConn \(self.key) Unable to dial service \(self.zid.id):\(self.svc.name ?? "nil"), \(errStr)")
+                return // false
+            }
+        }
         return true
     }
     
     func write(payload:Data) -> Int {
-        print("ZitiConn attempt to write \(payload.count) bytes")
         writeCond.lock()
-        while !okToWrite {
-            if !writeCond.wait(until: Date(timeIntervalSinceNow: 5.0)) {
-                NSLog("*** ZitiConn \(key) timed out waiting for ziti connection callback")
-                writeCond.unlock()
-                return -1
-            }
+        while !okToWrite && !timedOut {
+            writeCond.wait()
         }
         
-        // TODO: figure out how to avoid the copy (making payload optional would help)
-        let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: payload.count)
-        ptr.initialize(from: [UInt8](payload), count: payload.count)
-        let status = NF_write(nfConn, ptr, payload.count)
-        ptr.deallocate()
-        writeCond.unlock()
-        
-        if status != ZITI_OK {
-            let errStr = String(cString: ziti_errorstr(status))
-            NSLog("ZitiConn \(key) Error writing: \(errStr)")
+        if timedOut {
+            writeCond.unlock()
             return -1
         }
-        return payload.count
+        writeCond.unlock()
+        
+        if !regulator.wait(payload.count, 5.0) {
+            NSLog("Ziti conn timed out waiting for ziti write window \(key)")
+            return -1
+        } else {
+            zid.scheduleOp {
+                guard self.closeWait == false else { print("closeWait drop write"); return }
+                
+                let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: payload.count)
+                ptr.initialize(from: [UInt8](payload), count: payload.count)
+                let owd = OnWriteData(ptr, payload.count, self)
+                self.writeQueue.append(owd)
+                let status = NF_write(self.nfConn, ptr, payload.count, ZitiConn.on_nf_write, owd.toVoidPtr())
+                
+                if status != ZITI_OK {
+                    let errStr = String(cString: ziti_errorstr(status))
+                    NSLog("ZitiConn \(self.key) Ignoring error writing \(payload.count) bytes. Code:\(status) Msg:\(errStr)")
+                    return // -1
+                }
+            }
+        }
+        return payload.count // TODO: bogus
     }
     
     func close() {
-        NSLog("ZitiConn close \(key)")
-        if nfConn != nil {
-            let status = NF_close(&nfConn)
-            if status != ZITI_OK {
-                let errStr = String(cString: ziti_errorstr(status))
-                NSLog("ZitiConn.close error for \(key), \(errStr)")
+        zid.scheduleOp { [weak self] in
+            if self?.closeWait ?? false {
+                self?.releaseConnection?()
+            } else if let mySelf = self, mySelf.nfConn != nil {
+                NSLog("ZitiConn closing \(mySelf.key)")
+                self?.closeWait = true
+                let status = NF_close(&mySelf.nfConn)
+                if status != ZITI_OK {
+                    let errStr = String(cString: ziti_errorstr(status))
+                    NSLog("ZitiConn.close error for \(mySelf.key), \(errStr)")
+                }
+                mySelf.nfConn = nil
             }
-            nfConn = nil
         }
     }
     

@@ -6,26 +6,32 @@ import UIKit
 
 class LogViewController: UIViewController, UIActivityItemSource {
     @IBOutlet weak var textView: UITextView!
+    var refreshBtn:UIBarButtonItem?
     var shareBtn:UIBarButtonItem?
     var tag:String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        refreshBtn = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(onRefresh))
         shareBtn = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.action, target: self, action: #selector(onShare))
-        navigationItem.rightBarButtonItem = shareBtn
+        navigationItem.rightBarButtonItems = [shareBtn!, refreshBtn!]
+        onRefresh()
+    }
+    
+    @objc func onRefresh() {
         shareBtn?.isEnabled = false
-
-        if let url = logURL {
-            do {
-                try textView.text = String(contentsOf: url, encoding: .utf8)
-                if textView.text.count > 0 {
-                    shareBtn?.isEnabled = true
-                }
-            } catch {
-                textView.text = error.localizedDescription
-                NSLog("No content found for log, \(error.localizedDescription)")
+        guard let url = logURL else { return }
+        
+        do {
+            try textView.text = String(contentsOf: url, encoding: .utf8)
+            if textView.text.count > 0 {
+                refreshBtn?.isEnabled = true
+                shareBtn?.isEnabled = true
             }
+        } catch {
+            textView.text = error.localizedDescription
+            NSLog("No content found for log, \(error.localizedDescription)")
         }
         textView.layoutManager.allowsNonContiguousLayout = false
         textView.scrollRangeToVisible(NSMakeRange(textView.text.count-1, 0))

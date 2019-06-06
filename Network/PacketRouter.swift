@@ -8,13 +8,13 @@ import Foundation
 class PacketRouter : NSObject {
     let tunnelProvider:PacketTunnelProvider
     let dnsResolver:DNSResolver
+    let tcpRunloop:TcpRunloop
     
-    let tcpConnsLock = NSRecursiveLock()
-    var tcpConns:[String:TCPClientConn] = [:]
-
     init(tunnelProvider:PacketTunnelProvider, dnsResolver:DNSResolver) {
         self.tunnelProvider = tunnelProvider
         self.dnsResolver = dnsResolver
+        tcpRunloop = TcpRunloop(tunnelProvider, dnsResolver)
+        super.init()
     }
     
     private func routeUDP(_ udp:UDPPacket) {
@@ -25,73 +25,13 @@ class PacketRouter : NSObject {
             dnsResolver.resolve(udp)
         } else {
             // TODO: --> Ziti
-            NSLog("...UDP --> meant for Ziti? UDP not yet supported")
+            //NSLog("...UDP --> meant for Ziti? UDP not yet supported")
         }
     }
     
-    private func routeTCP(_ pkt:TCPPacket) {
-        //NSLog("Router routing curr thread = \(Thread.current)")
-        //NSLog("TCP-->: \(pkt.debugDescription)")
-        
-        var tcpConn:TCPClientConn
-        let key = "TCP:\(pkt.ip.sourceAddressString):\(pkt.sourcePort)->\(pkt.ip.destinationAddressString):\(pkt.destinationPort)"
-        
-        tcpConnsLock.lock()
-        if let foundConn = tcpConns[key] {
-            tcpConn = foundConn
-        } else {
-            if pkt.SYN {
-                var zitiConn:ZitiClientProtocol? = nil
-                
-                // meant for Ziti?
-                let intercept = "\(pkt.ip.destinationAddressString):\(pkt.destinationPort)"
-                let (zidR, svcR) = tunnelProvider.getServiceForIntercept(intercept)
-                if let zid = zidR, let svc = svcR {
-                    zitiConn = ZitiConn(key, zid, svc)
-                } else {
-                    // if not for Ziti, can we proxy it to orginal IP address?
-                    let dnsRecs = dnsResolver.findRecordsByIp(pkt.ip.destinationAddressString)
-                    for i in 0..<dnsRecs.count {
-                        if let realIp = dnsRecs[i].realIp {
-                            zitiConn = TCPProxyConn(key, realIp, pkt.destinationPort)
-                            break
-                        }
-                    }
-                }
-                NSLog("Router new session:\(key)")
-
-                // Callback is escaping and will run either in this thread or in another
-                tcpConn = TCPClientConn(key, zitiConn, tunnelProvider.providerConfig.mtu) { [weak self] respPkt in
-                    guard let respPkt = respPkt else {
-                        // remove connection
-                        NSLog("Router closing con: \(key)")
-                        self?.tcpConnsLock.lock()
-                        self?.tcpConns.removeValue(forKey: key)
-                        self?.tcpConnsLock.unlock()
-                        return
-                    }
-                    //NSLog("<--TCP: \(respPkt.debugDescription)")
-                    self?.tunnelProvider.writePacket(respPkt.ip.data)
-                }
-                tcpConns[key] = tcpConn
-            } else if pkt.FIN && pkt.ACK {
-                NSLog("FIN ACK for \(key)")
-                tcpConnsLock.unlock()
-                return
-            } else {
-                NSLog("Unexpected packet for key \(key)\n\(pkt.debugDescription)")
-                tcpConnsLock.unlock()
-                return
-            }
-        }
-        tcpConnsLock.unlock()
-        
-        let state = tcpConn.tcpReceive(pkt)
-        if state == TCPClientConn.State.TIME_WAIT || state == TCPClientConn.State.Closed {
-            NSLog("Router removing con on state \(state): \(key)")
-            tcpConnsLock.lock()
-            tcpConns.removeValue(forKey: key)
-            tcpConnsLock.unlock()
+    private func routeTCP(_ data:Data) {
+        tcpRunloop.scheduleOp { [weak self] in
+            self?.tcpRunloop.tcpStack.received(packet: data)
         }
     }
 
@@ -137,9 +77,10 @@ class PacketRouter : NSObject {
                 routeUDP(udp)
             }
         case IPProtocolId.TCP:
-            if let tcp = TCPPacket(ip) {
+            /*if let tcp = TCPPacket(ip) {
                 routeTCP(tcp)
-            }
+            }*/
+            routeTCP(data)
         default:
             NSLog("No support for protocol \(ip.protocolId)")
         }

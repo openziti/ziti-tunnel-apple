@@ -3,6 +3,7 @@
 //
 
 import NetworkExtension
+import Network
 
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
@@ -108,13 +109,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     zid.enabled = false
                     zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 } else {
-                    let zEdge = ZitiEdge(zid)
+                    //let zEdge = ZitiEdge(zid)
                     zid.services?.forEach { svc in
                         svc.status = ZitiEdgeService.Status(Date().timeIntervalSince1970, status: .Available)
+                        /*
                         if !getNetSessionSync(zEdge, zid, svc) {
                             // since startRunloop is blocking, this shouln't happen...
                             NSLog("WARN: unable to get network session for \(zid.id)")
-                        }
+                        }*/
                         
                         // add hostnames to dns, routes to intercept, and set interceptIp
                         updateHostsAndIntercepts(zid, svc)
@@ -155,8 +157,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         Logger.initShared(Logger.TUN_TAG)
         NSLog(versionString)
         
-        NSLog("startTunnel: \(Thread.current): \(OperationQueue.current?.underlyingQueue?.label ?? "None")")
-
+        NSLog("startTunnel: options=\(options?.debugDescription ?? "nil")")
+        
+        //setenv("ZITI_LOG", "100", 1)
+        
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {
             NSLog("Unable to startTunnel. Invalid providerConfiguration. \(error)")
@@ -204,7 +208,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 NSLog(error.localizedDescription)
                 completionHandler(error as NSError)
             }
-            
+
             // packetFlow FD
             var ifname:String?
             let fd = (self.packetFlow.value(forKeyPath: "socket.fileDescriptor") as? Int32) ?? -1

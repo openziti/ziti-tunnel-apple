@@ -145,6 +145,7 @@ class DNSResolver : NSObject {
                                                         ttl:0,
                                                         resourceData:data)
                             answers.append(ans)
+                            NSLog("DNS: \(result.name) -> \(result.ip)")
                         }
                     } else {
                         // AAAA with matches, return nameError

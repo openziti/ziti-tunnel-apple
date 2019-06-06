@@ -23,8 +23,8 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     var haveFilePresenter = false
     weak var delegate:ZitiIdentityStoreDelegate?
     
-    override init() { print("init id store") }
-    deinit { print("deinit id store") }
+    override init() { }
+    deinit { }
     
     func loadAll() -> ([ZitiIdentity]?, ZitiError?) {
         guard let presentedItemURL = self.presentedItemURL else {

@@ -57,13 +57,14 @@ class MainMenuBar : NSObject, NSWindowDelegate {
             statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarDisconnected"))
             break
         case .invalid:
-            print("Invalid")
+            tunStatusItem.title = "Status: Invalid"
+            statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarDisconnected"))
             break
         case .reasserting:
             tunStatusItem.title = "Status: Reasserting..."
             break
         @unknown default:
-            print("Unknown...")
+            print("Unknown tunnel status...")
             break
         }
     }

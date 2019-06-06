@@ -67,9 +67,23 @@
 		5A34E9612278F49100E221DD /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E95D2278F49100E221DD /* Version.swift */; };
 		5A34E963227916BA00E221DD /* LogsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E962227916BA00E221DD /* LogsTableViewController.swift */; };
 		5A34E96522791FCA00E221DD /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E96422791FCA00E221DD /* LogViewController.swift */; };
+		5A3664CA228452BE00193C70 /* TCPSocketHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3664C9228452BE00193C70 /* TCPSocketHandler.swift */; };
+		5A3664CB228452BE00193C70 /* TCPSocketHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3664C9228452BE00193C70 /* TCPSocketHandler.swift */; };
+		5A3664D822862EF400193C70 /* TcpRunloop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3664D722862EF400193C70 /* TcpRunloop.swift */; };
+		5A3664D922862EF400193C70 /* TcpRunloop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3664D722862EF400193C70 /* TcpRunloop.swift */; };
 		5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */; };
 		5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AD0221F937D00051475 /* ServicesViewController.swift */; };
+		5A5B33022292DB4E002A3437 /* TransferRegulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B33012292DB4E002A3437 /* TransferRegulator.swift */; };
+		5A5B33032292DB4E002A3437 /* TransferRegulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5B33012292DB4E002A3437 /* TransferRegulator.swift */; };
+		5A5B330622955F5A002A3437 /* lwip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A3664C72283B03B00193C70 /* lwip.framework */; };
+		5A5B330722955F5A002A3437 /* lwip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5A3664C72283B03B00193C70 /* lwip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5A5B330B22955F62002A3437 /* tun2socks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A3664C32283B03B00193C70 /* tun2socks.framework */; };
+		5A5B330C22955F62002A3437 /* tun2socks.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5A3664C32283B03B00193C70 /* tun2socks.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5A5B33142295857E002A3437 /* tun2socks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A3664C12283B03B00193C70 /* tun2socks.framework */; };
+		5A5B33152295857E002A3437 /* tun2socks.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5A3664C12283B03B00193C70 /* tun2socks.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5A5B3319229585E4002A3437 /* lwip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A3664C52283B03B00193C70 /* lwip.framework */; };
+		5A5B331A229585E4002A3437 /* lwip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5A3664C52283B03B00193C70 /* lwip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A6BA25D226DE5FB00224F09 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6BA25C226DE5FB00224F09 /* AboutViewController.swift */; };
@@ -162,6 +176,62 @@
 			remoteGlobalIDString = 5A2EA2DE209B754400437608;
 			remoteInfo = MobilePacketTunnelProvider;
 		};
+		5A3664C02283B03B00193C70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3642C9FE1CEDCC60001E0AAF;
+			remoteInfo = "tun2socks-macOS";
+		};
+		5A3664C22283B03B00193C70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 36C48CA21CF8701A0071804F;
+			remoteInfo = "tun2socks-iOS";
+		};
+		5A3664C42283B03B00193C70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 36A718F11D5B0A1B00DC35F5;
+			remoteInfo = "lwip-macOS";
+		};
+		5A3664C62283B03B00193C70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 36A718FF1D5B0AC100DC35F5;
+			remoteInfo = "lwip-iOS";
+		};
+		5A5B330822955F5A002A3437 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 36A718FE1D5B0AC100DC35F5;
+			remoteInfo = "lwip-iOS";
+		};
+		5A5B330D22955F62002A3437 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 36C48CA11CF8701A0071804F;
+			remoteInfo = "tun2socks-iOS";
+		};
+		5A5B33162295857E002A3437 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3642C9FD1CEDCC60001E0AAF;
+			remoteInfo = "tun2socks-macOS";
+		};
+		5A5B331B229585E4002A3437 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 36A718F01D5B0A1B00DC35F5;
+			remoteInfo = "lwip-macOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -185,6 +255,30 @@
 				5A2EA2E7209B754500437608 /* MobilePacketTunnelProvider.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A5B330A22955F5B002A3437 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5A5B330722955F5A002A3437 /* lwip.framework in Embed Frameworks */,
+				5A5B330C22955F62002A3437 /* tun2socks.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A5B33182295857E002A3437 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5A5B331A229585E4002A3437 /* lwip.framework in Embed Frameworks */,
+				5A5B33152295857E002A3437 /* tun2socks.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -227,9 +321,13 @@
 		5A34E95D2278F49100E221DD /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		5A34E962227916BA00E221DD /* LogsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsTableViewController.swift; sourceTree = "<group>"; };
 		5A34E96422791FCA00E221DD /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
+		5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = tun2socks.xcodeproj; path = tun2socks/tun2socks.xcodeproj; sourceTree = "<group>"; };
+		5A3664C9228452BE00193C70 /* TCPSocketHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPSocketHandler.swift; sourceTree = "<group>"; };
+		5A3664D722862EF400193C70 /* TcpRunloop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TcpRunloop.swift; sourceTree = "<group>"; };
 		5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelConfigViewController.swift; sourceTree = "<group>"; };
 		5A379ACB221EDB1400051475 /* ZitiIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentity.swift; sourceTree = "<group>"; };
 		5A379AD0221F937D00051475 /* ServicesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesViewController.swift; sourceTree = "<group>"; };
+		5A5B33012292DB4E002A3437 /* TransferRegulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferRegulator.swift; sourceTree = "<group>"; };
 		5A67F8F0209F948F00DEFE87 /* IPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPPacket.swift; sourceTree = "<group>"; };
 		5A6BA25C226DE5FB00224F09 /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		5A6BA25F226DF2C500224F09 /* Notices.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Notices.rtf; sourceTree = "<group>"; };
@@ -285,6 +383,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A02AAE420703167006261C6 /* NetworkExtension.framework in Frameworks */,
+				5A5B33142295857E002A3437 /* tun2socks.framework in Frameworks */,
+				5A5B3319229585E4002A3437 /* lwip.framework in Frameworks */,
 				B1E92EEC973199D2CA36083E /* Pods_ZitiPacketTunnel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -309,6 +409,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A2EA2EE209B758800437608 /* NetworkExtension.framework in Frameworks */,
+				5A5B330B22955F62002A3437 /* tun2socks.framework in Frameworks */,
+				5A5B330622955F5A002A3437 /* lwip.framework in Frameworks */,
 				028DCC831DCED3687B7E78E1 /* Pods_ZitiMobilePacketTunnel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -334,6 +436,7 @@
 		5A02AAAB206EBD7E006261C6 = {
 			isa = PBXGroup;
 			children = (
+				5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */,
 				5AF9C24B226B6FAC009CFD71 /* Default-568h@2x.png */,
 				5A8702D722372E7800314199 /* Common */,
 				5A2EA2A4209788CF00437608 /* Ziti */,
@@ -444,6 +547,9 @@
 				5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */,
 				5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */,
 				5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */,
+				5A3664C9228452BE00193C70 /* TCPSocketHandler.swift */,
+				5A3664D722862EF400193C70 /* TcpRunloop.swift */,
+				5A5B33012292DB4E002A3437 /* TransferRegulator.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -477,6 +583,17 @@
 				5A2EA2E4209B754500437608 /* MobilePacketTunnelProvider.entitlements */,
 			);
 			path = MobilePacketTunnelProvider;
+			sourceTree = "<group>";
+		};
+		5A3664BA2283B03B00193C70 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5A3664C12283B03B00193C70 /* tun2socks.framework */,
+				5A3664C32283B03B00193C70 /* tun2socks.framework */,
+				5A3664C52283B03B00193C70 /* lwip.framework */,
+				5A3664C72283B03B00193C70 /* lwip.framework */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		5A6BA25E226DF25A00224F09 /* bundle */ = {
@@ -533,10 +650,13 @@
 				5A02AAB2206EBD7E006261C6 /* Resources */,
 				5A02AAD7206EBDD5006261C6 /* Embed App Extensions */,
 				A01C0B7C5BDB2E3E047AF473 /* [CP] Embed Pods Frameworks */,
+				5A5B33182295857E002A3437 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				5A5B331C229585E4002A3437 /* PBXTargetDependency */,
+				5A5B33172295857E002A3437 /* PBXTargetDependency */,
 				5A02AAD2206EBDD5006261C6 /* PBXTargetDependency */,
 			);
 			name = ZitiPacketTunnel;
@@ -571,10 +691,13 @@
 				5A2EA2C7209B750A00437608 /* Resources */,
 				5A2EA2EB209B754500437608 /* Embed App Extensions */,
 				E3E6B17CD246D7B71C13B0E9 /* [CP] Embed Pods Frameworks */,
+				5A5B330A22955F5B002A3437 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				5A5B330922955F5A002A3437 /* PBXTargetDependency */,
+				5A5B330E22955F62002A3437 /* PBXTargetDependency */,
 				5A2EA2E6209B754500437608 /* PBXTargetDependency */,
 			);
 			name = ZitiMobilePacketTunnel;
@@ -704,6 +827,12 @@
 			mainGroup = 5A02AAAB206EBD7E006261C6;
 			productRefGroup = 5A02AAB5206EBD7E006261C6 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 5A3664BA2283B03B00193C70 /* Products */;
+					ProjectRef = 5A3664B92283B03B00193C70 /* tun2socks.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				5A02AAB3206EBD7E006261C6 /* ZitiPacketTunnel */,
@@ -713,6 +842,37 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		5A3664C12283B03B00193C70 /* tun2socks.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = tun2socks.framework;
+			remoteRef = 5A3664C02283B03B00193C70 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5A3664C32283B03B00193C70 /* tun2socks.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = tun2socks.framework;
+			remoteRef = 5A3664C22283B03B00193C70 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5A3664C52283B03B00193C70 /* lwip.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = lwip.framework;
+			remoteRef = 5A3664C42283B03B00193C70 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5A3664C72283B03B00193C70 /* lwip.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = lwip.framework;
+			remoteRef = 5A3664C62283B03B00193C70 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		5A02AAB2206EBD7E006261C6 /* Resources */ = {
@@ -875,6 +1035,8 @@
 				5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */,
 				5A100A6620A4FD6100B0B99D /* IPv6Packet.swift in Sources */,
 				5A8702D42230B4D300314199 /* ZitiEdgeNetworkSession.swift in Sources */,
+				5A3664CA228452BE00193C70 /* TCPSocketHandler.swift in Sources */,
+				5A5B33022292DB4E002A3437 /* TransferRegulator.swift in Sources */,
 				5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */,
 				5AF7868D208A99640093498C /* UDPPacket.swift in Sources */,
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
@@ -891,6 +1053,7 @@
 				5AF786932090967F0093498C /* DNSName.swift in Sources */,
 				5AF78695209096CD0093498C /* DNSResourceRecord.swift in Sources */,
 				5A0D1D262225A87F00D01F30 /* ZitiKeychain.swift in Sources */,
+				5A3664D822862EF400193C70 /* TcpRunloop.swift in Sources */,
 				5AF7868F208AACC50093498C /* DNSPacket.swift in Sources */,
 				5AF4BECD2246F271001F1F4D /* TCPProxyConn.swift in Sources */,
 			);
@@ -944,6 +1107,8 @@
 				5A100A6720A4FD6300B0B99D /* IPv6Packet.swift in Sources */,
 				5A91B4CA2222E156006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A8702D62230B4D300314199 /* ZitiEdgeNetworkSession.swift in Sources */,
+				5A3664CB228452BE00193C70 /* TCPSocketHandler.swift in Sources */,
+				5A5B33032292DB4E002A3437 /* TransferRegulator.swift in Sources */,
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
 				5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */,
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,
@@ -960,6 +1125,7 @@
 				5A2EA2F6209B75D500437608 /* DNSName.swift in Sources */,
 				5A2EA2F7209B75DA00437608 /* DNSResourceRecord.swift in Sources */,
 				5A0D1D282225A87F00D01F30 /* ZitiKeychain.swift in Sources */,
+				5A3664D922862EF400193C70 /* TcpRunloop.swift in Sources */,
 				5A2EA2F3209B75C800437608 /* UDPPacket.swift in Sources */,
 				5AF4BECE2246F271001F1F4D /* TCPProxyConn.swift in Sources */,
 			);
@@ -977,6 +1143,26 @@
 			isa = PBXTargetDependency;
 			target = 5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */;
 			targetProxy = 5A2EA2E5209B754500437608 /* PBXContainerItemProxy */;
+		};
+		5A5B330922955F5A002A3437 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "lwip-iOS";
+			targetProxy = 5A5B330822955F5A002A3437 /* PBXContainerItemProxy */;
+		};
+		5A5B330E22955F62002A3437 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "tun2socks-iOS";
+			targetProxy = 5A5B330D22955F62002A3437 /* PBXContainerItemProxy */;
+		};
+		5A5B33172295857E002A3437 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "tun2socks-macOS";
+			targetProxy = 5A5B33162295857E002A3437 /* PBXContainerItemProxy */;
+		};
+		5A5B331C229585E4002A3437 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "lwip-macOS";
+			targetProxy = 5A5B331B229585E4002A3437 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1132,7 +1318,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ZitiPacketTunnel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1155,7 +1341,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ZitiPacketTunnel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -1173,6 +1359,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = (
 					"../ziti-sdk-c/includes",
 					"../ziti-sdk-c/deps/uv-mbed/libuv/include",
@@ -1201,6 +1388,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = (
 					"../ziti-sdk-c/includes",
 					"../ziti-sdk-c/deps/uv-mbed/libuv/include",
@@ -1231,13 +1419,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Debug;
 		};
@@ -1253,7 +1442,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1261,6 +1450,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Release;
 		};
@@ -1290,6 +1480,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Debug;
 		};
@@ -1319,6 +1510,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 arm64e";
 			};
 			name = Release;
 		};

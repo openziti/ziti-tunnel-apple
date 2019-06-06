@@ -13,7 +13,6 @@ class LogsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("\(indexPath)")
         if indexPath.section == 0 {
             if let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "LOG_VC") as? LogViewController {
                 vc.title = "Packet Tunnel Log"
