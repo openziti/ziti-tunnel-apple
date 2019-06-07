@@ -80,8 +80,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         }
         
         if nBytes > 0 && buf != nil {
-            //let data = Data(bytesNoCopy: buf!, count: Int(nBytes), deallocator: .none) // TODO: CHICKEN DINNER!
-            let data = Data(bytes: buf!, count: Int(nBytes)) // bytes no copy is mem error when ziti sdk frees buff before we write
+            let data = Data(bytes: buf!, count: Int(nBytes))
             mySelf.onDataAvailable?(data, Int(nBytes))
         } else {
             let errStr = String(cString: ziti_errorstr(nBytes))
@@ -181,7 +180,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
                     NSLog("ZitiConn \(self.key) Ignoring error writing \(payload.count) bytes. Code:\(status) Msg:\(errStr)")
                     return // -1
                 }
-            }
+           }
         }
         return payload.count // TODO: bogus
     }
