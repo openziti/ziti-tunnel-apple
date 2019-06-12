@@ -84,7 +84,7 @@ class ZitiEdge : NSObject {
         let urlRequest = createRequest(url, method:POST_METHOD, contentType:TEXT_TYPE, body:csrPEM)
         
         // don't share session with other edge calls since we have no secId at this point
-        let enrollSession = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:OperationQueue.main)
+        let enrollSession = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:nil)
         enrollSession.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
                 completionHandler(zErr)
@@ -116,7 +116,7 @@ class ZitiEdge : NSObject {
         }
         
         // don't share session with other edge calls since we have no secId at this point
-        let fetchSession = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:OperationQueue.main)
+        let fetchSession = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:nil)
         let urlRequest = createRequest(url, method:GET_METHOD, contentType:TEXT_TYPE, body:nil)
         fetchSession.dataTask(with: urlRequest) { (data, response, error) in
             if let zErr = self.validateResponse(data, response, error) {
@@ -287,7 +287,7 @@ class ZitiEdge : NSObject {
     
     private var hasSession = false
     private lazy var urlSession:URLSession = {
-        let session = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:OperationQueue.main)
+        let session = URLSession(configuration: URLSessionConfiguration.default, delegate:self, delegateQueue:nil)
         hasSession = true
         return session
     }()
@@ -327,7 +327,7 @@ extension ZitiEdge : URLSessionDelegate {
             // This is to address issue with C SDK needing valid certs in order to trust a server.
             // This can be removed once C SDK is updated to delgate trust/signing to 3rd part (i.e.,
             // this app and extension)
-            let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue.main) { secTrust, result in
+            let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue(label: "ServerTrust")) { secTrust, result in
                 if result == .proceed || result == .unspecified {
                     //Get certs from secTrust, convert to PEM, store in rootCa
                     var newRootCa:String = ""
@@ -369,7 +369,7 @@ extension ZitiEdge : URLSessionDelegate {
             return
         }
         
-        let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue.main) { secTrust, result in
+        let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue(label: "ServerTrust")) { secTrust, result in
             if result == .proceed || result == .unspecified {
                 completionHandler(.useCredential, URLCredential(trust:secTrust))
             } else if result == .recoverableTrustFailure {
