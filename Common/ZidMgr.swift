@@ -48,28 +48,8 @@ class ZidMgr : NSObject {
             throw ZitiError("JWT signature not found")
         }
         
-        
-        // Hit zid.apiBaseUrl and get public key from leaf cert (at index 0)
-        let jwtScraper = JwtPubKeyScraper()
-        let session = URLSession(configuration: URLSessionConfiguration.default, delegate:jwtScraper, delegateQueue:nil)
-        session.dataTask(with: url).resume() // signals when key retrieved
-        session.finishTasksAndInvalidate()
-        
-        // Wait for public key to be scraped
-        if !jwtScraper.wait(5.0) {
-            throw ZitiError("JWT timed out waiting for server \(zid.apiBaseUrl) public key")
-        }
-        
-        // Did we get the public key?
-        guard let pubKey = jwtScraper.jwtPubKey else {
-            throw ZitiError("JWT Unable to retrieve \(zid.apiBaseUrl) public key")
-        }
-        NSLog("JWT pub key: \(pubKey)")
-        
-        
         let jwtAlg = jwt.header["alg"] as? String ?? "unspecified"
         var secKeyAlg:SecKeyAlgorithm
-        NSLog("JWT Alg: \(jwtAlg)")
         switch jwtAlg {
         case "RS256": secKeyAlg = .rsaSignatureMessagePKCS1v15SHA256
         case "RS384": secKeyAlg = .rsaSignatureMessagePKCS1v15SHA384
@@ -81,25 +61,48 @@ class ZidMgr : NSObject {
             throw ZitiError("JWT unsupported signing algorythm \(jwtAlg)")
         }
         
-        let comps = token.components(separatedBy: ".") // TODO: errorcheck for 3 parts
-        let signedData = (comps[0] + "." + comps[1]).data(using: .ascii)
+        // get dataToSign and decoded signature
+        let comps = token.components(separatedBy: ".") // JWTDecode already guarentess we have 3 parts, no need to guard
+        guard let signedData = (comps[0] + "." + comps[1]).data(using: .ascii) else {
+            throw ZitiError("Unable to extract signing data")
+        }
+        guard let signedHashBytes = base64UrlDecode(signature) else {
+            throw ZitiError("Unable to decode JWT signature")
+        }
         
-        let signedHashBytesSize = SecKeyGetBlockSize(pubKey)
-        NSLog("JWT pub key size: \(signedHashBytesSize)")
-        let signedHashBytes = base64UrlDecode(signature)
+        // Can we get the public key?
+        guard let pubKey = getPubKey(url) else {
+            throw ZitiError("JWT Unable to retrieve \(zid.apiBaseUrl) public key")
+        }
         
         //var cfErr:CFError?
-        if !SecKeyVerifySignature(pubKey, secKeyAlg, signedData! as CFData, signedHashBytes! as CFData, nil) { // TODO Error check
+        if !SecKeyVerifySignature(pubKey, secKeyAlg, signedData as CFData, signedHashBytes as CFData, nil) {
             throw ZitiError("Unable to verify JWT sig, alg=\(jwtAlg)")
         }
         
         // store it
-        if let error = zidStore.store(zid) {
-            throw error
-        }
+        if let error = zidStore.store(zid) { throw error }
         
         // add it
         zids.insert(zid, at:at)
+    }
+    
+    private func getPubKey(_ url:URL) -> SecKey? {
+        let jwtScraper = JwtPubKeyScraper()
+        let session = URLSession(configuration: URLSessionConfiguration.default, delegate:jwtScraper, delegateQueue:nil)
+        session.dataTask(with: url).resume() // signals when key retrieved
+        session.finishTasksAndInvalidate()
+        
+        if !jwtScraper.wait(5.0) {
+            NSLog("JWT timed out waiting for server \(url.absoluteString) public key")
+            return nil
+        }
+        
+        guard let pubKey = jwtScraper.jwtPubKey else {
+            NSLog("JWT Unable to retrieve \(url.absoluteString) public key")
+            return nil
+        }
+        return pubKey
     }
     
     private func base64UrlDecode(_ value: String) -> Data? {
@@ -145,7 +148,6 @@ class JwtPubKeyScraper : NSObject, URLSessionDelegate {
             jwtPubKeyCond.signal()
             jwtPubKeyCond.unlock()
         }
-        
         return completionHandler(.performDefaultHandling, nil)
     }
     

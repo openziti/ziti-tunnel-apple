@@ -285,19 +285,21 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         panel.title = "Select Enrollment JWT file"
         
         panel.beginSheetModal(for: window) { (result) in
-            if result == NSApplication.ModalResponse.OK {
-                do {
-                    try self.zidMgr.insertFromJWT(panel.urls[0], at: 0)
-                    self.tableView.reloadData()
-                    self.representedObject = 0
-                    self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
-                } catch let error as ZitiError {
-                    panel.orderOut(nil)
-                    self.dialogAlert("Unable to add identity", error.localizedDescription)
-                } catch {
-                    panel.orderOut(nil)
-                    self.dialogAlert("JWT Error", error.localizedDescription)
-                    return
+            DispatchQueue(label: "JwtLoader").async {
+                if result == NSApplication.ModalResponse.OK {
+                    do {
+                        try self.zidMgr.insertFromJWT(panel.urls[0], at: 0)
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                            self.representedObject = 0
+                            self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
+                        }
+                    } catch {
+                        DispatchQueue.main.async {
+                            panel.orderOut(nil)
+                            self.dialogAlert("Unable to add identity", error.localizedDescription)
+                        }
+                    }
                 }
             }
         }
