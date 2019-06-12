@@ -148,7 +148,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                 zErr = ZitiError("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")
             }
         }
-        if zErr == nil { zErr = removeCId(zid) }
+        if zErr == nil { _ = removeCId(zid) } // .zid already gone.  Ignore any error removing .cid (e.g., if never started tun)
         return zErr
     }
     

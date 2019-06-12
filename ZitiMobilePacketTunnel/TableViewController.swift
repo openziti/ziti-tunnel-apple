@@ -297,28 +297,25 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     func onNewUrl(_ url:URL) {
-        do {
-            try zidMgr.insertFromJWT(url, at: 0)
-            tableView.reloadData()
-            tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
-            performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
-        } catch let error as ZitiError {
-            let alert = UIAlertController(
-                title:"Unable to add identity",
-                message: error.localizedDescription,
-                preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
-            present(alert, animated: true, completion: nil)
-            NSLog("Unable to add identity: \(error.localizedDescription)")
-        } catch {
-            let alert = UIAlertController(
-                title:"JWT Error",
-                message: error.localizedDescription,
-                preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
-            present(alert, animated: true, completion: nil)
-            NSLog("JWT Error: \(error.localizedDescription)")
-            return
+        DispatchQueue(label: "JwtLoader").async {
+            do {
+                try zidMgr.insertFromJWT(url, at: 0)
+                DispatchQueue.main.async {
+                    tableView.reloadData()
+                    tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
+                    performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(
+                        title:"Unable to add identity",
+                        message: error.localizedDescription,
+                        preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+                    present(alert, animated: true, completion: nil)
+                    NSLog("Unable to add identity: \(error.localizedDescription)")
+                }
+            }
         }
     }
     
