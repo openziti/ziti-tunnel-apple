@@ -299,11 +299,11 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     func onNewUrl(_ url:URL) {
         DispatchQueue(label: "JwtLoader").async {
             do {
-                try zidMgr.insertFromJWT(url, at: 0)
+                try self.zidMgr.insertFromJWT(url, at: 0)
                 DispatchQueue.main.async {
-                    tableView.reloadData()
-                    tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
-                    performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+                    self.tableView.reloadData()
+                    self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
+                    self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -312,7 +312,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                         message: error.localizedDescription,
                         preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
-                    present(alert, animated: true, completion: nil)
+                    self.present(alert, animated: true, completion: nil)
                     NSLog("Unable to add identity: \(error.localizedDescription)")
                 }
             }
