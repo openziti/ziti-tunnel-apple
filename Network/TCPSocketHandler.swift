@@ -12,15 +12,15 @@ class TCPSocketHandler: TSTCPSocketDelegate {
     init(_ ziti:ZitiClientProtocol, _ regulator:TransferRegulator) {
         self.ziti = ziti
         self.regulator = regulator
-        NSLog("TCPSocketHandler init")
+        //NSLog("TCPSocketHandler init")
     }
     
     deinit {
-        NSLog("TCPSocketHandler deinit")
+        //NSLog("TCPSocketHandler deinit")
     }
     
     func localDidClose(_ socket: TSTCPSocket) {
-        NSLog("TCPSocketHandler localDidClose. Closing Socket")
+        //NSLog("TCPSocketHandler localDidClose. Closing Socket")
         socket.close()
     }
     
@@ -35,7 +35,7 @@ class TCPSocketHandler: TSTCPSocketDelegate {
     }
     
     func socketDidClose(_ socket: TSTCPSocket) {
-        NSLog("TCPSocketHandler socketDidClose. Closing Ziti")
+        //NSLog("TCPSocketHandler socketDidClose. Closing Ziti")
         ziti.close()
     }
     

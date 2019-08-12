@@ -47,11 +47,11 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         self.svc = svc
         
         super.init()
-        NSLog("init ZitiConn \(key)")
+        //NSLog("init ZitiConn \(key)")
     }
     
     deinit {
-        NSLog("deinit ZitiConn \(key)")
+        //NSLog("deinit ZitiConn \(key)")
     }
     
     static let on_nf_conn:nf_conn_cb = { nfConn, status in
@@ -62,11 +62,11 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
         mySelf.writeCond.lock()
         if status == ZITI_OK {
-            print("ZitiConn.onConn OK to write \(mySelf.key)")
+            //print("ZitiConn.onConn OK to write \(mySelf.key)")
             mySelf.okToWrite = true
         } else {
             let errStr = String(cString: ziti_errorstr(status))
-            print("ZitiConn.onConn \"\(errStr)\" \(mySelf.key)")
+            NSLog("ZitiConn.onConn error \"\(errStr)\" \(mySelf.key)")
             mySelf.timedOut = true
         }
         mySelf.writeCond.signal()
@@ -83,8 +83,11 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             let data = Data(bytes: buf!, count: Int(nBytes))
             mySelf.onDataAvailable?(data, Int(nBytes))
         } else {
-            let errStr = String(cString: ziti_errorstr(nBytes))
-            NSLog("ZitiConn.onData \"\(errStr)\" \(mySelf.key).")
+            
+            if nBytes != ZITI_EOF {
+                let errStr = String(cString: ziti_errorstr(nBytes))
+                NSLog("ZitiConn.onData error \"\(errStr)\" \(mySelf.key).")
+            }
             
             if mySelf.closeWait {
                 mySelf.releaseConnection?()
@@ -121,7 +124,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     }
     
     func connect(_ onDataAvailable: @escaping DataAvailableCallback) -> Bool {
-        NSLog("ZitiConn connect \(key)")
+        //NSLog("ZitiConn connect \(key)")
         self.onDataAvailable = onDataAvailable
         
         // validate the service
@@ -131,11 +134,21 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         }
         
         zid.scheduleOp {
+            // Is service avail (valid net session)?
+            let availStatus = NF_service_available(self.zid.nf_context, svcName_c)
+            if availStatus != ZITI_OK {
+                let errStr = String(cString: ziti_errorstr(availStatus))
+                NSLog("ZitiConn \(self.key) sevice avail = \"\(errStr)\"")
+                self.onDataAvailable?(nil, Int(-1))
+                return // false
+            }
+            
             // init the connection
             var status = NF_conn_init(self.zid.nf_context, &self.nfConn, self.toVoidPtr())
-            guard  status == ZITI_OK else {
+            guard status == ZITI_OK else {
                 let errStr = String(cString: ziti_errorstr(status))
                 NSLog("ZitiConn \(self.key) Unable to initiate connection for \(self.zid.id):\(self.svc.name ?? "nil"), \(errStr)")
+                self.onDataAvailable?(nil, Int(-1))
                 return // false
             }
         
@@ -190,7 +203,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
             if self?.closeWait ?? false {
                 self?.releaseConnection?()
             } else if let mySelf = self, mySelf.nfConn != nil {
-                NSLog("ZitiConn closing \(mySelf.key)")
+                //NSLog("ZitiConn closing \(mySelf.key)")
                 self?.closeWait = true
                 let status = NF_close(&mySelf.nfConn)
                 if status != ZITI_OK {

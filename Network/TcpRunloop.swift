@@ -91,7 +91,7 @@ class TcpRunloop: TSIPStackDelegate {
             return
         }
         
-        NSLog("TCP Accepted \(key)")        
+        //NSLog("TCP Accepted \(key)")        
         let regulator = TransferRegulator(Int(0xffff)) // TODO = TCP_SND_BUF
         let delegate = TCPSocketHandler(gotConn, regulator)
         
@@ -101,7 +101,7 @@ class TcpRunloop: TSIPStackDelegate {
         tcpConnsLock.unlock()
         
         gotConn.releaseConnection = {
-            NSLog("Releasing \(key)")
+            //NSLog("Releasing \(key)")
             self.tcpConnsLock.lock()
             self.tcpConns.removeValue(forKey: key)
             self.tcpConnsLock.unlock()
