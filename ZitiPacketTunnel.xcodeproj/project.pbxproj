@@ -347,7 +347,6 @@
 		5ABA5EC722727AEE00B2221D /* libmbedcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedcrypto.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedcrypto.a"; sourceTree = "<group>"; };
 		5ABA5EC822727AEE00B2221D /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedtls.a"; sourceTree = "<group>"; };
 		5ABA5EC922727AEE00B2221D /* libmbedx509.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedx509.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedx509.a"; sourceTree = "<group>"; };
-		5ABA5ED6227338FA00B2221D /* libprotobuf-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libprotobuf-c.a"; path = "../ziti-sdk-c/build/lib/libprotobuf-c.a"; sourceTree = "<group>"; };
 		5ABA5ED92274D2EB00B2221D /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		5ABA5EDE22765E7500B2221D /* ZitiIdentity+nf_context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZitiIdentity+nf_context.swift"; sourceTree = "<group>"; };
 		5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPPacket.swift; sourceTree = "<group>"; };
@@ -488,7 +487,6 @@
 		5A02AAD8206EBE3C006261C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5ABA5ED6227338FA00B2221D /* libprotobuf-c.a */,
 				5ABA5EC722727AEE00B2221D /* libmbedcrypto.a */,
 				5ABA5EC822727AEE00B2221D /* libmbedtls.a */,
 				5ABA5EC922727AEE00B2221D /* libmbedx509.a */,

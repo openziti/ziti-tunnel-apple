@@ -29,7 +29,7 @@ class ZidMgr : NSObject {
         }
         
         // only support OTT
-        guard zid.method == .ott else {
+        guard zid.getEnrollmentMethod() == .ott else {
             throw ZitiError("Only OTT Enrollment is supported by this application")
         }
         
@@ -71,7 +71,7 @@ class ZidMgr : NSObject {
         }
         
         // Can we get the public key?
-        guard let pubKey = getPubKey(url) else {
+        guard let pubKey = getPubKey(zid, url) else {
             throw ZitiError("JWT Unable to retrieve \(zid.apiBaseUrl) public key")
         }
         
@@ -87,8 +87,9 @@ class ZidMgr : NSObject {
         zids.insert(zid, at:at)
     }
     
-    private func getPubKey(_ url:URL) -> SecKey? {
+    private func getPubKey(_ zid:ZitiIdentity, _ url:URL) -> SecKey? {
         let jwtScraper = JwtPubKeyScraper()
+        jwtScraper.zid = zid
         let session = URLSession(configuration: URLSessionConfiguration.default, delegate:jwtScraper, delegateQueue:nil)
         session.dataTask(with: url).resume() // signals when key retrieved
         session.finishTasksAndInvalidate()
@@ -121,6 +122,7 @@ class ZidMgr : NSObject {
 }
 
 class JwtPubKeyScraper : NSObject, URLSessionDelegate {
+    var zid:ZitiIdentity?
     var jwtPubKey:SecKey?
     let jwtPubKeyCond = NSCondition()
     
@@ -136,10 +138,30 @@ class JwtPubKeyScraper : NSObject, URLSessionDelegate {
         }
         
         let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue(label: "ServerTrust")) { [weak self] secTrust, result in
+            
+            // Store off the key so we can validate the JWT sig
             self?.jwtPubKey = SecTrustCopyPublicKey(secTrust)
             self?.jwtPubKeyCond.lock()
             self?.jwtPubKeyCond.signal()
             self?.jwtPubKeyCond.unlock()
+            
+            // Temp workaround until implement fetching certs per RFC7030
+            guard let zid = self?.zid else { return }
+            if zid.rootCa == nil {
+                var newRootCa:String = ""
+                let zkc = ZitiKeychain()
+                for i in 0..<SecTrustGetCertificateCount(secTrust) {
+                    if let cert = SecTrustGetCertificateAtIndex(secTrust, i) {
+                        if let certData = SecCertificateCopyData(cert) as Data? {
+                            newRootCa += zkc.convertToPEM("CERTIFICATE", der: certData)
+                        }
+                    }
+                }
+                if newRootCa.count > 0 {
+                    self?.zid?.rootCa = newRootCa
+                }
+            }
+            completionHandler(.useCredential, URLCredential(trust:secTrust))
         }
         
         if steStatus != errSecSuccess {
@@ -147,8 +169,8 @@ class JwtPubKeyScraper : NSObject, URLSessionDelegate {
             jwtPubKeyCond.lock()
             jwtPubKeyCond.signal()
             jwtPubKeyCond.unlock()
+            return completionHandler(.performDefaultHandling, nil)
         }
-        return completionHandler(.performDefaultHandling, nil)
     }
     
     func wait(_ ti:TimeInterval) -> Bool {

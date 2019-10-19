@@ -95,7 +95,17 @@ class ZitiIdentity : NSObject, Codable {
     let versions:Versions
     let enrollmentUrl:String
     let apiBaseUrl:String
-    let method:EnrollmentMethod
+    
+    var em:EnrollmentMethod?
+    var method:EnrollmentMethod?
+    var enrollmentMethod:EnrollmentMethod?
+    func getEnrollmentMethod() -> EnrollmentMethod {
+        if let m = em { return m }
+        if let m = method { return m }
+        if let m = enrollmentMethod { return m }
+        return EnrollmentMethod.ott
+    }
+    
     let token:String
     var rootCa:String?
     var exp:Int = 0

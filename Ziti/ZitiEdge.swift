@@ -322,6 +322,7 @@ extension ZitiEdge : URLSessionDelegate {
         }
         
         guard let rootCa = zid.rootCa else {
+            print("*** Null RootCA")
             // Should just: completionHandler(.performDefaultHandling, nil)
             //
             // This is to address issue with C SDK needing valid certs in order to trust a server.
@@ -329,6 +330,7 @@ extension ZitiEdge : URLSessionDelegate {
             // this app and extension)
             let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue(label: "ServerTrust")) { secTrust, result in
                 if result == .proceed || result == .unspecified {
+                    print("*** Null RootCA, proceed or unspecified")
                     //Get certs from secTrust, convert to PEM, store in rootCa
                     var newRootCa:String = ""
                     let zkc = ZitiKeychain()
@@ -343,6 +345,7 @@ extension ZitiEdge : URLSessionDelegate {
                         self.zid.rootCa = newRootCa
                         _ = ZitiIdentityStore().storeCId(self.zid)
                     }
+                    print("*** Null RootCA, trust it")
                     completionHandler(.useCredential, URLCredential(trust:secTrust))
                 } else {
                     // reject
@@ -359,6 +362,7 @@ extension ZitiEdge : URLSessionDelegate {
         }
         
         // Add our rootCAs
+        print("*** Setting anchors")
         let zkc = ZitiKeychain()
         let rootCerts = zkc.PEMstoCerts(zkc.extractPEMs(rootCa))
         let stStatus = SecTrustSetAnchorCertificates(serverTrust, rootCerts as CFArray)
@@ -371,6 +375,7 @@ extension ZitiEdge : URLSessionDelegate {
         
         let steStatus = SecTrustEvaluateAsync(serverTrust, DispatchQueue(label: "ServerTrust")) { secTrust, result in
             if result == .proceed || result == .unspecified {
+                print("*** Set anchors, trust it: result = \(result.rawValue)")
                 completionHandler(.useCredential, URLCredential(trust:secTrust))
             } else if result == .recoverableTrustFailure {
                 // Will very likely fail, but give default handling a chance so if user manually adds the root CA

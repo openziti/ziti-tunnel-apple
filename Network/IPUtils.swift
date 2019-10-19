@@ -133,7 +133,7 @@ class IPUtils {
     static let v6AddrNumWords = 8
     static func ipV6AddressToSting(_ addr:Data) -> String {
         var str = "::" // 'unspecified' or 'invalid'
-        var addrWords:[UInt16] = addr.withUnsafeBytes{ urbp in
+        let addrWords:[UInt16] = addr.withUnsafeBytes{ urbp in
             urbp.bindMemory(to: UInt16.self).map(UInt16.init(bigEndian:))
         }
         

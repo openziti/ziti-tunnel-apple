@@ -285,7 +285,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         panel.title = "Select Enrollment JWT file"
         
         panel.beginSheetModal(for: window) { (result) in
-            DispatchQueue(label: "JwtLoader").async {
+            //DispatchQueue(label: "JwtLoader").async {
                 if result == NSApplication.ModalResponse.OK {
                     do {
                         try self.zidMgr.insertFromJWT(panel.urls[0], at: 0)
@@ -301,7 +301,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                         }
                     }
                 }
-            }
+            //}
         }
     }
     
