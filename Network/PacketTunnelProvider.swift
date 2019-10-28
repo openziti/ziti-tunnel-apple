@@ -178,7 +178,24 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
-        dnsSettings.matchDomains = self.providerConfig.dnsMatchDomains
+        //dnsSettings.matchDomains = [""] //self.providerConfig.dnsMatchDomains
+        
+        // Fugly workaround, but it'll pretty much work...
+        // First, make sure we don't become primary resolver (specified by having name = "")
+        if self.dnsResolver?.hostnames.count ?? 0 == 0 || self.dnsResolver?.hostnames.first?.name ?? "" == "" {
+            self.dnsResolver?.hostnames.append(("ziti-test.netfoundry.io", "104.199.116.47", "104.199.116.47"))
+        }
+        // now add in all the hostnames we want to intercept as 'matchDomains'. We'll get some extras, but for most use
+        // cases should be just fine
+        var matchDomains:[String] = []
+        if let hns = self.dnsResolver?.hostnames {
+            for hn in hns {
+                matchDomains.append(hn.name)
+            }
+        }
+        
+        dnsSettings.matchDomains = matchDomains
+        //print("----- matches: \(dnsSettings.matchDomains ?? [""])")
         tunnelNetworkSettings.dnsSettings = dnsSettings
         
         // add dnsServer routes if configured outside of configured subnet
