@@ -16,10 +16,10 @@ class ZitiCId : NSObject, Codable {
     }
     
     let ztAPI:String
-    let versions:ZitiIdentity.Versions
+    var versions:ZitiIdentity.Versions?
     let id:Identity
     
-    init(_ ztAPI:String, _ versions:ZitiIdentity.Versions, _ id:Identity) {
+    init(_ ztAPI:String, _ versions:ZitiIdentity.Versions?, _ id:Identity) {
         self.ztAPI = ztAPI
         self.versions = versions
         self.id = id
@@ -88,14 +88,39 @@ class ZitiIdentity : NSObject, Codable {
         }
     }
     
-    let identity:Identity
-    var name:String { return identity.name }
-    var id:String { return identity.id }
-    var sessionToken:String?
-    let versions:Versions
-    let enrollmentUrl:String
-    let apiBaseUrl:String
+    // backwards compatibility shenanigans (setup ensured in insertFromJwt)
+    var identity:Identity?
+    var sub:String?  // identity.id now sepcified in sub
     
+    var name:String { return identity?.name ?? "--" }
+    var id:String { return identity?.id ?? sub ?? "--invalid_id--" }
+    var sessionToken:String?
+    var versions:Versions?
+    
+    // backwards compatability
+    var enrollmentUrl:String?
+    func getEnrollmentUrl() -> String {
+        if let e = enrollmentUrl { return e }
+        if iss != nil {
+            let em = getEnrollmentMethod().rawValue
+            let enrollParams = "enroll?method=\(em)+&token=\(getToken())"
+            if let url = URL(string: enrollParams, relativeTo:URL(string:getBaseUrl())) {
+                return url.absoluteString
+            }
+        }
+        return "--invalid_enrollment_url--"
+    }
+    
+    // backwards compatibility
+    var apiBaseUrl:String?
+    var iss:String?
+    func getBaseUrl() -> String {
+        if let u = apiBaseUrl { return u }
+        if let u = iss { return u }
+        return ""
+    }
+    
+    // backwards compatibility...
     var em:EnrollmentMethod?
     var method:EnrollmentMethod?
     var enrollmentMethod:EnrollmentMethod?
@@ -106,7 +131,15 @@ class ZitiIdentity : NSObject, Codable {
         return EnrollmentMethod.ott
     }
     
-    let token:String
+    // backwards compatibility...
+    var token:String?
+    var jti:String?
+    func getToken() -> String {
+        if let t = jti { return t }
+        if let t = token { return t }
+        return "-invald_token-"
+    }
+    
     var rootCa:String?
     var exp:Int = 0
     var expDate:Date { return Date(timeIntervalSince1970: TimeInterval(exp)) }
@@ -159,7 +192,7 @@ class ZitiIdentity : NSObject, Codable {
             let pems = zkc.extractPEMs(rootCa!)
             ca = "pem:\(pems.joined())"
         }
-        return ZitiCId(apiBaseUrl, versions, ZitiCId.Identity(key, certPEM, ca))
+        return ZitiCId(getBaseUrl(), versions, ZitiCId.Identity(key, certPEM, ca))
     }
     
     private class Cache : Codable {

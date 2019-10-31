@@ -99,7 +99,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             idEnabledBtn.state = zId.isEnabled ? .on : .off
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
-            idNetworkLabel.stringValue = zId.apiBaseUrl
+            idNetworkLabel.stringValue = zId.getBaseUrl()
             idControllerStatusLabel.stringValue = csStr
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
             idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.expDate))"

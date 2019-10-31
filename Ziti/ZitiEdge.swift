@@ -24,8 +24,8 @@ class ZitiEdge : NSObject {
     }
     
     func authenticate(completionHandler: @escaping (ZitiError?) -> Void) {
-        guard let url = URL(string: AUTH_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
-            completionHandler(ZitiError("Enable to convert auth URL \"\(AUTH_PATH)\" for \"\(zid.apiBaseUrl)\""))
+        guard let url = URL(string: AUTH_PATH, relativeTo:URL(string:zid.getBaseUrl())) else {
+            completionHandler(ZitiError("Enable to convert auth URL \"\(AUTH_PATH)\" for \"\(zid.getBaseUrl())\""))
             return
         }
         
@@ -58,8 +58,8 @@ class ZitiEdge : NSObject {
     }
     
     func enroll(completionHandler: @escaping (ZitiError?) -> Void) {
-        guard let url = URL(string: zid.enrollmentUrl) else {
-            completionHandler(ZitiError("Enable to convert enrollment URL \"\(zid.enrollmentUrl)\""))
+        guard let url = URL(string: zid.getEnrollmentUrl()) else {
+            completionHandler(ZitiError("Unable to convert enrollment URL \"\(zid.getEnrollmentUrl())\""))
             return
         }
         
@@ -110,8 +110,8 @@ class ZitiEdge : NSObject {
     
     // rfc 7030
     func fetchCertificates(completionHandler: @escaping (String?, ZitiError?) -> Void) {
-        guard let url = URL(string: FETCH_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
-            completionHandler(nil, ZitiError("Enable convert URL to fetch certs from \(zid.apiBaseUrl)"))
+        guard let url = URL(string: FETCH_PATH, relativeTo:URL(string:zid.getBaseUrl())) else {
+            completionHandler(nil, ZitiError("Enable convert URL to fetch certs from \(zid.getBaseUrl())"))
             return
         }
         
@@ -134,8 +134,8 @@ class ZitiEdge : NSObject {
     }
     
     func getServices(completionHandler: @escaping (Bool, ZitiError?) -> Void) {
-        guard let url = URL(string: SERVCES_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
-            completionHandler(false, ZitiError("Enable to convert URL \"\(SERVCES_PATH)\" for \"\(zid.apiBaseUrl)\""))
+        guard let url = URL(string: SERVCES_PATH, relativeTo:URL(string:zid.getBaseUrl())) else {
+            completionHandler(false, ZitiError("Enable to convert URL \"\(SERVCES_PATH)\" for \"\(zid.getBaseUrl())\""))
             return
         }
         let urlRequest = createRequest(url, method:GET_METHOD, contentType:JSON_TYPE, body:nil)
@@ -186,8 +186,8 @@ class ZitiEdge : NSObject {
     }
     
     func getNetworkSession(_ serviceId:String, completionHandler: @escaping (ZitiError?) -> Void) {
-        guard let url = URL(string: NETSESSIONS_PATH, relativeTo:URL(string:zid.apiBaseUrl)) else {
-            completionHandler(ZitiError("Enable to convert URL \"\(NETSESSIONS_PATH)\" for \"\(zid.apiBaseUrl)\""))
+        guard let url = URL(string: NETSESSIONS_PATH, relativeTo:URL(string:zid.getBaseUrl())) else {
+            completionHandler(ZitiError("Enable to convert URL \"\(NETSESSIONS_PATH)\" for \"\(zid.getBaseUrl())\""))
             return
         }
         guard let services = zid.services else {
@@ -345,7 +345,7 @@ extension ZitiEdge : URLSessionDelegate {
                         self.zid.rootCa = newRootCa
                         _ = ZitiIdentityStore().storeCId(self.zid)
                     }
-                    print("*** Null RootCA, trust it")
+                    print("*** Null RootCA, evaluation: trust it")
                     completionHandler(.useCredential, URLCredential(trust:secTrust))
                 } else {
                     // reject

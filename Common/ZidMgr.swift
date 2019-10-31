@@ -28,6 +28,16 @@ class ZidMgr : NSObject {
                 throw ZitiError("Unable to parse enrollment data")
         }
         
+        // make sure we have an id
+        if zid.identity?.id == nil {
+            guard let sub = zid.sub else {
+                throw ZitiError("Unable to determine identity from JWT")
+            }
+            zid.identity = ZitiIdentity.Identity(zid.identity?.name ?? "-", sub)
+        }
+        
+        // TODO: kickoff a request to get the controller version...
+        
         // only support OTT
         guard zid.getEnrollmentMethod() == .ott else {
             throw ZitiError("Only OTT Enrollment is supported by this application")
@@ -39,8 +49,8 @@ class ZidMgr : NSObject {
         }
         
         // URL used to retrieve leaf public key
-        guard let url = URL(string: zid.apiBaseUrl) else {
-            throw ZitiError("Enable to convert URL for \"\(zid.apiBaseUrl)\"")
+        guard let url = URL(string: zid.getBaseUrl()) else {
+            throw ZitiError("Enable to convert URL for \"\(zid.getBaseUrl())\"")
         }
         
         // make sure we have a sig
@@ -72,7 +82,7 @@ class ZidMgr : NSObject {
         
         // Can we get the public key?
         guard let pubKey = getPubKey(zid, url) else {
-            throw ZitiError("JWT Unable to retrieve \(zid.apiBaseUrl) public key")
+            throw ZitiError("JWT Unable to retrieve \(zid.getBaseUrl()) public key")
         }
         
         //var cfErr:CFError?
@@ -152,6 +162,9 @@ class JwtPubKeyScraper : NSObject, URLSessionDelegate {
                 let zkc = ZitiKeychain()
                 for i in 0..<SecTrustGetCertificateCount(secTrust) {
                     if let cert = SecTrustGetCertificateAtIndex(secTrust, i) {
+                        let summary = SecCertificateCopySubjectSummary(cert)
+                        print("Cert summary: \(summary ?? "No summary available" as CFString)")
+                        
                         if let certData = SecCertificateCopyData(cert) as Data? {
                             newRootCa += zkc.convertToPEM("CERTIFICATE", der: certData)
                         }
