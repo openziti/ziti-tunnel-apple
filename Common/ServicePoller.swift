@@ -14,7 +14,15 @@ class ServicePoller : NSObject {
     func pollOnce() {
         zidMgr?.zids.forEach { zid in
             if (zid.enrolled ?? false) == true && (zid.enabled ?? false) == true {
-                zid.edge.getServices { [weak self] didChange, _ in
+                let nameWas = zid.name
+                zid.edge.getServices { [weak self] didChange, zErr in
+                    if let e = zErr {
+                        NSLog("getServices for \(zid.name):\(zid.id) error \"\(e.localizedDescription)\"")
+                    }
+                    let nameIs = zid.name
+                    if nameIs != nameWas {
+                        _ = self?.zidMgr?.zidStore.store(zid)
+                    }
                     self?.onServicePoll?(didChange, zid)
                 }
             } else {

@@ -29,7 +29,7 @@ class ZitiCId : NSObject, Codable {
 class ZitiIdentity : NSObject, Codable {
     //let identity:(name:String, id:String)
     class Identity : Codable {
-        let name:String, id:String
+        var name:String, id:String
         init(_ name:String, _ id:String) {
             self.name = name; self.id = id
         }
@@ -103,7 +103,7 @@ class ZitiIdentity : NSObject, Codable {
         if let e = enrollmentUrl { return e }
         if iss != nil {
             let em = getEnrollmentMethod().rawValue
-            let enrollParams = "enroll?method=\(em)+&token=\(getToken())"
+            let enrollParams = "enroll?method=\(em)&token=\(getToken())"
             if let url = URL(string: enrollParams, relativeTo:URL(string:getBaseUrl())) {
                 return url.absoluteString
             }
@@ -119,6 +119,9 @@ class ZitiIdentity : NSObject, Codable {
         if let u = iss { return u }
         return ""
     }
+    
+    // returned from /version, retrieved when validating JWT, polled periodically
+    var controllerVersion:String?
     
     // backwards compatibility...
     var em:EnrollmentMethod?

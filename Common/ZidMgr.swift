@@ -49,7 +49,8 @@ class ZidMgr : NSObject {
         }
         
         // URL used to retrieve leaf public key
-        guard let url = URL(string: zid.getBaseUrl()) else {
+        guard let url = URL(string: "/version", relativeTo:URL(string:zid.getBaseUrl())) else {
+        //guard let url = URL(string: zid.getBaseUrl()) else {
             throw ZitiError("Enable to convert URL for \"\(zid.getBaseUrl())\"")
         }
         
@@ -101,7 +102,16 @@ class ZidMgr : NSObject {
         let jwtScraper = JwtPubKeyScraper()
         jwtScraper.zid = zid
         let session = URLSession(configuration: URLSessionConfiguration.default, delegate:jwtScraper, delegateQueue:nil)
-        session.dataTask(with: url).resume() // signals when key retrieved
+        session.dataTask(with: url) { (data, response, error) in
+            if let data = data,
+                let json = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]) as [String : Any]??),
+                let dataJSON = json?["data"] as? [String: Any],
+                let version = dataJSON["version"] as? String
+            {
+                NSLog("\(zid.id) controller version: \(version) (\(url.absoluteString))")
+                zid.controllerVersion = version
+            }
+        }.resume() // signals when key retrieved by delegate
         session.finishTasksAndInvalidate()
         
         if !jwtScraper.wait(5.0) {

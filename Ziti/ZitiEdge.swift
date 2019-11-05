@@ -39,12 +39,17 @@ class ZitiEdge : NSObject {
             guard
                 let json = ((try? JSONSerialization.jsonObject(with: data!, options: []) as? [String: Any]) as [String : Any]??),
                 let dataJSON = json?["data"] as? [String: Any],
-                let sessionJSON = dataJSON["session"] as? [String:Any],
-                let token = sessionJSON["token"] as? String
+                let token = dataJSON["token"] as? String
             else {
                 completionHandler(ZitiError("error trying to convert data to JSON"))
                 return
             }
+            
+            // grab the name...
+            if let idJSON = dataJSON["identity"] as? [String:Any], let name = idJSON["name"] as? String {
+                self.zid.identity?.name = name
+            }
+            
             //print("zt-session: \(token)")
             self.zid.sessionToken = token
             completionHandler(nil)
@@ -62,7 +67,7 @@ class ZitiEdge : NSObject {
             completionHandler(ZitiError("Unable to convert enrollment URL \"\(zid.getEnrollmentUrl())\""))
             return
         }
-        
+                
         // Get Keys
         let (privKey, pubKey, keyErr) = getKeys(zid)
         guard keyErr == nil else {
