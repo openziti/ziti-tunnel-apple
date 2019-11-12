@@ -149,7 +149,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = zid?.name
             } else if indexPath.row == 1 {
                 cell?.textLabel?.text = "Network"
-                cell?.detailTextLabel?.text = zid?.apiBaseUrl
+                cell?.detailTextLabel?.text = zid?.getBaseUrl()
             } else if indexPath.row == 2 {
                 cell?.textLabel?.text = "Status"
                 let cs = zid?.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
