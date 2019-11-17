@@ -113,7 +113,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 1 {
-            nRows = 4
+            nRows = 5
         } else if section == 2 {
             if zid?.isEnrolled ?? false {
                 nRows = zid?.services?.count ?? 0
@@ -151,6 +151,9 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.textLabel?.text = "Network"
                 cell?.detailTextLabel?.text = zid?.getBaseUrl()
             } else if indexPath.row == 2 {
+                cell?.textLabel?.text = "Version"
+                cell?.detailTextLabel?.text = zid?.controllerVersion ?? "unknown"
+            } else if indexPath.row == 3 {
                 cell?.textLabel?.text = "Status"
                 let cs = zid?.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
                 var csStr = ""
