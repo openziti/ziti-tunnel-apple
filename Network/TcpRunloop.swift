@@ -115,7 +115,7 @@ class TcpRunloop: TSIPStackDelegate {
             if nBytes <= 0 || payload == nil {
                 self?.scheduleOp { sock?.close() }
             } else if sockConnected {
-                if !regulator.wait(payload!.count, 1.0) {
+                if !regulator.wait(payload!.count, 5.0) {
                     NSLog("TCP ziti conn timed out waiting for socket write window \(key)")
                     self?.scheduleOp {
                         sock?.close()

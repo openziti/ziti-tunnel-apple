@@ -67,6 +67,11 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         } else {
             let errStr = String(cString: ziti_errorstr(status))
             NSLog("ZitiConn.onConn error \"\(errStr)\" \(mySelf.key)")
+            if status == ZITI_TIMEOUT {
+                mySelf.closeWait = true
+            }
+            
+            // want this side affect on any error to start close sequence
             mySelf.timedOut = true
         }
         mySelf.writeCond.signal()
