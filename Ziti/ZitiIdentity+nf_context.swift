@@ -64,7 +64,7 @@ extension ZitiIdentity {
         
         NF_set_timeout(nf_context, 5000)
         
-        // TODO: remove this...
+        // Some useful troubleshooting info.
         NF_dump(nf_context)
         
         // signal init condition

@@ -35,7 +35,7 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     let writeCond = NSCondition()
     var okToWrite = false
-    var timedOut = false
+    var connectFailed = false
     let regulator = TransferRegulator(0xffff0) // TODO: What's right value. Start with maxWndScale << 1
     
     var nfConn:nf_connection?
@@ -67,12 +67,8 @@ class ZitiConn : NSObject, ZitiClientProtocol {
         } else {
             let errStr = String(cString: ziti_errorstr(status))
             NSLog("ZitiConn.onConn error \"\(errStr)\" \(mySelf.key)")
-            if status == ZITI_TIMEOUT {
-                mySelf.closeWait = true
-            }
-            
-            // want this side affect on any error to start close sequence
-            mySelf.timedOut = true
+            mySelf.closeWait = true
+            mySelf.connectFailed = true
         }
         mySelf.writeCond.signal()
         mySelf.writeCond.unlock()
@@ -170,11 +166,11 @@ class ZitiConn : NSObject, ZitiClientProtocol {
     
     func write(payload:Data) -> Int {
         writeCond.lock()
-        while !okToWrite && !timedOut {
+        while !okToWrite && !connectFailed {
             writeCond.wait()
         }
         
-        if timedOut {
+        if connectFailed {
             writeCond.unlock()
             return -1
         }

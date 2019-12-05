@@ -274,7 +274,7 @@ class DNSPacket : NSObject {
         var response:[DNSResourceRecord] = []
         
         if let payload = udp.payload {
-            var dnsData = payload[(payload.startIndex + DNSPacket.answersOffset + recordStartIndx)...]
+            let dnsData = payload[(payload.startIndex + DNSPacket.answersOffset + recordStartIndx)...]
             var offset = 0
             
             for _ in 0..<recordCount {
@@ -386,7 +386,7 @@ class DNSPacket : NSObject {
         get {
             var response:[DNSQuestion] = []
             if let payload = udp.payload {
-                var dnsData = payload[(payload.startIndex + DNSPacket.answersOffset)...]
+                let dnsData = payload[(payload.startIndex + DNSPacket.answersOffset)...]
                 var offset = 0
                 
                 for _ in 0..<self.questionCount {
