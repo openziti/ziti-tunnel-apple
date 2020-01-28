@@ -173,7 +173,7 @@ class JwtPubKeyScraper : NSObject, URLSessionDelegate {
                 for i in 0..<SecTrustGetCertificateCount(secTrust) {
                     if let cert = SecTrustGetCertificateAtIndex(secTrust, i) {
                         let summary = SecCertificateCopySubjectSummary(cert)
-                        print("Cert summary: \(summary ?? "No summary available" as CFString)")
+                        //print("Cert summary: \(summary ?? "No summary available" as CFString)")
                         
                         if let certData = SecCertificateCopyData(cert) as Data? {
                             newRootCa += zkc.convertToPEM("CERTIFICATE", der: certData)

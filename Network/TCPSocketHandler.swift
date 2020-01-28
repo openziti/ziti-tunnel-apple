@@ -7,47 +7,46 @@ import tun2socks
 
 class TCPSocketHandler: TSTCPSocketDelegate {
     var ziti:ZitiClientProtocol
-    var regulator:TransferRegulator
+    weak var regulator:TransferRegulator?
     
     init(_ ziti:ZitiClientProtocol, _ regulator:TransferRegulator) {
         self.ziti = ziti
         self.regulator = regulator
-        //NSLog("TCPSocketHandler init")
+        NSLog("TCPSocketHandler init \(ziti.key)")
     }
     
     deinit {
-        //NSLog("TCPSocketHandler deinit")
+        NSLog("TCPSocketHandler deinit \(ziti.key)")
     }
     
     func localDidClose(_ socket: TSTCPSocket) {
-        //NSLog("TCPSocketHandler localDidClose. Closing Socket")
+        NSLog("TCPSocketHandler localDidClose. Closing Socket \(ziti.key)")
         socket.close()
     }
     
     func socketDidReset(_ socket: TSTCPSocket) {
-        NSLog("TCPSocketHandler socketDidReset. Closing Ziti")
+        NSLog("TCPSocketHandler socketDidReset. Closing Ziti \(ziti.key)")
         ziti.close()
     }
     
     func socketDidAbort(_ socket: TSTCPSocket) {
-        NSLog("TCPSocketHandler socketDidAbort. Closing Ziti")
+        NSLog("TCPSocketHandler socketDidAbort. Closing Ziti \(ziti.key)")
         ziti.close()
     }
     
     func socketDidClose(_ socket: TSTCPSocket) {
-        //NSLog("TCPSocketHandler socketDidClose. Closing Ziti")
+        NSLog("TCPSocketHandler socketDidClose. Closing Ziti \(ziti.key)")
         ziti.close()
     }
     
     func didReadData(_ data: Data, from: TSTCPSocket) {
         if ziti.write(payload: data) <= 0 {
-            NSLog("Unable to write socket data to Ziti")
-            ziti.onDataAvailable?(nil, -1)
+            NSLog("Unable to write socket data to Ziti \(ziti.key)")
         }
     }
     
     func didWriteData(_ length: Int, from: TSTCPSocket) {
         //print(">>>TCPSocketHandler didWriteData: \(length) bytes were written (back to TUN)")
-        regulator.decPending(length)
+        regulator?.decPending(length)
     }
 }

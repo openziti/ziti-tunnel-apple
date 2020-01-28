@@ -13,6 +13,9 @@ class TcpRunloop: TSIPStackDelegate {
     let netMon = NWPathMonitor()
     var currPath:NWPath?
     let dnsResolver:DNSResolver
+    let socketRegulator = TransferRegulator(Int(0xffff), "SockRegulator") // TODO = TCP_SND_BUF
+    let zitiRegulator = TransferRegulator(Int(0xffff), "ZitiRegulator")
+    let waitQueue = DispatchQueue(label: "TcpWaitQueue", attributes: [])
     
     //private var thread:Thread?
     //private let opQueueLock = NSLock()
@@ -74,7 +77,7 @@ class TcpRunloop: TSIPStackDelegate {
         let intercept = "\(dstAddr):\(dstPort)"
         let (zidR, svcR) = tunnelProvider.getServiceForIntercept(intercept)
         if let zid = zidR, let svc = svcR {
-            zitiConn = ZitiConn(key, zid, svc)
+            zitiConn = ZitiConn(key, zid, svc, zitiRegulator)
         } else {
             // if not for Ziti, can we proxy it to orginal IP address?
             let dnsRecs = dnsResolver.findRecordsByIp(dstAddr)
@@ -91,9 +94,8 @@ class TcpRunloop: TSIPStackDelegate {
             return
         }
         
-        //NSLog("TCP Accepted \(key)")        
-        let regulator = TransferRegulator(Int(0xffff)) // TODO = TCP_SND_BUF
-        let delegate = TCPSocketHandler(gotConn, regulator)
+        NSLog("TCP Accepted \(key)")
+        let delegate = TCPSocketHandler(gotConn, socketRegulator)
         
         // keep delegate around until we know we're done with it (sock keeps a weak reference)
         tcpConnsLock.lock()
@@ -101,30 +103,47 @@ class TcpRunloop: TSIPStackDelegate {
         tcpConnsLock.unlock()
         
         gotConn.releaseConnection = {
-            //NSLog("Releasing \(key)")
             self.tcpConnsLock.lock()
+            NSLog("TCP Releasing \(key)")
             self.tcpConns.removeValue(forKey: key)
             self.tcpConnsLock.unlock()
         }
         sock.delegate = delegate
         
-        var sockConnected = true
         // connect Ziti
         let zStarted = gotConn.connect { [weak self, weak sock] payload, nBytes in
             // queue for sending in run loop thread
             if nBytes <= 0 || payload == nil {
-                self?.scheduleOp { sock?.close() }
-            } else if sockConnected {
-                if !regulator.wait(payload!.count, 5.0) {
-                    NSLog("TCP ziti conn timed out waiting for socket write window \(key)")
-                    self?.scheduleOp {
-                        sock?.close()
-                        sockConnected = false
-                    }
-                } else {
-                    self?.scheduleOp(key) {
-                        sockConnected = sock?.isConnected ?? false 
-                        if sockConnected { sock?.writeData(payload!) }
+                self?.scheduleOp {
+                    //print("   ... (done) closing sock \(key) isConnected? \(sock?.isConnected ?? false), nBytes:\(nBytes)")
+                    //print("   ... delegate? \((sock?.delegate != nil) ? "yes" : "no")")
+                    //print("   ... sock? \((sock?.delegate != nil) ? "yes" : "no")")
+                    sock?.close()
+                }
+            } else {
+                // need to get the wait() onto a diff thread.
+                // (its executing on the ziti run loop, which could block waiting for a signal from this run look)
+                self?.waitQueue.async {
+                    if !(self?.socketRegulator.wait(payload!.count, 5.0) ?? false) { //PIG
+                        NSLog("TCP ziti conn timed out waiting for socket write window \(key)")
+                        //print("   ... self? \(self == nil ? "nope" : "yep")")
+                        self?.scheduleOp {
+                            //print("   ... (regulator) closing sock \(key)")
+                            sock?.close()
+                            
+                            // PIG: could dec more than it should.  move this to socket delegate and maintain counter...
+                            self?.socketRegulator.decPending(self?.socketRegulator.pending ?? 0)
+                            //
+                        }
+                    } else {
+                        self?.scheduleOp(key) {
+                            if sock?.isConnected ?? false {
+                                //print("\(key) socket write \(payload!.count)")
+                                sock?.writeData(payload!)
+                            } else {
+                                self?.socketRegulator.decPending(payload!.count)
+                            }
+                        }
                     }
                 }
             }

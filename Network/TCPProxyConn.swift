@@ -8,7 +8,7 @@ import Foundation
 class TCPProxyConn : NSObject, ZitiClientProtocol {
     var releaseConnection: (() -> Void)?
     
-    let key:String
+    var key:String
     let ip:String
     let port:UInt16
     

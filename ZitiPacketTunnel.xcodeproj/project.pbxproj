@@ -137,8 +137,6 @@
 		5AF4BEC4223EE998001F1F4D /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
 		5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
-		5AF4BECA2241046F001F1F4D /* TCPClientConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */; };
-		5AF4BECB2241046F001F1F4D /* TCPClientConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */; };
 		5AF4BECD2246F271001F1F4D /* TCPProxyConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */; };
 		5AF4BECE2246F271001F1F4D /* TCPProxyConn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */; };
 		5AF4BED4224C4508001F1F4D /* ZitiClientProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */; };
@@ -350,7 +348,6 @@
 		5ABA5ED92274D2EB00B2221D /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		5ABA5EDE22765E7500B2221D /* ZitiIdentity+nf_context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ZitiIdentity+nf_context.swift"; sourceTree = "<group>"; };
 		5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPPacket.swift; sourceTree = "<group>"; };
-		5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPClientConn.swift; sourceTree = "<group>"; };
 		5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPProxyConn.swift; sourceTree = "<group>"; };
 		5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiClientProtocol.swift; sourceTree = "<group>"; };
 		5AF78686208A702A0093498C /* IPv4Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Packet.swift; sourceTree = "<group>"; };
@@ -538,7 +535,6 @@
 				5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */,
 				5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */,
 				5AF7868C208A99640093498C /* UDPPacket.swift */,
-				5AF4BEC92241046F001F1F4D /* TCPClientConn.swift */,
 				5AF4BECC2246F271001F1F4D /* TCPProxyConn.swift */,
 				5AF4BED3224C4508001F1F4D /* ZitiClientProtocol.swift */,
 				5A3664C9228452BE00193C70 /* TCPSocketHandler.swift */,
@@ -1035,7 +1031,6 @@
 				5AF7868D208A99640093498C /* UDPPacket.swift in Sources */,
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
 				5A85A91B225A6EB2004A29F2 /* ZitiConn.swift in Sources */,
-				5AF4BECA2241046F001F1F4D /* TCPClientConn.swift in Sources */,
 				5A34E95F2278F49100E221DD /* Version.swift in Sources */,
 				5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
@@ -1107,7 +1102,6 @@
 				5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */,
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,
 				5A85A91C225A6EB2004A29F2 /* ZitiConn.swift in Sources */,
-				5AF4BECB2241046F001F1F4D /* TCPClientConn.swift in Sources */,
 				5A34E9612278F49100E221DD /* Version.swift in Sources */,
 				5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */,
 				5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */,

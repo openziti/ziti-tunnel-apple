@@ -15,7 +15,7 @@ class DNSResolver : NSObject {
     }
     
     func findRecordsByName(_ name:String) -> [(name:String, ip:String, realIp:String?)] {
-        return hostnames.filter{ return $0.name == name }
+        return hostnames.filter{ return $0.name.caseInsensitiveCompare(name) == .orderedSame }
     }
     
     func findRecordsByIp(_ ip:String) -> [(name:String, ip:String, realIp:String?)] {

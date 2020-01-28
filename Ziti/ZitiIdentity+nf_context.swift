@@ -62,7 +62,7 @@ extension ZitiIdentity {
         // save off nf_context
         Thread.main.threadDictionary[mySelf.nf_context_key] = nf_context
         
-        NF_set_timeout(nf_context, 5000)
+        NF_set_timeout(nf_context, 5000) //PIG
         
         // Some useful troubleshooting info.
         NF_dump(nf_context)
@@ -155,7 +155,6 @@ extension ZitiIdentity {
             forSecurityApplicationGroupIdentifier: ZitiIdentityStore.APP_GROUP_ID) {
             
             let url = appGroupURL.appendingPathComponent("\(id).cid", isDirectory:false)
-            NSLog("cid path: \(url.path)")
             zitiConfigPath = url.path
         }
         return zitiConfigPath?.cString(using: .utf8)
