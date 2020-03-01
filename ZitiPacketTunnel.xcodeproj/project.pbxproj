@@ -1407,10 +1407,12 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1430,10 +1432,12 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1452,6 +1456,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -1463,6 +1468,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build-iOS-arm64/**";
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1483,6 +1489,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -1494,6 +1501,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build-iOS-arm64/**";
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

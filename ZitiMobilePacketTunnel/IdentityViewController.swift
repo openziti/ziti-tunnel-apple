@@ -35,6 +35,23 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Nic saw an issue where controllerVersion shown as unknown.  Prob from a device enrolled
+        // before we tracked controllerVersion.  Garb it in the background for now just to make sure
+        if let zid = self.zid {
+            zid.edge.version { version, zErr in
+                let currVers = zid.controllerVersion
+                if let version = version {
+                   if version != currVers {
+                        zid.controllerVersion = version
+                        _ = self.tvc?.zidMgr.zidStore.store(zid)
+                        DispatchQueue.main.async {
+                            self.tvc?.tableView.reloadData()
+                        }
+                   }
+                }
+            }
+        }
     }
     
     func onEnabledValueChanged(_ enabled:Bool) {

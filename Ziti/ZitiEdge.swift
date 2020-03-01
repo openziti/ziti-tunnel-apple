@@ -4,6 +4,7 @@
 
 import Foundation
 
+fileprivate let VERSION_PATH = "/version"
 fileprivate let AUTH_PATH = "/authenticate?method=cert"
 fileprivate let SESSION_TAG = "zt-session"
 fileprivate let SERVCES_PATH = "/services?limit=5000"
@@ -21,6 +22,27 @@ class ZitiEdge : NSObject {
     weak var zid:ZitiIdentity!
     init(_ zid:ZitiIdentity) {
         self.zid = zid
+    }
+    
+    func version(completionHandler: @escaping (String?, ZitiError?) -> Void) {
+        guard let url = URL(string: VERSION_PATH, relativeTo:URL(string:zid.getBaseUrl())) else {
+            completionHandler(nil, ZitiError("Enable to convert version URL \"\(VERSION_PATH)\" for \"\(zid.getBaseUrl())\""))
+            return
+        }
+        
+        let session = URLSession(configuration: URLSessionConfiguration.default)
+        session.dataTask(with: url) { (data, response, error) in
+            guard let data = data,
+                let json = ((try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]) as [String : Any]??),
+                let dataJSON = json?["data"] as? [String: Any],
+                let version = dataJSON["version"] as? String else
+            {
+                completionHandler(nil, ZitiError("Unable to retrieve controller version for \(self.zid.id)"))
+                return
+            }
+            completionHandler(version, nil)
+        }.resume()
+        session.finishTasksAndInvalidate()
     }
     
     func authenticate(completionHandler: @escaping (ZitiError?) -> Void) {

@@ -165,14 +165,14 @@ class JwtPubKeyScraper : NSObject, URLSessionDelegate {
             self?.jwtPubKeyCond.signal()
             self?.jwtPubKeyCond.unlock()
             
-            // Temp workaround until implement fetching certs per RFC7030
+            //Temp workaround until implement fetching certs per RFC7030
             guard let zid = self?.zid else { return }
             if zid.rootCa == nil {
                 var newRootCa:String = ""
                 let zkc = ZitiKeychain()
                 for i in 0..<SecTrustGetCertificateCount(secTrust) {
                     if let cert = SecTrustGetCertificateAtIndex(secTrust, i) {
-                        let summary = SecCertificateCopySubjectSummary(cert)
+                        //let summary = SecCertificateCopySubjectSummary(cert)
                         //print("Cert summary: \(summary ?? "No summary available" as CFString)")
                         
                         if let certData = SecCertificateCopyData(cert) as Data? {
