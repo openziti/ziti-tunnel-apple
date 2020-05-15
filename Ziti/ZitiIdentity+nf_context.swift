@@ -62,7 +62,7 @@ extension ZitiIdentity {
         // save off nf_context
         Thread.main.threadDictionary[mySelf.nf_context_key] = nf_context
         
-        NF_set_timeout(nf_context, 5000) //PIG
+        NF_set_timeout(nf_context, 15000) //upped to 15 after seeing Nic's timeouts
         
         // Some useful troubleshooting info.
         NF_dump(nf_context)

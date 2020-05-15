@@ -7,7 +7,7 @@ import Foundation
 class ZitiKeychain : NSObject {
     // kSecAttrAccessGroup not needed if sharing only a single keychain group?
     static let ZITI_KEYCHAIN_GROUP = "TEAMID.ZitiKeychain"
-    let keySize = 2048
+    let keySize = 3072 //2048
     
     #if os(macOS)
     private func getSecAccessRef() -> SecAccess? {
@@ -99,7 +99,6 @@ class ZitiKeychain : NSObject {
             NSLog("getKeyPEM: Unable to get external rep for key: \(cfErr!.takeRetainedValue() as Error)")
             return ""
         }
-        
         return convertToPEM("RSA PRIVATE KEY", der: derKey as Data) // RSA PRIVATE KEY?
     }
     

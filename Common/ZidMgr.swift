@@ -69,7 +69,7 @@ class ZidMgr : NSObject {
         case "ES384": secKeyAlg = .ecdsaSignatureMessageX962SHA384
         case "ES512": secKeyAlg = .ecdsaSignatureMessageX962SHA512
         default:
-            throw ZitiError("JWT unsupported signing algorythm \(jwtAlg)")
+            throw ZitiError("JWT unsupported signing algorithm \(jwtAlg)")
         }
         
         // get dataToSign and decoded signature

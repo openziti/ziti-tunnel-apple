@@ -137,6 +137,18 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         if let svc = servicesViewController {
             svc.zid = zId
         }
+        
+        // if first time run, present dialog that App Store reviewer required
+        if !UserDefaults.standard.bool(forKey: "launchedBefore") {
+            UserDefaults.standard.set(true, forKey: "launchedBefore")
+            DispatchQueue.main.async {
+                let alert = NSAlert()
+                alert.messageText = "For Your Information"
+                alert.informativeText = "There is no user data collected by this app and shared with NetFoundry."
+                alert.alertStyle = NSAlert.Style.informational
+                alert.runModal()
+            }
+        }
     }
    
     override func viewDidLoad() {
