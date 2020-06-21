@@ -1,16 +1,20 @@
 PODS:
-  - JWTDecode (2.1.1)
+  - CZiti-iOS (0.13.17)
+  - CZiti-macOS (0.13.17)
 
 DEPENDENCIES:
-  - JWTDecode (~> 2.1)
+  - CZiti-iOS (~> 0.1)
+  - CZiti-macOS (~> 0.1)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
-    - JWTDecode
+  trunk:
+    - CZiti-iOS
+    - CZiti-macOS
 
 SPEC CHECKSUMS:
-  JWTDecode: 83e8b381aafe27158d9f692cbdca2b12d61d460c
+  CZiti-iOS: 8f50507f8cca7950d41feb567d50624ceb34a315
+  CZiti-macOS: 0556687b6492c54c6c0c445c86f018dd03d02bf0
 
-PODFILE CHECKSUM: 02a63d60d25e85329c06c40a2687d7d83211d7b0
+PODFILE CHECKSUM: 6c5ec4261decceb07036a0e2ffd9bdc6077ee879
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.9.1

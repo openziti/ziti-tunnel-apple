@@ -1,12 +1,23 @@
-
-target 'ZitiMobilePacketTunnel' do
-  platform :ios, '11.3'
+abstract_target 'ios_targets' do
+  platform :ios, '13.4.3'
   use_frameworks!
-  pod 'JWTDecode', '~> 2.1'
+  pod 'CZiti-iOS', '~> 0.1'
+
+  target 'ZitiMobilePacketTunnel' do
+  end
+
+  target 'MobilePacketTunnelProvider' do
+  end
 end
 
-target 'ZitiPacketTunnel' do
-  platform :osx, '10.14'
+abstract_target 'macos_targets' do
+  platform :osx, '10.15'
   use_frameworks!
-  pod 'JWTDecode', '~> 2.1'
+  pod 'CZiti-macOS', '~> 0.1'
+
+  target 'ZitiPacketTunnel' do
+  end
+
+  target 'PacketTunnelProvider' do
+  end
 end

@@ -29,7 +29,7 @@ class ServicesViewController: NSViewController {
     }
     
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
-        guard tableView.selectedRow >= 0, let svc = zid?.services?[tableView.selectedRow] else { return }
+        guard tableView.selectedRow >= 0, let svc = zid?.services[tableView.selectedRow] else { return }
         
         print("\nTODO: modal view, button to clear net session and restart")
         print("name: \(svc.name ?? "")")
@@ -37,15 +37,6 @@ class ServicesViewController: NSViewController {
         print("hostname: \(svc.dns?.hostname ?? "")")
         print("current ip: \(svc.dns?.interceptIp ?? "")")
         print("port: \(svc.dns?.port ?? 0)")
-        
-        if let gws = svc.networkSession?.gateways {
-            gws.forEach { gw in
-                print("gateway: \(gw.name ?? ""): \(gw.hostname ?? "")")
-                gw.urls?.forEach { url in
-                    print("   \(url.key): \(url.value)")
-                }
-            }
-        }
     }
     
     override var representedObject: Any? {
@@ -61,7 +52,7 @@ class ServicesViewController: NSViewController {
 
 extension ServicesViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return zid?.services?.count ?? 0
+        return zid?.services.count ?? 0
     }
 }
 
@@ -74,7 +65,7 @@ extension ServicesViewController: NSTableViewDelegate {
     }
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard let svc = zid?.services?[row] else {
+        guard let svc = zid?.services[row] else {
             return nil
         }
         

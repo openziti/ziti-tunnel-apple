@@ -109,8 +109,8 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     return
                 }
                 zid.enabled = true
+                zid.enrolled = true
                 _ = self.tvc?.zidMgr.zidStore.store(zid)
-                _ = self.tvc?.zidMgr.zidStore.storeCId(zid)
                 self.tableView.reloadData()
                 self.tvc?.tableView.reloadData()
             }
@@ -166,7 +166,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = zid?.name
             } else if indexPath.row == 1 {
                 cell?.textLabel?.text = "Network"
-                cell?.detailTextLabel?.text = zid?.getBaseUrl()
+                cell?.detailTextLabel?.text = zid?.czId?.ztAPI
             } else if indexPath.row == 2 {
                 cell?.textLabel?.text = "Version"
                 cell?.detailTextLabel?.text = zid?.controllerVersion ?? "unknown"

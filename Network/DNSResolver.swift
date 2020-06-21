@@ -8,18 +8,17 @@ import NetworkExtension
 class DNSResolver : NSObject {
     static let dnsPort:UInt16 = 53
     let tunnelProvider:PacketTunnelProvider
+    
+    var hostnamesLock = NSLock()
     var hostnames:[(name:String, ip:String, realIp:String?)] = []
     
     init(_ tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
     }
     
+    // must be locked
     func findRecordsByName(_ name:String) -> [(name:String, ip:String, realIp:String?)] {
         return hostnames.filter{ return $0.name.caseInsensitiveCompare(name) == .orderedSame }
-    }
-    
-    func findRecordsByIp(_ ip:String) -> [(name:String, ip:String, realIp:String?)] {
-        return hostnames.filter{ return $0.ip == ip }
     }
     
     func getIpRange(_ ip:Data, mask:Data) -> (first:Data, broadcast:Data) {
@@ -61,6 +60,7 @@ class DNSResolver : NSObject {
         #endif
     }
     
+    // must be locked
     func addHostname(_ name:String) -> String? {
         let ip = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.ipAddress)
         let mask = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.subnetMask)
@@ -132,7 +132,9 @@ class DNSResolver : NSObject {
             // - if no match, reject
             //
             if q.recordType == DNSRecordType.A || q.recordType == DNSRecordType.AAAA {
+                hostnamesLock.lock()
                 let matches = findRecordsByName(q.name.nameString)
+                hostnamesLock.unlock()
                 
                 if (matches.count > 0) {
                     if (q.recordType == DNSRecordType.A) {
