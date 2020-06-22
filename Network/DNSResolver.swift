@@ -156,7 +156,20 @@ class DNSResolver : NSObject {
                 } else if inMatchDomains {
                     responseCode = DNSResponseCode.nameError
                 } else {
-                    responseCode = DNSResponseCode.refused
+                    // Sending `refused` no longer works since Catalina updata.  Attempt to resolve, see if I get into infinate loop
+                    //responseCode = DNSResponseCode.refused
+                    
+                    responseCode = DNSResponseCode.nameError
+                    if let ip = resolveHostname(q.name.nameString) {
+                        let data = IPUtils.ipV4AddressStringToData(ip)
+                        let ans = DNSResourceRecord(q.name.nameString,
+                                                    recordType:DNSRecordType.A,
+                                                    recordClass:DNSRecordClass.IN,
+                                                    ttl:0,
+                                                    resourceData: data)
+                        answers.append(ans)
+                        //NSLog("System DNS: \(q.name.nameString) -> \(ip)")
+                    }
                 }
             }
         }

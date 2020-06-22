@@ -26,7 +26,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     var dnsResolver:DNSResolver?
     var interceptedRoutes:[NEIPv4Route] = []
     var zids:[ZitiIdentity] = []    
-    var ptpRunloop:RunLoop!
     var netifDriver:NetifDriver!
     var tnlr_ctx:tunneler_context?
     var loop:UnsafeMutablePointer<uv_loop_t>!
@@ -67,13 +66,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     func writePacket(_ data:Data) {
-        if ptpRunloop == RunLoop.current {
-            packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber])
-        } else {
-            ptpRunloop.perform {
-                self.packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber])
-            }
-        }
+        // TODO: add locking back in?
+        packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber])
     }
     
     override var debugDescription: String {
@@ -159,6 +153,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     
                     ziti.registerServiceCallback { [weak self] ztx, zs, status in
                         print("*** loadIdentities:registerServiceCallback \(Thread.current)")
+                        
                         guard var zs = zs?.pointee, let self = self else { return }
                         NSLog("...gotcha service update: \(String(cString: zs.name))")
                         
@@ -173,7 +168,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                 if let svc = serviceWas {
                                     // Update all fields except interceptIP
                                     svc.name = serviceName
-                                    svc.dns?.hostname = cfg.hostname
+                                    svc.dns?.hostname = cfg.hostname //TODO: if this changed need to update DNS
                                     svc.dns?.port = cfg.port
                                     
                                     // remove intercept
@@ -273,9 +268,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         //setenv("MBEDTLS_DEBUG", "4", 1)
         
         NSLog("startTunnel: options=\(options?.debugDescription ?? "nil")")
-        
-        ptpRunloop = RunLoop.current
-        
+                
         //loop = uv_default_loop()
         loop = UnsafeMutablePointer<uv_loop_t>.allocate(capacity: 1)
         loop.initialize(to: uv_loop_t())
@@ -303,8 +296,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
-        //dnsSettings.matchDomains = [""] //self.providerConfig.dnsMatchDomains
-        
+        dnsSettings.matchDomains = [""] //self.providerConfig.dnsMatchDomains
+ 
+        #if false
         // Fugly workaround, but it'll pretty much work...
         // First, make sure we don't become primary resolver (specified by having name = "")
         if self.dnsResolver?.hostnames.count ?? 0 == 0 || self.dnsResolver?.hostnames.first?.name ?? "" == "" {
@@ -320,6 +314,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
         
         dnsSettings.matchDomains = matchDomains
+        #endif
         //print("----- matches: \(dnsSettings.matchDomains ?? [""])")
         tunnelNetworkSettings.dnsSettings = dnsSettings
         
