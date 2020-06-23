@@ -29,6 +29,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     var netifDriver:NetifDriver!
     var tnlr_ctx:tunneler_context?
     var loop:UnsafeMutablePointer<uv_loop_t>!
+    var writeLock = NSLock()
     
     override init() {
         super.init()
@@ -66,8 +67,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     func writePacket(_ data:Data) {
-        // TODO: add locking back in?
+        writeLock.lock()
         packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber])
+        writeLock.unlock()
     }
     
     override var debugDescription: String {
@@ -298,23 +300,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
         dnsSettings.matchDomains = [""] //self.providerConfig.dnsMatchDomains
  
-        #if false
-        // Fugly workaround, but it'll pretty much work...
-        // First, make sure we don't become primary resolver (specified by having name = "")
-        if self.dnsResolver?.hostnames.count ?? 0 == 0 || self.dnsResolver?.hostnames.first?.name ?? "" == "" {
-            self.dnsResolver?.hostnames.append(("ziti-test.netfoundry.io", "104.199.116.47", "104.199.116.47"))
-        }
-        // now add in all the hostnames we want to intercept as 'matchDomains'. We'll get some extras, but for most use
-        // cases should be just fine
-        var matchDomains:[String] = []
-        if let hns = self.dnsResolver?.hostnames {
-            for hn in hns {
-                matchDomains.append(hn.name)
-            }
-        }
-        
-        dnsSettings.matchDomains = matchDomains
-        #endif
         //print("----- matches: \(dnsSettings.matchDomains ?? [""])")
         tunnelNetworkSettings.dnsSettings = dnsSettings
         
