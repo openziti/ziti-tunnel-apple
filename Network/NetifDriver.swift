@@ -52,7 +52,6 @@ class NetifDriver : NSObject {
     }
     
     static let setup_cb:setup_packet_cb = { handle, loop, cb, netif in
-        print("*** NetifDriver:setup_cb \(Thread.current)")
         guard let mySelf = NetifDriver.unretained(UnsafeMutableRawPointer(handle)) else {
             NSLog("NetifDriver setup_cb WTF invalid handle")
             return -1
@@ -69,7 +68,6 @@ class NetifDriver : NSObject {
     }
     
     static let async_cb:uv_async_cb = { ctx in
-        print("*** NetifDriver:async_cb \(Thread.current)")
         guard let mySelf = NetifDriver.unretained(ctx?.pointee.data) else {
             NSLog("NetifDriver async_cb WTF invalid ctx")
             return
