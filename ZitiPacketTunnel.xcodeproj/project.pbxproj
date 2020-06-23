@@ -52,6 +52,10 @@
 		5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */; };
 		5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AD0221F937D00051475 /* ServicesViewController.swift */; };
+		5A476FF524A17BC000B27A47 /* libziti_tunneler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A476FF424A17BB300B27A47 /* libziti_tunneler.a */; };
+		5A476FF624A17BC000B27A47 /* libziti_tunneler_cbs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A476FF224A17BB200B27A47 /* libziti_tunneler_cbs.a */; };
+		5A476FF724A17BC000B27A47 /* liblwipcore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A476FF324A17BB200B27A47 /* liblwipcore.a */; };
+		5A476FF824A17BC000B27A47 /* liblwipunixarch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A476FF124A17BB200B27A47 /* liblwipunixarch.a */; };
 		5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A67F8F3209F952E00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
 		5A6BA25D226DE5FB00224F09 /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6BA25C226DE5FB00224F09 /* AboutViewController.swift */; };
@@ -75,12 +79,6 @@
 		5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
 		5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
-		5ABA5ED022727B6400B2221D /* libziti.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC622727AEE00B2221D /* libziti.a */; };
-		5ABA5ED122727B6400B2221D /* libuv_mbed.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC522727AEE00B2221D /* libuv_mbed.a */; };
-		5ABA5ED222727B6400B2221D /* libuv_a.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC422727AEE00B2221D /* libuv_a.a */; };
-		5ABA5ED322727B6400B2221D /* libmbedcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC722727AEE00B2221D /* libmbedcrypto.a */; };
-		5ABA5ED422727B6400B2221D /* libmbedx509.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC922727AEE00B2221D /* libmbedx509.a */; };
-		5ABA5ED522727B6400B2221D /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ABA5EC822727AEE00B2221D /* libmbedtls.a */; };
 		5ABA5EDA2274D2EB00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5ABA5EDB2274D2EB00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
@@ -213,6 +211,10 @@
 		5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelConfigViewController.swift; sourceTree = "<group>"; };
 		5A379ACB221EDB1400051475 /* ZitiIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentity.swift; sourceTree = "<group>"; };
 		5A379AD0221F937D00051475 /* ServicesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServicesViewController.swift; sourceTree = "<group>"; };
+		5A476FF124A17BB200B27A47 /* liblwipunixarch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblwipunixarch.a; path = "deps/ziti-tunneler-sdk-c/build-iphoneos-arm64/lib/liblwipunixarch.a"; sourceTree = "<group>"; };
+		5A476FF224A17BB200B27A47 /* libziti_tunneler_cbs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler_cbs.a; path = "deps/ziti-tunneler-sdk-c/build-iphoneos-arm64/lib/libziti_tunneler_cbs.a"; sourceTree = "<group>"; };
+		5A476FF324A17BB200B27A47 /* liblwipcore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblwipcore.a; path = "deps/ziti-tunneler-sdk-c/build-iphoneos-arm64/lib/liblwipcore.a"; sourceTree = "<group>"; };
+		5A476FF424A17BB300B27A47 /* libziti_tunneler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler.a; path = "deps/ziti-tunneler-sdk-c/build-iphoneos-arm64/lib/libziti_tunneler.a"; sourceTree = "<group>"; };
 		5A67F8F0209F948F00DEFE87 /* IPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPPacket.swift; sourceTree = "<group>"; };
 		5A6BA25C226DE5FB00224F09 /* AboutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		5A6BA25F226DF2C500224F09 /* Notices.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Notices.rtf; sourceTree = "<group>"; };
@@ -297,14 +299,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5ABA5ED122727B6400B2221D /* libuv_mbed.a in Frameworks */,
-				5ABA5ED222727B6400B2221D /* libuv_a.a in Frameworks */,
-				5ABA5ED522727B6400B2221D /* libmbedtls.a in Frameworks */,
-				5ABA5ED422727B6400B2221D /* libmbedx509.a in Frameworks */,
-				5ABA5ED322727B6400B2221D /* libmbedcrypto.a in Frameworks */,
-				5ABA5ED022727B6400B2221D /* libziti.a in Frameworks */,
 				5A2EA2ED209B756400437608 /* NetworkExtension.framework in Frameworks */,
+				5A476FF824A17BC000B27A47 /* liblwipunixarch.a in Frameworks */,
+				5A476FF524A17BC000B27A47 /* libziti_tunneler.a in Frameworks */,
 				17D8A0F17887892FEC22834E /* Pods_ios_targets_MobilePacketTunnelProvider.framework in Frameworks */,
+				5A476FF724A17BC000B27A47 /* liblwipcore.a in Frameworks */,
+				5A476FF624A17BC000B27A47 /* libziti_tunneler_cbs.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,9 +369,13 @@
 			isa = PBXGroup;
 			children = (
 				5AF0C41F24951A9F00CD4DAE /* liblwipcore.a */,
+				5A476FF324A17BB200B27A47 /* liblwipcore.a */,
 				5AF0C41E24951A9F00CD4DAE /* liblwipunixarch.a */,
 				5AF0C41D24951A9F00CD4DAE /* libziti_tunneler_cbs.a */,
 				5AF0C41C24951A9F00CD4DAE /* libziti_tunneler.a */,
+				5A476FF124A17BB200B27A47 /* liblwipunixarch.a */,
+				5A476FF224A17BB200B27A47 /* libziti_tunneler_cbs.a */,
+				5A476FF424A17BB300B27A47 /* libziti_tunneler.a */,
 				5ABA5EC722727AEE00B2221D /* libmbedcrypto.a */,
 				5ABA5EC822727AEE00B2221D /* libmbedtls.a */,
 				5ABA5EC922727AEE00B2221D /* libmbedx509.a */,
@@ -1243,7 +1247,7 @@
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
@@ -1269,7 +1273,7 @@
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
@@ -1294,11 +1298,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
-				HEADER_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/include",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/deps/ziti-sdk-c/deps/uv-mbed/deps/libuv/include",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/deps/ziti-sdk-c/includes",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/deps/ziti-sdk-c/deps/uv-mbed/include/",
+				);
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build-iOS-arm64/**";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/lib/**",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/lib",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-iphoneos-arm64/lib",
+				);
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1324,11 +1338,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
-				HEADER_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/include",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/deps/ziti-sdk-c/deps/uv-mbed/deps/libuv/include",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/deps/ziti-sdk-c/includes",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/deps/ziti-sdk-c/deps/uv-mbed/include/",
+				);
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				LIBRARY_SEARCH_PATHS = "../ziti-sdk-c/build-iOS-arm64/**";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/lib/**",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/lib",
+					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-iphoneos-arm64/lib",
+				);
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";

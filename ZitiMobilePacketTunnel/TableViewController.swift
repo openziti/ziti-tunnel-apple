@@ -6,6 +6,7 @@ import UIKit
 import NetworkExtension
 import SafariServices
 import MessageUI
+import CZiti
 
 class StatusCell: UITableViewCell {
     @IBOutlet weak var connectStatus: UILabel!
@@ -66,7 +67,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     static let providerBundleIdentifier = "io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
     var tunnelMgr = TunnelMgr.shared
     var zidMgr = ZidMgr()
-    var servicePoller = ServicePoller()
     weak var ivc:IdentityViewController?
 
     override func viewDidLoad() {
@@ -93,21 +93,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             NSLog(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
         tableView.reloadData()
-        
-        servicePoller.zidMgr = zidMgr
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.servicePoller.startPolling { didChange, zid in
-                DispatchQueue.main.async {
-                    self.ivc?.tableView.reloadData()
-                    if didChange {
-                        _ = self.zidMgr.zidStore.store(zid)
-                        if zid.isEnabled {
-                            self.tunnelMgr.restartTunnel()
-                        }
-                    }
-                }
-            }
-        }
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
@@ -128,7 +113,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 NSLog("\(zid.name):\(zid.id) NEW")
                 self.zidMgr.zids.append(zid)
             }
-            self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+            self.tableView.reloadData()
+            self.ivc?.tableView.reloadData()
         }
     }
     
@@ -138,7 +124,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 // shouldn't happend unless somebody deletes the file.
                 NSLog("\(idString) REMOVED")
                 _ = self.zidMgr.loadZids()
-                self.representedObject = Int(0)
+                self.tableView.reloadData()
+                self.ivc?.tableView.reloadData()
                 self.tunnelMgr.restartTunnel()
            // }
         }
