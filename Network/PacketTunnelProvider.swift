@@ -40,8 +40,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     func readPacketFlow() {
         packetFlow.readPacketObjects { (packets:[NEPacket]) in
             for packet in packets {
-                //self.packetRouter?.route(packet.data)
-            
                 if packet.data.count > 0 {
                     var isDNS = false
                     let version = packet.data[0] >> 4
@@ -56,7 +54,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                             dnsResolver.resolve(udp)
                         }
                     }
-                    
                     if !isDNS {
                         self.netifDriver.queuePacket(packet.data)
                     }
@@ -170,7 +167,21 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                 if let svc = serviceWas {
                                     // Update all fields except interceptIP
                                     svc.name = serviceName
-                                    svc.dns?.hostname = cfg.hostname //TODO: if this changed need to update DNS
+                                    
+                                    // if dns changed we need to update DNS hostnames
+                                    if svc.dns?.hostname != cfg.hostname {
+                                        if self.countInterceptRefs(zids!, svc.dns?.interceptIp ?? "") == 1 {
+                                            if let interceptIp = svc.dns?.interceptIp, let dnsResolver = self.dnsResolver {
+                                                let hn = svc.dns?.hostname ?? ""
+                                                NSLog("Removing DNS entry for service \(serviceName), \(hn) != \(interceptIp)")
+                                                dnsResolver.hostnamesLock.lock()
+                                                dnsResolver.hostnames = dnsResolver.hostnames.filter { $0.ip != interceptIp }
+                                                dnsResolver.hostnamesLock.unlock()
+                                            }
+                                        }
+                                        svc.dns?.hostname = cfg.hostname
+                                        self.updateHostsAndIntercepts(zid, svc)
+                                    }
                                     svc.dns?.port = cfg.port
                                     
                                     // remove intercept
@@ -204,7 +215,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         } else if status == ZITI_SERVICE_UNAVAILABLE {
                             NSLog("Service Unvailable \(zid.name)::\(serviceName)")
                             
-                            let refCount = self.countInterceptRefs(zids!, serviceId)
+                            let refCount = self.countInterceptRefs(zids!, serviceWas?.dns?.interceptIp ?? "")
                             if refCount == 1 {
                                 // remove from hostnames (locked) TODO: move DNS stuff into DnsResolver
                                 if let interceptIp = serviceWas?.dns?.interceptIp, let dnsResolver = self.dnsResolver {
