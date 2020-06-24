@@ -6,7 +6,6 @@ import UIKit
 import NetworkExtension
 import SafariServices
 import MessageUI
-import CZiti
 
 class StatusCell: UITableViewCell {
     @IBOutlet weak var connectStatus: UILabel!
