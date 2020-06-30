@@ -61,8 +61,8 @@ class NetifDriver : NSObject {
         uv_async_init(loop, &(mySelf.asyncHandle!), NetifDriver.async_cb)
         mySelf.asyncHandle?.data = mySelf.toVoidPtr()
         
-        mySelf.packetCallback = cb // Prob need to be called on the given loop...
-        mySelf.netif = netif // ?
+        mySelf.packetCallback = cb
+        mySelf.netif = netif
         
         return Int32(0)
     }

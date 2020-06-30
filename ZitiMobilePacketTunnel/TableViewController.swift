@@ -61,7 +61,7 @@ class StatusCell: UITableViewCell {
     }
 }
 
-class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate, ZitiIdentityStoreDelegate {
+class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate, ScannerDelegate, ZitiIdentityStoreDelegate {
     
     static let providerBundleIdentifier = "io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
     var tunnelMgr = TunnelMgr.shared
@@ -238,13 +238,82 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         }
     }
     
+    func addViaJWTFile() {
+        let dp = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .import)
+        dp.modalPresentationStyle = .formSheet
+        dp.allowsMultipleSelection = false
+        dp.delegate = self
+        self.present(dp, animated: true, completion: nil)
+    }
+    
+    func addViaQRCode() {
+        let sc = ScannerViewController()
+        sc.delegate = self
+        self.present(sc, animated: true, completion: nil)
+    }
+    
+    func found(code: String) {
+        let secs = Int(NSDate().timeIntervalSince1970)
+        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("QRScan\(secs).jwt")
+        guard let data = code.data(using: .utf8) else {
+            let alert = UIAlertController(
+                title:"Scan Error",
+                message: "Unable to decode scanned data",
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("Ok", comment: "Ok"),
+                style: .default,
+                handler: nil))
+            DispatchQueue.main.async {
+                self.present(alert, animated: true, completion: nil)
+            }
+            return
+        }
+        
+        do {
+            try data.write(to: tempURL, options: .atomic)
+            self.onNewUrl(tempURL)
+        } catch {
+            let alert = UIAlertController(
+                title:"Scan Error",
+                message: "Unable to store scanned data: \(error.localizedDescription)",
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("Ok", comment: "Ok"),
+                style: .default,
+                handler: nil))
+            DispatchQueue.main.async {
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
-            let dp = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .import)
-            dp.modalPresentationStyle = .formSheet
-            dp.allowsMultipleSelection = false
-            dp.delegate = self
-            self.present(dp, animated: true, completion: nil)
+            let alert = UIAlertController(
+                title:"Select Enrollment Method",
+                message: "Which enrollment method would you like to use?",
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("JWT File", comment: "JWT"),
+                style: .default,
+                handler: { _ in
+                    self.addViaJWTFile()
+            }))
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("QR Code", comment: "QR"),
+                style: .default,
+                handler: { _ in
+                    self.addViaQRCode()
+            }))
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("Cancel", comment: "Cancel"),
+                style: .default,
+                handler: { _ in
+            }))
+            DispatchQueue.main.async {
+                self.present(alert, animated: true, completion: nil)
+            }
         } else if indexPath.section == 2 && indexPath.row == 0 {
             // quick 'n dirty support email composer.  TODO: Look into Instabug
             if MFMailComposeViewController.canSendMail() {
