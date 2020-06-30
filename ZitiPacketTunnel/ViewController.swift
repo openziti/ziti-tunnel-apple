@@ -368,6 +368,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                     zid.enrolled = true
                     _ = self.zidMgr.zidStore.store(zid)
                     self.updateServiceUI(zId:zid)
+                    self.tunnelMgr.restartTunnel()
                 }
             }
         }

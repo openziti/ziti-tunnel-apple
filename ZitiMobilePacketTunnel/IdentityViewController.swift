@@ -90,9 +90,20 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         let jwtFile = url.path
         
         // Ziti.enroll takes too long, needs to be done in background
+        let spinner = SpinnerViewController()
+        addChild(spinner)
+        spinner.view.frame = view.frame
+        view.addSubview(spinner.view)
+        spinner.didMove(toParent: self)
+        
         DispatchQueue.global().async {
             Ziti.enroll(jwtFile) { zidResp, zErr in
                 DispatchQueue.main.async {
+                    // lose the spinner
+                    spinner.willMove(toParent: nil)
+                    spinner.view.removeFromSuperview()
+                    spinner.removeFromParent()
+                    
                     guard zErr == nil, let zidResp = zidResp else {
                         _ = self.tvc?.zidMgr.zidStore.store(zid)
                         self.tableView.reloadData()
@@ -123,6 +134,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     _ = self.tvc?.zidMgr.zidStore.store(zid)
                     self.tableView.reloadData()
                     self.tvc?.tableView.reloadData()
+                    self.tvc?.tunnelMgr.restartTunnel()
                 }
             }
         }

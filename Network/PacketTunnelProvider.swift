@@ -136,25 +136,27 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 
                 let nameWas = czid.name
                 
-                NSLog("------ name:\(String(describing: czid.name)) id:\(czid.id) ztAPI:\(czid.ztAPI)")
-                ziti.runAsync { zErr in
-                    print("*** loadIdentities:runAsync \(Thread.current)")
+                ziti.run { zErr in
                     guard zErr == nil else {
                         NSLog("Unable to init \(zid.name):\(zid.id), err: \(zErr!.localizedDescription)")
                         zid.enabled = false
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                         return
                     }
-                    NSLog("-- initCB name:\(String(describing: czid.name)) id:\(czid.id) ztAPI:\(czid.ztAPI)")
                     if czid.name != nameWas {
                         _ = zidStore.store(zid)
                     }
                     
+                    let (cvers, _, _) = ziti.getControllerVersion()
+                    let cVersion = "\(cvers)"
+                    if zid.controllerVersion != cVersion {
+                        zid.controllerVersion = cVersion
+                        _ = zidStore.store(zid)
+                    }
+                    
                     ziti.registerServiceCallback { [weak self] ztx, zs, status in
-                        print("*** loadIdentities:registerServiceCallback \(Thread.current)")
                         
                         guard var zs = zs?.pointee, let self = self else { return }
-                        NSLog("...gotcha service update: \(String(cString: zs.name))")
                         
                         let serviceName = String(cString: zs.name)
                         let serviceId = String(cString: zs.id)
@@ -251,7 +253,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     static let dummy:uv_async_cb = { h in }
     @objc func runZiti() {
-        print("*** PacketTunnelProvider:runZiti \(Thread.current)")
         // put something on the loop to hold it open for now. TODO:should be able to remove once NetifDriver is running
         var h = uv_async_t()
         uv_async_init(loop, &h, PacketTunnelProvider.dummy)

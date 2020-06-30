@@ -59,7 +59,7 @@ class ZitiIdentity : NSObject, Codable {
     var id:String { return czid?.id ?? "--invalid_id--" }
     
     // returned from /version, retrieved when validating JWT, polled periodically
-    var controllerVersion:String? // TODO
+    var controllerVersion:String?
 
     var expDate:Date { return Date(timeIntervalSince1970: TimeInterval(claims?.exp ?? 0)) }
     

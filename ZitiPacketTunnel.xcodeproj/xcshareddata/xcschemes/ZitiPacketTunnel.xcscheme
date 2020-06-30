@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "PLIST=&quot;${PROJECT_DIR}/${INFOPLIST_FILE}&quot;&#10;PLB=/usr/libexec/PlistBuddy&#10;LAST_NUMBER=$($PLB -c &quot;Print CFBundleVersion&quot; &quot;$PLIST&quot;)&#10;NEW_VERSION=$(($LAST_NUMBER + 1))&#10;$PLB -c &quot;Set :CFBundleVersion $NEW_VERSION&quot; &quot;$PLIST&quot;&#10;$PLB -c &quot;Set :CFBundleVersion $NEW_VERSION&quot; &quot;${PROJECT_DIR}/PacketTunnelProvider/Info.plist&quot;&#10;">
+               scriptText = "&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
@@ -45,8 +45,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <Testables>
-      </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
@@ -56,8 +54,8 @@
             ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <Testables>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -79,8 +77,6 @@
             ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -110,7 +106,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "PLIST=&quot;${PROJECT_DIR}/${INFOPLIST_FILE}&quot;&#10;PLB=/usr/libexec/PlistBuddy&#10;LAST_NUMBER=$($PLB -c &quot;Print CFBundleVersion&quot; &quot;$PLIST&quot;)&#10;NEW_VERSION=$(($LAST_NUMBER - 1))&#10;$PLB -c &quot;Set :CFBundleVersion $NEW_VERSION&quot; &quot;$PLIST&quot;&#10;$PLB -c &quot;Set :CFBundleVersion $NEW_VERSION&quot; &quot;${PROJECT_DIR}/PacketTunnelProvider/Info.plist&quot;&#10;">
+               scriptText = "&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
@@ -128,7 +124,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "PLIST=&quot;${PROJECT_DIR}/${INFOPLIST_FILE}&quot;&#10;PLB=/usr/libexec/PlistBuddy&#10;SHORT_VERSION=$($PLB -c &quot;Print CFBundleShortVersionString&quot; &quot;$PLIST&quot;)&#10;BUILD_NUMBER=$($PLB -c &quot;Print CFBundleVersion&quot; &quot;$PLIST&quot;)&#10;&#10;# Tag version.&#10;cd ${PROJECT_DIR}&#10;git tag macOS-Archive-v$SHORT_VERSION-build$BUILD_NUMBER&#10;">
+               scriptText = "&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"

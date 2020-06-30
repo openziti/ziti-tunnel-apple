@@ -76,7 +76,9 @@ class DNSResolver : NSObject {
             // add it and get outta here
             if inUse == false {
                 let realIpStr = resolveHostname(name)
-                NSLog("Real IP for \(name) = \(realIpStr ?? "nil")")
+                if let rips = realIpStr {
+                    NSLog("Real IP for \(name) = \(rips)")
+                }
                 hostnames.append((name:name, ip:fakeIpStr, realIp:realIpStr))
                 return fakeIpStr
             }
