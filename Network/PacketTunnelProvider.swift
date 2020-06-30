@@ -118,7 +118,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         return count
     }
     
-    //private var tmpZitis:[Ziti] = []
     private func loadIdentites(_ loop:UnsafeMutablePointer<uv_loop_t>) -> ZitiError? {
         let zidStore = ZitiIdentityStore()
         let (zids, zErr) = zidStore.loadAll()
@@ -131,9 +130,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 zid.services = []
                 
                 let ziti = Ziti(zid: czid, loop: loop)
-                
-                //tmpZitis.append(ziti)
-                
                 let nameWas = czid.name
                 
                 ziti.run { zErr in
@@ -143,6 +139,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                         return
                     }
+                                        
                     if czid.name != nameWas {
                         _ = zidStore.store(zid)
                     }
@@ -154,9 +151,21 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         _ = zidStore.store(zid)
                     }
                     
+                    // forces reference to ziti to be kept by ziti.  generally not a great idea, but fine
+                    // for us since we want the ziti instance to exist for the entire run (new or deleted
+                    // identities cause tunnel to be restarted). will need to change this to a weak reference
+                    // to `ziti` if we change from restarting on add/delete of identities, and add management
+                    // of `ziti` lifecycle...
                     ziti.registerServiceCallback { [weak self] ztx, zs, status in
                         
                         guard var zs = zs?.pointee, let self = self else { return }
+                        
+                        // C SDK currently grabs all services in single call.  Eventtually it'll be
+                        // paginated, but for now, once C SDK reports on a single service it knows about
+                        // all of 'em.  So ziti_dump() here should have lots of useful info.
+                        // note also another string referene to ziti that should be clean-up when we
+                        // change from restarting the tunnel on new/deleted identities
+                        if zid.services.count == 0 { ziti.dump() }
                         
                         let serviceName = String(cString: zs.name)
                         let serviceId = String(cString: zs.id)

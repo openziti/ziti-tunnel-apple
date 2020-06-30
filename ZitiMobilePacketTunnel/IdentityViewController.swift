@@ -111,7 +111,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                         
                         let alert = UIAlertController(
                             title:"Unable to enroll \(zid.name)",
-                            message: zErr!.localizedDescription,
+                            message: zErr != nil ? zErr!.localizedDescription : "",
                             preferredStyle: .alert)
                         
                         alert.addAction(UIAlertAction(
