@@ -66,7 +66,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     static let providerBundleIdentifier = "io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
     var tunnelMgr = TunnelMgr.shared
     var zidMgr = ZidMgr()
-    var servicePoller = ServicePoller()
     weak var ivc:IdentityViewController?
 
     override func viewDidLoad() {
@@ -93,41 +92,43 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             NSLog(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
         tableView.reloadData()
-        
-        servicePoller.zidMgr = zidMgr
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.servicePoller.startPolling { didChange, zid in
-                DispatchQueue.main.async {
-                    self.ivc?.tableView.reloadData()
-                    if didChange {
-                        _ = self.zidMgr.zidStore.store(zid)
-                        if zid.isEnabled {
-                            self.tunnelMgr.restartTunnel()
-                        }
-                    }
-                }
-            }
-        }
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        if let match = zidMgr.zids.first(where: { $0.id == zid.id }) {
-            NSLog("\(zid.name):\(zid.id) changed")
-            
-            // TUN will disable if unable to start for zid
-            match.edgeStatus = zid.edgeStatus
-            match.enabled = zid.enabled
-            
-            // always take new service from tunneler...
-            match.services = zid.services
-            tableView.reloadData()
-            ivc?.tableView.reloadData()
-        } else {
-            // new one..
+        DispatchQueue.main.async {
+            if let match = self.zidMgr.zids.first(where: { $0.id == zid.id }) {
+                NSLog("\(zid.name):\(zid.id) CHANGED")
+                
+                // TUN will disable if unable to start for zid
+                match.edgeStatus = zid.edgeStatus
+                match.enabled = zid.enabled
+                
+                // always take new service from tunneler...
+                match.services = zid.services
+                match.czid?.name = zid.name
+                match.controllerVersion = zid.controllerVersion
+            } else {
+                // new one.  generally zids are only added by this app (so will be matched above).
+                // But possible somebody could load one manually or some day via MDM or somesuch
+                NSLog("\(zid.name):\(zid.id) NEW")
+                self.zidMgr.zids.append(zid)
+            }
+            self.tableView.reloadData()
+            self.ivc?.tableView.reloadData()
         }
     }
     
     func onRemovedId(_ idString: String) {
+        DispatchQueue.main.async {
+            //if let match = self.zidMgr.zids.first(where: { $0.id == idString }) {
+                // shouldn't happend unless somebody deletes the file.
+                NSLog("\(idString) REMOVED")
+                _ = self.zidMgr.loadZids()
+                self.tableView.reloadData()
+                self.ivc?.tableView.reloadData()
+                self.tunnelMgr.restartTunnel()
+           // }
+        }
     }
     
     // MARK: - Table view data source

@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import CZiti
 
 protocol ZitiIdentityStoreDelegate: class {
     func onNewOrChangedId(_ zid:ZitiIdentity)
@@ -47,7 +48,11 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                         let data = try Data.init(contentsOf: url)
                         let jsonDecoder = JSONDecoder()
                         if let zId = try? jsonDecoder.decode(ZitiIdentity.self, from: data) {
-                            zIds.append(zId)
+                            if zId.czid == nil {
+                                NSLog("ZitiIdentityStore.load failed loading \(url.lastPathComponent).  Unsupported version")
+                            } else {
+                                zIds.append(zId)
+                            }
                         } else {
                             // log it and continue (don't return error and abort)
                             NSLog("ZitiIdentityStore.load failed loading \(url.lastPathComponent)")
@@ -107,24 +112,20 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         return zErr
     }
     
-    func storeCId(_ zId:ZitiIdentity) -> ZitiError? {
+    func storeJWT(_ zId:ZitiIdentity, _ jwtOrig:URL) -> ZitiError? {
         guard let presentedItemURL = self.presentedItemURL else {
-            return ZitiError("ZitiIdentityStore.storeCId: Invalid container URL")
-        }
-        guard let cId = zId.toCId() else {
-            return ZitiError("ZitiIdentityStore.storeCId: Unable to create CId")
+            return ZitiError("ZitiIdentityStore.store: Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
-        let url = presentedItemURL.appendingPathComponent("\(zId.id).cid", isDirectory:false)
+        let url = presentedItemURL.appendingPathComponent("\(zId.id).jwt", isDirectory:false)
         var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: [], error: nil) { url in
             do {
-                let jsonEncoder = JSONEncoder()
-                let data = try jsonEncoder.encode(cId)
+                let data = try Data(contentsOf: jwtOrig)
                 try data.write(to: url, options: .atomic)
             } catch {
-                zErr = ZitiError("ZitiIdentityStore.storeCId Unable to write URL: \(error.localizedDescription)")
+                zErr = ZitiError("ZitiIdentityStore.store Unable store JWT URL: \(error.localizedDescription)")
             }
         }
         return zErr
@@ -140,31 +141,31 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: .forDeleting, error: nil) { url in
             do {
-                let zkc = ZitiKeychain()
-                _ = zkc.deleteCertificate(zid.id)
-                _ = zkc.deleteKeyPair(zid)
+                if let czid = zid.czid {
+                    Ziti(withId: czid).forget()
+                }
                 try FileManager.default.removeItem(at: url)
             } catch {
                 zErr = ZitiError("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")
             }
         }
-        if zErr == nil { _ = removeCId(zid) } // .zid already gone.  Ignore any error removing .cid (e.g., if never started tun)
+        if zErr == nil { _ = removeJWT(zid) }
         return zErr
     }
     
-    func removeCId(_ zid:ZitiIdentity) -> ZitiError? {
+    func removeJWT(_ zid:ZitiIdentity) -> ZitiError? {
         guard let presentedItemURL = self.presentedItemURL else {
             return ZitiError("ZitiIdentityStore.removeCId: Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
-        let url = presentedItemURL.appendingPathComponent("\(zid.id).cid", isDirectory:false)
+        let url = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false)
         var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: .forDeleting, error: nil) { url in
             do {
                 try FileManager.default.removeItem(at: url)
             } catch {
-                zErr = ZitiError("ZitiIdentityStore.removeCid Unable to delete zId: \(error.localizedDescription)")
+                zErr = ZitiError("ZitiIdentityStore.removeJWT Unable to delete JWT: \(error.localizedDescription)")
             }
         }
         return zErr

@@ -4,7 +4,7 @@
 
 import Foundation
 
-class ZitiEdgeService : Codable {
+class ZitiService : Codable {
     class Dns : Codable {
         var hostname:String?
         var interceptIp:String?
@@ -21,12 +21,5 @@ class ZitiEdgeService : Codable {
     var name:String?
     var id:String?
     var dns:Dns?
-    var networkSession:ZitiEdgeNetworkSession?
     var status:Status?
-}
-
-class ZitiEdgeServiceResponse : Codable {
-    class Meta : Codable {}
-    var meta:Meta?
-    var data:[ZitiEdgeService]?
 }

@@ -4,6 +4,7 @@
 
 import UIKit
 import MessageUI
+import CZiti
 
 class IdentityEnabledCell: UITableViewCell {
     weak var ivc:IdentityViewController?
@@ -35,23 +36,6 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Nic saw an issue where controllerVersion shown as unknown.  Prob from a device enrolled
-        // before we tracked controllerVersion.  Garb it in the background for now just to make sure
-        if let zid = self.zid {
-            zid.edge.version { version, zErr in
-                let currVers = zid.controllerVersion
-                if let version = version {
-                   if version != currVers {
-                        zid.controllerVersion = version
-                        _ = self.tvc?.zidMgr.zidStore.store(zid)
-                        DispatchQueue.main.async {
-                            self.tvc?.tableView.reloadData()
-                        }
-                   }
-                }
-            }
-        }
     }
     
     func onEnabledValueChanged(_ enabled:Bool) {
@@ -90,29 +74,68 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     
     func onEnroll() {
         guard let zid = self.zid else { return }
-        zid.edge.enroll() { zErr in
-            DispatchQueue.main.async {
-                guard zErr == nil else {
+        guard let presentedItemURL = self.tvc?.zidMgr.zidStore.presentedItemURL else {
+            let alert = UIAlertController(
+                title:"Unable to enroll \(zid.name)",
+                message: "Unable to access group container",
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("OK", comment: "Default action"),
+                style: .default))
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
+        
+        let url = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false)
+        let jwtFile = url.path
+        
+        // Ziti.enroll takes too long, needs to be done in background
+        let spinner = SpinnerViewController()
+        addChild(spinner)
+        spinner.view.frame = view.frame
+        view.addSubview(spinner.view)
+        spinner.didMove(toParent: self)
+        
+        DispatchQueue.global().async {
+            Ziti.enroll(jwtFile) { zidResp, zErr in
+                DispatchQueue.main.async {
+                    // lose the spinner
+                    spinner.willMove(toParent: nil)
+                    spinner.view.removeFromSuperview()
+                    spinner.removeFromParent()
+                    
+                    guard zErr == nil, let zidResp = zidResp else {
+                        _ = self.tvc?.zidMgr.zidStore.store(zid)
+                        self.tableView.reloadData()
+                        self.tvc?.tableView.reloadData()
+                        
+                        let alert = UIAlertController(
+                            title:"Unable to enroll \(zid.name)",
+                            message: zErr!.localizedDescription,
+                            preferredStyle: .alert)
+                        
+                        alert.addAction(UIAlertAction(
+                            title: NSLocalizedString("OK", comment: "Default action"),
+                            style: .default))
+                        self.present(alert, animated: true, completion: nil)
+                        return
+                    }
+                    
+                    if zid.czid == nil {
+                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPI: zidResp.ztAPI)
+                    }
+                    zid.czid?.ca = zidResp.ca
+                    if zidResp.name != nil {
+                        zid.czid?.name = zidResp.name
+                    }
+                    
+                    zid.enabled = true
+                    zid.enrolled = true
                     _ = self.tvc?.zidMgr.zidStore.store(zid)
                     self.tableView.reloadData()
                     self.tvc?.tableView.reloadData()
-                    
-                    let alert = UIAlertController(
-                        title:"Unable to enroll \(zid.name)",
-                        message: zErr!.localizedDescription,
-                        preferredStyle: .alert)
-                    
-                    alert.addAction(UIAlertAction(
-                        title: NSLocalizedString("OK", comment: "Default action"),
-                        style: .default))
-                    self.present(alert, animated: true, completion: nil)
-                    return
+                    self.tvc?.tunnelMgr.restartTunnel()
                 }
-                zid.enabled = true
-                _ = self.tvc?.zidMgr.zidStore.store(zid)
-                _ = self.tvc?.zidMgr.zidStore.storeCId(zid)
-                self.tableView.reloadData()
-                self.tvc?.tableView.reloadData()
             }
         }
     }
@@ -133,7 +156,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             nRows = 5
         } else if section == 2 {
             if zid?.isEnrolled ?? false {
-                nRows = zid?.services?.count ?? 0
+                nRows = zid?.services.count ?? 0
             } else {
                 nRows = 1
             }
@@ -142,7 +165,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 2 && zid?.services?.count ?? 0 > 0 && zid?.isEnrolled ?? false {
+        if section == 2 && zid?.services.count ?? 0 > 0 && zid?.isEnrolled ?? false {
             return "Services"
         }
         return nil
@@ -166,7 +189,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = zid?.name
             } else if indexPath.row == 1 {
                 cell?.textLabel?.text = "Network"
-                cell?.detailTextLabel?.text = zid?.getBaseUrl()
+                cell?.detailTextLabel?.text = zid?.czid?.ztAPI
             } else if indexPath.row == 2 {
                 cell?.textLabel?.text = "Version"
                 cell?.detailTextLabel?.text = zid?.controllerVersion ?? "unknown"
@@ -190,8 +213,8 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         } else if indexPath.section == 2 {
             if zid?.isEnrolled ?? false {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_SERVICE_CELL", for: indexPath)
-                cell?.textLabel?.text = zid?.services?[indexPath.row].name
-                cell?.detailTextLabel?.text = "\(zid?.services?[indexPath.row].dns?.hostname ?? ""):\(zid?.services?[indexPath.row].dns?.port ?? -1)"
+                cell?.textLabel?.text = zid?.services[indexPath.row].name
+                cell?.detailTextLabel?.text = "\(zid?.services[indexPath.row].dns?.hostname ?? ""):\(zid?.services[indexPath.row].dns?.port ?? -1)"
             } else {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_ENROLL_CELL", for: indexPath)
                 if let ivCell = cell as? EnrollIdentityCell { ivCell.ivc = self }

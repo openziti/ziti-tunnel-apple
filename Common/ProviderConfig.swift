@@ -68,7 +68,7 @@ class ProviderConfig : NSObject {
         }
         if let dns = conf[ProviderConfig.DNS_KEY] {
             let dnsArray = (dns as! String).components(separatedBy: ",")
-            if dnsArray.count == 0 || dnsArray.contains { !isValidIpAddress($0) } {
+            if dnsArray.count == 0 || dnsArray.contains(where: { !isValidIpAddress($0) }) {
                 return ProviderConfigError.invalidDnsAddresses
             }
         } else {

@@ -4,6 +4,7 @@
 
 import Cocoa
 import NetworkExtension
+import CZiti
 
 class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDelegate {
     @IBOutlet weak var connectButton: NSButton!
@@ -26,7 +27,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     var tunnelMgr = TunnelMgr.shared
     var zidMgr = ZidMgr()
     var enrollingIds:[ZitiIdentity] = []
-    var servicePoller = ServicePoller()
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
         connectButton.isEnabled = true
@@ -99,7 +99,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             idEnabledBtn.state = zId.isEnabled ? .on : .off
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
-            idNetworkLabel.stringValue = zId.getBaseUrl()
+            idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
             idControllerStatusLabel.stringValue = csStr
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
             idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.expDate))"
@@ -175,23 +175,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         tableView.reloadData()
         representedObject = 0
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
-        
-        servicePoller.zidMgr = zidMgr
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.servicePoller.startPolling { didChange, zid in
-                DispatchQueue.main.async {
-                    if zid == self.zidMgr.zids[self.representedObject as! Int] {
-                        self.updateServiceUI(zId:zid)
-                    }
-                    if didChange {
-                        _ = self.zidMgr.zidStore.store(zid)
-                        if zid.isEnabled {
-                            self.tunnelMgr.restartTunnel()
-                        }
-                    }
-                }
-            }
-        }
     }
 
     override var representedObject: Any? {
@@ -201,29 +184,37 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     }
     
     func onRemovedId(_ idString: String) {
-        //print("zid \(idString) removed")
+        DispatchQueue.main.async {
+            //if let match = self.zidMgr.zids.first(where: { $0.id == idString }) {
+                // shouldn't happend unless somebody deletes the file.
+                NSLog("\(idString) REMOVED")
+                _ = self.zidMgr.loadZids()
+                self.representedObject = Int(0)
+                self.tunnelMgr.restartTunnel()
+            //}
+        }
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        if let match = zidMgr.zids.first(where: { $0.id == zid.id }) {
-            NSLog("\(zid.name):\(zid.id) changed")
-            
-            // TUN will disable if unable to start for zid
-            match.edgeStatus = zid.edgeStatus
-            match.enabled = zid.enabled
-            
-            // always take new service from tunneler...
-            match.services = zid.services
-            
-            if zidMgr.zids.count > 0, match == zidMgr.zids[(representedObject ?? 0) as! Int] {
-                updateServiceUI(zId:zid)
+        DispatchQueue.main.async {
+            if let match = self.zidMgr.zids.first(where: { $0.id == zid.id }) {
+                NSLog("\(zid.name):\(zid.id) CHANGED")
+                
+                // TUN will disable if unable to start for zid
+                match.edgeStatus = zid.edgeStatus
+                match.enabled = zid.enabled
+                
+                // always take new service from tunneler...
+                match.services = zid.services
+                match.czid?.name = zid.name
+            } else {
+                // new one.  generally zids are only added by this app (so will be matched above).
+                // But possible somebody could load one manually or some day via MDM or somesuch
+                NSLog("\(zid.name):\(zid.id) NEW")
+                self.zidMgr.zids.append(zid)
             }
-        } else {
-            // new one
+            self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
         }
-        
-        // Also TODO: add support for showning netSessions when present
-        //print(zid.debugDescription)
     }
     
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
@@ -345,19 +336,40 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         enrollingIds.append(zid)
         updateServiceUI(zId: zid)
         
-        zid.edge.enroll() { zErr in
-            DispatchQueue.main.async {
-                self.enrollingIds.removeAll { $0.id == zid.id }
-                guard zErr == nil else {
+        guard let presentedItemURL = zidMgr.zidStore.presentedItemURL else {
+            self.dialogAlert("Unable to enroll \(zid.name)", "Unable to access group container")
+            return
+        }
+        
+        let url = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false)
+        let jwtFile = url.path
+        
+        // Ziti.enroll takes too long, needs to be done in background
+        DispatchQueue.global().async {
+            Ziti.enroll(jwtFile) { zidResp, zErr in
+                DispatchQueue.main.async {
+                    self.enrollingIds.removeAll { $0.id == zid.id }
+                    guard zErr == nil, let zidResp = zidResp else {
+                        _ = self.zidMgr.zidStore.store(zid)
+                        self.updateServiceUI(zId:zid)
+                        self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
+                        return
+                    }
+                    
+                    if zid.czid == nil {
+                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPI: zidResp.ztAPI)
+                    }
+                    zid.czid?.ca = zidResp.ca
+                    if zidResp.name != nil {
+                        zid.czid?.name = zidResp.name
+                    }
+                    
+                    zid.enabled = true
+                    zid.enrolled = true
                     _ = self.zidMgr.zidStore.store(zid)
                     self.updateServiceUI(zId:zid)
-                    self.dialogAlert("Unable to enroll \(zid.name)", zErr!.localizedDescription)
-                    return
+                    self.tunnelMgr.restartTunnel()
                 }
-                zid.enabled = true
-                _ = self.zidMgr.zidStore.store(zid)
-                _ = self.zidMgr.zidStore.storeCId(zid)
-                self.updateServiceUI(zId:zid)
             }
         }
     }

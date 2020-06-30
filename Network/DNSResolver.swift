@@ -8,18 +8,17 @@ import NetworkExtension
 class DNSResolver : NSObject {
     static let dnsPort:UInt16 = 53
     let tunnelProvider:PacketTunnelProvider
+    
+    var hostnamesLock = NSLock()
     var hostnames:[(name:String, ip:String, realIp:String?)] = []
     
     init(_ tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
     }
     
+    // must be locked
     func findRecordsByName(_ name:String) -> [(name:String, ip:String, realIp:String?)] {
         return hostnames.filter{ return $0.name.caseInsensitiveCompare(name) == .orderedSame }
-    }
-    
-    func findRecordsByIp(_ ip:String) -> [(name:String, ip:String, realIp:String?)] {
-        return hostnames.filter{ return $0.ip == ip }
     }
     
     func getIpRange(_ ip:Data, mask:Data) -> (first:Data, broadcast:Data) {
@@ -54,13 +53,10 @@ class DNSResolver : NSObject {
                 }
             }
         }
-        #if LOCALHOST_PROXY
-        return "127.0.0.1"
-        #else
         return nil
-        #endif
     }
     
+    // must be locked
     func addHostname(_ name:String) -> String? {
         let ip = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.ipAddress)
         let mask = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.subnetMask)
@@ -80,7 +76,9 @@ class DNSResolver : NSObject {
             // add it and get outta here
             if inUse == false {
                 let realIpStr = resolveHostname(name)
-                NSLog("Real IP for \(name) = \(realIpStr ?? "nil")")
+                if let rips = realIpStr {
+                    NSLog("Real IP for \(name) = \(rips)")
+                }
                 hostnames.append((name:name, ip:fakeIpStr, realIp:realIpStr))
                 return fakeIpStr
             }
@@ -132,7 +130,9 @@ class DNSResolver : NSObject {
             // - if no match, reject
             //
             if q.recordType == DNSRecordType.A || q.recordType == DNSRecordType.AAAA {
+                hostnamesLock.lock()
                 let matches = findRecordsByName(q.name.nameString)
+                hostnamesLock.unlock()
                 
                 if (matches.count > 0) {
                     if (q.recordType == DNSRecordType.A) {
@@ -154,7 +154,20 @@ class DNSResolver : NSObject {
                 } else if inMatchDomains {
                     responseCode = DNSResponseCode.nameError
                 } else {
-                    responseCode = DNSResponseCode.refused
+                    // Sending `refused` no longer works since Catalina updata.  Attempt to resolve, see if I get into infinate loop
+                    //responseCode = DNSResponseCode.refused
+                    
+                    responseCode = DNSResponseCode.nameError
+                    if let ip = resolveHostname(q.name.nameString) {
+                        let data = IPUtils.ipV4AddressStringToData(ip)
+                        let ans = DNSResourceRecord(q.name.nameString,
+                                                    recordType:DNSRecordType.A,
+                                                    recordClass:DNSRecordClass.IN,
+                                                    ttl:0,
+                                                    resourceData: data)
+                        answers.append(ans)
+                        //NSLog("System DNS: \(q.name.nameString) -> \(ip)")
+                    }
                 }
             }
         }
