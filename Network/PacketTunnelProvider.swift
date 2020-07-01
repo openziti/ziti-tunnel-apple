@@ -165,7 +165,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         // all of 'em.  So ziti_dump() here should have lots of useful info.
                         // note also another string referene to ziti that should be clean-up when we
                         // change from restarting the tunnel on new/deleted identities
-                        if zid.services.count == 0 { ziti.dump() }
+                        // if zid.services.count == 0 { ziti.dump() } // only stubbed out in C SDK :(
                         
                         let serviceName = String(cString: zs.name)
                         let serviceId = String(cString: zs.id)

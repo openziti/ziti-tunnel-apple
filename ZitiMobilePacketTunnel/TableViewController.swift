@@ -316,11 +316,13 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             }
         } else if indexPath.section == 2 && indexPath.row == 0 {
             // quick 'n dirty support email composer.  TODO: Look into Instabug
+            let supportEmail = Bundle.main.infoDictionary?["ZitiSupportEmail"] as? String ?? ""
+            let supportSubj = Bundle.main.infoDictionary?["ZitiSupportSubject"] as? String ?? ""
             if MFMailComposeViewController.canSendMail() {
                 let mail = MFMailComposeViewController()
                 mail.mailComposeDelegate = self
-                mail.setSubject("Ziti Support (iOS)")
-                mail.setToRecipients(["support@netfoundry.io"])
+                mail.setSubject(supportSubj)
+                mail.setToRecipients([supportEmail])
                 mail.setMessageBody("\n\n\nVersion: \(Version.str)\nOS \(Version.osVersion)\nDevice: \(deviceName())", isHTML: false)
                 if let logger = Logger.shared {
                     if let url = logger.currLog(forTag: Logger.TUN_TAG), let data = try? Data(contentsOf: url) {
@@ -335,13 +337,14 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 NSLog("Mail view controller not available")
                 let alert = UIAlertController(
                     title:"Mail view not available",
-                    message: "Please email support@netfoundry.io for assistance",
+                    message: "Please email \(supportEmail) for assistance",
                     preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
                 self.present(alert, animated: true, completion: nil)
             }
         } else if indexPath.section == 2 && indexPath.row == 1 {
-            if let url = URL(string: "https://netfoundry.zendesk.com/hc/en-us/categories/360000991011-Docs-Guides") {
+            let zitiHelpUrl = Bundle.main.infoDictionary?["ZitiHelpURL"] as? String ?? ""
+            if let url = URL(string: zitiHelpUrl) {
                 let vc = SFSafariViewController(url: url)
                 present(vc, animated: true)
             }
