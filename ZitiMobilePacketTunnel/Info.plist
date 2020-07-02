@@ -138,7 +138,13 @@
 			</dict>
 		</dict>
 	</array>
-    <key>NSCameraUsageDescription</key>
-    <string>Enable camera access for scanning JWT GR Code?</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Enable camera access for scanning JWT GR Code?</string>
+	<key>ZitiSupportEmail</key>
+	<string>support@netfoundry.io</string>
+	<key>ZitiSupportSubject</key>
+	<string>Ziti Support (iOS)</string>
+	<key>ZitiHelpURL</key>
+	<string>https://netfoundry.zendesk.com/hc/en-us/categories/360000991011-Docs-Guides</string>
 </dict>
 </plist>
