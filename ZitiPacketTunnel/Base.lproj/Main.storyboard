@@ -14,8 +14,8 @@
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
                     <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
                         <items>
-                            <menuItem title="Ziti Edge" hidden="YES" id="1Xt-HY-uBw">
-                                <menu key="submenu" title="Ziti Edge" systemMenu="apple" id="uQy-DD-JDr">
+                            <menuItem title="Ziti Desktop Edge" hidden="YES" id="1Xt-HY-uBw">
+                                <menu key="submenu" title="Ziti Desktop Edge" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
                                         <menuItem title="About ZitiPacketTunnel" id="5kV-Vb-QxS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -46,7 +46,7 @@
             <objects>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Ziti Edge" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="Ziti Desktop Edge" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="667" height="525"/>
@@ -209,7 +209,7 @@
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="N3v-mR-AwK">
                                         <rect key="frame" x="157" y="279" width="269" height="13"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="(expires February 13, 2020 at 6:49:18 AM EST)" id="27x-yl-XNV">
-                                            <font key="font" metaFont="system" size="10"/>
+                                            <font key="font" metaFont="menu" size="10"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -429,10 +429,10 @@
             </objects>
             <point key="canvasLocation" x="151.5" y="917.5"/>
         </scene>
-        <!--ZitiPacketTunnel Config-->
+        <!--Ziti Desktop Edge Config-->
         <scene sceneID="S7K-QY-luD">
             <objects>
-                <viewController title="ZitiPacketTunnel Config" showSeguePresentationStyle="single" id="c8W-la-m0J" customClass="TunnelConfigViewController" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Ziti Desktop Edge Config" showSeguePresentationStyle="single" id="c8W-la-m0J" customClass="TunnelConfigViewController" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Kqz-8q-KOl">
                         <rect key="frame" x="0.0" y="0.0" width="572" height="262"/>
                         <autoresizingMask key="autoresizingMask"/>
