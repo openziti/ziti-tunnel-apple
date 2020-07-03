@@ -10,12 +10,12 @@
             <objects>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ZitiPacketTunnel" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Ziti_Desktop_Edge" customModuleProvider="target"/>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
                     <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
                         <items>
-                            <menuItem title="ZitiPacketTunnel" hidden="YES" id="1Xt-HY-uBw">
-                                <menu key="submenu" title="ZitiPacketTunnel" systemMenu="apple" id="uQy-DD-JDr">
+                            <menuItem title="Ziti Edge" hidden="YES" id="1Xt-HY-uBw">
+                                <menu key="submenu" title="Ziti Edge" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
                                         <menuItem title="About ZitiPacketTunnel" id="5kV-Vb-QxS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -46,7 +46,7 @@
             <objects>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="ZitiPacketTunnel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="Ziti Edge" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="667" height="525"/>
@@ -66,7 +66,7 @@
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="ZitiPacketTunnel" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="667" height="525"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -432,7 +432,7 @@
         <!--ZitiPacketTunnel Config-->
         <scene sceneID="S7K-QY-luD">
             <objects>
-                <viewController title="ZitiPacketTunnel Config" showSeguePresentationStyle="single" id="c8W-la-m0J" customClass="TunnelConfigViewController" customModule="ZitiPacketTunnel" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="ZitiPacketTunnel Config" showSeguePresentationStyle="single" id="c8W-la-m0J" customClass="TunnelConfigViewController" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Kqz-8q-KOl">
                         <rect key="frame" x="0.0" y="0.0" width="572" height="262"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -614,7 +614,7 @@ Gw
         <!--Services View Controller-->
         <scene sceneID="3Cb-vg-Bcp">
             <objects>
-                <viewController id="5qd-GZ-sfp" customClass="ServicesViewController" customModule="ZitiPacketTunnel" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="5qd-GZ-sfp" customClass="ServicesViewController" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="30s-HX-UgF">
                         <rect key="frame" x="0.0" y="0.0" width="444" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>

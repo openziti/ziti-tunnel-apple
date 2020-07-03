@@ -30,8 +30,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "5A02AAB3206EBD7E006261C6"
-               BuildableName = "ZitiPacketTunnel.app"
-               BlueprintName = "ZitiPacketTunnel"
+               BuildableName = "Ziti Desktop Edge.app"
+               BlueprintName = "Ziti Desktop Edge"
                ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -75,8 +75,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5A02AAB3206EBD7E006261C6"
-            BuildableName = "ZitiPacketTunnel.app"
-            BlueprintName = "ZitiPacketTunnel"
+            BuildableName = "Ziti Desktop Edge.app"
+            BlueprintName = "Ziti Desktop Edge"
             ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -93,8 +93,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5A02AAB3206EBD7E006261C6"
-            BuildableName = "ZitiPacketTunnel.app"
-            BlueprintName = "ZitiPacketTunnel"
+            BuildableName = "Ziti Desktop Edge.app"
+            BlueprintName = "Ziti Desktop Edge"
             ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

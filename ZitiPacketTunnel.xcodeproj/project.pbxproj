@@ -193,7 +193,7 @@
 		328AE963EE30DEF9334A41CC /* Pods-macos_targets-PacketTunnelProvider.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-PacketTunnelProvider.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-PacketTunnelProvider/Pods-macos_targets-PacketTunnelProvider.release.xcconfig"; sourceTree = "<group>"; };
 		469124A4D95014E040D8F927 /* Pods-ZitiMobilePacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiMobilePacketTunnel.release.xcconfig"; path = "Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
 		534E7C9041DB42B11BAB0551 /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiMobilePacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
-		5A02AAB4206EBD7E006261C6 /* ZitiPacketTunnel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZitiPacketTunnel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Desktop Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5A02AAB9206EBD7E006261C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		5A02AABB206EBD7E006261C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -211,7 +211,7 @@
 		5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		5A2D2FE224AB899E00D154AA /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
 		5A2EA2A52097890400437608 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
-		5A2EA2C9209B750A00437608 /* ZitiMobilePacketTunnel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZitiMobilePacketTunnel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Mobile Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A2EA2CB209B750A00437608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5A2EA2D0209B750A00437608 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5A2EA2D2209B750C00437608 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -381,9 +381,9 @@
 		5A02AAB5206EBD7E006261C6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5A02AAB4206EBD7E006261C6 /* ZitiPacketTunnel.app */,
+				5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */,
 				5A02AACB206EBDD5006261C6 /* PacketTunnelProvider.appex */,
-				5A2EA2C9209B750A00437608 /* ZitiMobilePacketTunnel.app */,
+				5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */,
 				5A2EA2DF209B754400437608 /* MobilePacketTunnelProvider.appex */,
 				824456B224AE2E5A00CB2563 /* Ziti-UI-Mobile.app */,
 				824456CD24AE2E8200CB2563 /* Ziti-UI-Mac.app */,
@@ -598,9 +598,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5A02AAB3206EBD7E006261C6 /* ZitiPacketTunnel */ = {
+		5A02AAB3206EBD7E006261C6 /* Ziti Desktop Edge */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5A02AAC4206EBD7E006261C6 /* Build configuration list for PBXNativeTarget "ZitiPacketTunnel" */;
+			buildConfigurationList = 5A02AAC4206EBD7E006261C6 /* Build configuration list for PBXNativeTarget "Ziti Desktop Edge" */;
 			buildPhases = (
 				FDDE2F24B08CEF5FE64408B4 /* [CP] Check Pods Manifest.lock */,
 				5A02AAB0206EBD7E006261C6 /* Sources */,
@@ -615,9 +615,9 @@
 			dependencies = (
 				5A02AAD2206EBDD5006261C6 /* PBXTargetDependency */,
 			);
-			name = ZitiPacketTunnel;
+			name = "Ziti Desktop Edge";
 			productName = ZitiPacketTunnel;
-			productReference = 5A02AAB4206EBD7E006261C6 /* ZitiPacketTunnel.app */;
+			productReference = 5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5A02AACA206EBDD5006261C6 /* PacketTunnelProvider */ = {
@@ -638,9 +638,9 @@
 			productReference = 5A02AACB206EBDD5006261C6 /* PacketTunnelProvider.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		5A2EA2C8209B750A00437608 /* ZitiMobilePacketTunnel */ = {
+		5A2EA2C8209B750A00437608 /* Ziti Mobile Edge */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5A2EA2D8209B750C00437608 /* Build configuration list for PBXNativeTarget "ZitiMobilePacketTunnel" */;
+			buildConfigurationList = 5A2EA2D8209B750C00437608 /* Build configuration list for PBXNativeTarget "Ziti Mobile Edge" */;
 			buildPhases = (
 				8CEB47F6FE3DDEFA4284075F /* [CP] Check Pods Manifest.lock */,
 				5A2EA2C5209B750A00437608 /* Sources */,
@@ -655,9 +655,9 @@
 			dependencies = (
 				5A2EA2E6209B754500437608 /* PBXTargetDependency */,
 			);
-			name = ZitiMobilePacketTunnel;
+			name = "Ziti Mobile Edge";
 			productName = ZitiMobilePacketTunnel;
-			productReference = 5A2EA2C9209B750A00437608 /* ZitiMobilePacketTunnel.app */;
+			productReference = 5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */ = {
@@ -827,9 +827,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5A02AAB3206EBD7E006261C6 /* ZitiPacketTunnel */,
+				5A02AAB3206EBD7E006261C6 /* Ziti Desktop Edge */,
 				5A02AACA206EBDD5006261C6 /* PacketTunnelProvider */,
-				5A2EA2C8209B750A00437608 /* ZitiMobilePacketTunnel */,
+				5A2EA2C8209B750A00437608 /* Ziti Mobile Edge */,
 				5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */,
 				824456B124AE2E5A00CB2563 /* Ziti-UI-Mobile */,
 				824456CC24AE2E8200CB2563 /* Ziti-UI-Mac */,
@@ -1455,7 +1455,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Ziti Mobile Edge";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1481,7 +1481,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Ziti Mobile Edge";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1671,7 +1671,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5A02AAC4206EBD7E006261C6 /* Build configuration list for PBXNativeTarget "ZitiPacketTunnel" */ = {
+		5A02AAC4206EBD7E006261C6 /* Build configuration list for PBXNativeTarget "Ziti Desktop Edge" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5A02AAC5206EBD7E006261C6 /* Debug */,
@@ -1689,7 +1689,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5A2EA2D8209B750C00437608 /* Build configuration list for PBXNativeTarget "ZitiMobilePacketTunnel" */ = {
+		5A2EA2D8209B750C00437608 /* Build configuration list for PBXNativeTarget "Ziti Mobile Edge" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5A2EA2D9209B750C00437608 /* Debug */,
