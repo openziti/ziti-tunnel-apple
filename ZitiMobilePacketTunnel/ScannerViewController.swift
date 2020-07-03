@@ -6,12 +6,11 @@ import AVFoundation
 import UIKit
 
 protocol ScannerDelegate {
-    func found(code: String)
+    func found(code: String?)
 }
 
 class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
-    var delegate:ScannerDelegate?
-    var lastScan:String?
+    var delegate:ScannerDelegate!
     
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
@@ -84,15 +83,14 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         captureSession.stopRunning()
 
+        var code:String?
         if let metadataObject = metadataObjects.first {
             guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else { return }
             guard let stringValue = readableObject.stringValue else { return }
             AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-            lastScan = stringValue
-            NSLog("lastScan? \(lastScan != nil)")
-            delegate?.found(code: stringValue)
+            code = stringValue
         }
-        NSLog("lastScan pre-dismiss: \(lastScan ?? "nil")")
+        delegate.found(code: code)
         dismiss(animated: true)
     }
 
