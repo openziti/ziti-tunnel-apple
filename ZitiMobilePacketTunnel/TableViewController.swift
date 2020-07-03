@@ -67,11 +67,14 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     var tunnelMgr = TunnelMgr.shared
     var zidMgr = ZidMgr()
     weak var ivc:IdentityViewController?
+    let sc = ScannerViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.isEditing = true
         tableView.allowsSelectionDuringEditing = true
+        
+        sc.delegate = self
         
         // watch for changes to the zids
         zidMgr.zidStore.delegate = self
@@ -247,43 +250,45 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     func addViaQRCode() {
-        let sc = ScannerViewController()
-        sc.delegate = self
-        self.present(sc, animated: true, completion: nil)
+        present(sc, animated: true)
     }
     
-    func found(code: String) {
-        let secs = Int(NSDate().timeIntervalSince1970)
-        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("QRScan\(secs).jwt")
-        guard let data = code.data(using: .utf8) else {
-            let alert = UIAlertController(
-                title:"Scan Error",
-                message: "Unable to decode scanned data",
-                preferredStyle: .alert)
-            alert.addAction(UIAlertAction(
-                title: NSLocalizedString("Ok", comment: "Ok"),
-                style: .default,
-                handler: nil))
-            DispatchQueue.main.async {
-                self.present(alert, animated: true, completion: nil)
+    func found(code: String?) {
+        sc.dismiss(animated: true) {
+            guard let code = code else { return }
+            
+            let secs = Int(NSDate().timeIntervalSince1970)
+            let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("QRScan\(secs).jwt")
+            guard let data = code.data(using: .utf8) else {
+                let alert = UIAlertController(
+                    title:"Scan Error",
+                    message: "Unable to decode scanned data",
+                    preferredStyle: .alert)
+                alert.addAction(UIAlertAction(
+                    title: NSLocalizedString("Ok", comment: "Ok"),
+                    style: .default,
+                    handler: nil))
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true, completion: nil)
+                }
+                return
             }
-            return
-        }
-        
-        do {
-            try data.write(to: tempURL, options: .atomic)
-            self.onNewUrl(tempURL)
-        } catch {
-            let alert = UIAlertController(
-                title:"Scan Error",
-                message: "Unable to store scanned data: \(error.localizedDescription)",
-                preferredStyle: .alert)
-            alert.addAction(UIAlertAction(
-                title: NSLocalizedString("Ok", comment: "Ok"),
-                style: .default,
-                handler: nil))
-            DispatchQueue.main.async {
-                self.present(alert, animated: true, completion: nil)
+            
+            do {
+                try data.write(to: tempURL, options: .atomic)
+                self.onNewUrl(tempURL)
+            } catch {
+                let alert = UIAlertController(
+                    title:"Scan Error",
+                    message: "Unable to store scanned data: \(error.localizedDescription)",
+                    preferredStyle: .alert)
+                alert.addAction(UIAlertAction(
+                    title: NSLocalizedString("Ok", comment: "Ok"),
+                    style: .default,
+                    handler: nil))
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true, completion: nil)
+                }
             }
         }
     }

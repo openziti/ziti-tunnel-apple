@@ -44,7 +44,7 @@ class ProviderConfig : NSObject {
     var dnsAddresses:[String] = ["169.254.0.2"]
     var dnsMatchDomains:[String] = [""]
     var username = "Ziti"
-    var localizedDescription = "NetFoundry"
+    var localizedDescription = "Ziti"
     
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,

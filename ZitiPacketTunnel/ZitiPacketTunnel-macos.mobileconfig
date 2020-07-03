@@ -5,7 +5,7 @@
 	<key>ConsentText</key>
 	<dict>
 		<key>default</key>
-		<string>By accepting below you agree with NetFoundry terms and conditions for installing the Ziti Packet Tunnel, blah blah blah </string>
+		<string>By accepting below you agree with NetFoundry terms and conditions for installing Ziti, blah blah blah </string>
 	</dict>
 	<key>PayloadContent</key>
 	<array>
@@ -18,7 +18,7 @@
 			<key>PayloadDescription</key>
 			<string>Configures Ziti settings</string>
 			<key>PayloadDisplayName</key>
-			<string>Ziti Packet Tunnel</string>
+			<string>Ziti</string>
 			<key>PayloadIdentifier</key>
 			<string>com.apple.vpn.managed.CE766F96-2F8E-4A06-9EB4-C368701605AC</string>
 			<key>PayloadType</key>
@@ -35,7 +35,7 @@
 				<integer>0</integer>
 			</dict>
 			<key>UserDefinedName</key>
-			<string>Ziti Packet Tunnel</string>
+			<string>Ziti</string>
 			<key>VPN</key>
 			<dict>
 				<key>AuthName</key>
@@ -69,9 +69,9 @@
 		</dict>
 	</array>
 	<key>PayloadDescription</key>
-	<string>Ziti Packet Tunnel from NetFoundry</string>
+	<string>Ziti from NetFoundry</string>
 	<key>PayloadDisplayName</key>
-	<string>Ziti Packet Tunnel</string>
+	<string>Ziti</string>
 	<key>PayloadIdentifier</key>
 	<string>my-test-profile.257208F3-DF1A-47D6-9B4A-738AFA864891</string>
 	<key>PayloadOrganization</key>

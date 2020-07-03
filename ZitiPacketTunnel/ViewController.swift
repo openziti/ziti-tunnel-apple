@@ -309,6 +309,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     }
     
     @IBAction func removeIdentityButton(_ sender: Any) {
+        guard zidMgr.zids.count > 0 else { return }
+        
         let indx = representedObject as! Int
         let zid = zidMgr.zids[indx]
         let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
