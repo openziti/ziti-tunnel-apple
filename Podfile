@@ -3,7 +3,7 @@ abstract_target 'ios_targets' do
   use_frameworks!
   pod 'CZiti-iOS', '~> 0.1'
 
-  target 'ZitiMobilePacketTunnel' do
+  target 'Ziti Mobile Edge' do
   end
 
   target 'MobilePacketTunnelProvider' do
@@ -15,7 +15,7 @@ abstract_target 'macos_targets' do
   use_frameworks!
   pod 'CZiti-macOS', '~> 0.1'
 
-  target 'ZitiPacketTunnel' do
+  target 'Ziti Desktop Edge' do
   end
 
   target 'PacketTunnelProvider' do
