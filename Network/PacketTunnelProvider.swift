@@ -139,7 +139,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                         return
                     }
-                                        
+                    zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+                    
                     if czid.name != nameWas {
                         _ = zidStore.store(zid)
                     }
@@ -202,8 +203,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                     if let interceptIp = svc.dns?.interceptIp {
                                         NSLog("Updating intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
                                         ziti_tunneler_intercept_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
+                                        svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
                                     }
-                                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable)
+                                    
                                 } else {
                                     let newSvc = ZitiService()
                                     newSvc.name = serviceName
@@ -216,8 +218,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                     if let interceptIp = newSvc.dns?.interceptIp {
                                         NSLog("Adding intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
                                         ziti_tunneler_intercept_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
+                                        newSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
                                     }
-                                    newSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
                                     zid.services.append(newSvc)
                                 }
                             } else {
