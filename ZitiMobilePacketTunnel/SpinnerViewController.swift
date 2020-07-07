@@ -12,6 +12,7 @@ class SpinnerViewController: UIViewController {
         view.backgroundColor = UIColor(white: 0, alpha: 0.7)
 
         spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.color = .white
         spinner.startAnimating()
         view.addSubview(spinner)
 
