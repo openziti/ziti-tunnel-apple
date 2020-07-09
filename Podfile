@@ -6,6 +6,9 @@ abstract_target 'ios_targets' do
   target 'Ziti Mobile Edge' do
   end
 
+  target 'MobileShare' do
+  end
+
   target 'MobilePacketTunnelProvider' do
   end
 end

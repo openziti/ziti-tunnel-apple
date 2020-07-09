@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		17D8A0F17887892FEC22834E /* Pods_ios_targets_MobilePacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AECA5F8F6088E36CA172D35E /* Pods_ios_targets_MobilePacketTunnelProvider.framework */; };
+		29F81AE5DB22FF0C9F866325 /* Pods_ios_targets_MobileShare.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59ED0D602622178039E7DE15 /* Pods_ios_targets_MobileShare.framework */; };
 		55A0E70B6BBA0162D541670B /* Pods_ios_targets_Ziti_Mobile_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39F85A586730E259BA8D7444 /* Pods_ios_targets_Ziti_Mobile_Edge.framework */; };
 		5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */; };
 		5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AAB9206EBD7E006261C6 /* ViewController.swift */; };
@@ -26,6 +27,13 @@
 		5A0D1D2F222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
 		5A2D2FE124AA6CB900D154AA /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */; };
 		5A2D2FE324AB899E00D154AA /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D2FE224AB899E00D154AA /* ScannerViewController.swift */; };
+		5A2E11AE24B6A52E002856F3 /* ZidMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A051F602264183500B11CB2 /* ZidMgr.swift */; };
+		5A2E11AF24B6A538002856F3 /* ZitiIdentityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */; };
+		5A2E11B024B6A543002856F3 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
+		5A2E11B124B6A54E002856F3 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
+		5A2E11B224B6A579002856F3 /* ZitiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8702CD2230B24B00314199 /* ZitiService.swift */; };
+		5A2E11B424B797FC002856F3 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
+		5A2E11B524B7BC25002856F3 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */; };
 		5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
 		5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
 		5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2CB209B750A00437608 /* AppDelegate.swift */; };
@@ -93,6 +101,9 @@
 		5AF0C42124951AC400CD4DAE /* libziti_tunneler_cbs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AF0C41D24951A9F00CD4DAE /* libziti_tunneler_cbs.a */; };
 		5AF0C42224951AC400CD4DAE /* liblwipcore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AF0C41F24951A9F00CD4DAE /* liblwipcore.a */; };
 		5AF0C42324951AC400CD4DAE /* liblwipunixarch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AF0C41E24951A9F00CD4DAE /* liblwipunixarch.a */; };
+		5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF3DCAB24B52642005047BC /* ShareViewController.swift */; };
+		5AF3DCAF24B52642005047BC /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5AF3DCAD24B52642005047BC /* MainInterface.storyboard */; };
+		5AF3DCB324B52642005047BC /* MobileShare.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5AF3DCA924B52642005047BC /* MobileShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
 		5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
 		5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78686208A702A0093498C /* IPv4Packet.swift */; };
@@ -139,6 +150,13 @@
 			remoteGlobalIDString = 5A2EA2DE209B754400437608;
 			remoteInfo = MobilePacketTunnelProvider;
 		};
+		5AF3DCB124B52642005047BC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A02AAAC206EBD7E006261C6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AF3DCA824B52642005047BC;
+			remoteInfo = MobileShare;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -159,6 +177,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				5AF3DCB324B52642005047BC /* MobileShare.appex in Embed App Extensions */,
 				5A2EA2E7209B754500437608 /* MobilePacketTunnelProvider.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -195,6 +214,7 @@
 		39F85A586730E259BA8D7444 /* Pods_ios_targets_Ziti_Mobile_Edge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_targets_Ziti_Mobile_Edge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		469124A4D95014E040D8F927 /* Pods-ZitiMobilePacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiMobilePacketTunnel.release.xcconfig"; path = "Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
 		534E7C9041DB42B11BAB0551 /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiMobilePacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
+		59ED0D602622178039E7DE15 /* Pods_ios_targets_MobileShare.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_targets_MobileShare.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Desktop Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5A02AAB9206EBD7E006261C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -212,6 +232,7 @@
 		5A0D1D2B222B093F00D01F30 /* ZitiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiError.swift; sourceTree = "<group>"; };
 		5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		5A2D2FE224AB899E00D154AA /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
+		5A2E11B324B6A5BD002856F3 /* MobileShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobileShare.entitlements; sourceTree = "<group>"; };
 		5A2EA2A52097890400437608 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
 		5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Mobile Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A2EA2CB209B750A00437608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -257,6 +278,10 @@
 		5AF0C41D24951A9F00CD4DAE /* libziti_tunneler_cbs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler_cbs.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler_cbs.a"; sourceTree = "<group>"; };
 		5AF0C41E24951A9F00CD4DAE /* liblwipunixarch.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblwipunixarch.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/liblwipunixarch.a"; sourceTree = "<group>"; };
 		5AF0C41F24951A9F00CD4DAE /* liblwipcore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblwipcore.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/liblwipcore.a"; sourceTree = "<group>"; };
+		5AF3DCA924B52642005047BC /* MobileShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MobileShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AF3DCAB24B52642005047BC /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		5AF3DCAE24B52642005047BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		5AF3DCB024B52642005047BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPPacket.swift; sourceTree = "<group>"; };
 		5AF78686208A702A0093498C /* IPv4Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Packet.swift; sourceTree = "<group>"; };
 		5AF78688208A8D050093498C /* IPUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPUtils.swift; sourceTree = "<group>"; };
@@ -290,6 +315,7 @@
 		824456DE24AE2E8200CB2563 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		824456DF24AE2E8200CB2563 /* Ziti_UI_Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ziti_UI_Mac.entitlements; sourceTree = "<group>"; };
 		976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; sourceTree = "<group>"; };
+		A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobileShare.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobileShare/Pods-ios_targets-MobileShare.release.xcconfig"; sourceTree = "<group>"; };
 		A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; sourceTree = "<group>"; };
 		AECA5F8F6088E36CA172D35E /* Pods_ios_targets_MobilePacketTunnelProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_targets_MobilePacketTunnelProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF72D0362A9CFC5ABE786D51 /* Pods-ios_targets-MobilePacketTunnelProvider.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobilePacketTunnelProvider.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobilePacketTunnelProvider/Pods-ios_targets-MobilePacketTunnelProvider.release.xcconfig"; sourceTree = "<group>"; };
@@ -298,6 +324,7 @@
 		D8AA43E427149108FA6F7ECF /* Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobilePacketTunnelProvider/Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig"; sourceTree = "<group>"; };
 		E2D4420EFA2906A21C91CD96 /* Pods-ZitiPacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiPacketTunnel.release.xcconfig"; path = "Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
 		E671F0F8919AD76BAAE387E0 /* Pods-macos_targets-PacketTunnelProvider.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-PacketTunnelProvider.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-PacketTunnelProvider/Pods-macos_targets-PacketTunnelProvider.debug.xcconfig"; sourceTree = "<group>"; };
+		E680228BB4AA8A195D933A87 /* Pods-ios_targets-MobileShare.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobileShare.debug.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobileShare/Pods-ios_targets-MobileShare.debug.xcconfig"; sourceTree = "<group>"; };
 		EF03484142199E9097C001C4 /* Pods-ios_targets-Ziti Mobile Edge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-Ziti Mobile Edge.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-Ziti Mobile Edge/Pods-ios_targets-Ziti Mobile Edge.release.xcconfig"; sourceTree = "<group>"; };
 		F605E3FB2C1243294297432B /* Pods-ios_targets-ZitiMobilePacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-ZitiMobilePacketTunnel.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-ZitiMobilePacketTunnel/Pods-ios_targets-ZitiMobilePacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -347,6 +374,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF3DCA624B52642005047BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				29F81AE5DB22FF0C9F866325 /* Pods_ios_targets_MobileShare.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		824456AF24AE2E5A00CB2563 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -374,6 +409,7 @@
 				5A02AAB6206EBD7E006261C6 /* ZitiPacketTunnel */,
 				5A2EA2CA209B750A00437608 /* ZitiMobilePacketTunnel */,
 				5A2EA2E0209B754500437608 /* MobilePacketTunnelProvider */,
+				5AF3DCAA24B52642005047BC /* MobileShare */,
 				824456B324AE2E5A00CB2563 /* Ziti-UI-Mobile */,
 				824456CE24AE2E8200CB2563 /* Ziti-UI-Mac */,
 				5A02AAB5206EBD7E006261C6 /* Products */,
@@ -391,6 +427,7 @@
 				5A2EA2DF209B754400437608 /* MobilePacketTunnelProvider.appex */,
 				824456B224AE2E5A00CB2563 /* Ziti-UI-Mobile.app */,
 				824456CD24AE2E8200CB2563 /* Ziti-UI-Mac.app */,
+				5AF3DCA924B52642005047BC /* MobileShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -445,6 +482,7 @@
 				1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */,
 				39F85A586730E259BA8D7444 /* Pods_ios_targets_Ziti_Mobile_Edge.framework */,
 				7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */,
+				59ED0D602622178039E7DE15 /* Pods_ios_targets_MobileShare.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -534,6 +572,17 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
+		5AF3DCAA24B52642005047BC /* MobileShare */ = {
+			isa = PBXGroup;
+			children = (
+				5A2E11B324B6A5BD002856F3 /* MobileShare.entitlements */,
+				5AF3DCAB24B52642005047BC /* ShareViewController.swift */,
+				5AF3DCAD24B52642005047BC /* MainInterface.storyboard */,
+				5AF3DCB024B52642005047BC /* Info.plist */,
+			);
+			path = MobileShare;
+			sourceTree = "<group>";
+		};
 		824456B324AE2E5A00CB2563 /* Ziti-UI-Mobile */ = {
 			isa = PBXGroup;
 			children = (
@@ -599,6 +648,8 @@
 				EF03484142199E9097C001C4 /* Pods-ios_targets-Ziti Mobile Edge.release.xcconfig */,
 				976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */,
 				A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */,
+				E680228BB4AA8A195D933A87 /* Pods-ios_targets-MobileShare.debug.xcconfig */,
+				A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -662,6 +713,7 @@
 			);
 			dependencies = (
 				5A2EA2E6209B754500437608 /* PBXTargetDependency */,
+				5AF3DCB224B52642005047BC /* PBXTargetDependency */,
 			);
 			name = "Ziti Mobile Edge";
 			productName = ZitiMobilePacketTunnel;
@@ -684,6 +736,24 @@
 			name = MobilePacketTunnelProvider;
 			productName = MobilePacketTunnelProvider;
 			productReference = 5A2EA2DF209B754400437608 /* MobilePacketTunnelProvider.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		5AF3DCA824B52642005047BC /* MobileShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AF3DCB424B52642005047BC /* Build configuration list for PBXNativeTarget "MobileShare" */;
+			buildPhases = (
+				93274DCA29A70EF890F29298 /* [CP] Check Pods Manifest.lock */,
+				5AF3DCA524B52642005047BC /* Sources */,
+				5AF3DCA624B52642005047BC /* Frameworks */,
+				5AF3DCA724B52642005047BC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MobileShare;
+			productName = MobileShare;
+			productReference = 5AF3DCA924B52642005047BC /* MobileShare.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		824456B124AE2E5A00CB2563 /* Ziti-UI-Mobile */ = {
@@ -812,6 +882,10 @@
 							};
 						};
 					};
+					5AF3DCA824B52642005047BC = {
+						CreatedOnToolsVersion = 11.5;
+						ProvisioningStyle = Automatic;
+					};
 					824456B124AE2E5A00CB2563 = {
 						CreatedOnToolsVersion = 11.5;
 						ProvisioningStyle = Automatic;
@@ -841,6 +915,7 @@
 				5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */,
 				824456B124AE2E5A00CB2563 /* Ziti-UI-Mobile */,
 				824456CC24AE2E8200CB2563 /* Ziti-UI-Mac */,
+				5AF3DCA824B52642005047BC /* MobileShare */,
 			);
 		};
 /* End PBXProject section */
@@ -881,6 +956,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A6BA261226DF2E300224F09 /* Notices.rtf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AF3DCA724B52642005047BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AF3DCAF24B52642005047BC /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1003,6 +1086,28 @@
 			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-ios_targets-Ziti Mobile Edge-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		93274DCA29A70EF890F29298 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ios_targets-MobileShare-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1136,6 +1241,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AF3DCA524B52642005047BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A2E11AF24B6A538002856F3 /* ZitiIdentityStore.swift in Sources */,
+				5A2E11B224B6A579002856F3 /* ZitiService.swift in Sources */,
+				5A2E11B124B6A54E002856F3 /* ZitiError.swift in Sources */,
+				5A2E11AE24B6A52E002856F3 /* ZidMgr.swift in Sources */,
+				5A2E11B524B7BC25002856F3 /* SpinnerViewController.swift in Sources */,
+				5A2E11B424B797FC002856F3 /* Logger.swift in Sources */,
+				5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */,
+				5A2E11B024B6A543002856F3 /* ZitiIdentity.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		824456AE24AE2E5A00CB2563 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1170,6 +1290,11 @@
 			target = 5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */;
 			targetProxy = 5A2EA2E5209B754500437608 /* PBXContainerItemProxy */;
 		};
+		5AF3DCB224B52642005047BC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5AF3DCA824B52642005047BC /* MobileShare */;
+			targetProxy = 5AF3DCB124B52642005047BC /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -1195,6 +1320,14 @@
 				5A2EA2D5209B750C00437608 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		5AF3DCAD24B52642005047BC /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5AF3DCAE24B52642005047BC /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 		824456C224AE2E5B00CB2563 /* LaunchScreen.storyboard */ = {
@@ -1455,7 +1588,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
@@ -1481,7 +1614,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
@@ -1507,7 +1640,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
@@ -1546,7 +1679,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
@@ -1573,6 +1706,52 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "arm64 arm64e";
+			};
+			name = Release;
+		};
+		5AF3DCB524B52642005047BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E680228BB4AA8A195D933A87 /* Pods-ios_targets-MobileShare.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = MobileShare/MobileShare.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MN5S649TXM;
+				INFOPLIST_FILE = MobileShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobileShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5AF3DCB624B52642005047BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = MobileShare/MobileShare.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MN5S649TXM;
+				INFOPLIST_FILE = MobileShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobileShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -1709,6 +1888,15 @@
 			buildConfigurations = (
 				5A2EA2E9209B754500437608 /* Debug */,
 				5A2EA2EA209B754500437608 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AF3DCB424B52642005047BC /* Build configuration list for PBXNativeTarget "MobileShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AF3DCB524B52642005047BC /* Debug */,
+				5AF3DCB624B52642005047BC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

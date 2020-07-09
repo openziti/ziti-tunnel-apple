@@ -114,7 +114,14 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 // new one.  generally zids are only added by this app (so will be matched above).
                 // But possible somebody could load one manually or some day via MDM or somesuch
                 NSLog("\(zid.name):\(zid.id) NEW")
-                self.zidMgr.zids.append(zid)
+                self.zidMgr.zids.insert(zid, at:0)
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                    self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
+                    self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+                }
+                self.tunnelMgr.restartTunnel()
             }
             self.tableView.reloadData()
             self.ivc?.tableView.reloadData()
