@@ -44,7 +44,6 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if let provider = attachments.first {
             // Check if the content type is the same as we expected
             if provider.hasItemConformingToTypeIdentifier("public.url") {
-               
                 provider.loadItem(forTypeIdentifier: "public.url", options: nil) { [weak self] (data, error) in
                     guard error == nil else {
                         self?.showAlert(alertTitle, error!.localizedDescription) { _ in
@@ -119,15 +118,6 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         } else {
             return tableView.dequeueReusableCell(withIdentifier: "ENROLL_CELL", for: indexPath as IndexPath)
         }
-    }
-    
-    @objc private func cancelAction () {
-        let error = NSError(domain: "some.bundle.identifier", code: 0, userInfo: [NSLocalizedDescriptionKey: "An error description"])
-        extensionContext?.cancelRequest(withError: error)
-    }
-
-    @objc private func doneAction() {
-        extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
     
     @IBAction func onEnrollButton(_ sender: Any) {
