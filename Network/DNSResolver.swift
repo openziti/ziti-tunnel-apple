@@ -59,9 +59,11 @@ class DNSResolver : NSObject {
                 var hn = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                 if getnameinfo(addr.bytes.assumingMemoryBound(to: sockaddr.self), socklen_t(addr.length),
                                &hn, socklen_t(hn.count), nil, 0, NI_NUMERICHOST) == 0 {
-                    // keep as loop for now - may need to come back to this and filter out non IPv4 results
+                    // Only return IPv4 results for now
                     let ipStr = String(cString: hn)
-                    return ipStr
+                    if IPUtils.isValidIpV4Address(ipStr) {
+                        return ipStr
+                    }
                 }
             }
         }
@@ -166,11 +168,11 @@ class DNSResolver : NSObject {
                 } else if inMatchDomains {
                     responseCode = DNSResponseCode.nameError
                 } else {
-                    // Sending `refused` no longer works since Catalina updata.  Attempt to resolve, see if I get into infinate loop
+                    // Sending `refused` no longer works since Catalina updata.  Attempt to resolve...
                     //responseCode = DNSResponseCode.refused
                     
                     responseCode = DNSResponseCode.nameError
-                    if let ip = resolveHostname(q.name.nameString) {
+                    if let ip = resolveHostname(q.name.nameString) { // Will only resolve IPv4
                         let data = IPUtils.ipV4AddressStringToData(ip)
                         let ans = DNSResourceRecord(q.name.nameString,
                                                     recordType:DNSRecordType.A,
