@@ -37,6 +37,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     let providerConfig = ProviderConfig()
     var dnsResolver:DNSResolver?
     var interceptedRoutes:[NEIPv4Route] = []
+    let netMon = NWPathMonitor()
+    var currPath:Network.NWPath?
     var zids:[ZitiIdentity] = []    
     var netifDriver:NetifDriver!
     var tnlr_ctx:tunneler_context?
@@ -45,8 +47,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override init() {
         super.init()
-        self.dnsResolver = DNSResolver(self)
-        self.netifDriver = NetifDriver(ptp: self)
+        netMon.pathUpdateHandler = self.pathUpdateHandler
+        netMon.start(queue: DispatchQueue.global())
+        dnsResolver = DNSResolver(self)
+        netifDriver = NetifDriver(ptp: self)
+    }
+    
+    func pathUpdateHandler(path: Network.NWPath) {
+        currPath = path
+        var ifaceStr = ""
+        for i in path.availableInterfaces {
+            ifaceStr += " \n     \(i.index): name:\(i.name), type:\(i.type)"
+        }
+        NSLog("Network Path Update:\n   Status:\(path.status), Expensive:\(path.isExpensive), Cellular:\(path.usesInterfaceType(.cellular))\n   Interfaces:\(ifaceStr)")
     }
     
     func readPacketFlow() {
