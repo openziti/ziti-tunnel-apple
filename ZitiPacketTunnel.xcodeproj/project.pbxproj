@@ -118,19 +118,6 @@
 		5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76C225D644A0048B2F6 /* TableViewController.swift */; };
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
-		824456B524AE2E5A00CB2563 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824456B424AE2E5A00CB2563 /* AppDelegate.swift */; };
-		824456B724AE2E5A00CB2563 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824456B624AE2E5A00CB2563 /* SceneDelegate.swift */; };
-		824456BA24AE2E5A00CB2563 /* Ziti_UI_Mobile.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 824456B824AE2E5A00CB2563 /* Ziti_UI_Mobile.xcdatamodeld */; };
-		824456BC24AE2E5A00CB2563 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824456BB24AE2E5A00CB2563 /* ContentView.swift */; };
-		824456BE24AE2E5B00CB2563 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 824456BD24AE2E5B00CB2563 /* Assets.xcassets */; };
-		824456C124AE2E5B00CB2563 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 824456C024AE2E5B00CB2563 /* Preview Assets.xcassets */; };
-		824456C424AE2E5B00CB2563 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 824456C224AE2E5B00CB2563 /* LaunchScreen.storyboard */; };
-		824456D024AE2E8200CB2563 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824456CF24AE2E8200CB2563 /* AppDelegate.swift */; };
-		824456D224AE2E8200CB2563 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824456D124AE2E8200CB2563 /* ContentView.swift */; };
-		824456D524AE2E8200CB2563 /* Ziti_UI_Mac.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 824456D324AE2E8200CB2563 /* Ziti_UI_Mac.xcdatamodeld */; };
-		824456D724AE2E8200CB2563 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 824456D624AE2E8200CB2563 /* Assets.xcassets */; };
-		824456DA24AE2E8200CB2563 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 824456D924AE2E8200CB2563 /* Preview Assets.xcassets */; };
-		824456DD24AE2E8200CB2563 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 824456DB24AE2E8200CB2563 /* Main.storyboard */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
 /* End PBXBuildFile section */
@@ -297,23 +284,7 @@
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
 		7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_macos_targets_Ziti_Desktop_Edge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		824456B224AE2E5A00CB2563 /* Ziti-UI-Mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti-UI-Mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		824456B424AE2E5A00CB2563 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		824456B624AE2E5A00CB2563 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		824456B924AE2E5A00CB2563 /* Ziti_UI_Mobile.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Ziti_UI_Mobile.xcdatamodel; sourceTree = "<group>"; };
-		824456BB24AE2E5A00CB2563 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		824456BD24AE2E5B00CB2563 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		824456C024AE2E5B00CB2563 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		824456C324AE2E5B00CB2563 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		824456C524AE2E5B00CB2563 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		824456CD24AE2E8200CB2563 /* Ziti-UI-Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti-UI-Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		824456CF24AE2E8200CB2563 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		824456D124AE2E8200CB2563 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		824456D424AE2E8200CB2563 /* Ziti_UI_Mac.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Ziti_UI_Mac.xcdatamodel; sourceTree = "<group>"; };
-		824456D624AE2E8200CB2563 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		824456D924AE2E8200CB2563 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		824456DC24AE2E8200CB2563 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		824456DE24AE2E8200CB2563 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		824456DF24AE2E8200CB2563 /* Ziti_UI_Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ziti_UI_Mac.entitlements; sourceTree = "<group>"; };
 		976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; sourceTree = "<group>"; };
 		A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobileShare.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobileShare/Pods-ios_targets-MobileShare.release.xcconfig"; sourceTree = "<group>"; };
 		A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; sourceTree = "<group>"; };
@@ -410,8 +381,6 @@
 				5A2EA2CA209B750A00437608 /* ZitiMobilePacketTunnel */,
 				5A2EA2E0209B754500437608 /* MobilePacketTunnelProvider */,
 				5AF3DCAA24B52642005047BC /* MobileShare */,
-				824456B324AE2E5A00CB2563 /* Ziti-UI-Mobile */,
-				824456CE24AE2E8200CB2563 /* Ziti-UI-Mac */,
 				5A02AAB5206EBD7E006261C6 /* Products */,
 				5A02AAD8206EBE3C006261C6 /* Frameworks */,
 				9235754F7BC4BDA731BD7317 /* Pods */,
@@ -581,52 +550,6 @@
 				5AF3DCB024B52642005047BC /* Info.plist */,
 			);
 			path = MobileShare;
-			sourceTree = "<group>";
-		};
-		824456B324AE2E5A00CB2563 /* Ziti-UI-Mobile */ = {
-			isa = PBXGroup;
-			children = (
-				824456B424AE2E5A00CB2563 /* AppDelegate.swift */,
-				824456B624AE2E5A00CB2563 /* SceneDelegate.swift */,
-				824456BB24AE2E5A00CB2563 /* ContentView.swift */,
-				824456BD24AE2E5B00CB2563 /* Assets.xcassets */,
-				824456C224AE2E5B00CB2563 /* LaunchScreen.storyboard */,
-				824456C524AE2E5B00CB2563 /* Info.plist */,
-				824456B824AE2E5A00CB2563 /* Ziti_UI_Mobile.xcdatamodeld */,
-				824456BF24AE2E5B00CB2563 /* Preview Content */,
-			);
-			path = "Ziti-UI-Mobile";
-			sourceTree = "<group>";
-		};
-		824456BF24AE2E5B00CB2563 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				824456C024AE2E5B00CB2563 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		824456CE24AE2E8200CB2563 /* Ziti-UI-Mac */ = {
-			isa = PBXGroup;
-			children = (
-				824456CF24AE2E8200CB2563 /* AppDelegate.swift */,
-				824456D124AE2E8200CB2563 /* ContentView.swift */,
-				824456D624AE2E8200CB2563 /* Assets.xcassets */,
-				824456DB24AE2E8200CB2563 /* Main.storyboard */,
-				824456DE24AE2E8200CB2563 /* Info.plist */,
-				824456DF24AE2E8200CB2563 /* Ziti_UI_Mac.entitlements */,
-				824456D324AE2E8200CB2563 /* Ziti_UI_Mac.xcdatamodeld */,
-				824456D824AE2E8200CB2563 /* Preview Content */,
-			);
-			path = "Ziti-UI-Mac";
-			sourceTree = "<group>";
-		};
-		824456D824AE2E8200CB2563 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				824456D924AE2E8200CB2563 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		9235754F7BC4BDA731BD7317 /* Pods */ = {
@@ -971,9 +894,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				824456C424AE2E5B00CB2563 /* LaunchScreen.storyboard in Resources */,
-				824456C124AE2E5B00CB2563 /* Preview Assets.xcassets in Resources */,
-				824456BE24AE2E5B00CB2563 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -981,9 +901,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				824456DD24AE2E8200CB2563 /* Main.storyboard in Resources */,
-				824456DA24AE2E8200CB2563 /* Preview Assets.xcassets in Resources */,
-				824456D724AE2E8200CB2563 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1260,10 +1177,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				824456B524AE2E5A00CB2563 /* AppDelegate.swift in Sources */,
-				824456BA24AE2E5A00CB2563 /* Ziti_UI_Mobile.xcdatamodeld in Sources */,
-				824456BC24AE2E5A00CB2563 /* ContentView.swift in Sources */,
-				824456B724AE2E5A00CB2563 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1271,9 +1184,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				824456D524AE2E8200CB2563 /* Ziti_UI_Mac.xcdatamodeld in Sources */,
-				824456D224AE2E8200CB2563 /* ContentView.swift in Sources */,
-				824456D024AE2E8200CB2563 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1328,22 +1238,6 @@
 				5AF3DCAE24B52642005047BC /* Base */,
 			);
 			name = MainInterface.storyboard;
-			sourceTree = "<group>";
-		};
-		824456C224AE2E5B00CB2563 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				824456C324AE2E5B00CB2563 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		824456DB24AE2E8200CB2563 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				824456DC24AE2E8200CB2563 /* Base */,
-			);
-			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -1920,29 +1814,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		824456B824AE2E5A00CB2563 /* Ziti_UI_Mobile.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				824456B924AE2E5A00CB2563 /* Ziti_UI_Mobile.xcdatamodel */,
-			);
-			currentVersion = 824456B924AE2E5A00CB2563 /* Ziti_UI_Mobile.xcdatamodel */;
-			path = Ziti_UI_Mobile.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-		824456D324AE2E8200CB2563 /* Ziti_UI_Mac.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				824456D424AE2E8200CB2563 /* Ziti_UI_Mac.xcdatamodel */,
-			);
-			currentVersion = 824456D424AE2E8200CB2563 /* Ziti_UI_Mac.xcdatamodel */;
-			path = Ziti_UI_Mac.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 5A02AAAC206EBD7E006261C6 /* Project object */;
 }
