@@ -283,8 +283,6 @@
 		5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewController.swift; sourceTree = "<group>"; };
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
 		7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_macos_targets_Ziti_Desktop_Edge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		824456B224AE2E5A00CB2563 /* Ziti-UI-Mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti-UI-Mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		824456CD24AE2E8200CB2563 /* Ziti-UI-Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti-UI-Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; sourceTree = "<group>"; };
 		A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobileShare.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobileShare/Pods-ios_targets-MobileShare.release.xcconfig"; sourceTree = "<group>"; };
 		A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; sourceTree = "<group>"; };
@@ -353,20 +351,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		824456AF24AE2E5A00CB2563 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		824456CA24AE2E8200CB2563 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -394,8 +378,6 @@
 				5A02AACB206EBDD5006261C6 /* PacketTunnelProvider.appex */,
 				5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */,
 				5A2EA2DF209B754400437608 /* MobilePacketTunnelProvider.appex */,
-				824456B224AE2E5A00CB2563 /* Ziti-UI-Mobile.app */,
-				824456CD24AE2E8200CB2563 /* Ziti-UI-Mac.app */,
 				5AF3DCA924B52642005047BC /* MobileShare.appex */,
 			);
 			name = Products;
@@ -679,40 +661,6 @@
 			productReference = 5AF3DCA924B52642005047BC /* MobileShare.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		824456B124AE2E5A00CB2563 /* Ziti-UI-Mobile */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 824456C824AE2E5C00CB2563 /* Build configuration list for PBXNativeTarget "Ziti-UI-Mobile" */;
-			buildPhases = (
-				824456AE24AE2E5A00CB2563 /* Sources */,
-				824456AF24AE2E5A00CB2563 /* Frameworks */,
-				824456B024AE2E5A00CB2563 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "Ziti-UI-Mobile";
-			productName = "Ziti-UI-Mobile";
-			productReference = 824456B224AE2E5A00CB2563 /* Ziti-UI-Mobile.app */;
-			productType = "com.apple.product-type.application";
-		};
-		824456CC24AE2E8200CB2563 /* Ziti-UI-Mac */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 824456E024AE2E8200CB2563 /* Build configuration list for PBXNativeTarget "Ziti-UI-Mac" */;
-			buildPhases = (
-				824456C924AE2E8200CB2563 /* Sources */,
-				824456CA24AE2E8200CB2563 /* Frameworks */,
-				824456CB24AE2E8200CB2563 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "Ziti-UI-Mac";
-			productName = "Ziti-UI-Mac";
-			productReference = 824456CD24AE2E8200CB2563 /* Ziti-UI-Mac.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -809,14 +757,6 @@
 						CreatedOnToolsVersion = 11.5;
 						ProvisioningStyle = Automatic;
 					};
-					824456B124AE2E5A00CB2563 = {
-						CreatedOnToolsVersion = 11.5;
-						ProvisioningStyle = Automatic;
-					};
-					824456CC24AE2E8200CB2563 = {
-						CreatedOnToolsVersion = 11.5;
-						ProvisioningStyle = Automatic;
-					};
 				};
 			};
 			buildConfigurationList = 5A02AAAF206EBD7E006261C6 /* Build configuration list for PBXProject "ZitiPacketTunnel" */;
@@ -836,8 +776,6 @@
 				5A02AACA206EBDD5006261C6 /* PacketTunnelProvider */,
 				5A2EA2C8209B750A00437608 /* Ziti Mobile Edge */,
 				5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */,
-				824456B124AE2E5A00CB2563 /* Ziti-UI-Mobile */,
-				824456CC24AE2E8200CB2563 /* Ziti-UI-Mac */,
 				5AF3DCA824B52642005047BC /* MobileShare */,
 			);
 		};
@@ -887,20 +825,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AF3DCAF24B52642005047BC /* MainInterface.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		824456B024AE2E5A00CB2563 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		824456CB24AE2E8200CB2563 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1170,20 +1094,6 @@
 				5A2E11B424B797FC002856F3 /* Logger.swift in Sources */,
 				5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */,
 				5A2E11B024B6A543002856F3 /* ZitiIdentity.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		824456AE24AE2E5A00CB2563 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		824456C924AE2E8200CB2563 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1482,7 +1392,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
@@ -1508,7 +1418,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
@@ -1534,7 +1444,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
@@ -1573,7 +1483,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
@@ -1649,95 +1559,6 @@
 			};
 			name = Release;
 		};
-		824456C624AE2E5C00CB2563 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"Ziti-UI-Mobile/Preview Content\"";
-				DEVELOPMENT_TEAM = MN5S649TXM;
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "Ziti-UI-Mobile/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.netfoundry.ziti.Ziti-UI-Mobile";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		824456C724AE2E5C00CB2563 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"Ziti-UI-Mobile/Preview Content\"";
-				DEVELOPMENT_TEAM = MN5S649TXM;
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "Ziti-UI-Mobile/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.netfoundry.ziti.Ziti-UI-Mobile";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		824456E124AE2E8200CB2563 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = "Ziti-UI-Mac/Ziti_UI_Mac.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Ziti-UI-Mac/Preview Content\"";
-				DEVELOPMENT_TEAM = MN5S649TXM;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "Ziti-UI-Mac/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.netfoundry.ziti.Ziti-UI-Mac";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		824456E224AE2E8200CB2563 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = "Ziti-UI-Mac/Ziti_UI_Mac.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Ziti-UI-Mac/Preview Content\"";
-				DEVELOPMENT_TEAM = MN5S649TXM;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = "Ziti-UI-Mac/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.netfoundry.ziti.Ziti-UI-Mac";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1791,24 +1612,6 @@
 			buildConfigurations = (
 				5AF3DCB524B52642005047BC /* Debug */,
 				5AF3DCB624B52642005047BC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		824456C824AE2E5C00CB2563 /* Build configuration list for PBXNativeTarget "Ziti-UI-Mobile" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				824456C624AE2E5C00CB2563 /* Debug */,
-				824456C724AE2E5C00CB2563 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		824456E024AE2E8200CB2563 /* Build configuration list for PBXNativeTarget "Ziti-UI-Mac" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				824456E124AE2E8200CB2563 /* Debug */,
-				824456E224AE2E8200CB2563 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
