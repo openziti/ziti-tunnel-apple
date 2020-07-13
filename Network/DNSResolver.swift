@@ -50,7 +50,7 @@ class DNSResolver : NSObject {
     
     // Called before tunnel starts to save off the resolvedIp address if there is one
     // We can then proxy non-intercpted ports to this IP address
-    private func resolveHostname(_ hostname:String) -> String? {
+    private func resolveHostname(_ hostname:String, _ recordType:DNSRecordType) -> String? {
         let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
         CFHostStartInfoResolution(host, .addresses, nil)
         var success:DarwinBoolean = false
@@ -59,9 +59,10 @@ class DNSResolver : NSObject {
                 var hn = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                 if getnameinfo(addr.bytes.assumingMemoryBound(to: sockaddr.self), socklen_t(addr.length),
                                &hn, socklen_t(hn.count), nil, 0, NI_NUMERICHOST) == 0 {
-                    // Only return IPv4 results for now
                     let ipStr = String(cString: hn)
-                    if IPUtils.isValidIpV4Address(ipStr) {
+                    if recordType == .A && IPUtils.isValidIpV4Address(ipStr) {
+                        return ipStr
+                    } else if recordType == .AAAA {
                         return ipStr
                     }
                 }
@@ -89,7 +90,7 @@ class DNSResolver : NSObject {
             
             // add it and get outta here
             if inUse == false {
-                let realIpStr = resolveHostname(name)
+                let realIpStr = resolveHostname(name, .A)
                 if let rips = realIpStr {
                     NSLog("Real IP for \(name) = \(rips)")
                 }
@@ -124,15 +125,11 @@ class DNSResolver : NSObject {
         if dns.qrFlag { return }
         
         var answers:[DNSResourceRecord] = []
-        var inMatchDomains = false
         var responseCode:DNSResponseCode = DNSResponseCode.notImplemented
     
         // Respond only to single Query. If multiple queries, respond notImplemented (defacto standard)
         if dns.questions.count == 1 {
             let q:DNSQuestion = dns.questions[0]
-            
-            // respond to all queries if matching names (.nameError if unable to respolve)
-            inMatchDomains = self.inMatchDomains(q.name.nameString)
             
             //
             // Only give a valid response to A requests
@@ -143,7 +140,7 @@ class DNSResolver : NSObject {
             // - if find matches, return nameError
             // - if no match, reject
             //
-            if q.recordType == DNSRecordType.A || q.recordType == DNSRecordType.AAAA {
+            if (q.recordType == DNSRecordType.A || q.recordType == DNSRecordType.AAAA) && q.recordClass == DNSRecordClass.IN {
                 hostnamesLock.lock()
                 let matches = findRecordsByName(q.name.nameString)
                 hostnamesLock.unlock()
@@ -165,22 +162,23 @@ class DNSResolver : NSObject {
                         // AAAA with matches, return nameError
                         responseCode = DNSResponseCode.nameError
                     }
-                } else if inMatchDomains {
-                    responseCode = DNSResponseCode.nameError
                 } else {
-                    // Sending `refused` no longer works since Catalina updata.  Attempt to resolve...
-                    //responseCode = DNSResponseCode.refused
-                    
                     responseCode = DNSResponseCode.nameError
-                    if let ip = resolveHostname(q.name.nameString) { // Will only resolve IPv4
-                        let data = IPUtils.ipV4AddressStringToData(ip)
-                        let ans = DNSResourceRecord(q.name.nameString,
-                                                    recordType:DNSRecordType.A,
-                                                    recordClass:DNSRecordClass.IN,
-                                                    ttl:0,
-                                                    resourceData: data)
-                        answers.append(ans)
-                        //NSLog("System DNS: \(q.name.nameString) -> \(ip)")
+                    if let ip = resolveHostname(q.name.nameString, q.recordType) {
+                        if q.recordType == .A {
+                            let data = IPUtils.ipV4AddressStringToData(ip)
+                            let ans = DNSResourceRecord(q.name.nameString,
+                                                        recordType:DNSRecordType.A,
+                                                        recordClass:DNSRecordClass.IN,
+                                                        ttl:0,
+                                                        resourceData: data)
+                            answers.append(ans)
+                            //NSLog("System DNS: \(q.name.nameString) -> \(ip)")
+                        } else if q.recordType == .AAAA {
+                            // TODO: need to write IPUtils.ipV6AddressStringToData(ip)
+                            // for now return nameError, which should inspire request for .A
+                            // NSLog("DNSResolver returning NXDomain instead of \(q.name.nameString) -> \(ip) ")
+                        }
                     }
                 }
             }
