@@ -166,6 +166,7 @@ class DNSResolver : NSObject {
                     responseCode = DNSResponseCode.nameError
                     if let ip = resolveHostname(q.name.nameString, q.recordType) {
                         if q.recordType == .A {
+                            responseCode = DNSResponseCode.noError
                             let data = IPUtils.ipV4AddressStringToData(ip)
                             let ans = DNSResourceRecord(q.name.nameString,
                                                         recordType:DNSRecordType.A,
