@@ -155,7 +155,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 zid.services = []
                 
                 let ziti = Ziti(zid: czid, loop: loop)
-                let nameWas = czid.name
                 
                 ziti.run { zErr in
                     guard zErr == nil else {
@@ -164,18 +163,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                         return
                     }
-                    zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
-                    
-                    if czid.name != nameWas {
-                        _ = zidStore.store(zid)
-                    }
+                    zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
                     
                     let (cvers, _, _) = ziti.getControllerVersion()
                     let cVersion = "\(cvers)"
                     if zid.controllerVersion != cVersion {
                         zid.controllerVersion = cVersion
-                        _ = zidStore.store(zid)
                     }
+                     _ = zidStore.store(zid)
                     
                     // forces reference to ziti to be kept by ziti.  generally not a great idea, but fine
                     // for us since we want the ziti instance to exist for the entire run (new or deleted

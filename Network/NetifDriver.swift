@@ -95,7 +95,7 @@ class NetifDriver : NSObject {
             let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
             ptr.initialize(from: [UInt8](data), count: len)
             defer {
-                ptr.deinitialize(count: len)
+                //ptr.deinitialize(count: len)
                 ptr.deallocate()
             }
             ptr.withMemoryRebound(to: Int8.self, capacity: len) {
@@ -109,6 +109,7 @@ class NetifDriver : NSObject {
         return Int(0)
     }
     
+    
     static let write_cb:netif_write_cb = { handle, buf, len in
         guard let mySelf = NetifDriver.unretained(UnsafeMutableRawPointer(handle)) else {
             NSLog("NetifDriver write_cb WTF invalid handle")
@@ -119,9 +120,11 @@ class NetifDriver : NSObject {
             return -1
         }
         
-        let data = Data(bytes: buf!, count: len)
-        ptp.writePacket(data)
-        
+        //let data = Data(bytes: buf!, count: len) // this leaks (I don't understand why)
+        if let ptr = UnsafeMutableRawPointer(mutating: buf) {
+            let data = Data(bytesNoCopy: ptr, count: len, deallocator: .none)
+            ptp.writePacket(data)
+        }
         return len
     }
     
