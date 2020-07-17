@@ -60,7 +60,7 @@
 				<key>subnet</key>
 				<string>255.255.252.0</string>
                 <key>mtu</key>
-                <string>16000</string>
+                <string>4000</string>
                 <key>dns</key>
                 <string>169.254.0.2</string>
                 <key>matchDomains</key>

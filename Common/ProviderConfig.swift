@@ -49,7 +49,7 @@ class ProviderConfig : NSObject {
     var ipAddress:String = "169.254.0.1"
     var subnetMask:String = "255.255.255.0"
     #if os(macOS)
-    var mtu:Int = 16000
+    var mtu:Int = 4000
     #else
     var mtu:Int = 4000
     #endif
