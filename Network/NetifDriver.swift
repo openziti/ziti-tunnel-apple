@@ -94,13 +94,10 @@ class NetifDriver : NSObject {
             let len = data.count
             let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
             ptr.initialize(from: [UInt8](data), count: len)
-            defer {
-                //ptr.deinitialize(count: len)
-                ptr.deallocate()
-            }
             ptr.withMemoryRebound(to: Int8.self, capacity: len) {
                 mySelf.packetCallback?($0, len, mySelf.netif)
             }
+            ptr.deallocate()
         }
     }
     
@@ -108,7 +105,6 @@ class NetifDriver : NSObject {
         NSLog("NetifDriver Unexpected read callback for non-poll driver")
         return Int(0)
     }
-    
     
     static let write_cb:netif_write_cb = { handle, buf, len in
         guard let mySelf = NetifDriver.unretained(UnsafeMutableRawPointer(handle)) else {
@@ -120,10 +116,11 @@ class NetifDriver : NSObject {
             return -1
         }
         
-        //let data = Data(bytes: buf!, count: len) // this leaks (I don't understand why)
-        if let ptr = UnsafeMutableRawPointer(mutating: buf) {
-            let data = Data(bytesNoCopy: ptr, count: len, deallocator: .none)
-            ptp.writePacket(data)
+        autoreleasepool {
+            if let ptr = UnsafeMutableRawPointer(mutating: buf) {
+                let data = Data(bytesNoCopy: ptr, count: len, deallocator: .none)
+                ptp.writePacket(data)
+            }
         }
         return len
     }
