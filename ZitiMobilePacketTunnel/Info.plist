@@ -141,9 +141,9 @@
 		</dict>
 	</array>
 	<key>ZitiHelpURL</key>
-	<string>https://netfoundry.zendesk.com/hc/en-us/categories/360000991011-Docs-Guides</string>
+	<string>https://openziti.discourse.group/</string>
 	<key>ZitiSupportEmail</key>
-	<string>support@netfoundry.io</string>
+	<string>openziti@netfoundry.io</string>
 	<key>ZitiSupportSubject</key>
 	<string>Ziti Support (iOS)</string>
 </dict>
