@@ -115,7 +115,6 @@ class NetifDriver : NSObject {
             NSLog("NetifDriver write_cb WTF invalid ptp")
             return -1
         }
-        
         autoreleasepool {
             if let ptr = UnsafeMutableRawPointer(mutating: buf) {
                 let data = Data(bytesNoCopy: ptr, count: len, deallocator: .none)
