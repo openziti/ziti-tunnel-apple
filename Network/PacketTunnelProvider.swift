@@ -159,8 +159,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 ziti.run { zErr in
                     guard zErr == nil else {
                         NSLog("Unable to init \(zid.name):\(zid.id), err: \(zErr!.localizedDescription)")
-                        zid.enabled = false
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+                        _ = zidStore.store(zid)
                         return
                     }
                     zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
