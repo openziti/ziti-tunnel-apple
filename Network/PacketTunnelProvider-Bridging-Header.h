@@ -14,6 +14,6 @@
 // limitations under the License.
 //
 
-#include "ziti/ziti_tunneler.h"
-#include "ziti/ziti_tunneler_cbs.h"
+#include "ziti/ziti_tunnel.h"
+#include "ziti/ziti_tunnel_cbs.h"
 #include "ziti/netif_driver.h"

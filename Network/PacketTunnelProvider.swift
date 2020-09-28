@@ -39,6 +39,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     var interceptedRoutes:[NEIPv4Route] = []
     let netMon = NWPathMonitor()
     var currPath:Network.NWPath?
+    var ifname:String?
     var zids:[ZitiIdentity] = []    
     var netifDriver:NetifDriver!
     var tnlr_ctx:tunneler_context?
@@ -112,7 +113,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     interceptedRoutes.append(route)
                 }
                 svc.dns?.interceptIp = "\(hn)"
-                NSLog("***** Not ***** Adding route for \(zid.name): \(hn) (port \(port))")
+                #if false
+                NSLog("***** Adding route for \(zid.name): \(hn) (port \(port))")
+                if let ifname = self.ifname {
+                    let p = Process()
+                    p.launchPath = "/sbin/route"
+                    p.arguments = ["add", "-host", hn, "-interface", ifname]
+                    p.launch()
+                    p.waitUntilExit()
+                    let s = p.terminationStatus
+                    NSLog("Attemtp to add route \"/sbin/route add -host \(hn) -interface \(ifname)\", status = \(s), reason = \(p.terminationReason.rawValue)")
+                } else {
+                    NSLog("invalid (nil) interface name")
+                }
+                #else
+                NSLog("***** NOT Adding route for \(zid.name): \(hn) (port \(port))")
+                #endif
             } else {
                 dnsResolver?.hostnamesLock.lock()
                 // See if we already have this DNS name
@@ -282,18 +298,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
     
-    static let dummy:uv_async_cb = { h in }
+    // wrapper to address type mismatch in tunnel sdk
+    static let ziti_sdk_c_host_v1_wrapper:ziti_sdk_host_v1_cb = { zc, loop, svc, proto, host, port in
+        ziti_sdk_c_host_v1(zc?.load(as: ziti_context.self), loop, svc, proto, host, port)
+    }
     @objc func runZiti() {
-        // put something on the loop to hold it open for now. TODO:should be able to remove once NetifDriver is running
-        var h = uv_async_t()
-        uv_async_init(loop, &h, PacketTunnelProvider.dummy)
-                
-        // make sure we have netif setup before reurning or starting run loop
+        // make sure we have netif setup before returning or starting run loop
         var tunneler_opts = tunneler_sdk_options(
             netif_driver: self.netifDriver.open(),
             ziti_dial: ziti_sdk_c_dial,
             ziti_close: ziti_sdk_c_close,
-            ziti_write: ziti_sdk_c_write)
+            ziti_write: ziti_sdk_c_write,
+            ziti_host_v1: PacketTunnelProvider.ziti_sdk_c_host_v1_wrapper)
         self.tnlr_ctx = ziti_tunneler_init(&tunneler_opts, self.loop)
         
         let rStatus = uv_run(loop, UV_RUN_DEFAULT)
@@ -375,7 +391,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
 
             // packetFlow FD
-            var ifname:String?
             let fd = (self.packetFlow.value(forKeyPath: "socket.fileDescriptor") as? Int32) ?? -1
             if fd < 0 {
                 NSLog("Unable to get tun fd")
@@ -384,11 +399,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 let ifnamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: Int(ifnameSz))
                 ifnamePtr.initialize(repeating: 0, count: Int(ifnameSz))
                 if getsockopt(fd, 2 /* SYSPROTO_CONTROL */, 2 /* UTUN_OPT_IFNAME */, ifnamePtr, &ifnameSz) == 0 {
-                    ifname = String(cString: ifnamePtr)
+                    self.ifname = String(cString: ifnamePtr)
                 }
                 ifnamePtr.deallocate()
             }
-            NSLog("Tunnel interface is \(ifname ?? "unknown")")
+            NSLog("Tunnel interface is \(self.ifname ?? "unknown")")
             
             // spawn thread running uv_loop
             Thread(target: self, selector: #selector(self.runZiti), object: nil).start()
