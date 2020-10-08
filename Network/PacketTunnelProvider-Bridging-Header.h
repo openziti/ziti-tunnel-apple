@@ -17,3 +17,6 @@
 #include "ziti/ziti_tunnel.h"
 #include "ziti/ziti_tunnel_cbs.h"
 #include "ziti/netif_driver.h"
+
+// deal with type mismatch in tunneler SDL (ziti_context vs void *)
+void ziti_sdk_c_host_v1_wrapper(void *ziti_ctx, uv_loop_t *loop, const char *service_id, const char *proto, const char *hostname, int port);
