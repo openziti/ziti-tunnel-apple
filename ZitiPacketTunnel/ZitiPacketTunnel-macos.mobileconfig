@@ -45,7 +45,7 @@
 				<key>AuthenticationMethod</key>
 				<string>Password</string>
 				<key>RemoteAddress</key>
-				<string>169.254.1.1</string>
+				<string>100.64.0.1</string>
 				<key>ProviderBundleIdentifier</key>
 				<string>io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider</string>
 			</dict>
@@ -56,13 +56,13 @@
 			<key>VendorConfig</key>
 			<dict>
 				<key>ip</key>
-				<string>169.254.0.1</string>
+				<string>1100.64.0.1</string>
 				<key>subnet</key>
-				<string>255.255.252.0</string>
+				<string>255.192.0.0</string>
                 <key>mtu</key>
                 <string>4000</string>
                 <key>dns</key>
-                <string>169.254.0.2</string>
+                <string>100.64.0.2</string>
                 <key>matchDomains</key>
                 <string></string>
 			</dict>

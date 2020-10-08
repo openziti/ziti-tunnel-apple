@@ -18,15 +18,36 @@ import NetworkExtension
 import Network
 import CZiti
 
-class ZitiTunnelConfig : Codable {
+class ZitiTunnelClientConfig : Codable {
     static var configType = "ziti-tunneler-client.v1"
     
     let hostname:String
     let port:Int
     
-    static func parseConfig(_ zs: inout ziti_service) -> ZitiTunnelConfig? {
-        if let cfg = ziti_service_get_raw_config(&zs, ZitiTunnelConfig.configType.cString(using: .utf8)) {
-            return try? JSONDecoder().decode(ZitiTunnelConfig.self, from: Data(String(cString: cfg).utf8))
+    static func parseConfig(_ zs: inout ziti_service) -> ZitiTunnelClientConfig? {
+        if let cfg = ziti_service_get_raw_config(&zs, ZitiTunnelClientConfig.configType.cString(using: .utf8)) {
+            return try? JSONDecoder().decode(ZitiTunnelClientConfig.self, from: Data(String(cString: cfg).utf8))
+        }
+        return nil
+    }
+}
+
+class ZitiTunnelServerConfig : Codable {
+    static var configType = "ziti-tunneler-server.v1"
+    enum CodingKeys: String, CodingKey {
+            case hostname
+        
+            case port
+            case proto = "protocol"
+        }
+    
+    let hostname:String
+    let port:Int
+    let proto:String // `protocol` is a reserved word...
+    
+    static func parseConfig(_ zs: inout ziti_service) -> ZitiTunnelServerConfig? {
+        if let cfg = ziti_service_get_raw_config(&zs, ZitiTunnelServerConfig.configType.cString(using: .utf8)) {
+            return try? JSONDecoder().decode(ZitiTunnelServerConfig.self, from: Data(String(cString: cfg).utf8))
         }
         return nil
     }
@@ -193,7 +214,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     // identities cause tunnel to be restarted). will need to change this to a weak reference
                     // to `ziti` if we change from restarting on add/delete of identities, and add management
                     // of `ziti` lifecycle...
+                    var gotServices = false
                     ziti.registerServiceCallback { [weak self] ztx, zs, status in
+                        if !gotServices {
+                            gotServices = true
+                            ziti.perform {
+                                print("\n\n\(zid.name): \(zid.services.count) services\n\n")
+                            }
+                        }
                         
                         guard var zs = zs?.pointee, let self = self else { return }
                         
@@ -208,8 +236,21 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         let serviceId = String(cString: zs.id)
                         let serviceWas = zid.services.first(where: { $0.id == serviceId })
                         
+                        if status == ZITI_OK && ((zs.perm_flags & ZITI_CAN_BIND) != 0) {
+                            NSLog("service \(serviceName) CAN bind")
+                            if let cfg = ZitiTunnelServerConfig.parseConfig(&zs) {
+                                NSLog("Bind config hostname:\(cfg.hostname), port:\(cfg.port), proto:\(cfg.proto)")
+                                ziti_tunneler_host_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.name,
+                                                      cfg.proto.cString(using: .utf8),
+                                                      cfg.hostname.cString(using: .utf8),
+                                                      Int32(cfg.port))
+                            } else {
+                                NSLog("Unable to parse server config for \(serviceName)")
+                            }
+                        }
+                        
                         if status == ZITI_OK && ((zs.perm_flags & ZITI_CAN_DIAL) != 0) {
-                            if let cfg = ZitiTunnelConfig.parseConfig(&zs) {
+                            if let cfg = ZitiTunnelClientConfig.parseConfig(&zs) {
                                 NSLog("Service Available \(zid.name)::\(serviceName)")
                                 
                                 if let svc = serviceWas {
@@ -298,10 +339,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
     
-    // wrapper to address type mismatch in tunnel sdk
-    static let ziti_sdk_c_host_v1_wrapper:ziti_sdk_host_v1_cb = { zc, loop, svc, proto, host, port in
-        ziti_sdk_c_host_v1(zc?.load(as: ziti_context.self), loop, svc, proto, host, port)
-    }
     @objc func runZiti() {
         // make sure we have netif setup before returning or starting run loop
         var tunneler_opts = tunneler_sdk_options(
@@ -309,7 +346,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             ziti_dial: ziti_sdk_c_dial,
             ziti_close: ziti_sdk_c_close,
             ziti_write: ziti_sdk_c_write,
-            ziti_host_v1: PacketTunnelProvider.ziti_sdk_c_host_v1_wrapper)
+            ziti_host_v1: ziti_sdk_c_host_v1_wrapper)
         self.tnlr_ctx = ziti_tunneler_init(&tunneler_opts, self.loop)
         
         let rStatus = uv_run(loop, UV_RUN_DEFAULT)
@@ -325,7 +362,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         Logger.initShared(Logger.TUN_TAG)
         NSLog(versionString)
         
-        //setenv("ZITI_LOG", "100", 1)
+        //setenv("ZITI_LOG", "11", 1)
         //setenv("MBEDTLS_DEBUG", "4", 1)
         
         NSLog("startTunnel: options=\(options?.debugDescription ?? "nil")")
