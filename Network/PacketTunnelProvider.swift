@@ -134,22 +134,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     interceptedRoutes.append(route)
                 }
                 svc.dns?.interceptIp = "\(hn)"
-                #if false
-                NSLog("***** Adding route for \(zid.name): \(hn) (port \(port))")
-                if let ifname = self.ifname {
-                    let p = Process()
-                    p.launchPath = "/sbin/route"
-                    p.arguments = ["add", "-host", hn, "-interface", ifname]
-                    p.launch()
-                    p.waitUntilExit()
-                    let s = p.terminationStatus
-                    NSLog("Attemtp to add route \"/sbin/route add -host \(hn) -interface \(ifname)\", status = \(s), reason = \(p.terminationReason.rawValue)")
-                } else {
-                    NSLog("invalid (nil) interface name")
-                }
-                #else
-                NSLog("***** NOT Adding route for \(zid.name): \(hn) (port \(port))")
-                #endif
+                NSLog("***** Adding route for \(zid.name): \(hn) (port \(port)).  Re-start may be required.")
             } else {
                 dnsResolver?.hostnamesLock.lock()
                 // See if we already have this DNS name
@@ -181,10 +166,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     private func loadIdentites(_ loop:UnsafeMutablePointer<uv_loop_t>) -> ZitiError? {
+        
         let zidStore = ZitiIdentityStore()
         let (zids, zErr) = zidStore.loadAll()
         guard zErr == nil, zids != nil else { return zErr }
-                
+        
+        var routeCond = NSCondition() // so we can block waiting for services to be reported..
+        var zidsToLoad = zids!.filter { $0.czid != nil && $0.isEnabled }.count
+        
         for zid in zids! {
             if let czid = zid.czid, zid.isEnabled == true {
                 
@@ -219,7 +208,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         if !gotServices {
                             gotServices = true
                             ziti.perform {
-                                print("\n\n\(zid.name): \(zid.services.count) services\n\n")
+                                //print("\n\n\(zid.name): \(zid.services.count) services\n\n")
+                                routeCond.lock()
+                                zidsToLoad -= 1
+                                print("...loaded \(zid.name), \(zid.services.count) services.  zidsToLoad=\(zidsToLoad)")
+                                routeCond.signal()
+                                routeCond.unlock()
                             }
                         }
                         
@@ -328,6 +322,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
         self.zids = zids ?? []
+        
+        // spawn thread running uv_loop
+        Thread(target: self, selector: #selector(self.runZiti), object: nil).start()
+        
+        // wait for services to be reported...
+        print("\n\nWaiting for routes...\n\n")
+        routeCond.lock()
+        while zidsToLoad > 0 {
+            if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(10.0))) {
+                NSLog("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad)")
+                break
+            }
+        }
+        routeCond.unlock()
+        print("\n\nDone waiting for routes...\n\n")
+        
         return nil
     }
     
@@ -441,9 +451,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 ifnamePtr.deallocate()
             }
             NSLog("Tunnel interface is \(self.ifname ?? "unknown")")
-            
-            // spawn thread running uv_loop
-            Thread(target: self, selector: #selector(self.runZiti), object: nil).start()
             
             // call completion handler with nil to indicate success
             completionHandler(nil)
