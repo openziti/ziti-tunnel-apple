@@ -67,6 +67,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     var loop:UnsafeMutablePointer<uv_loop_t>!
     var writeLock = NSLock()
     
+    var routesLocked = false // when true, restart is required to update routes for services intercepted by IP
+    var rlLock = NSLock()
+    
     override init() {
         super.init()
         netMon.pathUpdateHandler = self.pathUpdateHandler
@@ -129,13 +132,24 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 let route = NEIPv4Route(destinationAddress: hn,
                                         subnetMask: "255.255.255.255")
                 
-                // only add if haven't already..
+                // only add if haven't already.. (potential race condition now on interceptedRoutes...)
                 if interceptedRoutes.first(where: { $0.destinationAddress == route.destinationAddress }) == nil {
                     interceptedRoutes.append(route)
                 }
                 svc.dns?.interceptIp = "\(hn)"
-                NSLog("***** Adding route for \(zid.name): \(hn) (port \(port)).  Re-start may be required.")
+                
+                rlLock.lock()
+                if routesLocked {
+                    NSLog("*** Unable to add route for \(zid.name): \(hn) (port \(port)) to running tunnel. " +
+                            "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
+                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+                } else {
+                    NSLog("Adding route for \(zid.name): \(hn) (port \(port)).")
+                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
+                }
+                rlLock.unlock()
             } else {
+                svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
                 dnsResolver?.hostnamesLock.lock()
                 // See if we already have this DNS name
                 if let currIPs = dnsResolver?.findRecordsByName(hn), currIPs.count > 0 {
@@ -171,7 +185,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let (zids, zErr) = zidStore.loadAll()
         guard zErr == nil, zids != nil else { return zErr }
         
-        var routeCond = NSCondition() // so we can block waiting for services to be reported..
+        let routeCond = NSCondition() // so we can block waiting for services to be reported..
         var zidsToLoad = zids!.filter { $0.czid != nil && $0.isEnabled }.count
         
         for zid in zids! {
@@ -205,6 +219,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     // of `ziti` lifecycle...
                     var gotServices = false
                     ziti.registerServiceCallback { [weak self] ztx, zs, status in
+                        
+                        // C SDK currently grabs all services in single call.  Eventtually it'll be
+                        // paginated, but for now, once C SDK reports on a single service it knows about
+                        // all of 'em, and puts all the service callbacks on the loop. So if we've got
+                        // any service for this zid, we've got them all
                         if !gotServices {
                             gotServices = true
                             ziti.perform {
@@ -218,13 +237,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         }
                         
                         guard var zs = zs?.pointee, let self = self else { return }
-                        
-                        // C SDK currently grabs all services in single call.  Eventtually it'll be
-                        // paginated, but for now, once C SDK reports on a single service it knows about
-                        // all of 'em.  So ziti_dump() here should have lots of useful info.
-                        // note also another string referene to ziti that should be clean-up when we
-                        // change from restarting the tunnel on new/deleted identities
-                        // if zid.services.count == 0 { ziti.dump() } // only stubbed out in C SDK :(
                         
                         let serviceName = String(cString: zs.name)
                         let serviceId = String(cString: zs.id)
@@ -289,7 +301,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                     if let interceptIp = newSvc.dns?.interceptIp {
                                         NSLog("Adding intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
                                         ziti_tunneler_intercept_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
-                                        newSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
                                     }
                                     zid.services.append(newSvc)
                                 }
@@ -327,7 +338,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         Thread(target: self, selector: #selector(self.runZiti), object: nil).start()
         
         // wait for services to be reported...
-        print("\n\nWaiting for routes...\n\n")
         routeCond.lock()
         while zidsToLoad > 0 {
             if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(10.0))) {
@@ -336,7 +346,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
         routeCond.unlock()
-        print("\n\nDone waiting for routes...\n\n")
+        
+        rlLock.lock()
+        routesLocked = true
+        rlLock.unlock()
         
         return nil
     }
