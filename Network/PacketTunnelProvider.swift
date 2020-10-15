@@ -133,19 +133,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                         subnetMask: "255.255.255.255")
                 
                 // only add if haven't already.. (potential race condition now on interceptedRoutes...)
+                var alreadyExists = true
                 if interceptedRoutes.first(where: { $0.destinationAddress == route.destinationAddress }) == nil {
+                    alreadyExists = false
                     interceptedRoutes.append(route)
                 }
                 svc.dns?.interceptIp = "\(hn)"
                 
                 rlLock.lock()
-                if routesLocked {
+                if routesLocked && !alreadyExists {
                     NSLog("*** Unable to add route for \(zid.name): \(hn) (port \(port)) to running tunnel. " +
                             "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
-                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
+                    
                 } else {
                     NSLog("Adding route for \(zid.name): \(hn) (port \(port)).")
-                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
+                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
                 }
                 rlLock.unlock()
             } else {
@@ -160,7 +163,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     NSLog("Adding DNS hostname \(hn): \(ipStr) (port \(port))")
                 } else {
                     NSLog("Unable to add DNS hostname \(hn) for \(zid.name)")
-                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable)
+                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: false)
                 }
                 dnsResolver?.hostnamesLock.unlock()
             }
