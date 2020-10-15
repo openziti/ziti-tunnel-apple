@@ -25,9 +25,11 @@ class ZitiService : Codable {
     class Status : Codable {
         let lastUpdatedAt:TimeInterval
         let status:ZitiIdentity.ConnectivityStatus
-        init(_ lastUpdatedAt:TimeInterval, status:ZitiIdentity.ConnectivityStatus) {
+        var needsRestart:Bool?
+        init(_ lastUpdatedAt:TimeInterval, status:ZitiIdentity.ConnectivityStatus, needsRestart:Bool=false) {
             self.lastUpdatedAt = lastUpdatedAt
             self.status = status
+            self.needsRestart = needsRestart
         }
     }
     var name:String?
