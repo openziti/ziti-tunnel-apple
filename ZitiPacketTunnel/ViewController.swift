@@ -226,6 +226,16 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 self.zidMgr.zids.append(zid)
             }
             self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+            let needsRestart = zid.services.filter {
+                if let status = $0.status, let needsRestart = status.needsRestart {
+                    return needsRestart
+                }
+                return false
+            }
+            print("--- needsRestart = \(needsRestart.count)")
+            if needsRestart.count > 0 {
+                self.tunnelMgr.restartTunnel()
+            }
         }
     }
     
