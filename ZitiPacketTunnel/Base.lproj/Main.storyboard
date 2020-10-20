@@ -18,14 +18,14 @@
                             <menuItem title="Ziti Desktop Edge" id="1Xt-HY-uBw">
                                 <menu key="submenu" title="Ziti Desktop Edge" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
-                                        <menuItem title="About ZitiPacketTunnel" id="5kV-Vb-QxS">
+                                        <menuItem title="About Ziti Desktop Edge" id="5kV-Vb-QxS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="orderFrontStandardAboutPanel:" target="Ady-hI-5gd" id="Exp-CZ-Vem"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
-                                        <menuItem title="Quit ZitiPacketTunnel" keyEquivalent="q" id="4sb-4s-VLi">
+                                        <menuItem title="Quit Ziti Desktop Edge" keyEquivalent="q" id="4sb-4s-VLi">
                                             <connections>
                                                 <action selector="terminate:" target="Ady-hI-5gd" id="Te7-pn-YzF"/>
                                             </connections>
