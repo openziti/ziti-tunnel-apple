@@ -204,6 +204,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         NSLog("Unable to init \(zid.name):\(zid.id), err: \(zErr!.localizedDescription)")
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                         _ = zidStore.store(zid)
+                        
+                        // dec the count (otherwise will need to wait for condition to timeout
+                        routeCond.lock()
+                        zidsToLoad -= 1
+                        routeCond.signal()
+                        routeCond.unlock()
+                        
                         return
                     }
                     zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
@@ -233,7 +240,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                 //print("\n\n\(zid.name): \(zid.services.count) services\n\n")
                                 routeCond.lock()
                                 zidsToLoad -= 1
-                                print("...loaded \(zid.name), \(zid.services.count) services.  zidsToLoad=\(zidsToLoad)")
                                 routeCond.signal()
                                 routeCond.unlock()
                             }
@@ -343,7 +349,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // wait for services to be reported...
         routeCond.lock()
         while zidsToLoad > 0 {
-            if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(10.0))) {
+            if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(30.0))) {
                 NSLog("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad)")
                 break
             }
