@@ -137,7 +137,13 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         task.waitUntilExit()
         let status = task.terminationStatus
         if (status != 0) {
-            print("Unable to open \(logFile) in com.apple.Console")
+            print("Unable to open \(logFile) in com.apple.Console, status=\(status)")
+            let alert = NSAlert()
+            alert.messageText = "Log Unavailable"
+            alert.informativeText = "Unable to open \(logFile) in com.apple.Console"
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "OK")
+            alert.runModal() //== .alertFirstButtonReturn
         }
     }
     
