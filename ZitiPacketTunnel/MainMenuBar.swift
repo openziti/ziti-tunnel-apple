@@ -37,9 +37,18 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         menu.addItem(tunConnectItem)
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "Manage Tunnels", action: #selector(MainMenuBar.showPanel(_:))))
+        
         showDocItem = newMenuItem(title: "Show In Dock", action: #selector(MainMenuBar.showInDock(_:)))
         showDocItem.state = .on
         menu.addItem(showDocItem)
+        
+        let logMenuItem = newMenuItem(title: "Logs", action: nil)
+        menu.addItem(logMenuItem)
+        let logMenu = NSMenu()
+        logMenu.addItem(newMenuItem(title: "Packet Tunnel", action: #selector(MainMenuBar.showPacketTunnelLog(_:))))
+        logMenu.addItem(newMenuItem(title: "Application", action: #selector(MainMenuBar.showApplicationLog(_:))))
+        menu.setSubmenu(logMenu, for: logMenuItem)
+        
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
         menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))
@@ -113,6 +122,31 @@ class MainMenuBar : NSObject, NSWindowDelegate {
             NSApp.setActivationPolicy(.regular)
             showDocItem.state = .on
         }
+    }
+    
+    func openConsole(_ tag:String) {
+        guard let logger = Logger.shared, let logFile = logger.currLog(forTag: tag)?.absoluteString else {
+            print("Unable to find path to \(tag) log")
+            return
+        }
+        
+        let task = Process()
+        task.arguments = ["-b", "com.apple.Console", logFile]
+        task.launchPath = "/usr/bin/open"
+        task.launch()
+        task.waitUntilExit()
+        let status = task.terminationStatus
+        if (status != 0) {
+            print("Unable to open \(logFile) in com.apple.Console")
+        }
+    }
+    
+    @objc func showPacketTunnelLog(_ sender:Any?) {
+        openConsole(Logger.TUN_TAG)
+    }
+    
+    @objc func showApplicationLog(_ sender:Any?) {
+        openConsole(Logger.APP_TAG)
     }
     
     @objc func showPanel(_ sender: Any?) {
