@@ -198,6 +198,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 zid.services = []
                 
                 let ziti = Ziti(zid: czid, loop: loop)
+                zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+                _ = zidStore.store(zid)
                 
                 ziti.run { zErr in
                     guard zErr == nil else {
@@ -349,7 +351,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // wait for services to be reported...
         routeCond.lock()
         while zidsToLoad > 0 {
-            if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(30.0))) {
+            if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(15.0))) {
                 NSLog("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad)")
                 break
             }
@@ -394,7 +396,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         Logger.initShared(Logger.TUN_TAG)
         NSLog(versionString)
         
-        //setenv("ZITI_LOG", "11", 1)
+        //setenv("ZITI_LOG", "4", 1)
         //setenv("MBEDTLS_DEBUG", "4", 1)
         
         NSLog("startTunnel: options=\(options?.debugDescription ?? "nil")")
