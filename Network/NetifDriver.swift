@@ -16,6 +16,23 @@
 
 import Foundation
 
+// looks like NEPacketTunnel flow uses a pool of NEPackets
+// copy the data to make sure we don't trample on re-used memory
+class QueuedPacket : NSObject {
+    let ptr:UnsafeMutablePointer<UInt8>
+    let len:Int
+    
+    init(_ data:Data) {
+        len = data.count
+        ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
+        ptr.initialize(from: [UInt8](data), count: len)
+        super.init()
+    }
+    deinit {
+        ptr.deallocate()
+    }
+}
+
 class NetifDriver : NSObject {
     weak var ptp:PacketTunnelProvider?
     
@@ -23,7 +40,7 @@ class NetifDriver : NSObject {
     var packetCallback:packet_cb?
     var netif:UnsafeMutableRawPointer?
     
-    var readQueue:[Data] = []
+    var readQueue:[QueuedPacket] = []
     var queueLock = NSLock()
     var asyncHandle:uv_async_t?
     
@@ -55,7 +72,7 @@ class NetifDriver : NSObject {
     
     func queuePacket(_ data:Data) {
         queueLock.lock()
-        readQueue.append(data)
+        readQueue.append(QueuedPacket(data))
         queueLock.unlock()
         
         if asyncHandle != nil {
@@ -90,14 +107,10 @@ class NetifDriver : NSObject {
         mySelf.readQueue = []
         mySelf.queueLock.unlock()
         
-        q.forEach { data in
-            let len = data.count
-            let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
-            ptr.initialize(from: [UInt8](data), count: len)
-            ptr.withMemoryRebound(to: Int8.self, capacity: len) {
-                mySelf.packetCallback?($0, len, mySelf.netif)
+        q.forEach { pkt in
+            pkt.ptr.withMemoryRebound(to: Int8.self, capacity: pkt.len) {
+                mySelf.packetCallback?($0, pkt.len, mySelf.netif)
             }
-            ptr.deallocate()
         }
     }
     
