@@ -41,16 +41,24 @@ class IPUtils {
     
     static func extractUInt16(_ data:Data, from:Int) -> UInt16 {
         let byteArray = [UInt8](data[from..<(from+2)])
-        return CFSwapInt16(UnsafePointer(byteArray).withMemoryRebound(to:UInt16.self, capacity: 1) {
-            $0.pointee
-        })
+        return CFSwapInt16(
+            byteArray.withUnsafeBufferPointer {
+                $0.baseAddress!.withMemoryRebound(to: UInt16.self, capacity: 1) {
+                    $0.pointee
+                }
+            }
+        )
     }
 
     static func extractUInt32(_ data:Data, from:Int) -> UInt32 {
         let byteArray = [UInt8](data[from..<(from+4)])
-        return CFSwapInt32(UnsafePointer(byteArray).withMemoryRebound(to:UInt32.self, capacity: 1) {
-            $0.pointee
-        })
+        return CFSwapInt32(
+            byteArray.withUnsafeBufferPointer {
+                $0.baseAddress!.withMemoryRebound(to: UInt32.self, capacity: 1) {
+                    $0.pointee
+                }
+            }
+        )
     }
 
     static func updateUInt16(_ data: inout Data, at:Int, value:UInt16) {
