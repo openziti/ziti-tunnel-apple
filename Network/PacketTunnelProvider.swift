@@ -396,7 +396,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         Logger.initShared(Logger.TUN_TAG)
         NSLog(versionString)
         
-        //setenv("ZITI_LOG", "4", 1)
+        //setenv("ZITI_LOG", "4", 1)  // none=0, error, warn, info(default), debug, verbose, trace
         //setenv("MBEDTLS_DEBUG", "4", 1)
         
         NSLog("startTunnel: options=\(options?.debugDescription ?? "nil")")
