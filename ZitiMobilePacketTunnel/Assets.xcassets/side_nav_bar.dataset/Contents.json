@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "side_nav_bar.xml",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
