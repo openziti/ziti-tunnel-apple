@@ -120,6 +120,7 @@
 		5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76C225D644A0048B2F6 /* TableViewController.swift */; };
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
+		82182B9E25521146002D4F5F /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 82182B9D25521146002D4F5F /* MainUI.storyboard */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
 /* End PBXBuildFile section */
@@ -290,6 +291,7 @@
 		5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewController.swift; sourceTree = "<group>"; };
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
 		7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_macos_targets_Ziti_Desktop_Edge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		82182B9D25521146002D4F5F /* MainUI.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
 		976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; sourceTree = "<group>"; };
 		A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobileShare.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobileShare/Pods-ios_targets-MobileShare.release.xcconfig"; sourceTree = "<group>"; };
 		A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; sourceTree = "<group>"; };
@@ -489,6 +491,7 @@
 				5A2EA2D2209B750C00437608 /* Assets.xcassets */,
 				5A2EA2D4209B750C00437608 /* LaunchScreen.storyboard */,
 				5A2EA2D7209B750C00437608 /* Info.plist */,
+				82182B9D25521146002D4F5F /* MainUI.storyboard */,
 			);
 			path = ZitiMobilePacketTunnel;
 			sourceTree = "<group>";
@@ -819,6 +822,7 @@
 				5A2EA2D6209B750C00437608 /* LaunchScreen.storyboard in Resources */,
 				5AF9C24C226B6FAC009CFD71 /* Default-568h@2x.png in Resources */,
 				5A2EA2D3209B750C00437608 /* Assets.xcassets in Resources */,
+				82182B9E25521146002D4F5F /* MainUI.storyboard in Resources */,
 				5A2EA2D1209B750A00437608 /* Main.storyboard in Resources */,
 				5A6BA260226DF2C500224F09 /* Notices.rtf in Resources */,
 			);
