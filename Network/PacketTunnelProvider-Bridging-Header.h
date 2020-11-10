@@ -20,3 +20,6 @@
 
 // deal with type mismatch in tunneler SDL (ziti_context vs void *)
 void ziti_sdk_c_host_v1_wrapper(void *ziti_ctx, uv_loop_t *loop, const char *service_id, const char *proto, const char *hostname, int port);
+
+char **get_mac_addrs();
+void free_mac_addrs(char **addrs);

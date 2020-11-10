@@ -191,6 +191,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let routeCond = NSCondition() // so we can block waiting for services to be reported..
         var zidsToLoad = zids!.filter { $0.czid != nil && $0.isEnabled }.count
         
+        let postureChecks = ZitiPostureChecks()
+        
         for zid in zids! {
             if let czid = zid.czid, zid.isEnabled == true {
                 
@@ -201,7 +203,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 _ = zidStore.store(zid)
                 
-                ziti.run { zErr in
+                ziti.run(postureChecks) { zErr in
                     guard zErr == nil else {
                         NSLog("Unable to init \(zid.name):\(zid.id), err: \(zErr!.localizedDescription)")
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
