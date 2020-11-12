@@ -73,21 +73,18 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     
     let osQueryImpl:OsQuery = { ctx, cb in
         let vers = ProcessInfo.processInfo.operatingSystemVersion
-        let strVers = "\(vers.majorVersion).\(vers.minorVersion)" // ".\(vers.patchVersion)" // TODO: see what needs to happen to add patchVersion...
+        let strVers = "\(vers.majorVersion).\(vers.minorVersion).\(vers.patchVersion)"
+        
+        // Hack for build number (only available via Apple private API, which will cause App Store rejection)
         var buildStr:String?
+        let fullVersion = ProcessInfo.processInfo.operatingSystemVersionString
+        if let buildStrCheck = fullVersion.components(separatedBy: " ").last?.dropLast() {
+            buildStr = String(buildStrCheck)
+        }
         
         var type:String?
 #if os(macOS)
         type = "macOS"
-
-        // Hack for build number (only available via Apple private API, which will cause App Store rejection, so grabbing from SystemVersion.plist)
-        let versURL = URL(fileURLWithPath: "/System/Library/CoreServices/SystemVersion.plist")
-        if let data = try? Data(contentsOf: versURL),
-           let plist = try? PropertyListSerialization.propertyList(from: data, options: .mutableContainers, format: nil) as? Dictionary<String, Any> {
-            if let plBuildStr = plist["ProductBuildVersion"] {
-                buildStr = plBuildStr as? String
-            }
-        }
 #elseif os(iOS)
         type = "iOS"
 #endif
