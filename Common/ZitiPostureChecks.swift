@@ -23,7 +23,12 @@ import AppKit
 #endif
 
 class ZitiPostureChecks : CZiti.ZitiPostureChecks {
+    var type:String?, strVers:String?, buildStr:String?
+    
     override init() {
+        // just get these once...
+        (type, strVers, buildStr) = ZitiPostureChecks.getOsInfo()
+        
         super.init()
         self.macQuery = macQueryImpl
         self.processQuery = processQueryImpl
@@ -31,24 +36,14 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
         self.osQuery = osQueryImpl
     }
     
-    let macQueryImpl:MacQuery = { ctx, cb in
-        var strs:[String]?
-        let addrs = get_mac_addrs();
-        if var ptr = addrs {
-            strs = []
-            while let s = ptr.pointee {
-                strs?.append(String(cString:s))
-                ptr += 1
-            }
-        }
-        free_mac_addrs(addrs)
-        
-        if strs != nil { strs = Array(Set(strs!)) } // remove duplicates
-        NSLog("MAC Posture Response: \(String(describing: strs))")
-        cb(ctx, strs)
+    func macQueryImpl(_ ctx:ZitiPostureContext, _ cb:MacResponse) {
+        // these can be changed without rebooting, so get them every time...
+        let macAddrs = ZitiPostureChecks.getMacAddrs()
+        NSLog("MAC Posture Response: \(String(describing: macAddrs))")
+        cb(ctx, macAddrs)
     }
     
-    let processQueryImpl:ProcessQuery = { ctx, path, cb in
+    func processQueryImpl(_ ctx:ZitiPostureContext, _ path:String, _ cb:ProcessResponse) {
 #if os(macOS)
         let isRunning = checkIfRunning(path)
         let url = URL(fileURLWithPath: path)
@@ -66,12 +61,32 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
 #endif
     }
     
-    let domainQueryImpl:DomainQuery = { ctx, cb in
+    func domainQueryImpl(_ ctx:ZitiPostureContext, _ cb:DomainResponse) {
         NSLog("Domain Posture Query - Unimplemented")
         cb(ctx, nil)
     }
     
-    let osQueryImpl:OsQuery = { ctx, cb in
+    func osQueryImpl(_ ctx:ZitiPostureContext, _ cb:OsResponse) {
+        NSLog("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
+        cb(ctx, type, strVers, buildStr)
+    }
+    
+    static func getMacAddrs() -> [String]? {
+        var strs:[String]?
+        let addrs = get_mac_addrs();
+        if var ptr = addrs {
+            strs = []
+            while let s = ptr.pointee {
+                strs?.append(String(cString:s))
+                ptr += 1
+            }
+        }
+        free_mac_addrs(addrs)
+        if strs != nil { strs = Array(Set(strs!)) } // remove duplicates
+        return strs
+    }
+    
+    static func getOsInfo() -> (String?, String?, String?) {
         let vers = ProcessInfo.processInfo.operatingSystemVersion
         let strVers = "\(vers.majorVersion).\(vers.minorVersion).\(vers.patchVersion)"
         
@@ -88,59 +103,58 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
 #elseif os(iOS)
         type = "iOS"
 #endif
-        NSLog("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers), build=\(buildStr ?? "")")
-        cb(ctx, type, strVers, buildStr)
+        return (type, strVers, buildStr)
     }
-}
-
-#if os(macOS)
-func checkIfRunning(_ path:String) -> Bool {
-    var found = false
-    for app in NSWorkspace.shared.runningApplications {
-        // contentsEqualAt correct?  more expensive than stright string comparison...
-        if let exePath = app.executableURL?.path, FileManager.default.contentsEqual(atPath: exePath, andPath: path) {
-            NSLog("Found running app for \"\(path)\"\n   name: \(String(describing: app.localizedName))\n   bundleId: \(app.bundleIdentifier ?? "")\n   bundlePath:\(app.bundleURL?.path ?? "")")
-            found = true
-            break
-        }
-    }
-    return found
-}
-
-func getSigners(_ url:URL) -> [String]? {
-    var signers:[String]?
     
-    var codeRef:SecStaticCode?
-    let createStatus = SecStaticCodeCreateWithPath(url as CFURL, SecCSFlags(rawValue: 0), &codeRef)
-    guard createStatus == errSecSuccess else {
-        let errStr = SecCopyErrorMessageString(createStatus, nil) as String? ?? "\(createStatus)"
-        NSLog("Unable to create static code object for file \"\(url.path)\": \(errStr)")
-        return nil
-    }
-
-    var cfDict:CFDictionary?
-    let copyStatus = SecCodeCopySigningInformation(codeRef!, SecCSFlags(rawValue: kSecCSSigningInformation), &cfDict)
-    guard copyStatus == errSecSuccess else {
-        let errStr = SecCopyErrorMessageString(createStatus, nil) as String? ?? "\(copyStatus)"
-        NSLog("Unable to retrieve signining info for file \"\(url.path)\": \(errStr)")
-        return nil
-    }
-
-    if let dict = cfDict as? [CFString:AnyObject] {
-        if dict[kSecCodeInfoCertificates] != nil {
-            let certChain = dict[kSecCodeInfoCertificates] as? [SecCertificate]
-            certChain?.forEach { cert in
-                let der = SecCertificateCopyData(cert) as Data
-                var digest = [UInt8](repeating: 0, count:Int(CC_SHA1_DIGEST_LENGTH))
-                der.withUnsafeBytes {
-                    _ = CC_SHA1($0.baseAddress, CC_LONG(der.count), &digest)
-                }
-                let hexStr = digest.map { String(format: "%02x", $0) }.joined()
-                if signers == nil { signers = [] }
-                signers?.append(hexStr)
+#if os(macOS)
+    func checkIfRunning(_ path:String) -> Bool {
+        var found = false
+        for app in NSWorkspace.shared.runningApplications {
+            // contentsEqualAt correct?  more expensive than stright string comparison...
+            if let exePath = app.executableURL?.path, FileManager.default.contentsEqual(atPath: exePath, andPath: path) {
+                NSLog("Found running app for \"\(path)\"\n   name: \(String(describing: app.localizedName))\n   bundleId: \(app.bundleIdentifier ?? "")\n   bundlePath:\(app.bundleURL?.path ?? "")")
+                found = true
+                break
             }
         }
+        return found
     }
-    return signers
-}
+
+    func getSigners(_ url:URL) -> [String]? {
+        var signers:[String]?
+        
+        var codeRef:SecStaticCode?
+        let createStatus = SecStaticCodeCreateWithPath(url as CFURL, SecCSFlags(rawValue: 0), &codeRef)
+        guard createStatus == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(createStatus, nil) as String? ?? "\(createStatus)"
+            NSLog("Unable to create static code object for file \"\(url.path)\": \(errStr)")
+            return nil
+        }
+
+        var cfDict:CFDictionary?
+        let copyStatus = SecCodeCopySigningInformation(codeRef!, SecCSFlags(rawValue: kSecCSSigningInformation), &cfDict)
+        guard copyStatus == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(createStatus, nil) as String? ?? "\(copyStatus)"
+            NSLog("Unable to retrieve signining info for file \"\(url.path)\": \(errStr)")
+            return nil
+        }
+
+        if let dict = cfDict as? [CFString:AnyObject] {
+            if dict[kSecCodeInfoCertificates] != nil {
+                let certChain = dict[kSecCodeInfoCertificates] as? [SecCertificate]
+                certChain?.forEach { cert in
+                    let der = SecCertificateCopyData(cert) as Data
+                    var digest = [UInt8](repeating: 0, count:Int(CC_SHA1_DIGEST_LENGTH))
+                    der.withUnsafeBytes {
+                        _ = CC_SHA1($0.baseAddress, CC_LONG(der.count), &digest)
+                    }
+                    let hexStr = digest.map { String(format: "%02x", $0) }.joined()
+                    if signers == nil { signers = [] }
+                    signers?.append(hexStr)
+                }
+            }
+        }
+        return signers
+    }
 #endif
+}
