@@ -34,6 +34,15 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
         self.processQuery = processQueryImpl
         self.domainQuery = domainQueryImpl
         self.osQuery = osQueryImpl
+        
+        Thread(target: self, selector: #selector(keepAlive), object: nil).start()
+    }
+    
+    // NSWorkspace runningApplications need main runloop to be active or list of processes doesn't get updated...
+    @objc func keepAlive() {
+        let t = Timer(fire: Date(), interval: 10, repeats: true) {_ in }
+        RunLoop.main.add(t, forMode: .common)
+        RunLoop.main.run()
     }
     
     func macQueryImpl(_ ctx:ZitiPostureContext, _ cb:MacResponse) {
@@ -81,7 +90,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
                 ptr += 1
             }
         }
-        free_mac_addrs(addrs)
+        free_string_array(addrs)
         if strs != nil { strs = Array(Set(strs!)) } // remove duplicates
         return strs
     }
@@ -112,8 +121,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
         for app in NSWorkspace.shared.runningApplications {
             // contentsEqualAt correct?  more expensive than stright string comparison...
             if let exePath = app.executableURL?.path, FileManager.default.contentsEqual(atPath: exePath, andPath: path) {
-                NSLog("Found running app for \"\(path)\"\n   name: \(String(describing: app.localizedName))\n   bundleId: \(app.bundleIdentifier ?? "")\n   bundlePath:\(app.bundleURL?.path ?? "")")
-                found = true
+                found = !app.isTerminated
                 break
             }
         }

@@ -25,6 +25,10 @@
 #include <net/if_dl.h>
 #include <ifaddrs.h>
 #include <errno.h>
+
+#import <sys/proc_info.h>
+#import <libproc.h>
+
 #include "ziti/ziti_tunnel_cbs.h"
 
 void ziti_sdk_c_host_v1_wrapper(void *ziti_ctx, uv_loop_t *loop, const char *service_id, const char *proto, const char *hostname, int port) {
@@ -62,7 +66,7 @@ char **get_mac_addrs() {
     return mac_addrs;
 }
 
-void free_mac_addrs(char **addrs) {
+void free_string_array(char **addrs) {
     if (!addrs) return;
     for (char **i = addrs; *i; i++) {
         free(*i);
@@ -70,3 +74,25 @@ void free_mac_addrs(char **addrs) {
     free(addrs);
 }
 
+#if false
+// always returns 0 procs (works in app with no sandbox)
+char **get_process_names() {
+    int nProcs = proc_listpids(PROC_ALL_PIDS, 0, NULL, 0);
+    char **procs = calloc(nProcs+1, sizeof(char*));
+    
+    pid_t pids[nProcs];
+    bzero(pids, sizeof(pids));
+    proc_listpids(PROC_ALL_PIDS, 0, pids, (int)sizeof(pids));
+    
+    int procIndx = 0;
+    for (int i = 0; i < nProcs; ++i) {
+        if (pids[i] == 0) { continue; }
+        char *pathBuffer = calloc(PROC_PIDPATHINFO_MAXSIZE, sizeof(char));
+        proc_pidpath(pids[i], pathBuffer, PROC_PIDPATHINFO_MAXSIZE * sizeof(char));
+        if (strlen(pathBuffer) > 0) {
+            procs[procIndx++] = pathBuffer;
+        }
+    }
+    return procs;
+}
+#endif
