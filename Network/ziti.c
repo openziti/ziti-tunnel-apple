@@ -26,8 +26,8 @@
 #include <ifaddrs.h>
 #include <errno.h>
 
-#import <sys/proc_info.h>
-#import <libproc.h>
+//#import <sys/proc_info.h>
+//#import <libproc.h>
 
 #include "ziti/ziti_tunnel_cbs.h"
 
