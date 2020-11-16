@@ -38,7 +38,7 @@ class Logger {
     
     func currLog(forTag tag:String) -> URL? {
         guard let appGroupURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: ZitiIdentityStore.APP_GROUP_ID)  else {
+            forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)  else {
                 return nil
         }
         
@@ -51,7 +51,7 @@ class Logger {
     // Delete \(tag)*.logs more than 48 hours old
     private func cleanup() {
         guard let appGroupURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: ZitiIdentityStore.APP_GROUP_ID)  else {
+            forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)  else {
                 NSLog("currLogfile: Invalid app group URL")
                 return
         }
@@ -115,7 +115,6 @@ class Logger {
         }
         setbuf(__stdoutp, nil) // set stdout to flush
         
-        NSLog("Logging to \(url.path)")
         return true
     }
     
