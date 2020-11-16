@@ -22,7 +22,7 @@ class IdentityRenderer: UIStackView {
         super.init(frame: frame)
     }
     
-    required init?(coder: NSCoder) {
+    required init(coder: NSCoder) {
         super.init(coder: coder)
     }
     

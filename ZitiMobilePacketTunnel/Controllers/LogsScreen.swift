@@ -19,11 +19,11 @@ import UIKit
 class LogsScreen: UIViewController, UIActivityItemSource {
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        <#code#>
+        return "";
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        <#code#>
+        return "";
     }
     
     
