@@ -1,6 +1,6 @@
 PODS:
-  - CZiti-iOS (0.16.0)
-  - CZiti-macOS (0.16.0)
+  - CZiti-iOS (0.16.3)
+  - CZiti-macOS (0.16.3)
 
 DEPENDENCIES:
   - CZiti-iOS (~> 0.1)
@@ -12,8 +12,8 @@ SPEC REPOS:
     - CZiti-macOS
 
 SPEC CHECKSUMS:
-  CZiti-iOS: e5112d2c4fac193cf1030e4c769f395a7514ce14
-  CZiti-macOS: fbda7cdf2e3bda59eb41cbe63e33b8dbf292caab
+  CZiti-iOS: b5a00750b3b305194b5525d77b2269ac023a1eaf
+  CZiti-macOS: 373b80e008bcb654f2255a2ebb894fa570f7476b
 
 PODFILE CHECKSUM: 2b4f6a0d4c3fb7ffba3e4f8050b4fa3fcec3206b
 
