@@ -19,12 +19,29 @@ import UIKit
 
 class LogDetailScreen: UIViewController, UIActivityItemSource {
     
+    var logType: String?
+    @IBOutlet weak var LogTitle: UILabel!
+    
+    @IBAction func dismissVC(_ sender: Any) {
+         dismiss(animated: true, completion: nil)
+    }
+    
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return "";
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        
         return "";
+    }
+    
+    
+    override func viewDidLoad() {
+        if (logType=="packet") {
+            LogTitle.text = "  Packet Tunnel Logs";
+        } else {
+            LogTitle.text = "  Application Logs";
+        }
     }
     
     

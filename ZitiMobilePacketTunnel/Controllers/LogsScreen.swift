@@ -18,12 +18,30 @@ import UIKit
 
 class LogsScreen: UIViewController, UIActivityItemSource {
     
+    @IBAction func dismissVC(_ sender: Any) {
+         dismiss(animated: true, completion: nil)
+    }
+    
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return "";
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
         return "";
+    }
+    
+    @IBAction func ShoPacketLog(_ sender: UITapGestureRecognizer) {
+        let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil)
+        let logDetails = storyBoard.instantiateViewController(withIdentifier: "LogDetails") as! LogDetailScreen
+        logDetails.logType = "packet";
+        self.present(logDetails, animated:true, completion:nil)
+    }
+    
+    @IBAction func ShowAppLog(_ sender: UITapGestureRecognizer) {
+        let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil)
+        let logDetails = storyBoard.instantiateViewController(withIdentifier: "LogDetails") as! LogDetailScreen
+        logDetails.logType = "application";
+        self.present(logDetails, animated:true, completion:nil)
     }
     
     

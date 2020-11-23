@@ -28,5 +28,17 @@ class AboutScreen: UIViewController, UIActivityItemSource {
         return "";
     }
     
+    @IBAction func OpenTerms(_ sender: UITapGestureRecognizer) {
+        let url = URL (string: "https://netfoundry.io/terms")!
+        UIApplication.shared.open (url)
+    }
     
+    @IBAction func OpenPrivacy(_ sender: UITapGestureRecognizer) {
+        let url = URL (string: "https://netfoundry.io/privacy")!
+        UIApplication.shared.open (url)
+    }
+    
+    @IBAction func dismissVC(_ sender: Any) {
+         dismiss(animated: true, completion: nil)
+    }
 }

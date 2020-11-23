@@ -15,9 +15,20 @@
 //
 
 import UIKit
+import MessageUI
+import CZiti
 
 
 class IdentityDetailScreen: UIViewController, UIActivityItemSource {
+    
+    @IBOutlet weak var IdName: UITextField!
+    @IBOutlet weak var IdNetwork: UITextField!
+    @IBOutlet weak var IdStatus: UITextField!
+    @IBOutlet weak var IdEnrollment: UITextField!
+    @IBOutlet weak var IdVersion: UITextField!
+    @IBOutlet weak var IdServiceCount: UILabel!
+    
+    var zid:ZitiIdentity?
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return "";
@@ -27,5 +38,32 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         return "";
     }
     
+    @IBAction func dismissVC(_ sender: Any) {
+         dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func ForgetAction(_ sender: UITapGestureRecognizer) {
+        
+    }
+    
+    override func viewDidLoad() {
+        IdName.text = zid?.name;
+        IdNetwork.text = zid?.czid?.ztAPI;
+        IdVersion.text = zid?.controllerVersion ?? "unknown";
+        IdEnrollment.text = zid?.enrollmentStatus.rawValue;
+        IdServiceCount.text = zid?.services.count ?? 0+" Services";
+        
+        let cs = zid?.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
+        var csStr = ""
+        if zid?.isEnrolled ?? false == false {
+            csStr = "None"
+        } else if cs.status == .PartiallyAvailable {
+            csStr = "Partially Available"
+        } else {
+            csStr = cs.status.rawValue
+        }
+        csStr += " (as of \(DateFormatter().timeSince(cs.lastContactAt)))"
+        IdStatus.text = csStr;
+    }
     
 }
