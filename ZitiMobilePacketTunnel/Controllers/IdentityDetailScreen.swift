@@ -51,7 +51,7 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         IdNetwork.text = zid?.czid?.ztAPI;
         IdVersion.text = zid?.controllerVersion ?? "unknown";
         IdEnrollment.text = zid?.enrollmentStatus.rawValue;
-        IdServiceCount.text = zid?.services.count ?? 0+" Services";
+        IdServiceCount.text = "\(zid?.services.count) Services";
         
         let cs = zid?.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
         var csStr = ""

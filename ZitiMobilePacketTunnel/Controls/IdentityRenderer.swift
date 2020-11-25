@@ -19,11 +19,16 @@ import UIKit
 class IdentityRenderer: UIStackView {
     
     override init(frame: CGRect) {
-        super.init(frame: frame)
+        super.init(frame: frame);
+        initView();
     }
     
     required init(coder: NSCoder) {
-        super.init(coder: coder)
+        super.init(coder: coder);
+        initView();
+    }
+    
+    func initView() {
     }
     
     /*

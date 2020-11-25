@@ -74,7 +74,8 @@ class AddIdentityScreen: UIViewController, UIActivityItemSource, UIDocumentPicke
                 DispatchQueue.main.async {
                     //self.tableView.reloadData()
                     //self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
-                    self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+                    // self.performSegue(withIdentifier: "IdentityDetailAddSeque", sender: self)
+                    self.dismiss(animated: true, completion: nil)
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -98,7 +99,11 @@ class AddIdentityScreen: UIViewController, UIActivityItemSource, UIDocumentPicke
         return "";
     }
     
-    @IBAction func AddFromJwt(_ sender: UITapGestureRecognizer) {
+    @IBAction func QrAdd(_ sender: UITapGestureRecognizer) {
+        present(sc, animated: true)
+    }
+    
+    @IBAction func JwtAdd(_ sender: UITapGestureRecognizer) {
         let dp = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .import)
         dp.modalPresentationStyle = .formSheet
         dp.allowsMultipleSelection = false
@@ -108,10 +113,6 @@ class AddIdentityScreen: UIViewController, UIActivityItemSource, UIDocumentPicke
     
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
         NSLog("picker cancelled")
-    }
-    
-    @IBAction func AddFromQR(_ sender: UITapGestureRecognizer) {
-        present(sc, animated: true)
     }
     
     @IBAction func dismissVC(_ sender: Any) {

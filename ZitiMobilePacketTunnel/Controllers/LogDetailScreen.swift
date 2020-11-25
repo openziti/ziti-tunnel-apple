@@ -21,9 +21,11 @@ class LogDetailScreen: UIViewController, UIActivityItemSource {
     
     var logType: String?
     @IBOutlet weak var LogTitle: UILabel!
+    @IBOutlet weak var LogText: UITextView!
+    @IBOutlet weak var ShareButton: UIImageView!
     
     @IBAction func dismissVC(_ sender: Any) {
-         dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
@@ -31,17 +33,29 @@ class LogDetailScreen: UIViewController, UIActivityItemSource {
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        
         return "";
     }
     
     
     override func viewDidLoad() {
+        let logger = Logger.shared;
+        guard let url = logger!.currLog(forTag: Logger.APP_TAG) else { return };
+        LogTitle.text = "  Application Logs";
         if (logType=="packet") {
             LogTitle.text = "  Packet Tunnel Logs";
-        } else {
-            LogTitle.text = "  Application Logs";
+            guard let url = logger!.currLog(forTag: Logger.TUN_TAG) else { return };
         }
+        
+        do {
+            try LogText.text = String(contentsOf: url, encoding: .utf8);
+            ShareButton?.isHidden = (LogText.text.count>0);
+        } catch {
+            LogText.text = error.localizedDescription
+            NSLog("No content found for log, \(error.localizedDescription)")
+        }
+        
+        LogText.layoutManager.allowsNonContiguousLayout = false;
+        LogText.scrollRangeToVisible(NSMakeRange(LogText.text.count-1, 0));
     }
     
     
