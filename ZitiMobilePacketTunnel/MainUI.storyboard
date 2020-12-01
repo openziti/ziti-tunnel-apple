@@ -2875,6 +2875,7 @@
                         <outlet property="IdServiceCount" destination="5bA-Fo-F9O" id="oXn-Pt-6fO"/>
                         <outlet property="IdStatus" destination="Zsd-DS-MWY" id="3Uq-Md-ZBl"/>
                         <outlet property="IdVersion" destination="VZy-vl-xW0" id="dTU-uy-Lav"/>
+                        <outlet property="ServiceList" destination="b1S-hn-A0E" id="BDP-AH-hvU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XPF-Zw-IbF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
