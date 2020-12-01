@@ -32,6 +32,7 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
     var zid:ZitiIdentity?
     var zidMgr:ZidMgr?
     var tunnelMgr:TunnelMgr?
+    var dash:DashboardScreen?
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return "";
@@ -61,6 +62,7 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
                         self.zidMgr?.zids.remove(at: indx)
                     }
                 }
+                self.dash?.reloadList();
                 self.dismiss(animated: true, completion: nil)
         }))
         
@@ -113,7 +115,7 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         view.addSubview(spinner.view)
         spinner.didMove(toParent: self)
         
-        //DispatchQueue.global().async {
+        DispatchQueue.global().async {
             Ziti.enroll(jwtFile) { zidResp, zErr in
                 DispatchQueue.main.async {
                     // lose the spinner
@@ -148,9 +150,10 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
                     zid.enrolled = true
                     _ = self.zidMgr?.zidStore.store(zid)
                     self.tunnelMgr?.restartTunnel()
+                    self.dash?.reloadList();
                 }
             }
-        //}
+        }
     }
     
     func onEnabledValueChanged(_ enabled:Bool) {
@@ -158,6 +161,7 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
             zid.enabled = enabled
             _ = zidMgr?.zidStore.store(zid)
             tunnelMgr?.restartTunnel()
+            self.dash?.reloadList();
         }
     }
     

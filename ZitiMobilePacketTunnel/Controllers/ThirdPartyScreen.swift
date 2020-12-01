@@ -18,6 +18,8 @@ import UIKit
 
 class ThirdPartyScreen: UIViewController, UIActivityItemSource {
     
+    @IBOutlet weak var textView: UITextView!
+    
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return "";
     }
@@ -28,6 +30,20 @@ class ThirdPartyScreen: UIViewController, UIActivityItemSource {
     
     @IBAction func dismissVC(_ sender: Any) {
          dismiss(animated: true, completion: nil)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        if let rtfPath = Bundle.main.url(forResource:"Notices", withExtension: "rtf") {
+            do {
+                let attributedStringWithRtf = try NSAttributedString(url: rtfPath, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil)
+                textView.attributedText = attributedStringWithRtf
+                textView.textColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0);
+            } catch {
+                NSLog("NoticesViewConroller: No content found!")
+            }
+        }
     }
     
     
