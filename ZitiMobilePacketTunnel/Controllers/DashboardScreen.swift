@@ -132,6 +132,8 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil);
         let idDetails = storyBoard.instantiateViewController(withIdentifier: "IdentityDetail") as! IdentityDetailScreen;
         idDetails.zid = zidMgr.zids[tag];
+        idDetails.zidMgr = zidMgr;
+        idDetails.tunnelMgr = tunnelMgr;
         self.present(idDetails, animated:true, completion:nil);
         
     }

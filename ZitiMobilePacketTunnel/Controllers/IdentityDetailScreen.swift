@@ -27,8 +27,11 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
     @IBOutlet weak var IdEnrollment: UITextField!
     @IBOutlet weak var IdVersion: UITextField!
     @IBOutlet weak var IdServiceCount: UILabel!
+    @IBOutlet weak var EnrollButton: UIButton!
     
     var zid:ZitiIdentity?
+    var zidMgr:ZidMgr?
+    var tunnelMgr:TunnelMgr?
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return "";
@@ -43,7 +46,26 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
     }
     
     @IBAction func ForgetAction(_ sender: UITapGestureRecognizer) {
+        let alert = UIAlertController(
+            title:"Are you sure?",
+            message: "Deleting identity \(zid?.name ?? "") cannot be undone.",
+            preferredStyle: .alert)
         
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("OK", comment: "Default action"),
+            style: .default,
+            handler: { _ in
+                if let zid = self.zid {
+                    _ = self.zidMgr?.zidStore.remove(zid)
+                    if let indx = self.zidMgr?.zids.firstIndex(of: zid) {
+                        self.zidMgr?.zids.remove(at: indx)
+                    }
+                }
+                self.dismiss(animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "Cancel"), style: .cancel))
+        present(alert, animated: true, completion: nil)
     }
     
     override func viewDidLoad() {
@@ -57,6 +79,7 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         var csStr = ""
         if zid?.isEnrolled ?? false == false {
             csStr = "None"
+            EnrollButton.isHidden = false;
         } else if cs.status == .PartiallyAvailable {
             csStr = "Partially Available"
         } else {
@@ -64,6 +87,78 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         }
         csStr += " (as of \(DateFormatter().timeSince(cs.lastContactAt)))"
         IdStatus.text = csStr;
+    }
+    
+    @IBAction func DoEnrollment(_ sender: UITapGestureRecognizer) {
+        guard let zid = self.zid else { return }
+        guard let presentedItemURL = self.zidMgr?.zidStore.presentedItemURL else {
+            let alert = UIAlertController(
+                title:"Unable to enroll \(zid.name)",
+                message: "Unable to access group container",
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("OK", comment: "Default action"),
+                style: .default))
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
+        
+        let url = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false)
+        let jwtFile = url.path
+        
+        // Ziti.enroll takes too long, needs to be done in background
+        let spinner = SpinnerViewController()
+        addChild(spinner)
+        spinner.view.frame = view.frame
+        view.addSubview(spinner.view)
+        spinner.didMove(toParent: self)
+        
+        //DispatchQueue.global().async {
+            Ziti.enroll(jwtFile) { zidResp, zErr in
+                DispatchQueue.main.async {
+                    // lose the spinner
+                    spinner.willMove(toParent: nil)
+                    spinner.view.removeFromSuperview()
+                    spinner.removeFromParent()
+                    
+                    guard zErr == nil, let zidResp = zidResp else {
+                        _ = self.zidMgr?.zidStore.store(zid)
+                        
+                        let alert = UIAlertController(
+                            title:"Unable to enroll \(zid.name)",
+                            message: zErr != nil ? zErr!.localizedDescription : "",
+                            preferredStyle: .alert)
+                        
+                        alert.addAction(UIAlertAction(
+                            title: NSLocalizedString("OK", comment: "Default action"),
+                            style: .default))
+                        self.present(alert, animated: true, completion: nil)
+                        return
+                    }
+                    
+                    if zid.czid == nil {
+                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPI: zidResp.ztAPI)
+                    }
+                    zid.czid?.ca = zidResp.ca
+                    if zidResp.name != nil {
+                        zid.czid?.name = zidResp.name
+                    }
+                    
+                    zid.enabled = true
+                    zid.enrolled = true
+                    _ = self.zidMgr?.zidStore.store(zid)
+                    self.tunnelMgr?.restartTunnel()
+                }
+            }
+        //}
+    }
+    
+    func onEnabledValueChanged(_ enabled:Bool) {
+        if let zid = self.zid {
+            zid.enabled = enabled
+            _ = zidMgr?.zidStore.store(zid)
+            tunnelMgr?.restartTunnel()
+        }
     }
     
 }
