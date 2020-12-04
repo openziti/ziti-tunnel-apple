@@ -255,7 +255,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         let serviceId = String(cString: zs.id)
                         let serviceWas = zid.services.first(where: { $0.id == serviceId })
                         
-                        if status == ZITI_OK && ((zs.perm_flags & ZITI_CAN_BIND) != 0) {
+                        if status == ZITI_OK && ((zs.perm_flags & Int32(ZITI_CAN_BIND)) != 0) {
                             NSLog("service \(serviceName) CAN bind")
                             if let cfg = ZitiTunnelServerConfig.parseConfig(&zs) {
                                 NSLog("Bind config hostname:\(cfg.hostname), port:\(cfg.port), proto:\(cfg.proto)")
@@ -268,7 +268,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                             }
                         }
                         
-                        if status == ZITI_OK && ((zs.perm_flags & ZITI_CAN_DIAL) != 0) {
+                        if status == ZITI_OK && ((zs.perm_flags & Int32(ZITI_CAN_DIAL)) != 0) {
                             if let cfg = ZitiTunnelClientConfig.parseConfig(&zs) {
                                 NSLog("Service Available \(zid.name)::\(serviceName)")
                                 
@@ -398,6 +398,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         Logger.initShared(Logger.TUN_TAG)
         NSLog(versionString)
         
+        setenv("ZITI_TIME_FORMAT", "utc", 1)
         //setenv("ZITI_LOG", "4", 1)  // none=0, error, warn, info(default), debug, verbose, trace
         //setenv("MBEDTLS_DEBUG", "4", 1)
         
