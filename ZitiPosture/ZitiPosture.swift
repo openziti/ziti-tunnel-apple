@@ -24,11 +24,6 @@ class ZitiPosture: NSObject, ZitiPostureProtocol {
         super.init()
     }
     
-    func upperCaseString(_ string: String, withReply reply: @escaping (String) -> Void) {
-        let response = string.uppercased()
-        reply(response)
-    }
-    
     func processQuery(_ path:String, withReply reply: @escaping (_ isRunning:Bool,_  sha512Hash:String?, _ signers:[String]?) -> Void) {
         let isRunning = is_running(path.cString(using: .utf8))
         let url = URL(fileURLWithPath: path)
