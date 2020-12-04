@@ -10,7 +10,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>MN5S649TXM.ZitiPacketTunnel.group</string>
+		<string>$(TeamIdentifierPrefix)ZitiPacketTunnel.group</string>
 	</array>
 	<key>com.apple.security.files.downloads.read-only</key>
 	<true/>
