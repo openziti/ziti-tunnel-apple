@@ -232,7 +232,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 }
                 return false
             }
-            print("--- needsRestart = \(needsRestart.count)")
             if needsRestart.count > 0 {
                 self.tunnelMgr.restartTunnel()
             }

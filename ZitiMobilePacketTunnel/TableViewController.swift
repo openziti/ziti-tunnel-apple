@@ -144,7 +144,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 }
                 return false
             }
-            print("--- needsRestart = \(needsRestart.count)")
             if needsRestart.count > 0 {
                 self.tunnelMgr.restartTunnel()
             }
