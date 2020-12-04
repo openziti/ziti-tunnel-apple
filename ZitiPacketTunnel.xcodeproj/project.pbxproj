@@ -87,7 +87,6 @@
 		5A78DE972562A88900316CE9 /* ZitiPostureProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A78DE7C25620C4100316CE9 /* ZitiPostureProtocol.swift */; };
 		5A78DEB12562B1FE00316CE9 /* ZitiPosture.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5A78DE7A25620C4100316CE9 /* ZitiPosture.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5A78DEB92562F45000316CE9 /* ziti_posture.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A78DEB82562F45000316CE9 /* ziti_posture.c */; };
-		5A78DEC22562FD3700316CE9 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5A78DEE325631E1000316CE9 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A78DEE225631E1000316CE9 /* AppGroup.swift */; };
 		5A78DEE425631E1000316CE9 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A78DEE225631E1000316CE9 /* AppGroup.swift */; };
 		5A78DEE525631E1000316CE9 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A78DEE225631E1000316CE9 /* AppGroup.swift */; };
@@ -124,6 +123,7 @@
 		5AF3DCB324B52642005047BC /* MobileShare.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5AF3DCA924B52642005047BC /* MobileShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
 		5AF4BEC8223FF19C001F1F4D /* TCPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */; };
+		5AF50F1D257A52200092DC47 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5AF7868A208A91650093498C /* IPv4Packet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78686208A702A0093498C /* IPv4Packet.swift */; };
 		5AF7868B208A91650093498C /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF7868D208A99640093498C /* UDPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF7868C208A99640093498C /* UDPPacket.swift */; };
@@ -331,6 +331,7 @@
 		5AF3DCAE24B52642005047BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		5AF3DCB024B52642005047BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPPacket.swift; sourceTree = "<group>"; };
+		5AF50F7D257AA5DF0092DC47 /* ZitiPosture.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ZitiPosture.entitlements; sourceTree = "<group>"; };
 		5AF78686208A702A0093498C /* IPv4Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Packet.swift; sourceTree = "<group>"; };
 		5AF78688208A8D050093498C /* IPUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPUtils.swift; sourceTree = "<group>"; };
 		5AF7868C208A99640093498C /* UDPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPPacket.swift; sourceTree = "<group>"; };
@@ -584,6 +585,7 @@
 		5A78DE7B25620C4100316CE9 /* ZitiPosture */ = {
 			isa = PBXGroup;
 			children = (
+				5AF50F7D257AA5DF0092DC47 /* ZitiPosture.entitlements */,
 				5A78DE7C25620C4100316CE9 /* ZitiPostureProtocol.swift */,
 				5A78DE7D25620C4100316CE9 /* ZitiPosture.swift */,
 				5A78DE7E25620C4100316CE9 /* ZitiPostureDelegate.swift */,
@@ -1219,10 +1221,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A78DE8125620C4100316CE9 /* main.swift in Sources */,
-				5A78DEC22562FD3700316CE9 /* Logger.swift in Sources */,
 				5A78DE7F25620C4100316CE9 /* ZitiPostureDelegate.swift in Sources */,
 				5A78DEE825631E1000316CE9 /* AppGroup.swift in Sources */,
 				5A78DEB92562F45000316CE9 /* ziti_posture.c in Sources */,
+				5AF50F1D257A52200092DC47 /* Logger.swift in Sources */,
 				5A78DE922562A87E00316CE9 /* ZitiPosture.swift in Sources */,
 				5A78DE972562A88900316CE9 /* ZitiPostureProtocol.swift in Sources */,
 			);
@@ -1679,13 +1681,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_ENTITLEMENTS = ZitiPosture/ZitiPosture.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ZitiPosture/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)_$(_BOOL_$(SKIP_INSTALL))) @loader_path/../../../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)_$(_BOOL_$(SKIP_INSTALL))) @loader_path/../../../../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1706,13 +1709,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_ENTITLEMENTS = ZitiPosture/ZitiPosture.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ZitiPosture/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)_$(_BOOL_$(SKIP_INSTALL))) @loader_path/../../../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST)_$(_BOOL_$(SKIP_INSTALL))) @loader_path/../../../../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel.ZitiPosture;
