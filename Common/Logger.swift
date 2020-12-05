@@ -15,6 +15,10 @@
 //
 
 import Foundation
+import CZiti
+
+// call Logger.initShared() first...
+var zLog:ZitiLog = Logger.shared!.zitiLog
 
 class Logger {
     static var shared:Logger?
@@ -23,9 +27,11 @@ class Logger {
     
     private let tag:String
     private var timer:Timer? = nil
+    let zitiLog:ZitiLog
     
     private init(_ tag:String) {
         self.tag = tag
+        self.zitiLog = ZitiLog(Bundle.main.displayName ?? tag)
     }
     
     deinit {
@@ -52,13 +58,13 @@ class Logger {
     private func cleanup() {
         guard let appGroupURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)  else {
-                NSLog("currLogfile: Invalid app group URL")
+            zLog.error("currLogfile: Invalid app group URL")
                 return
         }
         
         let fm = FileManager.default
         guard let list = try? fm.contentsOfDirectory(at: appGroupURL, includingPropertiesForKeys: nil, options: []) else {
-            NSLog("Logger.cleanup Unable to search log directory to log files to clear")
+            zLog.warn("Logger.cleanup Unable to search log directory for log files to clear")
             return
         }
         
@@ -68,12 +74,12 @@ class Logger {
                 if let attrs = try? fm.attributesOfItem(atPath: url.path), let iat = attrs[.creationDate] as? Date {
                     let daysOld = ((now.timeIntervalSince(iat) / 60) / 60) / 24
                     if daysOld > 2.0 {
-                        NSLog("Removing \(url.lastPathComponent) (is over \(Int(daysOld)) days old)")
+                        zLog.info("Removing \(url.lastPathComponent) (is over \(Int(daysOld)) days old)")
                         do { try fm.removeItem(at: url) }
-                        catch { NSLog("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)") }
+                        catch { zLog.error("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)") }
                     }
                 } else {
-                    NSLog("Logger.cleanup Unable to get file attributes pf \(url.lastPathComponent)")
+                    zLog.error("Logger.cleanup Unable to get file attributes pf \(url.lastPathComponent)")
                 }
             }
         }
@@ -81,7 +87,7 @@ class Logger {
     
     private func updateLogger() -> Bool {
         guard let url = currLog else {
-            NSLog("updateLogger: Invalid log URL")
+            zLog.error("updateLogger: Invalid log URL")
             return false
         }
         
@@ -95,13 +101,13 @@ class Logger {
             do {
                 try "".write(toFile: url.path, atomically: true, encoding: .utf8)
             } catch {
-                NSLog("Unable to create log file \(url.path)")
+                zLog.error("Unable to create log file \(url.path)")
                 return false
             }
         }
         
         guard let lfh = FileHandle(forUpdatingAtPath: url.path) else {
-            NSLog("Unable to get file handle for updating \(url.path)")
+            zLog.error("Unable to get file handle for updating \(url.path)")
             return false
         }
         
@@ -110,7 +116,7 @@ class Logger {
         let stdOutDes = dup2(lfh.fileDescriptor, FileHandle.standardOutput.fileDescriptor)
         
         if (stdErrDes != FileHandle.standardError.fileDescriptor) || (stdOutDes != FileHandle.standardOutput.fileDescriptor) {
-            NSLog("Unable to capture stdout and stderr to file \(url.path)")
+            zLog.error("Unable to capture stdout and stderr to file \(url.path)")
             return false
         }
         setbuf(__stdoutp, nil) // set stdout to flush
@@ -120,9 +126,11 @@ class Logger {
     
     static func initShared(_ tag:String) {
         Logger.shared = Logger(tag)
+        ZitiLog.setLogLevel(.INFO)
+        
         if Logger.shared?.updateLogger() == false {
             // Do what?  invalidate Logger? revisit when add #file #function #line stuff
-            NSLog("Unable to created shared Logger")
+            zLog.error("Unable to created shared Logger")
         }
 
         // fire timer periodically for clean-up and rolling
@@ -133,5 +141,12 @@ class Logger {
                 _ = Logger.shared?.updateLogger()
             }
         }
+    }
+}
+
+extension Bundle {
+    var displayName: String? {
+            return object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+                object(forInfoDictionaryKey: "CFBundleName") as? String
     }
 }

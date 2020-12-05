@@ -27,7 +27,7 @@ class ZitiError : LocalizedError, CustomNSError {
     public var errorUserInfo:[String:Any] = [:]
     
     init(_ errorDescription:String, errorCode:Int=Int(-1)) {
-        NSLog("\(errorCode) \(errorDescription)")
+        zLog.debug("\(errorCode) \(errorDescription)")
         self.errorDescription = errorDescription
         self.errorCode = errorCode
     }

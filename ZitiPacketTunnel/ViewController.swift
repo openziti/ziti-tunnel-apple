@@ -167,7 +167,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         super.viewDidLoad()
         
         Logger.initShared(Logger.APP_TAG)
-        NSLog(Version.verboseStr)
+        zLog.info(Version.verboseStr)
         
         zidMgr.zidStore.delegate = self
         tableView.delegate = self
@@ -181,7 +181,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         
         // Load previous identities
         if let err = zidMgr.loadZids() {
-            NSLog(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
+            zLog.error(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
         
         tableView.reloadData()
@@ -199,7 +199,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         DispatchQueue.main.async {
             //if let match = self.zidMgr.zids.first(where: { $0.id == idString }) {
                 // shouldn't happend unless somebody deletes the file.
-                NSLog("\(idString) REMOVED")
+                zLog.info("\(idString) REMOVED")
                 _ = self.zidMgr.loadZids()
                 self.representedObject = Int(0)
                 self.tunnelMgr.restartTunnel()
@@ -210,7 +210,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     func onNewOrChangedId(_ zid: ZitiIdentity) {
         DispatchQueue.main.async {
             if let match = self.zidMgr.zids.first(where: { $0.id == zid.id }) {
-                NSLog("\(zid.name):\(zid.id) CHANGED")
+                zLog.info("\(zid.name):\(zid.id) CHANGED")
                 
                 // TUN will disable if unable to start for zid
                 match.edgeStatus = zid.edgeStatus
@@ -222,7 +222,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             } else {
                 // new one.  generally zids are only added by this app (so will be matched above).
                 // But possible somebody could load one manually or some day via MDM or somesuch
-                NSLog("\(zid.name):\(zid.id) NEW")
+                zLog.info("\(zid.name):\(zid.id) NEW")
                 self.zidMgr.zids.append(zid)
             }
             self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
@@ -232,7 +232,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 }
                 return false
             }
-            print("--- needsRestart = \(needsRestart.count)")
             if needsRestart.count > 0 {
                 self.tunnelMgr.restartTunnel()
             }

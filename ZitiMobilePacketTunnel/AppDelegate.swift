@@ -24,21 +24,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         Logger.initShared(Logger.APP_TAG)
-        NSLog(Version.verboseStr)
+        zLog.info(Version.verboseStr)
         return true
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if let opts = launchOptions {
             launchURL = opts[UIApplication.LaunchOptionsKey.url] as? URL
-            NSLog("Launching app with URL: \(launchURL?.absoluteString ?? "invalid")")
+            zLog.info("Launching app with URL: \(launchURL?.absoluteString ?? "invalid")")
         }
         return true
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         if launchURL == nil {
-            NSLog("AppDelegate notifying new URL: \(url.absoluteURL)")
+            zLog.info("AppDelegate notifying new URL: \(url.absoluteURL)")
             notifyNewURL(url)
         }
         return true

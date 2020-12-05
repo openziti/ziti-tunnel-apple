@@ -82,7 +82,7 @@ class NetifDriver : NSObject {
     
     static let setup_cb:setup_packet_cb = { handle, loop, cb, netif in
         guard let mySelf = NetifDriver.unretained(UnsafeMutableRawPointer(handle)) else {
-            NSLog("NetifDriver setup_cb WTF invalid handle")
+            zLog.wtf("invalid handle")
             return -1
         }
         
@@ -98,7 +98,7 @@ class NetifDriver : NSObject {
     
     static let async_cb:uv_async_cb = { ctx in
         guard let mySelf = NetifDriver.unretained(ctx?.pointee.data) else {
-            NSLog("NetifDriver async_cb WTF invalid ctx")
+            zLog.wtf("invalid ctx")
             return
         }
         
@@ -115,17 +115,17 @@ class NetifDriver : NSObject {
     }
     
     static let read_cb:netif_read_cb = { handle, buf, len in
-        NSLog("NetifDriver Unexpected read callback for non-poll driver")
+        zLog.error("NetifDriver Unexpected read callback for non-poll driver")
         return Int(0)
     }
     
     static let write_cb:netif_write_cb = { handle, buf, len in
         guard let mySelf = NetifDriver.unretained(UnsafeMutableRawPointer(handle)) else {
-            NSLog("NetifDriver write_cb WTF invalid handle")
+            zLog.wtf("invalid handle")
             return -1
         }
         guard let ptp = mySelf.ptp else {
-            NSLog("NetifDriver write_cb WTF invalid ptp")
+            zLog.wtf("invalid ptp")
             return -1
         }
         autoreleasepool {
@@ -139,7 +139,7 @@ class NetifDriver : NSObject {
     
     static let close_cb:netif_close_cb = { handle in
         guard let mySelf = NetifDriver.unretained(UnsafeMutableRawPointer(handle)) else {
-            NSLog("NetifDriver write_cb WTF invalid handle")
+            zLog.wtf("invalid handle")
             return -1
         }
         mySelf.close()

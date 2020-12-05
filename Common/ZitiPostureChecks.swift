@@ -18,20 +18,23 @@ import Foundation
 import CZiti
 
 #if os(macOS)
-import ZitiPosture
+// import ZitiPosture
+import AppKit
+import CryptoKit
+import CommonCrypto
 #endif
 
 class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     var type:String?, strVers:String?, buildStr:String?
     
     #if os(macOS)
-    let service:ZitiPostureProtocol?
+    //let service:ZitiPostureProtocol?
     #endif
     
     override init() {
         // just get these once...
         (type, strVers, buildStr) = ZitiPostureChecks.getOsInfo()
-        
+/*
 #if os(macOS)
         // setup XPC
         let connection = NSXPCConnection(serviceName: "io.netfoundry.ZitiPacketTunnel.ZitiPosture")
@@ -39,47 +42,69 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
         connection.resume()
 
         service = connection.remoteObjectProxyWithErrorHandler { error in
-            NSLog("Received error getting proxy for ZitPosture XPC Service: \(error)")
+            zLog.error("Received error getting proxy for ZitPosture XPC Service: \(error)")
         } as? ZitiPostureProtocol
 #endif
+*/
         
         super.init()
         self.macQuery = macQueryImpl
         self.processQuery = processQueryImpl
         self.domainQuery = domainQueryImpl
         self.osQuery = osQueryImpl
+        
+        Thread(target: self, selector: #selector(keepAlive), object: nil).start()
     }
+    
+    // NSWorkspace runningApplications need main runloop to be active or list of processes doesn't get updated...
+    @objc func keepAlive() {
+        let t = Timer(fire: Date(), interval: 10, repeats: true) {_ in }
+        RunLoop.main.add(t, forMode: .common)
+        RunLoop.main.run()
+    }
+    
     
     func macQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping MacResponse) {
         // these can be changed without rebooting, so get them every time...
         let macAddrs = ZitiPostureChecks.getMacAddrs()
-        NSLog("MAC Posture Response: \(String(describing: macAddrs))")
+        zLog.info("MAC Posture Response: \(String(describing: macAddrs))")
         cb(ctx, macAddrs)
     }
     
     func processQueryImpl(_ ctx:ZitiPostureContext, _ path:String, _ cb: @escaping ProcessResponse) {
 #if os(macOS)
-        guard let service = service else {
-            NSLog("ZitiPosture XPC Servicex not available.")
+        /*guard let service = service else {
+            zLog.error("ZitiPosture XPC Servicex not available.")
             cb(ctx, path, false, nil, nil)
             return
         }
         service.processQuery(path) { isRunning, hashString, signers in
-            NSLog("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
+            zLog.info("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
             cb(ctx, path, isRunning, hashString, signers)
+        }*/
+        let isRunning = checkIfRunning(path)
+        let url = URL(fileURLWithPath: path)
+        var hashString:String?
+
+        if let data = try? Data(contentsOf: url) {
+            let hashed = SHA512.hash(data: data)
+            hashString = hashed.compactMap { String(format: "%02x", $0) }.joined()
         }
+        let signers = getSigners(url)
+        zLog.info("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
+        cb(ctx, path, isRunning, hashString, signers)
 #else
         cb(ctx, path, false, nil, nil)
 #endif
     }
     
     func domainQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping DomainResponse) {
-        NSLog("Domain Posture Query - Unimplemented")
+        zLog.warn("Domain Posture Query - Unimplemented")
         cb(ctx, nil)
     }
     
     func osQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping OsResponse) {
-        NSLog("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
+        zLog.info("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
         cb(ctx, type, strVers, buildStr)
     }
     
@@ -117,4 +142,55 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
 #endif
         return (type, strVers, buildStr)
     }
+    
+#if os(macOS)
+    func checkIfRunning(_ path:String) -> Bool {
+        var found = false
+        for app in NSWorkspace.shared.runningApplications {
+            // contentsEqualAt correct?  more expensive than stright string comparison...
+            if let exePath = app.executableURL?.path, FileManager.default.contentsEqual(atPath: exePath, andPath: path) {
+                found = !app.isTerminated
+                break
+            }
+        }
+        return found
+    }
+
+    func getSigners(_ url:URL) -> [String]? {
+        var signers:[String]?
+        
+        var codeRef:SecStaticCode?
+        let createStatus = SecStaticCodeCreateWithPath(url as CFURL, SecCSFlags(rawValue: 0), &codeRef)
+        guard createStatus == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(createStatus, nil) as String? ?? "\(createStatus)"
+            zLog.error("Unable to create static code object for file \"\(url.path)\": \(errStr)")
+            return nil
+        }
+
+        var cfDict:CFDictionary?
+        let copyStatus = SecCodeCopySigningInformation(codeRef!, SecCSFlags(rawValue: kSecCSSigningInformation), &cfDict)
+        guard copyStatus == errSecSuccess else {
+            let errStr = SecCopyErrorMessageString(createStatus, nil) as String? ?? "\(copyStatus)"
+            zLog.error("Unable to retrieve signining info for file \"\(url.path)\": \(errStr)")
+            return nil
+        }
+
+        if let dict = cfDict as? [CFString:AnyObject] {
+            if dict[kSecCodeInfoCertificates] != nil {
+                let certChain = dict[kSecCodeInfoCertificates] as? [SecCertificate]
+                certChain?.forEach { cert in
+                    let der = SecCertificateCopyData(cert) as Data
+                    var digest = [UInt8](repeating: 0, count:Int(CC_SHA1_DIGEST_LENGTH))
+                    der.withUnsafeBytes {
+                        _ = CC_SHA1($0.baseAddress, CC_LONG(der.count), &digest)
+                    }
+                    let hexStr = digest.map { String(format: "%02x", $0) }.joined()
+                    if signers == nil { signers = [] }
+                    signers?.append(hexStr)
+                }
+            }
+        }
+        return signers
+    }
+#endif
 }

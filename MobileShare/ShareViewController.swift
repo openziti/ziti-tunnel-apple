@@ -44,7 +44,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         view.isHidden = true
         
         Logger.initShared(Logger.APP_TAG)
-        NSLog("MobileShare loaded")
+        zLog.info("MobileShare loaded")
         
         tableView.dataSource = self
         tableView.delegate = self

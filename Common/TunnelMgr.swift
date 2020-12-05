@@ -40,7 +40,7 @@ class TunnelMgr: NSObject {
         var tpm = NETunnelProviderManager()
         NETunnelProviderManager.loadAllFromPreferences { [weak self] savedManagers, error in
             if let error = error {
-                NSLog(error.localizedDescription)
+                zLog.error(error.localizedDescription)
                 completionHandler?(nil, error)
                 return
             }
@@ -51,7 +51,7 @@ class TunnelMgr: NSObject {
             
             tpm.loadFromPreferences { error in
                 if let error = error {
-                    NSLog(error.localizedDescription)
+                    zLog.error(error.localizedDescription)
                     completionHandler?(nil, error)
                     return
                 }
@@ -73,12 +73,12 @@ class TunnelMgr: NSObject {
                     
                     tpm.saveToPreferences { error in
                         if let error = error {
-                            NSLog(error.localizedDescription)
+                            zLog.error(error.localizedDescription)
                         } else {
-                            NSLog("Saved successfully. Re-loading preferences")
+                            zLog.info("Saved successfully. Re-loading preferences")
                             // ios hack per apple forums (else NEVPNErrorDomain Code=1)
                             tpm.loadFromPreferences { error in
-                                NSLog("Re-loaded preferences, error=\(error != nil)")
+                                zLog.error("Re-loaded preferences, error=\(error != nil)")
                             }
                         }
                     }
@@ -118,20 +118,20 @@ class TunnelMgr: NSObject {
         if tpm.isEnabled {
             try (tpm.connection as? NETunnelProviderSession)?.startTunnel()
         } else {
-            NSLog("startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
+            zLog.warn("startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
             tpm.isEnabled = true
             tpm.saveToPreferences { error in
                 if let error = error {
-                    NSLog(error.localizedDescription)
+                    zLog.error(error.localizedDescription)
                 } else {
-                    NSLog("Saved successfully. Re-loading preferences")
+                    zLog.info("Saved successfully. Re-loading preferences")
                     // ios hack per apple forums (else NEVPNErrorDomain Code=1 on starting tunnel)
                     tpm.loadFromPreferences { [weak tpm] error in
-                        NSLog("Re-loaded preferences, error=\(error != nil). Attempting to start")
+                        zLog.error("Re-loaded preferences, error=\(error != nil). Attempting to start")
                         do {
                             try (tpm?.connection as? NETunnelProviderSession)?.startTunnel()
                         } catch {
-                            NSLog("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
+                            zLog.error("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
                         }
                     }
                 }
@@ -145,7 +145,7 @@ class TunnelMgr: NSObject {
     
     func restartTunnel() {
         if let status = tpm?.connection.status, status != .disconnected {
-            NSLog("Restarting tunnel")
+            zLog.info("Restarting tunnel")
             tunnelRestarting = true
             stopTunnel()
         }
