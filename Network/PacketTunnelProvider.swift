@@ -72,6 +72,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override init() {
         super.init()
+        
+        Logger.initShared(Logger.TUN_TAG)
+        zLog.info(versionString)
+        
         netMon.pathUpdateHandler = self.pathUpdateHandler
         netMon.start(queue: DispatchQueue.global())
         dnsResolver = DNSResolver(self)
@@ -84,7 +88,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         for i in path.availableInterfaces {
             ifaceStr += " \n     \(i.index): name:\(i.name), type:\(i.type)"
         }
-        NSLog("Network Path Update:\n   Status:\(path.status), Expensive:\(path.isExpensive), Cellular:\(path.usesInterfaceType(.cellular))\n   Interfaces:\(ifaceStr)")
+        zLog.info("Network Path Update:\n   Status:\(path.status), Expensive:\(path.isExpensive), Cellular:\(path.usesInterfaceType(.cellular))\n   Interfaces:\(ifaceStr)")
     }
     
     func readPacketFlow() {
@@ -142,12 +146,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 
                 rlLock.lock()
                 if routesLocked && !alreadyExists {
-                    NSLog("*** Unable to add route for \(zid.name): \(hn) (port \(port)) to running tunnel. " +
+                    zLog.warn("*** Unable to add route for \(zid.name): \(hn) (port \(port)) to running tunnel. " +
                             "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
                     svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
                     
                 } else {
-                    NSLog("Adding route for \(zid.name): \(hn) (port \(port)).")
+                    zLog.info("Adding route for \(zid.name): \(hn) (port \(port)).")
                     svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
                 }
                 rlLock.unlock()
@@ -157,12 +161,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 // See if we already have this DNS name
                 if let currIPs = dnsResolver?.findRecordsByName(hn), currIPs.count > 0 {
                     svc.dns?.interceptIp = "\(currIPs.first!.ip)"
-                    NSLog("Using DNS hostname \(hn): \(currIPs.first!.ip) (port \(port))")
+                    zLog.info("Using DNS hostname \(hn): \(currIPs.first!.ip) (port \(port))")
                 } else if let ipStr = dnsResolver?.addHostname(hn) {
                     svc.dns?.interceptIp = "\(ipStr)"
-                    NSLog("Adding DNS hostname \(hn): \(ipStr) (port \(port))")
+                    zLog.info("Adding DNS hostname \(hn): \(ipStr) (port \(port))")
                 } else {
-                    NSLog("Unable to add DNS hostname \(hn) for \(zid.name)")
+                    zLog.info("Unable to add DNS hostname \(hn) for \(zid.name)")
                     svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: false)
                 }
                 dnsResolver?.hostnamesLock.unlock()
@@ -205,7 +209,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 
                 ziti.run(postureChecks) { zErr in
                     guard zErr == nil else {
-                        NSLog("Unable to init \(zid.name):\(zid.id), err: \(zErr!.localizedDescription)")
+                        zLog.error("Unable to init \(zid.name):\(zid.id), err: \(zErr!.localizedDescription)")
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                         _ = zidStore.store(zid)
                         
@@ -241,7 +245,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         if !gotServices {
                             gotServices = true
                             ziti.perform {
-                                //print("\n\n\(zid.name): \(zid.services.count) services\n\n")
                                 routeCond.lock()
                                 zidsToLoad -= 1
                                 routeCond.signal()
@@ -256,21 +259,21 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         let serviceWas = zid.services.first(where: { $0.id == serviceId })
                         
                         if status == ZITI_OK && ((zs.perm_flags & Int32(ZITI_CAN_BIND)) != 0) {
-                            NSLog("service \(serviceName) CAN bind")
+                            zLog.debug("service \(serviceName) CAN bind")
                             if let cfg = ZitiTunnelServerConfig.parseConfig(&zs) {
-                                NSLog("Bind config hostname:\(cfg.hostname), port:\(cfg.port), proto:\(cfg.proto)")
+                                zLog.debug("Bind config hostname:\(cfg.hostname), port:\(cfg.port), proto:\(cfg.proto)")
                                 ziti_tunneler_host_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.name,
                                                       cfg.proto.cString(using: .utf8),
                                                       cfg.hostname.cString(using: .utf8),
                                                       Int32(cfg.port))
                             } else {
-                                NSLog("Unable to parse server config for \(serviceName)")
+                                zLog.error("Unable to parse server config for \(serviceName)")
                             }
                         }
                         
                         if status == ZITI_OK && ((zs.perm_flags & Int32(ZITI_CAN_DIAL)) != 0) {
                             if let cfg = ZitiTunnelClientConfig.parseConfig(&zs) {
-                                NSLog("Service Available \(zid.name)::\(serviceName)")
+                                zLog.debug("Service Available \(zid.name)::\(serviceName)")
                                 
                                 if let svc = serviceWas {
                                     // Update all fields except interceptIP
@@ -281,7 +284,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                         if self.countInterceptRefs(zids!, svc.dns?.interceptIp ?? "") == 1 {
                                             if let interceptIp = svc.dns?.interceptIp, let dnsResolver = self.dnsResolver {
                                                 let hn = svc.dns?.hostname ?? ""
-                                                NSLog("Removing DNS entry for service \(serviceName), \(hn) != \(interceptIp)")
+                                                zLog.debug("Removing DNS entry for service \(serviceName), \(hn) != \(interceptIp)")
                                                 dnsResolver.hostnamesLock.lock()
                                                 dnsResolver.hostnames = dnsResolver.hostnames.filter { $0.ip != interceptIp }
                                                 dnsResolver.hostnamesLock.unlock()
@@ -297,7 +300,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                     
                                     // add it back with new info
                                     if let interceptIp = svc.dns?.interceptIp {
-                                        NSLog("Updating intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
+                                        zLog.debug("Updating intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
                                         ziti_tunneler_intercept_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
                                         svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
                                     }
@@ -312,29 +315,29 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                     
                                     self.updateHostsAndIntercepts(zid, newSvc)
                                     if let interceptIp = newSvc.dns?.interceptIp {
-                                        NSLog("Adding intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
+                                        zLog.debug("Adding intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
                                         ziti_tunneler_intercept_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
                                     }
                                     zid.services.append(newSvc)
                                 }
                             } else {
-                                NSLog("Unable to parse config for serivce \(serviceName):\(serviceId)")
+                                zLog.error("Unable to parse config for serivce \(serviceName):\(serviceId)")
                             }
                         } else if status == ZITI_SERVICE_UNAVAILABLE {
-                            NSLog("Service Unvailable \(zid.name)::\(serviceName)")
+                            zLog.debug("Service Unvailable \(zid.name)::\(serviceName)")
                             
                             let refCount = self.countInterceptRefs(zids!, serviceWas?.dns?.interceptIp ?? "")
                             if refCount == 1 {
                                 // remove from hostnames (locked) TODO: move DNS stuff into DnsResolver
                                 if let interceptIp = serviceWas?.dns?.interceptIp, let dnsResolver = self.dnsResolver {
                                     let hn = serviceWas?.dns?.hostname ?? ""
-                                    NSLog("Removing DNS entry for service \(serviceName), \(hn) != \(interceptIp)")
+                                    zLog.debug("Removing DNS entry for service \(serviceName), \(hn) != \(interceptIp)")
                                     dnsResolver.hostnamesLock.lock()
                                     dnsResolver.hostnames = dnsResolver.hostnames.filter { $0.ip != interceptIp }
                                     dnsResolver.hostnamesLock.unlock()
                                 }
                             } else {
-                                NSLog("Leaving DNS entry, refCount was \(refCount)")
+                                zLog.debug("Leaving DNS entry, refCount was \(refCount)")
                             }
                             ziti_tunneler_stop_intercepting(self.tnlr_ctx, zs.id)
                             zid.services = zid.services.filter { $0.id != serviceId }
@@ -354,7 +357,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         routeCond.lock()
         while zidsToLoad > 0 {
             if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(15.0))) {
-                NSLog("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad)")
+                zLog.warn("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad)")
                 break
             }
         }
@@ -388,21 +391,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let rStatus = uv_run(loop, UV_RUN_DEFAULT)
         guard rStatus == 0 else {
             let errStr = String(cString: uv_strerror(rStatus))
-            NSLog("error running uv loop: \(rStatus) \(errStr)")
+            zLog.wtf("error running uv loop: \(rStatus) \(errStr)")
             return
         }
-        NSLog("runZiti - loop exited with status 0")
+        zLog.info("runZiti - loop exited with status 0")
     }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-        Logger.initShared(Logger.TUN_TAG)
-        NSLog(versionString)
-        
-        setenv("ZITI_TIME_FORMAT", "utc", 1)
-        //setenv("ZITI_LOG", "4", 1)  // none=0, error, warn, info(default), debug, verbose, trace
-        //setenv("MBEDTLS_DEBUG", "4", 1)
-        
-        NSLog("startTunnel: options=\(options?.debugDescription ?? "nil")")
+        zLog.info("startTunnel: options=\(options?.debugDescription ?? "nil")")
                 
         //loop = uv_default_loop()
         loop = UnsafeMutablePointer<uv_loop_t>.allocate(capacity: 1)
@@ -416,11 +412,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {
-            NSLog("Unable to startTunnel. Invalid providerConfiguration. \(error)")
+            zLog.wtf("Unable to startTunnel. Invalid providerConfiguration. \(error)")
             completionHandler(error)
             return
         }
-        NSLog("\(self.providerConfig.debugDescription)")
+        zLog.info("\(self.providerConfig.debugDescription)")
         
         // load identities
         // for each svc aither update intercepts or add hostname to resolver
@@ -452,7 +448,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                         subnetMask: self.providerConfig.subnetMask)
         interceptedRoutes.append(includedRoute)
         interceptedRoutes.forEach { r in
-            NSLog("route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
+            zLog.info("route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
         }
         tunnelNetworkSettings.ipv4Settings?.includedRoutes = interceptedRoutes
         // TODO: ipv6Settings
@@ -460,14 +456,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
             if let error = error {
-                NSLog(error.localizedDescription)
+                zLog.error(error.localizedDescription)
                 completionHandler(error as NSError)
             }
 
             // packetFlow FD
             let fd = (self.packetFlow.value(forKeyPath: "socket.fileDescriptor") as? Int32) ?? -1
             if fd < 0 {
-                NSLog("Unable to get tun fd")
+                zLog.warn("Unable to get tun fd")
             } else {
                 var ifnameSz = socklen_t(IFNAMSIZ)
                 let ifnamePtr = UnsafeMutablePointer<CChar>.allocate(capacity: Int(ifnameSz))
@@ -477,7 +473,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
                 ifnamePtr.deallocate()
             }
-            NSLog("Tunnel interface is \(self.ifname ?? "unknown")")
+            zLog.info("Tunnel interface is \(self.ifname ?? "unknown")")
             
             // call completion handler with nil to indicate success
             completionHandler(nil)
@@ -490,7 +486,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
-        NSLog("stopTunnel")
+        zLog.info("done")
         completionHandler()
         // Just exit - there are bugs in Apple macOS, plus makes sure we're 'clean' on restart
         exit(EXIT_SUCCESS)
@@ -501,7 +497,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler?(nil)
             return
         }
-        NSLog("PTP Got message from app... \(messageString)")
+        zLog.info("PTP Got message from app... \(messageString)")
         
         if let handler = completionHandler {
             handler(messageData)

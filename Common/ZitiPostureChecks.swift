@@ -42,7 +42,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
         connection.resume()
 
         service = connection.remoteObjectProxyWithErrorHandler { error in
-            NSLog("Received error getting proxy for ZitPosture XPC Service: \(error)")
+            zLog.error("Received error getting proxy for ZitPosture XPC Service: \(error)")
         } as? ZitiPostureProtocol
 #endif
 */
@@ -67,19 +67,19 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     func macQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping MacResponse) {
         // these can be changed without rebooting, so get them every time...
         let macAddrs = ZitiPostureChecks.getMacAddrs()
-        NSLog("MAC Posture Response: \(String(describing: macAddrs))")
+        zLog.info("MAC Posture Response: \(String(describing: macAddrs))")
         cb(ctx, macAddrs)
     }
     
     func processQueryImpl(_ ctx:ZitiPostureContext, _ path:String, _ cb: @escaping ProcessResponse) {
 #if os(macOS)
         /*guard let service = service else {
-            NSLog("ZitiPosture XPC Servicex not available.")
+            zLog.error("ZitiPosture XPC Servicex not available.")
             cb(ctx, path, false, nil, nil)
             return
         }
         service.processQuery(path) { isRunning, hashString, signers in
-            NSLog("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
+            zLog.info("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
             cb(ctx, path, isRunning, hashString, signers)
         }*/
         let isRunning = checkIfRunning(path)
@@ -91,7 +91,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
             hashString = hashed.compactMap { String(format: "%02x", $0) }.joined()
         }
         let signers = getSigners(url)
-        NSLog("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
+        zLog.info("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
         cb(ctx, path, isRunning, hashString, signers)
 #else
         cb(ctx, path, false, nil, nil)
@@ -99,12 +99,12 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     }
     
     func domainQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping DomainResponse) {
-        NSLog("Domain Posture Query - Unimplemented")
+        zLog.warn("Domain Posture Query - Unimplemented")
         cb(ctx, nil)
     }
     
     func osQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping OsResponse) {
-        NSLog("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
+        zLog.info("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
         cb(ctx, type, strVers, buildStr)
     }
     
@@ -163,7 +163,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
         let createStatus = SecStaticCodeCreateWithPath(url as CFURL, SecCSFlags(rawValue: 0), &codeRef)
         guard createStatus == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(createStatus, nil) as String? ?? "\(createStatus)"
-            NSLog("Unable to create static code object for file \"\(url.path)\": \(errStr)")
+            zLog.error("Unable to create static code object for file \"\(url.path)\": \(errStr)")
             return nil
         }
 
@@ -171,7 +171,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
         let copyStatus = SecCodeCopySigningInformation(codeRef!, SecCSFlags(rawValue: kSecCSSigningInformation), &cfDict)
         guard copyStatus == errSecSuccess else {
             let errStr = SecCopyErrorMessageString(createStatus, nil) as String? ?? "\(copyStatus)"
-            NSLog("Unable to retrieve signining info for file \"\(url.path)\": \(errStr)")
+            zLog.error("Unable to retrieve signining info for file \"\(url.path)\": \(errStr)")
             return nil
         }
 

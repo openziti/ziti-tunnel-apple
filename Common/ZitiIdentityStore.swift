@@ -49,23 +49,23 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                 let list = try FileManager.default.contentsOfDirectory(at: self.presentedItemURL!, includingPropertiesForKeys: nil, options: [])
                 try list.forEach { url in
                     if url.pathExtension == "zid" {
-                        NSLog("found id \(url.lastPathComponent)")
+                        zLog.debug("found id \(url.lastPathComponent)")
                         let data = try Data.init(contentsOf: url)
                         let jsonDecoder = JSONDecoder()
                         if let zId = try? jsonDecoder.decode(ZitiIdentity.self, from: data) {
                             if zId.czid == nil {
-                                NSLog("ZitiIdentityStore.load failed loading \(url.lastPathComponent).  Unsupported version")
+                                zLog.error("failed loading \(url.lastPathComponent).  Unsupported version")
                             } else {
                                 zIds.append(zId)
                             }
                         } else {
                             // log it and continue (don't return error and abort)
-                            NSLog("ZitiIdentityStore.load failed loading \(url.lastPathComponent)")
+                            zLog.error("failed loading \(url.lastPathComponent)")
                         }
                     }
                 }
             } catch {
-                zErr = ZitiError("ZitiIdentityStore.load Unable to read directory URL: \(error.localizedDescription)")
+                zErr = ZitiError("Unable to read directory URL: \(error.localizedDescription)")
             }
         }
         guard zErr == nil else {
@@ -76,7 +76,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     
     func load(_ idString:String) -> (ZitiIdentity?, ZitiError?) {
         guard let presentedItemURL = self.presentedItemURL else {
-            return (nil, ZitiError("ZitiIdentityStore.load: Invalid container URL"))
+            return (nil, ZitiError("Invalid container URL"))
         }
         
         let fc = NSFileCoordinator()
@@ -89,9 +89,9 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                 let jsonDecoder = JSONDecoder()
                 zid = try jsonDecoder.decode(ZitiIdentity.self, from: data)
             } catch let error as NSError where error.code == ZitiError.NoSuchFile {
-                zErr = ZitiError("ZitiIdentityStore unable to load zid \(idString): \(error.localizedDescription)", errorCode:ZitiError.NoSuchFile)
+                zErr = ZitiError("Unable to load zid \(idString): \(error.localizedDescription)", errorCode:ZitiError.NoSuchFile)
             } catch {
-                zErr = ZitiError("ZitiIdentityStore unable to load zid \(idString): \(error.localizedDescription)")
+                zErr = ZitiError("Unable to load zid \(idString): \(error.localizedDescription)")
             }
         }
         return (zid, zErr)
@@ -99,7 +99,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     
     func store(_ zId:ZitiIdentity) -> ZitiError? {
         guard let presentedItemURL = self.presentedItemURL else {
-            return ZitiError("ZitiIdentityStore.store: Invalid container URL")
+            return ZitiError("Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
@@ -111,7 +111,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                 let data = try jsonEncoder.encode(zId)
                 try data.write(to: url, options: .atomic)
             } catch {
-                zErr = ZitiError("ZitiIdentityStore.store Unable to write URL: \(error.localizedDescription)")
+                zErr = ZitiError("Unable to write URL: \(error.localizedDescription)")
             }
         }
         return zErr
@@ -119,7 +119,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     
     func storeJWT(_ zId:ZitiIdentity, _ jwtOrig:URL) -> ZitiError? {
         guard let presentedItemURL = self.presentedItemURL else {
-            return ZitiError("ZitiIdentityStore.store: Invalid container URL")
+            return ZitiError("Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
@@ -130,7 +130,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                 let data = try Data(contentsOf: jwtOrig)
                 try data.write(to: url, options: .atomic)
             } catch {
-                zErr = ZitiError("ZitiIdentityStore.store Unable store JWT URL: \(error.localizedDescription)")
+                zErr = ZitiError("Unable store JWT URL: \(error.localizedDescription)")
             }
         }
         return zErr
@@ -138,7 +138,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     
     func remove(_ zid:ZitiIdentity) -> ZitiError? {
         guard let presentedItemURL = self.presentedItemURL else {
-            return ZitiError("ZitiIdentityStore.remove: Invalid container URL")
+            return ZitiError("Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
@@ -151,7 +151,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
                 }
                 try FileManager.default.removeItem(at: url)
             } catch {
-                zErr = ZitiError("ZitiIdentityStore.remove Unable to delete zId: \(error.localizedDescription)")
+                zErr = ZitiError("Unable to delete zId: \(error.localizedDescription)")
             }
         }
         if zErr == nil { _ = removeJWT(zid) }
@@ -160,7 +160,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     
     func removeJWT(_ zid:ZitiIdentity) -> ZitiError? {
         guard let presentedItemURL = self.presentedItemURL else {
-            return ZitiError("ZitiIdentityStore.removeCId: Invalid container URL")
+            return ZitiError("Invalid container URL")
         }
         
         let fc = NSFileCoordinator()
@@ -170,7 +170,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
             do {
                 try FileManager.default.removeItem(at: url)
             } catch {
-                zErr = ZitiError("ZitiIdentityStore.removeJWT Unable to delete JWT: \(error.localizedDescription)")
+                zErr = ZitiError("Unable to delete JWT: \(error.localizedDescription)")
             }
         }
         return zErr
@@ -200,6 +200,6 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     // This is never called.  Per Internet, its a bug in Apple code
     // will have to use SubitemDidChange
     //func presentedSubitemDidAppear(at url: URL) {
-      //  NSLog("NEW: \(url.lastPathComponent)") /
+      //  zLog.info("NEW: \(url.lastPathComponent)") /
     //}
 }

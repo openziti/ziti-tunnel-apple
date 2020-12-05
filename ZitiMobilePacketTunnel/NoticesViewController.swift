@@ -27,7 +27,7 @@ class NoticesViewController: UIViewController {
                 let attributedStringWithRtf = try NSAttributedString(url: rtfPath, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil)
                 textView.attributedText = attributedStringWithRtf
             } catch {
-                NSLog("NoticesViewConroller: No content found!")
+                zLog.error("NoticesViewConroller: No content found!")
             }
         }
     }
