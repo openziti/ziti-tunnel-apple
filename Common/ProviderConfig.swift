@@ -16,6 +16,7 @@
 
 import Foundation
 import NetworkExtension
+import CZiti
 
 enum ProviderConfigError : Error {
     case invalidIpAddress
@@ -44,6 +45,7 @@ class ProviderConfig : NSObject {
     static var MTU_KEY = "mtu"
     static var DNS_KEY = "dns"
     static var MATCH_DOMAINS_KEY = "matchDomains"
+    static var LOG_LEVEL = "logLevel"
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "100.64.0.1"
@@ -61,11 +63,13 @@ class ProviderConfig : NSObject {
 #else
     var localizedDescription = "Ziti Mobile Edge"
 #endif
+    var logLevel:Int = Int(ZitiLog.LogLevel.INFO.rawValue)
     
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,
             ProviderConfig.SUBNET_KEY: self.subnetMask,
             ProviderConfig.MTU_KEY: String(self.mtu),
+            ProviderConfig.LOG_LEVEL: String(self.logLevel),
             ProviderConfig.DNS_KEY: self.dnsAddresses.joined(separator: ","),
             ProviderConfig.MATCH_DOMAINS_KEY: self.dnsMatchDomains.joined(separator: ",")]
     }
@@ -101,6 +105,7 @@ class ProviderConfig : NSObject {
         self.ipAddress = (conf[ProviderConfig.IP_KEY] as! String).trimmingCharacters(in: .whitespaces)
         self.subnetMask = (conf[ProviderConfig.SUBNET_KEY] as! String).trimmingCharacters(in: .whitespaces)
         self.mtu = Int(conf[ProviderConfig.MTU_KEY] as! String)!
+        self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL] as? String ?? "3") ?? 3
         self.dnsAddresses = (conf[ProviderConfig.DNS_KEY] as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
         self.dnsMatchDomains = [""] // all routes by default
         if let mds = conf[ProviderConfig.MATCH_DOMAINS_KEY] {
@@ -118,6 +123,7 @@ class ProviderConfig : NSObject {
             "subnetMask: \(self.subnetMask)\n" +
             "mtu: \(self.mtu)\n" +
             "dns: \(self.dnsAddresses.joined(separator:","))\n" +
-            "dnsMatchDomains: \(self.dnsMatchDomains.joined(separator:","))"
+            "dnsMatchDomains: \(self.dnsMatchDomains.joined(separator:","))\n" +
+            "logLevel: \(self.logLevel)"
     }
 }

@@ -18,7 +18,10 @@ import Foundation
 import CZiti
 
 // call Logger.initShared() first...
-var zLog:ZitiLog = Logger.shared!.zitiLog
+var zLog:ZitiLog {
+    assert(Logger.shared != nil, "zLog used before Logger initialized")
+    return Logger.shared!.zitiLog
+}
 
 class Logger {
     static var shared:Logger?
@@ -126,8 +129,8 @@ class Logger {
     
     static func initShared(_ tag:String) {
         Logger.shared = Logger(tag)
+        zLog.info("Setting log level to \(ZitiLog.LogLevel.INFO)")
         ZitiLog.setLogLevel(.INFO)
-        
         if Logger.shared?.updateLogger() == false {
             // Do what?  invalidate Logger? revisit when add #file #function #line stuff
             zLog.error("Unable to created shared Logger")

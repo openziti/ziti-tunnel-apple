@@ -16,6 +16,7 @@
 
 import Foundation
 import NetworkExtension
+import CZiti
 
 class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager?
@@ -36,7 +37,7 @@ class TunnelMgr: NSObject {
     deinit { NotificationCenter.default.removeObserver(self) }
     
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
-    func loadFromPreferences(_ bid:String, completionHandler: LoadCompletionHandler? = nil) {
+    func loadFromPreferences(_ bid:String, _ completionHandler: LoadCompletionHandler? = nil) {
         var tpm = NETunnelProviderManager()
         NETunnelProviderManager.loadAllFromPreferences { [weak self] savedManagers, error in
             if let error = error {
@@ -84,14 +85,27 @@ class TunnelMgr: NSObject {
                     }
                 }
                 
-                // Get notified when tunnel status changes
                 if let tmgr = self {
+                    // Get notified when tunnel status changes
                     NotificationCenter.default.removeObserver(tmgr)
                     NotificationCenter.default.addObserver(tmgr, selector:
                         #selector(TunnelMgr.tunnelStatusDidChange(_:)), name:
                         NSNotification.Name.NEVPNStatusDidChange, object: nil)
                 
                     tmgr.tpm = tpm
+                    
+                    // Get our logLevel from config
+                    if let conf = (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration {
+                        if let logLevel = conf[ProviderConfig.LOG_LEVEL] as? String {
+                            let li = Int32(logLevel) ?? ZitiLog.LogLevel.INFO.rawValue
+                            let ll = ZitiLog.LogLevel(rawValue: li) ?? ZitiLog.LogLevel.INFO
+                            zLog.info("Updating log level to \(logLevel) (\(ll))") 
+                            ZitiLog.setLogLevel(ll)
+                       }
+                    } else {
+                        zLog.info("No log level found.  Using default")
+                    }
+                    
                     completionHandler?(tpm, nil)
                     tmgr.tsChangedCallbacks.forEach { cb in cb(tpm.connection.status) }
                 } else {
@@ -148,6 +162,41 @@ class TunnelMgr: NSObject {
             zLog.info("Restarting tunnel")
             tunnelRestarting = true
             stopTunnel()
+        }
+    }
+    
+    func updateLogLevel(_ level:ZitiLog.LogLevel) {
+        zLog.info("Updating log level to \(level)")
+        ZitiLog.setLogLevel(level)
+        guard let tpm = tpm else {
+            zLog.error("Invalid tunnel provider. Tunnel logging level not updated")
+            return
+        }
+        
+        if var conf = (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration {
+            // update logLevel
+            conf[ProviderConfig.LOG_LEVEL] = String(level.rawValue)
+            (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = conf
+            
+            zLog.info("Updated providerConfiguration: \(String(describing: (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration))")
+            
+            tpm.saveToPreferences { error in
+                if let error = error {
+                    zLog.error(error.localizedDescription)
+                } else {
+                    // sendProviderMessage
+                    zLog.info("Sending logLevel \(level) to provider")
+                    do {
+                        try (tpm.connection as? NETunnelProviderSession)?.sendProviderMessage("logLevel=\(level.rawValue)".data(using: .utf8)!) {_ in
+                            zLog.debug("provider responded")
+                        }
+                    } catch {
+                        zLog.error("Unable to send provider message: \(error)")
+                    }
+                }
+            }
+        } else {
+            zLog.info("No log level found.  Using default")
         }
     }
 }

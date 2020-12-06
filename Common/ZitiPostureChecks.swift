@@ -67,7 +67,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     func macQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping MacResponse) {
         // these can be changed without rebooting, so get them every time...
         let macAddrs = ZitiPostureChecks.getMacAddrs()
-        zLog.info("MAC Posture Response: \(String(describing: macAddrs))")
+        zLog.debug("MAC Posture Response: \(String(describing: macAddrs))")
         cb(ctx, macAddrs)
     }
     
@@ -79,7 +79,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
             return
         }
         service.processQuery(path) { isRunning, hashString, signers in
-            zLog.info("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
+            zLog.debug("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
             cb(ctx, path, isRunning, hashString, signers)
         }*/
         let isRunning = checkIfRunning(path)
@@ -91,7 +91,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
             hashString = hashed.compactMap { String(format: "%02x", $0) }.joined()
         }
         let signers = getSigners(url)
-        zLog.info("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
+        zLog.debug("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
         cb(ctx, path, isRunning, hashString, signers)
 #else
         cb(ctx, path, false, nil, nil)
@@ -104,7 +104,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     }
     
     func osQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping OsResponse) {
-        zLog.info("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
+        zLog.debug("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
         cb(ctx, type, strVers, buildStr)
     }
     
