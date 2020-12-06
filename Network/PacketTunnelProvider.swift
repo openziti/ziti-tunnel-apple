@@ -56,6 +56,7 @@ class ZitiTunnelServerConfig : Codable {
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     let providerConfig = ProviderConfig()
+    var appLogLevel:ZitiLog.LogLevel?
     var dnsResolver:DNSResolver?
     var interceptedRoutes:[NEIPv4Route] = []
     let netMon = NWPathMonitor()
@@ -74,6 +75,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         super.init()
         
         Logger.initShared(Logger.TUN_TAG)
+        zLog.debug("")
         zLog.info(versionString)
         
         netMon.pathUpdateHandler = self.pathUpdateHandler
@@ -196,7 +198,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         var zidsToLoad = zids!.filter { $0.czid != nil && $0.isEnabled }.count
         
         let postureChecks = ZitiPostureChecks()
-        
+        let correctLogLevel = ZitiLog.getLogLevel() // first init of C SDK Ziti resets log level to INFO.  need to track that down, but for now...
         for zid in zids! {
             if let czid = zid.czid, zid.isEnabled == true {
                 
@@ -208,6 +210,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 _ = zidStore.store(zid)
                 
                 ziti.run(postureChecks) { zErr in
+                    
+                    // Blech. Track this down...
+                    let currLogLevel = ZitiLog.getLogLevel()
+                    if currLogLevel != correctLogLevel {
+                        zLog.info("Correcting logLevel.  Was \(currLogLevel), updating to \(correctLogLevel)")
+                        ZitiLog.setLogLevel(correctLogLevel)
+                    }
+                    
                     guard zErr == nil else {
                         zLog.error("Unable to init \(zid.name):\(zid.id), err: \(zErr!.localizedDescription)")
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
@@ -362,7 +372,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
         routeCond.unlock()
-        
+                
         rlLock.lock()
         routesLocked = true
         rlLock.unlock()
@@ -399,16 +409,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         zLog.info("startTunnel: options=\(options?.debugDescription ?? "nil")")
-                
-        //loop = uv_default_loop()
-        loop = UnsafeMutablePointer<uv_loop_t>.allocate(capacity: 1)
-        loop.initialize(to: uv_loop_t())
-        let lstat = uv_loop_init(loop)
-        
-        guard lstat == 0 else {
-            completionHandler(ZitiError("Unable to init uv_loop"))
-            return
-        }
         
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {
@@ -417,6 +417,25 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
         zLog.info("\(self.providerConfig.debugDescription)")
+        zLog.info("providerConfig.logLevel = \(providerConfig.logLevel)")
+        
+        if let appLogLevel = self.appLogLevel, appLogLevel.rawValue != Int32(providerConfig.logLevel) {
+            zLog.info("Overriding providerConfig.logLevel to appLogLevel of \(appLogLevel)")
+            ZitiLog.setLogLevel(appLogLevel)
+        } else {
+            let lvl = ZitiLog.LogLevel(rawValue: Int32(providerConfig.logLevel)) ?? ZitiLog.LogLevel.INFO
+            zLog.info("Updating log level to \(lvl)")
+            ZitiLog.setLogLevel(lvl)
+        }
+                
+        //loop = uv_default_loop()
+        loop = UnsafeMutablePointer<uv_loop_t>.allocate(capacity: 1)
+        loop.initialize(to: uv_loop_t())
+        let lstat = uv_loop_init(loop)
+        guard lstat == 0 else {
+            completionHandler(ZitiError("Unable to init uv_loop"))
+            return
+        }
         
         // load identities
         // for each svc aither update intercepts or add hostname to resolver
@@ -486,7 +505,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
-        zLog.info("done")
+        zLog.info("")
         completionHandler()
         // Just exit - there are bugs in Apple macOS, plus makes sure we're 'clean' on restart
         exit(EXIT_SUCCESS)
@@ -497,11 +516,23 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler?(nil)
             return
         }
-        zLog.info("PTP Got message from app... \(messageString)")
-        
-        if let handler = completionHandler {
-            handler(messageData)
+        zLog.debug("PTP Got message from app... \(messageString)")
+        let arr = messageString.components(separatedBy: "=")
+        if arr.count == 2 && arr.first == "logLevel" {
+            let lvlStr = arr.last ?? "3"
+            let lvl:ZitiLog.LogLevel = ZitiLog.LogLevel(rawValue: Int32(lvlStr) ?? ZitiLog.LogLevel.INFO.rawValue) ?? ZitiLog.LogLevel.INFO
+            zLog.info("Updating LogLevel to \(lvl)")
+            ZitiLog.setLogLevel(lvl)
+            
+            // Can be a timing issue with App updating config and startTunnel().  If we get a logLevel here, cache it
+            // in case startTunnel() is called after receiving this message...
+            appLogLevel = lvl
         }
+        
+        completionHandler?(nil)
+        /*if let handler = completionHandler {
+            handler(messageData)
+        }*/
     }
     
     override func sleep(completionHandler: @escaping () -> Void) {
