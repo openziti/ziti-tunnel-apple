@@ -66,7 +66,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             connectButton.isEnabled = false
             break
         @unknown default:
-            print("Unknown tunnel status")
+            zLog.warn("Unknown tunnel status")
             break
         }
         self.tableView.reloadData()
