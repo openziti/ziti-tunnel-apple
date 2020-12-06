@@ -120,7 +120,7 @@ class DNSResolver : NSObject {
     func resolve(_ udp:UDPPacket) {
         guard let dns = DNSPacket(udp) else { return }
         
-        //zLog.trace("DNS-->: \(dns.debugDescription)")
+        zLog.trace("DNS-->: \(dns.debugDescription)")
         // only resolve queries (should never see this...)
         if dns.qrFlag { return }
         
@@ -174,7 +174,7 @@ class DNSResolver : NSObject {
                                                         ttl:0,
                                                         resourceData: data)
                             answers.append(ans)
-                            //zLog.trace("System DNS: \(q.name.nameString) -> \(ip)")
+                            zLog.trace("System DNS: \(q.name.nameString) -> \(ip)")
                         } else if q.recordType == .AAAA {
                             // TODO: need to write IPUtils.ipV6AddressStringToData(ip)
                             // for now return nameError, which should inspire request for .A
@@ -189,7 +189,7 @@ class DNSResolver : NSObject {
         dnsR.responseCode = responseCode
         dnsR.udp.updateLengthsAndChecksums()
         
-        //zLog.trace("<--DNS: \(dnsR.debugDescription)")
+        zLog.trace("<--DNS: \(dnsR.debugDescription)")
         //zLog.trace("<--UDP: \(dnsR.udp.debugDescription)")
         //zLog.trace("<--IP: \(dnsR.udp.ip.debugDescription)")
  
