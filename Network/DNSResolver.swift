@@ -92,7 +92,7 @@ class DNSResolver : NSObject {
             if inUse == false {
                 let realIpStr = resolveHostname(name, .A)
                 if let rips = realIpStr {
-                    NSLog("Real IP for \(name) = \(rips)")
+                    zLog.info("Real IP for \(name) = \(rips)")
                 }
                 hostnames.append((name:name, ip:fakeIpStr, realIp:realIpStr))
                 return fakeIpStr
@@ -120,7 +120,7 @@ class DNSResolver : NSObject {
     func resolve(_ udp:UDPPacket) {
         guard let dns = DNSPacket(udp) else { return }
         
-        //NSLog("DNS-->: \(dns.debugDescription)")
+        zLog.trace("DNS-->: \(dns.debugDescription)")
         // only resolve queries (should never see this...)
         if dns.qrFlag { return }
         
@@ -156,7 +156,7 @@ class DNSResolver : NSObject {
                                                         ttl:0,
                                                         resourceData:data)
                             answers.append(ans)
-                            NSLog("DNS: \(result.name) -> \(result.ip)")
+                            zLog.info("DNS: \(result.name) -> \(result.ip)")
                         }
                     } else {
                         // AAAA with matches, return nameError
@@ -174,11 +174,11 @@ class DNSResolver : NSObject {
                                                         ttl:0,
                                                         resourceData: data)
                             answers.append(ans)
-                            //NSLog("System DNS: \(q.name.nameString) -> \(ip)")
+                            zLog.trace("System DNS: \(q.name.nameString) -> \(ip)")
                         } else if q.recordType == .AAAA {
                             // TODO: need to write IPUtils.ipV6AddressStringToData(ip)
                             // for now return nameError, which should inspire request for .A
-                            // NSLog("DNSResolver returning NXDomain instead of \(q.name.nameString) -> \(ip) ")
+                            // zLog.info("DNSResolver returning NXDomain instead of \(q.name.nameString) -> \(ip) ")
                         }
                     }
                 }
@@ -189,9 +189,9 @@ class DNSResolver : NSObject {
         dnsR.responseCode = responseCode
         dnsR.udp.updateLengthsAndChecksums()
         
-        //NSLog("<--DNS: \(dnsR.debugDescription)")
-        //NSLog("<--UDP: \(dnsR.udp.debugDescription)")
-        //NSLog("<--IP: \(dnsR.udp.ip.debugDescription)")
+        zLog.trace("<--DNS: \(dnsR.debugDescription)")
+        //zLog.trace("<--UDP: \(dnsR.udp.debugDescription)")
+        //zLog.trace("<--IP: \(dnsR.udp.ip.debugDescription)")
  
         tunnelProvider.writePacket(dnsR.udp.ip.data)
     }

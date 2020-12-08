@@ -16,6 +16,7 @@
 
 import Cocoa
 import NetworkExtension
+import CZiti
 
 class MainMenuBar : NSObject, NSWindowDelegate {
     static let shared = MainMenuBar()
@@ -25,6 +26,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     private var tunStatusItem:NSMenuItem!
     private var tunConnectItem:NSMenuItem!
     private var showDocItem:NSMenuItem!
+    private var logLevelMenu:NSMenu!
     
     private override init() {
         statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
@@ -42,20 +44,61 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         showDocItem.state = .on
         menu.addItem(showDocItem)
         
-        let logMenuItem = newMenuItem(title: "Logs", action: nil)
+        // Log Menu
+        let logMenuItem = newMenuItem(title: "Logging", action: nil)
         menu.addItem(logMenuItem)
         let logMenu = NSMenu()
-        logMenu.addItem(newMenuItem(title: "Packet Tunnel", action: #selector(MainMenuBar.showPacketTunnelLog(_:))))
-        logMenu.addItem(newMenuItem(title: "Application", action: #selector(MainMenuBar.showApplicationLog(_:))))
+        
+        logMenu.addItem(newMenuItem(title: "Packet Tunnel...", action: #selector(MainMenuBar.showPacketTunnelLog(_:))))
+        logMenu.addItem(newMenuItem(title: "Application...", action: #selector(MainMenuBar.showApplicationLog(_:))))
+        logMenu.addItem(NSMenuItem.separator())
+        
+        let logLevelMenuItem = newMenuItem(title: "Level", action: nil)
+        logMenu.addItem(logLevelMenuItem)
+        logLevelMenu = NSMenu()
+        logLevelMenu.addItem(newMenuItem(title: "FATAL",
+                                         action: #selector(MainMenuBar.selectLogLevel(_:)),
+                                         tag: Int(ZitiLog.LogLevel.NONE.rawValue)))
+        logLevelMenu.addItem(newMenuItem(title: "ERROR",
+                                         action: #selector(MainMenuBar.selectLogLevel(_:)),
+                                         tag: Int(ZitiLog.LogLevel.ERROR.rawValue)))
+        logLevelMenu.addItem(newMenuItem(title: "WARN",
+                                         action: #selector(MainMenuBar.selectLogLevel(_:)),
+                                         tag: Int(ZitiLog.LogLevel.WARN.rawValue)))
+        logLevelMenu.addItem(newMenuItem(title: "INFO",
+                                         action: #selector(MainMenuBar.selectLogLevel(_:)),
+                                         tag: Int(ZitiLog.LogLevel.INFO.rawValue)))
+        logLevelMenu.addItem(newMenuItem(title: "DEBUG",
+                                         action: #selector(MainMenuBar.selectLogLevel(_:)),
+                                         tag: Int(ZitiLog.LogLevel.DEBUG.rawValue)))
+        logLevelMenu.addItem(newMenuItem(title: "VERBOSE",
+                                         action: #selector(MainMenuBar.selectLogLevel(_:)),
+                                         tag: Int(ZitiLog.LogLevel.VERBOSE.rawValue)))
+        logLevelMenu.addItem(newMenuItem(title: "TRACE",
+                                         action: #selector(MainMenuBar.selectLogLevel(_:)),
+                                         tag: Int(ZitiLog.LogLevel.TRACE.rawValue)))
+        logMenu.setSubmenu(logLevelMenu, for: logLevelMenuItem)
+        updateLogLevelMenu()
+        
         menu.setSubmenu(logMenu, for: logMenuItem)
+        // End Log Menu
         
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
         menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))
         statusItem.menu = menu
         
+        // Track the menu, update items as necessary
+        NotificationCenter.default.addObserver(
+                forName: NSMenu.didBeginTrackingNotification,
+                object: nil, queue: .main, using: menuDidBeginTracking)
+        
         getMainWindow()?.delegate = self
         TunnelMgr.shared.tsChangedCallbacks.append(self.tunnelStatusDidChange)
+    }
+    
+    func menuDidBeginTracking(n: Notification) {
+        updateLogLevelMenu()
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
@@ -85,14 +128,15 @@ class MainMenuBar : NSObject, NSWindowDelegate {
             tunStatusItem.title = "Status: Reasserting..."
             break
         @unknown default:
-            print("Unknown tunnel status...")
+            zLog.warn("Unknown tunnel status...")
             break
         }
     }
     
-    func newMenuItem(title:String, action:Selector?, keyEquivalent:String="") -> NSMenuItem {
+    func newMenuItem(title:String, action:Selector?, keyEquivalent:String="", tag:Int=0) -> NSMenuItem {
         let mi = NSMenuItem(title:title, action:action, keyEquivalent:keyEquivalent)
         mi.target = self
+        mi.tag = tag
         return mi
     }
     
@@ -126,7 +170,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     func openConsole(_ tag:String) {
         guard let logger = Logger.shared, let logFile = logger.currLog(forTag: tag)?.absoluteString else {
-            print("Unable to find path to \(tag) log")
+            zLog.error("Unable to find path to \(tag) log")
             return
         }
         
@@ -137,7 +181,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         task.waitUntilExit()
         let status = task.terminationStatus
         if (status != 0) {
-            print("Unable to open \(logFile) in com.apple.Console, status=\(status)")
+            zLog.error("Unable to open \(logFile) in com.apple.Console, status=\(status)")
             let alert = NSAlert()
             alert.messageText = "Log Unavailable"
             alert.informativeText = "Unable to open \(logFile) in com.apple.Console"
@@ -153,6 +197,20 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     @objc func showApplicationLog(_ sender:Any?) {
         openConsole(Logger.APP_TAG)
+    }
+    
+    func updateLogLevelMenu() {
+        let level = ZitiLog.getLogLevel()
+        logLevelMenu.items.forEach { i in
+            i.state = Int32(i.tag) == level.rawValue ? .on : .off
+        }
+    }
+    
+    @objc func selectLogLevel(_ sender: NSMenuItem?) {
+        let raw  = sender != nil ? Int32(sender!.tag) : ZitiLog.LogLevel.INFO.rawValue
+        let lvl = ZitiLog.LogLevel(rawValue: raw) ?? ZitiLog.LogLevel.INFO
+        TunnelMgr.shared.updateLogLevel(lvl)
+        updateLogLevelMenu()
     }
     
     @objc func showPanel(_ sender: Any?) {

@@ -16,6 +16,7 @@
 
 import Cocoa
 import NetworkExtension
+import CZiti
 
 class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     weak var vc: ViewController?
@@ -87,6 +88,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         dict[ProviderConfig.MTU_KEY] = self.mtuText.stringValue
         dict[ProviderConfig.DNS_KEY] = self.dnsServersText.stringValue
         dict[ProviderConfig.MATCH_DOMAINS_KEY] = self.matchedDomainsText.stringValue
+        dict[ProviderConfig.LOG_LEVEL] = String(ZitiLog.getLogLevel().rawValue)
         
         let conf:ProviderConfig = ProviderConfig()
         if let error = conf.parseDictionary(dict) {

@@ -43,7 +43,7 @@ class LogViewController: UIViewController, UIActivityItemSource {
             }
         } catch {
             textView.text = error.localizedDescription
-            NSLog("No content found for log, \(error.localizedDescription)")
+            zLog.error("No content found for log, \(error.localizedDescription)")
         }
         textView.layoutManager.allowsNonContiguousLayout = false
         textView.scrollRangeToVisible(NSMakeRange(textView.text.count-1, 0))

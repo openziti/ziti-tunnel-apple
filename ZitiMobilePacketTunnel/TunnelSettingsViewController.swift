@@ -16,6 +16,7 @@
 
 import UIKit
 import NetworkExtension
+import CZiti
 
 class TunnelSettingsCell: UITableViewCell {
     @IBOutlet weak var label: UILabel!
@@ -64,6 +65,7 @@ class TunnelSettingsViewController: UITableViewController {
         dict[ProviderConfig.SUBNET_KEY] = mask
         dict[ProviderConfig.MTU_KEY] = mtu
         dict[ProviderConfig.DNS_KEY] = dns
+        dict[ProviderConfig.LOG_LEVEL] = String(ZitiLog.getLogLevel().rawValue)
         
         let conf:ProviderConfig = ProviderConfig()
         if let error = conf.parseDictionary(dict) {

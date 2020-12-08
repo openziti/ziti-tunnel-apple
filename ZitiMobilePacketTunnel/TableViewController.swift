@@ -104,7 +104,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         
         // Load previous identities
         if let err = zidMgr.loadZids() {
-            NSLog(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
+            zLog.error(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
         tableView.reloadData()
     }
@@ -112,7 +112,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     func onNewOrChangedId(_ zid: ZitiIdentity) {
         DispatchQueue.main.async {
             if let match = self.zidMgr.zids.first(where: { $0.id == zid.id }) {
-                NSLog("\(zid.name):\(zid.id) CHANGED")
+                zLog.info("\(zid.name):\(zid.id) CHANGED")
                 
                 // TUN will disable if unable to start for zid
                 match.edgeStatus = zid.edgeStatus
@@ -125,7 +125,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             } else {
                 // new one.  generally zids are only added by this app (so will be matched above).
                 // But possible somebody could load one manually or some day via MDM or somesuch
-                NSLog("\(zid.name):\(zid.id) NEW")
+                zLog.info("\(zid.name):\(zid.id) NEW")
                 self.zidMgr.zids.insert(zid, at:0)
                 
                 DispatchQueue.main.async {
@@ -144,7 +144,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 }
                 return false
             }
-            print("--- needsRestart = \(needsRestart.count)")
             if needsRestart.count > 0 {
                 self.tunnelMgr.restartTunnel()
             }
@@ -155,7 +154,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         DispatchQueue.main.async {
             //if let match = self.zidMgr.zids.first(where: { $0.id == idString }) {
                 // shouldn't happend unless somebody deletes the file.
-                NSLog("\(idString) REMOVED")
+                zLog.info("\(idString) REMOVED")
                 _ = self.zidMgr.loadZids()
                 self.tableView.reloadData()
                 self.ivc?.tableView.reloadData()
@@ -369,7 +368,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 }
                 self.present(mail, animated: true)
             } else {
-                NSLog("Mail view controller not available")
+                zLog.warn("Mail view controller not available")
                 let alert = UIAlertController(
                     title:"Mail view not available",
                     message: "Please email \(supportEmail) for assistance",
@@ -391,7 +390,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-        NSLog("picker cancelled")
+        zLog.debug("picker cancelled")
     }
     
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
@@ -421,7 +420,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                         preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
                     self.present(alert, animated: true, completion: nil)
-                    NSLog("Unable to add identity: \(error.localizedDescription)")
+                    zLog.error("Unable to add identity: \(error.localizedDescription)")
                 }
             }
         }

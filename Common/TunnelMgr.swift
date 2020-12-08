@@ -16,6 +16,7 @@
 
 import Foundation
 import NetworkExtension
+import CZiti
 
 class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager?
@@ -36,11 +37,11 @@ class TunnelMgr: NSObject {
     deinit { NotificationCenter.default.removeObserver(self) }
     
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
-    func loadFromPreferences(_ bid:String, completionHandler: LoadCompletionHandler? = nil) {
+    func loadFromPreferences(_ bid:String, _ completionHandler: LoadCompletionHandler? = nil) {
         var tpm = NETunnelProviderManager()
         NETunnelProviderManager.loadAllFromPreferences { [weak self] savedManagers, error in
             if let error = error {
-                NSLog(error.localizedDescription)
+                zLog.error(error.localizedDescription)
                 completionHandler?(nil, error)
                 return
             }
@@ -51,7 +52,7 @@ class TunnelMgr: NSObject {
             
             tpm.loadFromPreferences { error in
                 if let error = error {
-                    NSLog(error.localizedDescription)
+                    zLog.error(error.localizedDescription)
                     completionHandler?(nil, error)
                     return
                 }
@@ -73,25 +74,38 @@ class TunnelMgr: NSObject {
                     
                     tpm.saveToPreferences { error in
                         if let error = error {
-                            NSLog(error.localizedDescription)
+                            zLog.error(error.localizedDescription)
                         } else {
-                            NSLog("Saved successfully. Re-loading preferences")
+                            zLog.info("Saved successfully. Re-loading preferences")
                             // ios hack per apple forums (else NEVPNErrorDomain Code=1)
                             tpm.loadFromPreferences { error in
-                                NSLog("Re-loaded preferences, error=\(error != nil)")
+                                zLog.error("Re-loaded preferences, error=\(error != nil)")
                             }
                         }
                     }
                 }
                 
-                // Get notified when tunnel status changes
                 if let tmgr = self {
+                    // Get notified when tunnel status changes
                     NotificationCenter.default.removeObserver(tmgr)
                     NotificationCenter.default.addObserver(tmgr, selector:
                         #selector(TunnelMgr.tunnelStatusDidChange(_:)), name:
                         NSNotification.Name.NEVPNStatusDidChange, object: nil)
                 
                     tmgr.tpm = tpm
+                    
+                    // Get our logLevel from config
+                    if let conf = (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration {
+                        if let logLevel = conf[ProviderConfig.LOG_LEVEL] as? String {
+                            let li = Int32(logLevel) ?? ZitiLog.LogLevel.INFO.rawValue
+                            let ll = ZitiLog.LogLevel(rawValue: li) ?? ZitiLog.LogLevel.INFO
+                            zLog.info("Updating log level to \(logLevel) (\(ll))") 
+                            ZitiLog.setLogLevel(ll)
+                       }
+                    } else {
+                        zLog.info("No log level found.  Using default")
+                    }
+                    
                     completionHandler?(tpm, nil)
                     tmgr.tsChangedCallbacks.forEach { cb in cb(tpm.connection.status) }
                 } else {
@@ -118,20 +132,20 @@ class TunnelMgr: NSObject {
         if tpm.isEnabled {
             try (tpm.connection as? NETunnelProviderSession)?.startTunnel()
         } else {
-            NSLog("startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
+            zLog.warn("startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
             tpm.isEnabled = true
             tpm.saveToPreferences { error in
                 if let error = error {
-                    NSLog(error.localizedDescription)
+                    zLog.error(error.localizedDescription)
                 } else {
-                    NSLog("Saved successfully. Re-loading preferences")
+                    zLog.info("Saved successfully. Re-loading preferences")
                     // ios hack per apple forums (else NEVPNErrorDomain Code=1 on starting tunnel)
                     tpm.loadFromPreferences { [weak tpm] error in
-                        NSLog("Re-loaded preferences, error=\(error != nil). Attempting to start")
+                        zLog.error("Re-loaded preferences, error=\(error != nil). Attempting to start")
                         do {
                             try (tpm?.connection as? NETunnelProviderSession)?.startTunnel()
                         } catch {
-                            NSLog("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
+                            zLog.error("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
                         }
                     }
                 }
@@ -145,9 +159,44 @@ class TunnelMgr: NSObject {
     
     func restartTunnel() {
         if let status = tpm?.connection.status, status != .disconnected {
-            NSLog("Restarting tunnel")
+            zLog.info("Restarting tunnel")
             tunnelRestarting = true
             stopTunnel()
+        }
+    }
+    
+    func updateLogLevel(_ level:ZitiLog.LogLevel) {
+        zLog.info("Updating log level to \(level)")
+        ZitiLog.setLogLevel(level)
+        guard let tpm = tpm else {
+            zLog.error("Invalid tunnel provider. Tunnel logging level not updated")
+            return
+        }
+        
+        if var conf = (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration {
+            // update logLevel
+            conf[ProviderConfig.LOG_LEVEL] = String(level.rawValue)
+            (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = conf
+            
+            zLog.info("Updated providerConfiguration: \(String(describing: (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration))")
+            
+            tpm.saveToPreferences { error in
+                if let error = error {
+                    zLog.error(error.localizedDescription)
+                } else {
+                    // sendProviderMessage
+                    zLog.info("Sending logLevel \(level) to provider")
+                    do {
+                        try (tpm.connection as? NETunnelProviderSession)?.sendProviderMessage("logLevel=\(level.rawValue)".data(using: .utf8)!) {_ in
+                            zLog.debug("provider responded")
+                        }
+                    } catch {
+                        zLog.error("Unable to send provider message: \(error)")
+                    }
+                }
+            }
+        } else {
+            zLog.info("No log level found.  Using default")
         }
     }
 }

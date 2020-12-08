@@ -43,12 +43,15 @@ class ServicesViewController: NSViewController {
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
         guard tableView.selectedRow >= 0, let svc = zid?.services[tableView.selectedRow] else { return }
         
-        print("\nTODO: modal view, button to clear net session and restart")
-        print("name: \(svc.name ?? "")")
-        print("status: \(svc.status?.status ?? .None) (\(DateFormatter().timeSince(svc.status?.lastUpdatedAt ?? 0)))")
-        print("hostname: \(svc.dns?.hostname ?? "")")
-        print("current ip: \(svc.dns?.interceptIp ?? "")")
-        print("port: \(svc.dns?.port ?? 0)")
+        if zid?.isEnabled ?? false {
+            zLog.info("\n   name: \(svc.name ?? "")\n" +
+                        "   status: \(svc.status?.status ?? .None) (\(DateFormatter().timeSince(svc.status?.lastUpdatedAt ?? 0)))\n" +
+                        "   hostname: \(svc.dns?.hostname ?? "")\n" +
+                        "   current ip: \(svc.dns?.interceptIp ?? "")\n" +
+                        "   port: \(svc.dns?.port ?? 0)")
+        } else {
+            zLog.info("\(zid?.name ?? "") not enabled")
+        }
     }
     
     override var representedObject: Any? {

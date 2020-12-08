@@ -1,5 +1,5 @@
 //
-// Copyright 2019-2020 NetFoundry, Inc.
+// Copyright 2020 NetFoundry, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,20 +15,23 @@
 //
 
 import UIKit
+import CZiti
 
-class NoticesViewController: UIViewController {
-    @IBOutlet weak var textView: UITextView!
-    
+class LogLevelViewController: UITableViewController {
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        if let rtfPath = Bundle.main.url(forResource:"Notices", withExtension: "rtf") {
-            do {
-                let attributedStringWithRtf = try NSAttributedString(url: rtfPath, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil)
-                textView.attributedText = attributedStringWithRtf
-            } catch {
-                zLog.error("NoticesViewConroller: No content found!")
-            }
-        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        let lvl = Int(ZitiLog.getLogLevel().rawValue)
+        let ip = IndexPath(row: lvl, section: 0)
+        tableView.selectRow(at: ip, animated: true, scrollPosition: .none)
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        zLog.info("selected row at \(indexPath.row)")
+        let lvl = ZitiLog.LogLevel(rawValue: Int32(indexPath.row)) ?? ZitiLog.LogLevel.INFO
+        TunnelMgr.shared.updateLogLevel(lvl)
     }
 }
