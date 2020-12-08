@@ -27,20 +27,35 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
     var originalBgTransform:CGAffineTransform!
     var tunnelMgr = TunnelMgr.shared
     var zidMgr = ZidMgr()
+    @IBOutlet weak var TimerLabel: UILabel!
+    var timer = Timer();
+    var timeLaunched:Int = 0;
     
     @IBOutlet weak var ConnectButton: UIImageView!
     @IBOutlet weak var ConnectedButton: UIView!
     @IBOutlet weak var Dashboard: UIStackView!
     @IBOutlet weak var Background: UIView!
-    @IBOutlet weak var IdentityList: UIStackView!
+    @IBOutlet weak var IdentityList: UIScrollView!
     @IBOutlet weak var IdentityItem: IdentityRenderer!
     
+    @objc func UpdateTimer() {
+        let formatter = DateComponentsFormatter();
+        formatter.allowedUnits = [.hour, .minute, .second];
+        formatter.unitsStyle = .positional;
+        formatter.zeroFormattingBehavior = .pad;
+
+        TimerLabel.text = formatter.string(from: TimeInterval(timeLaunched))!;
+        timeLaunched += 1;
+    }
     
     @IBAction func DoConnect(_ sender: UITapGestureRecognizer) {
+        TimerLabel.text = "00:00.00";
         ConnectButton.isHidden = true;
         ConnectedButton.isHidden = false;
         do {
             try tunnelMgr.startTunnel()
+            timeLaunched = 1;
+            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
         } catch {
             let alert = UIAlertController(
                 title:"Ziti Connect Error",
@@ -53,6 +68,8 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
     }
     
     @IBAction func DoDisconnect(_ sender: UITapGestureRecognizer) {
+        TimerLabel.text = "00:00.00";
+        timer.invalidate();
         ConnectButton.isHidden = false;
         ConnectedButton.isHidden = true;
         tunnelMgr.stopTunnel()
@@ -126,6 +143,8 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         return "";
     }
     
+    @IBOutlet weak var MainTitle: UILabel!
+    
     @objc func GoToDetails(gesture : UITapGestureRecognizer) {
         let v = gesture.view!;
         let tag = v.tag;
@@ -138,88 +157,177 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         
     }
     
+    func switchValueDidChange(sender:UISwitch!)
+    {
+        if (sender.isOn == true){
+            print("on")
+        }
+        else{
+            print("off")
+        }
+    }
+    
     func reloadList() {
-        for view in IdentityList.arrangedSubviews {
+        for view in IdentityList.subviews {
             view.removeFromSuperview();
         }
         var index = 0;
         for identity in zidMgr.zids {
-            let idName = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 40));
-            let idServer = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 40));
-            let idServiceCount = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 40));
             
-            let isConnectedLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 40));
-            let serviceLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 40));
             
-            let arrowImage = UIImage(named: "next");
-            let arrowView = UIImageView(image: arrowImage);
-            arrowView.frame = CGRect(x: 0, y: 0, width: 20, height: 60);
-            let toggler = UISwitch(frame: CGRect(x: 0, y: 0, width: 30, height: 40));
+            // First Column of Identity Item Renderer
+            let toggler = UISwitch(frame: CGRect(x: 0, y: 0, width: 75, height: 30));
+            let connectLabel = UILabel();
             
-            idName.text = identity.name;
-            idServer.text = identity.czid?.ztAPI;
-            idServiceCount.text = String(identity.services.count);
-            serviceLabel.text = "services";
-            if (identity.enabled ?? false) {
-                isConnectedLabel.text = "connected";
+            connectLabel.frame.size.height = 20;
+            connectLabel.font = UIFont(name: "Open Sans", size: 10);
+            connectLabel.textColor = UIColor(named: "Light Gray Color");
+            
+            toggler.isEnabled = identity.isEnrolled;
+            toggler.isOn = identity.isEnabled;
+            toggler.isUserInteractionEnabled = true;
+            
+            if (identity.isEnrolled) {
+                if (identity.isEnabled) {
+                    connectLabel.text = "connected";
+                } else {
+                    connectLabel.text = "disconnected";
+                }
             } else {
-                isConnectedLabel.text = "disconnected";
+                connectLabel.text = "not enrolled";
             }
             
-            idName.font = UIFont(name: "Open Sans", size: 14);
-            idServiceCount.font = UIFont(name: "Open Sans", size: 14);
-            serviceLabel.font = UIFont(name: "Open Sans", size: 10);
-            serviceLabel.textColor = UIColor(named: "Light Gray Color");
-            isConnectedLabel.font = UIFont(name: "Open Sans", size: 10);
-            isConnectedLabel.textColor = UIColor(named: "Light Gray Color");
-            idServer.font = UIFont(name: "Open Sans", size: 10);
-            idServer.textColor = UIColor(named: "Light Gray Color");
             
-            let col1 = UIStackView(arrangedSubviews: [toggler, isConnectedLabel]);
-            let col2 = UIStackView(arrangedSubviews: [idName, idServer]);
-            let col3 = UIStackView(arrangedSubviews: [idServiceCount, serviceLabel]);
-            let col4 = UIStackView(arrangedSubviews: [arrowView]);
+            let leadLabel1 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 5));
+            leadLabel1.text = " ";
             
-            col1.distribution = .fillEqually;
-            col1.alignment = .fill;
+            let col1 = UIStackView(arrangedSubviews: [leadLabel1,toggler,connectLabel]);
+            
+            col1.frame.size.width = 75;
+            col1.distribution = .fillProportionally;
+            col1.alignment = .center;
             col1.spacing = 0;
             col1.axis = .vertical;
-            col1.frame = CGRect(x: 0, y: 0, width: 150, height: 60);
-            col1.translatesAutoresizingMaskIntoConstraints = false;
             
-            col2.distribution = .fillEqually;
-            col2.alignment = .fill;
+            
+            // Label Column of Identity Item Renderer
+            let idName = UILabel();
+            
+            idName.font = UIFont(name: "Open Sans", size: 22);
+            idName.textColor = UIColor(named: "White");
+            
+            idName.text = String(String(identity.name).prefix(10));
+            
+            
+            let idServer = UILabel();
+            idServer.font = UIFont(name: "Open Sans", size: 10);
+            idServer.textColor = UIColor(named: "Light Gray Color");
+            idServer.frame.size.height = 20;
+            idServer.text = identity.czid?.ztAPI;
+            
+            let leadLabel2 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 5));
+            leadLabel2.text = " ";
+            
+            let col2 = UIStackView(arrangedSubviews: [leadLabel2, idName, idServer]);
+            col2.distribution = .fillProportionally;
+            col2.alignment = .leading;
             col2.spacing = 0;
+            col2.frame.size.width = 100;
             col2.axis = .vertical;
-            col2.translatesAutoresizingMaskIntoConstraints = false;
             col2.isUserInteractionEnabled = true;
             col2.tag = index;
             col2.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
             
-            col3.distribution = .fillEqually;
+            
+            // Count column for the item renderer
+            
+            let serviceCountFrame = UIView();
+            let circlePath = UIBezierPath(arcCenter: CGPoint(x: 0, y: 15), radius: CGFloat(15), startAngle: CGFloat(0), endAngle: CGFloat(Double.pi * 2), clockwise: true);
+            let shapeLayer = CAShapeLayer();
+            serviceCountFrame.frame = CGRect(x: 0, y: 0, width: 50, height: 40)
+            shapeLayer.path = circlePath.cgPath;
+            shapeLayer.fillColor = UIColor(named: "PrimaryColor")?.cgColor;
+            
+            let idServiceCount = UILabel();
+            idServiceCount.textAlignment = .center;
+            idServiceCount.font = UIFont(name: "Open Sans", size: 22);
+            idServiceCount.textColor = UIColor(named: "White");
+            idServiceCount.text = String(identity.services.count);
+            
+            let serviceLabel = UILabel();
+            serviceLabel.textAlignment = .center;
+            serviceLabel.text = "services";
+            serviceLabel.frame.size.height = 20;
+            serviceLabel.font = UIFont(name: "Open Sans", size: 10);
+            serviceLabel.textColor = UIColor(named: "Light Gray Color");
+            
+            //serviceCountFrame.layer.addSublayer(shapeLayer);
+            serviceCountFrame.addSubview(idServiceCount);
+            
+            
+            let leadLabel3 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 5));
+            leadLabel3.text = " ";
+            
+            let col3 = UIStackView(arrangedSubviews: [leadLabel3, idServiceCount, serviceLabel]);
+            col3.frame.size.width = 50;
+            col3.distribution = .fillProportionally;
             col3.alignment = .center;
             col3.spacing = 0;
             col3.axis = .vertical;
-            col3.frame = CGRect(x: 10, y: 10, width: 60, height: 60);
-            col3.translatesAutoresizingMaskIntoConstraints = false;
+            col3.isUserInteractionEnabled = true;
+            col3.tag = index;
+            col3.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
             
-            col4.distribution = .fillEqually;
-            col4.alignment = .fill;
+            
+            
+            // Arrow image for Item Renderer
+            
+            let arrowImage = UIImage(named: "next");
+            let arrowView = UIImageView();
+            arrowView.frame = CGRect(x: 10, y: 10, width: 10, height: 10);
+            arrowView.contentMode = .scaleAspectFit;
+            arrowView.image = arrowImage;
+            
+            // These are simple margins because iOS keeps ignoring margin settings
+            let leadLabel4 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 10));
+            leadLabel4.text = " ";
+            
+            
+            let col4 = UIStackView(arrangedSubviews: [leadLabel4,arrowView]);
+            col4.distribution = .fillProportionally;
+            col4.alignment = .center;
             col4.spacing = 0;
             col4.axis = .vertical;
-            col4.frame = CGRect(x: 0, y: 0, width: 20, height: 60);
-            col4.translatesAutoresizingMaskIntoConstraints = false;
+            col4.isUserInteractionEnabled = true;
+            col4.tag = index;
+            col4.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
+            
+
+            //toggler.addTarget(self, action: Selector(("switchValueDidChange:")), for: UIControl.Event.valueChanged);
+
+      
+            // Put all the columns into the parent frames
             
             let renderer = UIStackView(arrangedSubviews: [col1,col2,col3,col4]);
             renderer.axis = .horizontal;
-            renderer.distribution = .fill;
+            renderer.distribution = .fillProportionally;
             renderer.alignment = .fill;
+            renderer.translatesAutoresizingMaskIntoConstraints = true;
             renderer.spacing = 8;
-            renderer.frame = CGRect(x: 0, y: CGFloat(index*60), width: view.frame.size.width, height: 60)
+            renderer.frame = CGRect(x: 10, y: CGFloat(index*60), width: view.frame.size.width-40, height: 60)
+            // renderer.frame = CGRect(x: 0, y: CGFloat(index*60), width: view.frame.size.width, height: 60)
+            // view.frame.size.width
+            /*
+            let lineView = UIView();
             
+            lineView.addSubview(renderer);
+            lineView.frame.size.height = 60;
+            lineView.isUserInteractionEnabled = true;
+            */
             IdentityList.addSubview(renderer);
             index = index + 1;
         }
+        IdentityList.contentSize.height = CGFloat(index*60);
     }
     
     // Copied From Daves Controller

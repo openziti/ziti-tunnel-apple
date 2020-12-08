@@ -21,13 +21,13 @@ import CZiti
 
 class IdentityDetailScreen: UIViewController, UIActivityItemSource {
     
-    @IBOutlet weak var IdName: UITextField!
-    @IBOutlet weak var IdNetwork: UITextField!
-    @IBOutlet weak var IdStatus: UITextField!
-    @IBOutlet weak var IdEnrollment: UITextField!
-    @IBOutlet weak var IdVersion: UITextField!
+    @IBOutlet weak var IdName: UITextView!
+    @IBOutlet weak var IdNetwork: UITextView!
+    @IBOutlet weak var IdStatus: UITextView!
+    @IBOutlet weak var IdEnrollment: UITextView!
+    @IBOutlet weak var IdVersion: UITextView!
     @IBOutlet weak var IdServiceCount: UILabel!
-    @IBOutlet weak var ServiceList: UIStackView!
+    @IBOutlet weak var ServiceList: UIScrollView!
     @IBOutlet weak var EnrollButton: UIButton!
     
     var zid:ZitiIdentity?
@@ -76,7 +76,7 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         IdNetwork.text = zid?.czid?.ztAPI;
         IdVersion.text = zid?.controllerVersion ?? "unknown";
         IdEnrollment.text = zid?.enrollmentStatus.rawValue;
-        IdServiceCount.text = "\(zid?.services.count) Services";
+        IdServiceCount.text = "\(String(describing: zid?.services.count)) Services";
         
         let cs = zid?.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
         var csStr = ""
@@ -88,14 +88,16 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         } else {
             csStr = cs.status.rawValue
         }
-        for view in ServiceList.arrangedSubviews {
+        for view in ServiceList.subviews {
             view.removeFromSuperview();
         }
         if zid?.isEnrolled ?? false {
+            var index = 0;
+            var rowHeight = 30;
             guard let zid = self.zid else { return }
             for service in zid.services {
-                let serviceName = UILabel(frame: CGRect(x: 0, y: 0, width: 300, height: 40));
-                let serviceUrl = UILabel(frame: CGRect(x: 0, y: 0, width: 300, height: 40));
+                let serviceName = UITextView(frame: CGRect(x: 0, y: 0, width: 300, height: 20));
+                let serviceUrl = UITextView(frame: CGRect(x: 0, y: 0, width: 300, height: 20));
                 
                 serviceName.text = service.name;
                 serviceUrl.text = "\(service.dns?.hostname ?? ""):\(service.dns?.port ?? -1)";
@@ -103,17 +105,32 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
                 serviceName.font = UIFont(name: "Open Sans", size: 12);
                 serviceUrl.font = UIFont(name: "Open Sans", size: 11);
                 
+                serviceName.isEditable = false;
+                serviceName.isScrollEnabled = false;
+                serviceUrl.isEditable = false;
+                serviceUrl.isScrollEnabled = false;
+                serviceUrl.textAlignment = .right;
+                
+                serviceName.backgroundColor = UIColor.clear;
+                serviceUrl.backgroundColor = UIColor.clear;
+                
+                serviceName.widthAnchor.constraint(equalToConstant: self.view.frame.width).isActive = true
+                serviceName.heightAnchor.constraint(equalToConstant: CGFloat(rowHeight)).isActive = true
+                serviceUrl.widthAnchor.constraint(equalToConstant: self.view.frame.width).isActive = true
+                serviceUrl.heightAnchor.constraint(equalToConstant: CGFloat(rowHeight)).isActive = true
+                
                 let stack = UIStackView(arrangedSubviews: [serviceName, serviceUrl]);
                 
-                stack.distribution = .fillEqually;
-                stack.alignment = .fill;
-                stack.spacing = 0;
-                stack.axis = .vertical;
-                stack.frame = CGRect(x: 0, y: 0, width: 320, height: 60);
-                stack.translatesAutoresizingMaskIntoConstraints = false;
+                stack.distribution = .fill;
+                stack.alignment = .leading;
+                stack.spacing = 5;
+                stack.axis = .horizontal;
+                stack.frame = CGRect(x: 20, y: CGFloat(index*rowHeight), width: view.frame.size.width-CGFloat(rowHeight), height: 30);
 
                 ServiceList.addSubview(stack);
+                index = index + 1;
             }
+            ServiceList.contentSize.height = CGFloat(index*rowHeight);
     
         }
         csStr += " (as of \(DateFormatter().timeSince(cs.lastContactAt)))"
