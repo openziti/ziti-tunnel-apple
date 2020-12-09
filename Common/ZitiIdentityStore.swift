@@ -106,12 +106,14 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         let url = presentedItemURL.appendingPathComponent("\(zId.id).zid", isDirectory:false)
         var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: [], error: nil) { url in
-            do {
-                let jsonEncoder = JSONEncoder()
-                let data = try jsonEncoder.encode(zId)
-                try data.write(to: url, options: .atomic)
-            } catch {
-                zErr = ZitiError("Unable to write URL: \(error.localizedDescription)")
+            autoreleasepool {
+                do {
+                    let jsonEncoder = JSONEncoder()
+                    let data = try jsonEncoder.encode(zId)
+                    try data.write(to: url, options: .atomic)
+                } catch {
+                    zErr = ZitiError("Unable to write URL: \(error.localizedDescription)")
+                }
             }
         }
         return zErr
@@ -126,11 +128,13 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         let url = presentedItemURL.appendingPathComponent("\(zId.id).jwt", isDirectory:false)
         var zErr:ZitiError? = nil
         fc.coordinate(writingItemAt: url, options: [], error: nil) { url in
-            do {
-                let data = try Data(contentsOf: jwtOrig)
-                try data.write(to: url, options: .atomic)
-            } catch {
-                zErr = ZitiError("Unable store JWT URL: \(error.localizedDescription)")
+            autoreleasepool {
+                do {
+                    let data = try Data(contentsOf: jwtOrig)
+                    try data.write(to: url, options: .atomic)
+                } catch {
+                    zErr = ZitiError("Unable store JWT URL: \(error.localizedDescription)")
+                }
             }
         }
         return zErr

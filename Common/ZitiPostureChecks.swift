@@ -65,47 +65,56 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     
     
     func macQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping MacResponse) {
-        // these can be changed without rebooting, so get them every time...
-        let macAddrs = ZitiPostureChecks.getMacAddrs()
-        zLog.debug("MAC Posture Response: \(String(describing: macAddrs))")
-        cb(ctx, macAddrs)
+        autoreleasepool { // implicit closure from init()
+            // these can be changed without rebooting, so get them every time...
+            let macAddrs = ZitiPostureChecks.getMacAddrs()
+            zLog.debug("MAC Posture Response: \(String(describing: macAddrs))")
+            cb(ctx, macAddrs)
+        }
     }
     
     func processQueryImpl(_ ctx:ZitiPostureContext, _ path:String, _ cb: @escaping ProcessResponse) {
+        autoreleasepool {
 #if os(macOS)
-        /*guard let service = service else {
-            zLog.error("ZitiPosture XPC Servicex not available.")
-            cb(ctx, path, false, nil, nil)
-            return
-        }
-        service.processQuery(path) { isRunning, hashString, signers in
+            /*guard let service = service else {
+                zLog.error("ZitiPosture XPC Servicex not available.")
+                cb(ctx, path, false, nil, nil)
+                return
+            }
+            service.processQuery(path) { isRunning, hashString, signers in
+                zLog.debug("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
+                cb(ctx, path, isRunning, hashString, signers)
+            }*/
+            let isRunning = checkIfRunning(path)
+            let url = URL(fileURLWithPath: path)
+            var hashString:String?
+
+            if let data = try? Data(contentsOf: url) {
+                let hashed = SHA512.hash(data: data)
+                hashString = hashed.compactMap { String(format: "%02x", $0) }.joined()
+            }
+            
+            let signers = getSigners(url)
             zLog.debug("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
             cb(ctx, path, isRunning, hashString, signers)
-        }*/
-        let isRunning = checkIfRunning(path)
-        let url = URL(fileURLWithPath: path)
-        var hashString:String?
-
-        if let data = try? Data(contentsOf: url) {
-            let hashed = SHA512.hash(data: data)
-            hashString = hashed.compactMap { String(format: "%02x", $0) }.joined()
-        }
-        let signers = getSigners(url)
-        zLog.debug("Process Posture Response: path=\(path), isRunning=\(isRunning), hash=\(hashString ?? "nil"), signers=\(signers ?? [])")
-        cb(ctx, path, isRunning, hashString, signers)
 #else
-        cb(ctx, path, false, nil, nil)
+            cb(ctx, path, false, nil, nil)
 #endif
+        }
     }
     
     func domainQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping DomainResponse) {
-        zLog.warn("Domain Posture Query - Unimplemented")
-        cb(ctx, nil)
+        autoreleasepool { // implicit closure from init()
+            zLog.warn("Domain Posture Query - Unimplemented")
+            cb(ctx, nil)
+        }
     }
     
     func osQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping OsResponse) {
-        zLog.debug("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
-        cb(ctx, type, strVers, buildStr)
+        autoreleasepool { // implicit closure from init()
+            zLog.debug("OS Posture Response: type=\(type ?? "nil"), vers=\(strVers ?? ""), build=\(buildStr ?? "")")
+            cb(ctx, type, strVers, buildStr)
+        }
     }
     
     static func getMacAddrs() -> [String]? {
@@ -147,7 +156,6 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     func checkIfRunning(_ path:String) -> Bool {
         var found = false
         for app in NSWorkspace.shared.runningApplications {
-            // contentsEqualAt correct?  more expensive than stright string comparison...
             if let exePath = app.executableURL?.path, FileManager.default.contentsEqual(atPath: exePath, andPath: path) {
                 found = !app.isTerminated
                 break
