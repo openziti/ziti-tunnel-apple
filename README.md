@@ -19,6 +19,9 @@ $ cmake -GNinja .. && ninja
 $ mkdir ../build-iphoneos-arm64
 $ cd !$
 $ cmake -GNinja -DCMAKE_TOOLCHAIN_FILE=../build-macos-x86_64/_deps/ziti-sdk-c-src/toolchains/iOS-arm64.cmake .. && ninja
+$ mkdir ../build-iphonesimulator-x86_64
+$ cd !$
+$ cmake -GNinja -DCMAKE_TOOLCHAIN_FILE=../build-macos-x86_64/_deps/ziti-sdk-c-src/toolchains/iOS-x86_64.cmake .. && ninja
 ```
 ## Update Pods
 ```bash
