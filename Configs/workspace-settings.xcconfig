@@ -1,0 +1,17 @@
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+DEVELOPMENT_TEAM = XXXXXXXXXX
+
+PRIVACY_POLICY_URL = http:/$()/...
+TERMS_URL = http:/$()/...
+SUPPORT_EMAIL = help@...
+
+MAC_APP_IDENTIFIER = org.openziti.ZitiDesktopEdge
+MAC_EXT_IDENTIFIER = org.openziti.ZitiDesktopEdge.ptp
+
+IOS_APP_IDENTIFIER = org.openziti.ZitiMobileEdge
+IOS_EXT_IDENTIFIER = org.openziti.ZitiMobileEdge.ptp
+IOS_SHARE_IDENTIFIER = org.openziti.ZitiMobileEdge.share
+
+#include? "workspace-settings-overrides.xcconfig"
