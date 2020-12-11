@@ -157,6 +157,13 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         
     }
     
+    @objc func SwapToggle(gesture : UITapGestureRecognizer) {
+        let v = gesture.view!;
+        let tag = v.tag;
+        let zid = zidMgr.zids[tag];
+        zid.enabled = !zid.enabled!;
+    }
+    
     func switchValueDidChange(sender:UISwitch!)
     {
         if (sender.isOn == true){
@@ -186,6 +193,8 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             toggler.isEnabled = identity.isEnrolled;
             toggler.isOn = identity.isEnabled;
             toggler.isUserInteractionEnabled = true;
+            toggler.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
+            //toggler.addTarget(self, action: Selector(("switchValueDidChange:")), for: UIControl.Event.valueChanged);
             
             if (identity.isEnrolled) {
                 if (identity.isEnabled) {
@@ -303,7 +312,6 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             col4.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
             
 
-            //toggler.addTarget(self, action: Selector(("switchValueDidChange:")), for: UIControl.Event.valueChanged);
 
       
             // Put all the columns into the parent frames
