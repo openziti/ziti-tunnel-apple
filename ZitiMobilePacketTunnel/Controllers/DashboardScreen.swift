@@ -193,6 +193,7 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             toggler.isEnabled = identity.isEnrolled;
             toggler.isOn = identity.isEnabled;
             toggler.isUserInteractionEnabled = true;
+            toggler.tag = index;
             toggler.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
             //toggler.addTarget(self, action: Selector(("switchValueDidChange:")), for: UIControl.Event.valueChanged);
             
