@@ -10,6 +10,11 @@ abstract_target 'ios_targets' do
   end
 
   target 'MobilePacketTunnelProvider' do
+    post_install do |installer|
+      installer.pods_project.build_configurations.each do |config|
+        config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+      end
+    end
   end
 end
 
@@ -24,3 +29,4 @@ abstract_target 'macos_targets' do
   target 'PacketTunnelProvider' do
   end
 end
+
