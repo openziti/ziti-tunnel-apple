@@ -20,7 +20,6 @@
 		5A02AAE420703167006261C6 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A02AADB206EBE85006261C6 /* NetworkExtension.framework */; };
 		5A051F612264183500B11CB2 /* ZidMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A051F602264183500B11CB2 /* ZidMgr.swift */; };
 		5A051F622264183500B11CB2 /* ZidMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A051F602264183500B11CB2 /* ZidMgr.swift */; };
-		5A0AA17320791EA000338D46 /* ZitiPacketTunnel-macos.mobileconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */; };
 		5A0D1D2C222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
 		5A0D1D2D222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
 		5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
@@ -225,7 +224,6 @@
 		5A02AAD0206EBDD5006261C6 /* PacketTunnelProvider.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PacketTunnelProvider.entitlements; sourceTree = "<group>"; };
 		5A02AADB206EBE85006261C6 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		5A051F602264183500B11CB2 /* ZidMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZidMgr.swift; sourceTree = "<group>"; };
-		5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "ZitiPacketTunnel-macos.mobileconfig"; sourceTree = "<group>"; };
 		5A0D1D2B222B093F00D01F30 /* ZitiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiError.swift; sourceTree = "<group>"; };
 		5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		5A2D2FE224AB899E00D154AA /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
@@ -288,6 +286,17 @@
 		5AF3DCB024B52642005047BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPPacket.swift; sourceTree = "<group>"; };
 		5AF50FE5257D82760092DC47 /* LogLevelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogLevelViewController.swift; sourceTree = "<group>"; };
+		5AF5104A2582470F0092DC47 /* macos_targets.Ziti Desktop Edge.debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "macos_targets.Ziti Desktop Edge.debug.xcconfig"; sourceTree = "<group>"; };
+		5AF5104B258247280092DC47 /* macos_targets.Ziti Desktop Edge.release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "macos_targets.Ziti Desktop Edge.release.xcconfig"; sourceTree = "<group>"; };
+		5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "workspace-settings.xcconfig"; sourceTree = "<group>"; };
+		5AF5104D25824E0D0092DC47 /* ios_targets.MobileShare.release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ios_targets.MobileShare.release.xcconfig; sourceTree = "<group>"; };
+		5AF5104E25824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ios_targets.Ziti Mobile Edge.release.xcconfig"; sourceTree = "<group>"; };
+		5AF5104F25824E0D0092DC47 /* ios_targets.MobileShare.debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ios_targets.MobileShare.debug.xcconfig; sourceTree = "<group>"; };
+		5AF5105025824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ios_targets.MobilePacketTunnelProvider.debug.xcconfig; sourceTree = "<group>"; };
+		5AF5105125824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ios_targets.Ziti Mobile Edge.debug.xcconfig"; sourceTree = "<group>"; };
+		5AF5105225824E0D0092DC47 /* macos_targets.PacketTunnelProvider.release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = macos_targets.PacketTunnelProvider.release.xcconfig; sourceTree = "<group>"; };
+		5AF5105325824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ios_targets.MobilePacketTunnelProvider.release.xcconfig; sourceTree = "<group>"; };
+		5AF5105425824E0D0092DC47 /* macos_targets.PacketTunnelProvider.debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = macos_targets.PacketTunnelProvider.debug.xcconfig; sourceTree = "<group>"; };
 		5AF78686208A702A0093498C /* IPv4Packet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv4Packet.swift; sourceTree = "<group>"; };
 		5AF78688208A8D050093498C /* IPUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPUtils.swift; sourceTree = "<group>"; };
 		5AF7868C208A99640093498C /* UDPPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPPacket.swift; sourceTree = "<group>"; };
@@ -378,6 +387,7 @@
 		5A02AAAB206EBD7E006261C6 = {
 			isa = PBXGroup;
 			children = (
+				5AF51049258246E60092DC47 /* Configs */,
 				5AF9C24B226B6FAC009CFD71 /* Default-568h@2x.png */,
 				5A8702D722372E7800314199 /* Common */,
 				5A2EA2C4209B317200437608 /* Network */,
@@ -416,7 +426,6 @@
 				5A379AD0221F937D00051475 /* ServicesViewController.swift */,
 				5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */,
 				5A02AAB9206EBD7E006261C6 /* ViewController.swift */,
-				5A0AA17220791E9F00338D46 /* ZitiPacketTunnel-macos.mobileconfig */,
 				5A02AAC1206EBD7E006261C6 /* ZitiPacketTunnel.entitlements */,
 			);
 			path = ZitiPacketTunnel;
@@ -562,6 +571,24 @@
 				5AF3DCB024B52642005047BC /* Info.plist */,
 			);
 			path = MobileShare;
+			sourceTree = "<group>";
+		};
+		5AF51049258246E60092DC47 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				5AF5105025824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.debug.xcconfig */,
+				5AF5105325824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.release.xcconfig */,
+				5AF5104F25824E0D0092DC47 /* ios_targets.MobileShare.debug.xcconfig */,
+				5AF5104D25824E0D0092DC47 /* ios_targets.MobileShare.release.xcconfig */,
+				5AF5105125824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.debug.xcconfig */,
+				5AF5104E25824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.release.xcconfig */,
+				5AF5105425824E0D0092DC47 /* macos_targets.PacketTunnelProvider.debug.xcconfig */,
+				5AF5105225824E0D0092DC47 /* macos_targets.PacketTunnelProvider.release.xcconfig */,
+				5AF5104A2582470F0092DC47 /* macos_targets.Ziti Desktop Edge.debug.xcconfig */,
+				5AF5104B258247280092DC47 /* macos_targets.Ziti Desktop Edge.release.xcconfig */,
+				5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */,
+			);
+			path = Configs;
 			sourceTree = "<group>";
 		};
 		9235754F7BC4BDA731BD7317 /* Pods */ = {
@@ -818,7 +845,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5A0AA17320791EA000338D46 /* ZitiPacketTunnel-macos.mobileconfig in Resources */,
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
 				5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */,
@@ -1307,7 +1333,7 @@
 		};
 		5A02AAC5206EBD7E006261C6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */;
+			baseConfigurationReference = 5AF5104A2582470F0092DC47 /* macos_targets.Ziti Desktop Edge.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1315,7 +1341,6 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
 				HEADER_SEARCH_PATHS = (
@@ -1326,7 +1351,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_APP_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -1335,7 +1360,7 @@
 		};
 		5A02AAC6206EBD7E006261C6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */;
+			baseConfigurationReference = 5AF5104B258247280092DC47 /* macos_targets.Ziti Desktop Edge.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1343,7 +1368,6 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
 				HEADER_SEARCH_PATHS = (
@@ -1353,7 +1377,7 @@
 				INFOPLIST_FILE = ZitiPacketTunnel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_APP_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1363,13 +1387,12 @@
 		};
 		5A02AAD5206EBDD5006261C6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E671F0F8919AD76BAAE387E0 /* Pods-macos_targets-PacketTunnelProvider.debug.xcconfig */;
+			baseConfigurationReference = 5AF5105425824E0D0092DC47 /* macos_targets.PacketTunnelProvider.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
@@ -1386,7 +1409,7 @@
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-DLOCALHOST_PROXY";
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -1398,13 +1421,12 @@
 		};
 		5A02AAD6206EBDD5006261C6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 328AE963EE30DEF9334A41CC /* Pods-macos_targets-PacketTunnelProvider.release.xcconfig */;
+			baseConfigurationReference = 5AF5105225824E0D0092DC47 /* macos_targets.PacketTunnelProvider.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
@@ -1420,7 +1442,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1432,7 +1454,7 @@
 		};
 		5A2EA2D9209B750C00437608 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1834833D1B0C8E4A14373156 /* Pods-ios_targets-Ziti Mobile Edge.debug.xcconfig */;
+			baseConfigurationReference = 5AF5105125824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1441,13 +1463,12 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 427;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_APP_IDENTIFIER)";
 				PRODUCT_NAME = "Ziti Mobile Edge";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -1458,7 +1479,7 @@
 		};
 		5A2EA2DA209B750C00437608 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EF03484142199E9097C001C4 /* Pods-ios_targets-Ziti Mobile Edge.release.xcconfig */;
+			baseConfigurationReference = 5AF5104E25824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1467,13 +1488,12 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 427;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_APP_IDENTIFIER)";
 				PRODUCT_NAME = "Ziti Mobile Edge";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -1485,7 +1505,7 @@
 		};
 		5A2EA2E9209B754500437608 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D8AA43E427149108FA6F7ECF /* Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig */;
+			baseConfigurationReference = 5AF5105025824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1493,7 +1513,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 427;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1511,7 +1530,7 @@
 					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-iphoneos-arm64/lib",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1525,7 +1544,7 @@
 		};
 		5A2EA2EA209B754500437608 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AF72D0362A9CFC5ABE786D51 /* Pods-ios_targets-MobilePacketTunnelProvider.release.xcconfig */;
+			baseConfigurationReference = 5AF5105325824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1533,7 +1552,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 427;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1551,7 +1569,7 @@
 					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-iphoneos-arm64/lib",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1565,20 +1583,20 @@
 		};
 		5AF3DCB524B52642005047BC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E680228BB4AA8A195D933A87 /* Pods-ios_targets-MobileShare.debug.xcconfig */;
+			baseConfigurationReference = 5AF5104F25824E0D0092DC47 /* ios_targets.MobileShare.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MobileShare/MobileShare.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				INFOPLIST_FILE = MobileShare/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobileShare;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_SHARE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -1588,19 +1606,19 @@
 		};
 		5AF3DCB624B52642005047BC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */;
+			baseConfigurationReference = 5AF5104D25824E0D0092DC47 /* ios_targets.MobileShare.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = MobileShare/MobileShare.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = MN5S649TXM;
 				INFOPLIST_FILE = MobileShare/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = io.netfoundry.ZitiMobilePacketTunnel.MobileShare;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_SHARE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
