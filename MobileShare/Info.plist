@@ -32,9 +32,9 @@
                 $extensionItem.attachments,
                 $attachment,
                 (
-                ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "io.netfoundry.ziti.ott.jwt"
-                || ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "io.netfoundry.ziti.ott.zott"
-                || ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "io.netfoundry.ziti.ott.ziti"
+                ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "org.openziti.ziti.ott.jwt"
+                || ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "org.openziti.ziti.ott.zott"
+                || ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "org.openziti.ziti.ott.ziti"
                 )
                 ).@count == 1
                 ).@count == 1
@@ -45,5 +45,11 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
 	</dict>
+	<key>TeamIdentifierPrefix</key>
+	<string>$(TeamIdentifierPrefix)</string>
+    <key>IOS_APP_IDENTIFIER</key>
+    <string>$(IOS_APP_IDENTIFIER)</string>
+    <key>IOS_EXT_IDENTIFIER</key>
+    <string>$(IOS_EXT_IDENTIFIER)</string>
 </dict>
 </plist>

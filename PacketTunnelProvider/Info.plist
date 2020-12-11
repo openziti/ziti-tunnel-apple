@@ -31,5 +31,11 @@
 	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2020 NetFoundry. All rights reserved.</string>
+    <key>TeamIdentifierPrefix</key>
+    <string>$(TeamIdentifierPrefix)</string>
+    <key>MAC_APP_IDENTIFIER</key>
+    <string>$(MAC_APP_IDENTIFIER)</string>
+    <key>MAC_EXT_IDENTIFIER</key>
+    <string>$(MAC_EXT_IDENTIFIER)</string>
 </dict>
 </plist>
