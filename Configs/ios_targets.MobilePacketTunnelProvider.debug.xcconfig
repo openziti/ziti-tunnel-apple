@@ -1,0 +1,7 @@
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64
+
+#include "workspace-settings.xcconfig"
+#include "../Pods/Target Support Files/Pods-ios_targets-MobilePacketTunnelProvider/Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig"

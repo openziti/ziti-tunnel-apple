@@ -17,7 +17,7 @@
 			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>io.netfoundry.ziti.ott.jwt</string>
+				<string>org.openziti.ziti.ott.jwt</string>
 			</array>
 		</dict>
 		<dict>
@@ -29,7 +29,7 @@
 			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>io.netfoundry.ziti.ott.zott</string>
+				<string>org.openziti.ziti.ott.zott</string>
 			</array>
 		</dict>
 		<dict>
@@ -41,7 +41,7 @@
 			<string>Owner</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>io.netfoundry.ziti.ott.ziti</string>
+				<string>org.openziti.ziti.ott.ziti</string>
 			</array>
 		</dict>
 	</array>
@@ -56,9 +56,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.7</string>
+	<string>2.8</string>
 	<key>CFBundleVersion</key>
-	<string>427</string>
+	<string>428</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
@@ -103,7 +103,7 @@
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
-			<string>io.netfoundry.ziti.ott.jwt</string>
+			<string>org.openziti.ziti.ott.jwt</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
@@ -120,7 +120,7 @@
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
-			<string>io.netfoundry.ziti.ott.zott</string>
+			<string>org.openziti.ziti.ott.zott</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
@@ -137,7 +137,7 @@
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
-			<string>io.netfoundry.ziti.ott.ziti</string>
+			<string>org.openziti.ziti.ott.ziti</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
@@ -148,8 +148,18 @@
 	<key>ZitiHelpURL</key>
 	<string>https://openziti.discourse.group/</string>
 	<key>ZitiSupportEmail</key>
-	<string>openziti@netfoundry.io</string>
+	<string>$(SUPPORT_EMAIL)</string>
 	<key>ZitiSupportSubject</key>
 	<string>Ziti Support (iOS)</string>
+    <key>TeamIdentifierPrefix</key>
+    <string>$(TeamIdentifierPrefix)</string>
+    <key>IOS_APP_IDENTIFIER</key>
+    <string>$(IOS_APP_IDENTIFIER)</string>
+    <key>IOS_EXT_IDENTIFIER</key>
+    <string>$(IOS_EXT_IDENTIFIER)</string>
+    <key>PRIVACY_POLICY_URL</key>
+    <string>$(PRIVACY_POLICY_URL)</string>
+    <key>TERMS_URL</key>
+    <string>$(TERMS_URL)</string>
 </dict>
 </plist>
