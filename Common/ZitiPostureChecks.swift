@@ -37,7 +37,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
 /*
 #if os(macOS)
         // setup XPC
-        let connection = NSXPCConnection(serviceName: "io.netfoundry.ZitiPacketTunnel.ZitiPosture")
+        let connection = NSXPCConnection(serviceName: "...ZitiPosture")
         connection.remoteObjectInterface = NSXPCInterface(with: ZitiPostureProtocol.self)
         connection.resume()
 

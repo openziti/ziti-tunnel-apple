@@ -17,10 +17,21 @@
 import Foundation
 
 class AppGroup {
-    // TODO: Get TEAMID programatically... (and will be diff on iOS)
 #if os(macOS)
-    static let APP_GROUP_ID = "MN5S649TXM.ZitiPacketTunnel.group"
+static var APP_GROUP_ID:String {
+    guard let prefix = Bundle.main.object(forInfoDictionaryKey: "TeamIdentifierPrefix") else {
+        fputs("Invalid TeamIdentifierPrefix", stderr)
+        return ""
+    }
+    return "\(prefix)ZitiPacketTunnel.group"
+}
 #else
-    static let APP_GROUP_ID = "group.io.netfoundry.ZitiMobilePacketTunnel"
+static var APP_GROUP_ID:String {
+    guard let appId = Bundle.main.object(forInfoDictionaryKey: "IOS_APP_IDENTIFIER") else {
+        fputs("Invalid IOS_APP_IDENTIFIER", stderr)
+        return ""
+    }
+    return "group.\(appId)"
+}
 #endif
 }
