@@ -16,7 +16,7 @@
 	<true/>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)io.netfoundry.ZitiPacketTunnel</string>
+		<string>$(AppIdentifierPrefix)$(MAC_APP_IDENTIFIER)</string>
 	</array>
 </dict>
 </plist>

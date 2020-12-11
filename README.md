@@ -28,6 +28,23 @@ $ cmake -GNinja -DCMAKE_TOOLCHAIN_FILE=../build-macos-x86_64/_deps/ziti-sdk-c-sr
 $ pod install
 ```
 
+## Update `xcconfig` Settings
+Create a file called `Configs/workspace-settings-overrides.xcconfig` and populate with appropriate values. 
+```
+DEVELOPMENT_TEAM = XXXXXXXXXX
+
+PRIVACY_POLICY_URL = http:/$()/...
+TERMS_URL = http:/$()/...
+SUPPORT_EMAIL = help@...
+
+MAC_APP_IDENTIFIER = ...
+MAC_EXT_IDENTIFIER = ....ptp
+
+IOS_APP_IDENTIFIER = ...mobile
+IOS_EXT_IDENTIFIER = ...mobile.ptp
+IOS_SHARE_IDENTIFIER = ...mobile.share
+```
+
 ## XCode
 Open the `ZitiPacketTunnel.xcworkspace` (_not_ the `.xcodeproj` file), and build targets as per usual with XCode
 

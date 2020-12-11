@@ -18,6 +18,22 @@ import UIKit
 import SafariServices
 
 class AboutViewController: UITableViewController {
+    
+    static var privacyUrl:String {
+        guard let str = Bundle.main.object(forInfoDictionaryKey: "PRIVACY_POLICY_URL") else {
+            zLog.error("Invalid PRIVACY_POLICY_URL")
+            return ""
+        }
+        return "\(str)"
+    }
+    
+    static var termsUrl:String {
+        guard let str = Bundle.main.object(forInfoDictionaryKey: "TERMS_URL") else {
+            zLog.error("Invalid TERMS_URL")
+            return ""
+        }
+        return "\(str)"
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,12 +64,12 @@ class AboutViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
-            if let url = URL(string: "https://netfoundry.io/privacy-policy/") {
+            if let url = URL(string: AboutViewController.privacyUrl) {
                 let vc = SFSafariViewController(url: url)
                 present(vc, animated: true)
             }
         } else if indexPath.row == 1 {
-            if let url = URL(string: "https://netfoundry.io/terms/") {
+            if let url = URL(string: AboutViewController.termsUrl) {
                 let vc = SFSafariViewController(url: url)
                 present(vc, animated: true)
             }

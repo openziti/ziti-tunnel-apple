@@ -10,6 +10,12 @@
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>TeamIdentifierPrefix</key>
+    <string>$(TeamIdentifierPrefix)</string>
+    <key>IOS_APP_IDENTIFIER</key>
+    <string>$(IOS_APP_IDENTIFIER)</string>
+    <key>IOS_EXT_IDENTIFIER</key>
+    <string>$(IOS_EXT_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -17,9 +23,9 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.7</string>
+	<string>2.8</string>
 	<key>CFBundleVersion</key>
-	<string>427</string>
+	<string>428</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>

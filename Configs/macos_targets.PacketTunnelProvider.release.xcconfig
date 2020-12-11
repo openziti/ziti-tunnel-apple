@@ -1,0 +1,5 @@
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+#include "workspace-settings.xcconfig"
+#include "../Pods/Target Support Files/Pods-macos_targets-PacketTunnelProvider/Pods-macos_targets-PacketTunnelProvider.release.xcconfig"

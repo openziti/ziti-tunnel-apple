@@ -75,7 +75,13 @@ class StatusCell: UITableViewCell {
 
 class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate, ScannerDelegate, ZitiIdentityStoreDelegate {
     
-    static let providerBundleIdentifier = "io.netfoundry.ZitiMobilePacketTunnel.MobilePacketTunnelProvider"
+    static var providerBundleIdentifier:String {
+        guard let bid = Bundle.main.object(forInfoDictionaryKey: "IOS_EXT_IDENTIFIER") else {
+            fputs("Invalid IOS_EXT_IDENTIFIER", stderr)
+            return ""
+        }
+        return "\(bid)"
+    }
     var tunnelMgr = TunnelMgr.shared
     var zidMgr = ZidMgr()
     weak var ivc:IdentityViewController?
