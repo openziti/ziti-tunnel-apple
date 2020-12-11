@@ -621,6 +621,24 @@
 			path = MobileShare;
 			sourceTree = "<group>";
 		};
+		5AF51049258246E60092DC47 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				5AF5105025824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.debug.xcconfig */,
+				5AF5105325824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.release.xcconfig */,
+				5AF5104F25824E0D0092DC47 /* ios_targets.MobileShare.debug.xcconfig */,
+				5AF5104D25824E0D0092DC47 /* ios_targets.MobileShare.release.xcconfig */,
+				5AF5105125824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.debug.xcconfig */,
+				5AF5104E25824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.release.xcconfig */,
+				5AF5105425824E0D0092DC47 /* macos_targets.PacketTunnelProvider.debug.xcconfig */,
+				5AF5105225824E0D0092DC47 /* macos_targets.PacketTunnelProvider.release.xcconfig */,
+				5AF5104A2582470F0092DC47 /* macos_targets.Ziti Desktop Edge.debug.xcconfig */,
+				5AF5104B258247280092DC47 /* macos_targets.Ziti Desktop Edge.release.xcconfig */,
+				5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */,
+			);
+			path = Configs;
+			sourceTree = "<group>";
+		};
 		829692312558AFC200ED44AB /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
@@ -661,24 +679,6 @@
 			children = (
 			);
 			path = Controllers;
-            sourceTree = "<group>";
-        };
-		5AF51049258246E60092DC47 /* Configs */ = {
-			isa = PBXGroup;
-			children = (
-				5AF5105025824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.debug.xcconfig */,
-				5AF5105325824E0D0092DC47 /* ios_targets.MobilePacketTunnelProvider.release.xcconfig */,
-				5AF5104F25824E0D0092DC47 /* ios_targets.MobileShare.debug.xcconfig */,
-				5AF5104D25824E0D0092DC47 /* ios_targets.MobileShare.release.xcconfig */,
-				5AF5105125824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.debug.xcconfig */,
-				5AF5104E25824E0D0092DC47 /* ios_targets.Ziti Mobile Edge.release.xcconfig */,
-				5AF5105425824E0D0092DC47 /* macos_targets.PacketTunnelProvider.debug.xcconfig */,
-				5AF5105225824E0D0092DC47 /* macos_targets.PacketTunnelProvider.release.xcconfig */,
-				5AF5104A2582470F0092DC47 /* macos_targets.Ziti Desktop Edge.debug.xcconfig */,
-				5AF5104B258247280092DC47 /* macos_targets.Ziti Desktop Edge.release.xcconfig */,
-				5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */,
-			);
-			path = Configs;
 			sourceTree = "<group>";
 		};
 		9235754F7BC4BDA731BD7317 /* Pods */ = {
@@ -937,7 +937,6 @@
 			files = (
 				829692322558AFCC00ED44AB /* OpenSans-Light.ttf in Resources */,
 				829692362558AFD000ED44AB /* OpenSans-Bold.ttf in Resources */,
-				5A0AA17320791EA000338D46 /* ZitiPacketTunnel-macos.mobileconfig in Resources */,
 				82C624C32577D34700BCF212 /* MainUI.storyboard in Resources */,
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
@@ -1454,6 +1453,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
 				HEADER_SEARCH_PATHS = (
@@ -1481,6 +1481,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
 				HEADER_SEARCH_PATHS = (
@@ -1506,6 +1507,7 @@
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
@@ -1540,6 +1542,7 @@
 				CODE_SIGN_ENTITLEMENTS = PacketTunnelProvider/PacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
@@ -1576,6 +1579,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 428;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1601,6 +1605,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 428;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1626,6 +1631,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 428;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1664,6 +1670,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 428;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1700,6 +1707,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobileShare/MobileShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				INFOPLIST_FILE = MobileShare/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
@@ -1723,6 +1731,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobileShare/MobileShare.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = MN5S649TXM;
 				INFOPLIST_FILE = MobileShare/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
