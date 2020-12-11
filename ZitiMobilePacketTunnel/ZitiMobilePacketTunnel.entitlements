@@ -22,11 +22,11 @@
 	<string>$(TeamIdentifierPrefix)$(CFBundleIdentifier)</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.io.netfoundry.ZitiMobilePacketTunnel</string>
+		<string>group.$(IOS_APP_IDENTIFIER)</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)io.netfoundry.ZitiMobilePacketTunnel</string>
+		<string>$(AppIdentifierPrefix)$(IOS_APP_IDENTIFIER)</string>
 	</array>
 </dict>
 </plist>
