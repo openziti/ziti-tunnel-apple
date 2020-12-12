@@ -49,7 +49,7 @@ char **get_mac_addrs() {
             unsigned char mac[6];
             if (6 == sdl->sdl_alen) {
                 i++;
-                mac_addrs = realloc(mac_addrs, sizeof(char**) * (i + 1));
+                mac_addrs = realloc(mac_addrs, sizeof(char*) * (i + 1));
                 mac_addrs[i] = NULL;
                 mac_addrs[i-1] = calloc(sdl->sdl_alen * 3, sizeof(char));
                 memcpy(mac, LLADDR(sdl), sdl->sdl_alen);
