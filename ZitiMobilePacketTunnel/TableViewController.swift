@@ -55,6 +55,9 @@ class StatusCell: UITableViewCell {
     }
     
     @IBAction func connectSwitchChanged(_ sender: Any) {
+        #if targetEnvironment(simulator)
+        tvc?.tunnelMgr.status = connectSwitch.isOn ? .connected : .disconnected
+        #else
         if connectSwitch.isOn {
             do {
                 try tvc?.tunnelMgr.startTunnel()
@@ -70,6 +73,7 @@ class StatusCell: UITableViewCell {
         } else {
             tvc?.tunnelMgr.stopTunnel()
         }
+        #endif
     }
 }
 

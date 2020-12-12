@@ -25,6 +25,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         Logger.initShared(Logger.APP_TAG)
         zLog.info(Version.verboseStr)
+        
+        #if targetEnvironment(simulator)
+            let zidStore = ZitiIdentityStore()
+            if let resourceURL = Bundle.main.resourceURL {
+                do {
+                    let list = try FileManager.default.contentsOfDirectory(at: resourceURL, includingPropertiesForKeys: nil, options: [])
+                    try list.forEach { url in
+                        if url.pathExtension == "zid" {
+                            zLog.info("found id \(url.lastPathComponent)")
+                            let data = try Data.init(contentsOf: url)
+                            let jsonDecoder = JSONDecoder()
+                            if let zId = try? jsonDecoder.decode(ZitiIdentity.self, from: data) {
+                                if zId.czid == nil {
+                                    zLog.error("failed loading \(url.lastPathComponent).  Unsupported version")
+                                } else {
+                                    _ = zidStore.store(zId)
+                                }
+                            } else {
+                                // log it and continue (don't return error and abort)
+                                zLog.error("failed loading \(url.lastPathComponent)")
+                            }
+                        }
+                    }
+                } catch {
+                    zLog.error("Unable to read directory URL: \(error.localizedDescription)")
+                }
+            }
+        #endif
         return true
     }
 
