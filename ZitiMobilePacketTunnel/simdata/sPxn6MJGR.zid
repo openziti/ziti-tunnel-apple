@@ -1,0 +1,66 @@
+{
+   "claims":{
+      "exp":1607638671,
+      "jti":"71bf2652-2cdc-4534-9bd7-8f62e2500662",
+      "iss":"https:\/\/23.20.34.114:443",
+      "em":"ott",
+      "sub":"sPxn6MJGR"
+   },
+   "enabled":true,
+   "controllerVersion":"v0.17.4",
+   "services":[
+      {
+         "status":{
+            "status":"Available",
+            "lastUpdatedAt":1607726617.7746921,
+            "needsRestart":false
+         },
+         "id":"v52sHL0Gg",
+         "dns":{
+            "port":80,
+            "hostname":"fireworks.netfoundry",
+            "interceptIp":"100.64.0.3"
+         },
+         "name":"Fireworks Service"
+      },
+      {
+         "status":{
+            "status":"Available",
+            "lastUpdatedAt":1607726617.840338,
+            "needsRestart":false
+         },
+         "id":"eMTsHY0GR",
+         "dns":{
+            "port":80,
+            "hostname":"weather.netfoundry",
+            "interceptIp":"100.64.0.4"
+         },
+         "name":"Weather Service"
+      },
+      {
+         "status":{
+            "status":"Available",
+            "lastUpdatedAt":1607726617.8811541,
+            "needsRestart":false
+         },
+         "id":"JCoyNY0Gg",
+         "dns":{
+            "port":80,
+            "hostname":"echo.netfoundry",
+            "interceptIp":"100.64.0.5"
+         },
+         "name":"Echo Service"
+      }
+   ],
+   "edgeStatus":{
+      "status":"Available",
+      "lastContactAt":1607726617.9102869
+   },
+   "enrolled":true,
+   "czid":{
+      "id":"sPxn6MJGR",
+      "ztAPI":"https:\/\/23.20.34.114:443",
+      "name":"nftcs-dhart-ios",
+      "ca":""
+   }
+}
