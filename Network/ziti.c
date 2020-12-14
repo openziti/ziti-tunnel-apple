@@ -26,12 +26,6 @@
 #include <ifaddrs.h>
 #include <errno.h>
 
-#include "ziti/ziti_tunnel_cbs.h"
-
-void ziti_sdk_c_host_v1_wrapper(void *ziti_ctx, uv_loop_t *loop, const char *service_id, const char *proto, const char *hostname, int port) {
-    ziti_sdk_c_host_v1(ziti_ctx, loop, service_id, proto, hostname, port);
-}
-
 char **get_mac_addrs() {
     char **mac_addrs = NULL;
     int i = 0;
