@@ -120,7 +120,7 @@ class DNSResolver : NSObject {
     func resolve(_ udp:UDPPacket) {
         guard let dns = DNSPacket(udp) else { return }
         
-        zLog.trace("DNS-->: \(dns.debugDescription)")
+        //zLog.trace("DNS-->: \(dns.debugDescription)")
         // only resolve queries (should never see this...)
         if dns.qrFlag { return }
         
@@ -189,7 +189,7 @@ class DNSResolver : NSObject {
         dnsR.responseCode = responseCode
         dnsR.udp.updateLengthsAndChecksums()
         
-        zLog.trace("<--DNS: \(dnsR.debugDescription)")
+        //zLog.trace("<--DNS: \(dnsR.debugDescription)")
         //zLog.trace("<--UDP: \(dnsR.udp.debugDescription)")
         //zLog.trace("<--IP: \(dnsR.udp.ip.debugDescription)")
  
