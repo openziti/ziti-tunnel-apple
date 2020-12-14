@@ -61,14 +61,8 @@
 		5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */; };
 		5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379AD0221F937D00051475 /* ServicesViewController.swift */; };
-		5A411E432520E047005EE351 /* libziti-tunnel-sdk-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A411E412520E036005EE351 /* libziti-tunnel-sdk-c.a */; };
-		5A411E442520E047005EE351 /* libziti-tunnel-cbs-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A411E422520E036005EE351 /* libziti-tunnel-cbs-c.a */; };
-		5A411E472520E07A005EE351 /* libziti-tunnel-sdk-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A411E462520E06D005EE351 /* libziti-tunnel-sdk-c.a */; };
-		5A411E482520E07A005EE351 /* libziti-tunnel-cbs-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A411E452520E06D005EE351 /* libziti-tunnel-cbs-c.a */; };
 		5A411E802523583E005EE351 /* ziti.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A411E7F2523583E005EE351 /* ziti.c */; };
 		5A411E812523583F005EE351 /* ziti.c in Sources */ = {isa = PBXBuildFile; fileRef = 5A411E7F2523583E005EE351 /* ziti.c */; };
-		5A476FF724A17BC000B27A47 /* liblwipcore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A476FF324A17BB200B27A47 /* liblwipcore.a */; };
-		5A476FF824A17BC000B27A47 /* liblwipunixarch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A476FF124A17BB200B27A47 /* liblwipunixarch.a */; };
 		5A5539102558425900C02F03 /* ZitiPostureChecks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A55390F2558425900C02F03 /* ZitiPostureChecks.swift */; };
 		5A5539112558425900C02F03 /* ZitiPostureChecks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A55390F2558425900C02F03 /* ZitiPostureChecks.swift */; };
 		5A67F8F2209F952D00DEFE87 /* IPPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A67F8F0209F948F00DEFE87 /* IPPacket.swift */; };
@@ -105,10 +99,6 @@
 		5ABA5EDD2274D2EC00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
-		5AF0C4172492D66A00CD4DAE /* NetifDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0C4162492D66900CD4DAE /* NetifDriver.swift */; };
-		5AF0C4182492D66A00CD4DAE /* NetifDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF0C4162492D66900CD4DAE /* NetifDriver.swift */; };
-		5AF0C42224951AC400CD4DAE /* liblwipcore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AF0C41F24951A9F00CD4DAE /* liblwipcore.a */; };
-		5AF0C42324951AC400CD4DAE /* liblwipunixarch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AF0C41E24951A9F00CD4DAE /* liblwipunixarch.a */; };
 		5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF3DCAB24B52642005047BC /* ShareViewController.swift */; };
 		5AF3DCAF24B52642005047BC /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5AF3DCAD24B52642005047BC /* MainInterface.storyboard */; };
 		5AF3DCB324B52642005047BC /* MobileShare.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5AF3DCA924B52642005047BC /* MobileShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -279,7 +269,6 @@
 		5ABA5EC822727AEE00B2221D /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedtls.a"; sourceTree = "<group>"; };
 		5ABA5EC922727AEE00B2221D /* libmbedx509.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedx509.a; path = "../ziti-sdk-c/build/deps/uv-mbed/mbedtls/library/libmbedx509.a"; sourceTree = "<group>"; };
 		5ABA5ED92274D2EB00B2221D /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
-		5AF0C4162492D66900CD4DAE /* NetifDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetifDriver.swift; sourceTree = "<group>"; };
 		5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PacketTunnelProvider-Bridging-Header.h"; sourceTree = "<group>"; };
 		5AF0C41C24951A9F00CD4DAE /* libziti_tunneler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler.a"; sourceTree = "<group>"; };
 		5AF0C41D24951A9F00CD4DAE /* libziti_tunneler_cbs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler_cbs.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler_cbs.a"; sourceTree = "<group>"; };
@@ -353,11 +342,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A02AADC206EBE85006261C6 /* NetworkExtension.framework in Frameworks */,
-				5A411E472520E07A005EE351 /* libziti-tunnel-sdk-c.a in Frameworks */,
-				5AF0C42324951AC400CD4DAE /* liblwipunixarch.a in Frameworks */,
 				AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */,
-				5A411E482520E07A005EE351 /* libziti-tunnel-cbs-c.a in Frameworks */,
-				5AF0C42224951AC400CD4DAE /* liblwipcore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,11 +360,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A2EA2ED209B756400437608 /* NetworkExtension.framework in Frameworks */,
-				5A411E432520E047005EE351 /* libziti-tunnel-sdk-c.a in Frameworks */,
-				5A476FF824A17BC000B27A47 /* liblwipunixarch.a in Frameworks */,
 				17D8A0F17887892FEC22834E /* Pods_ios_targets_MobilePacketTunnelProvider.framework in Frameworks */,
-				5A411E442520E047005EE351 /* libziti-tunnel-cbs-c.a in Frameworks */,
-				5A476FF724A17BC000B27A47 /* liblwipcore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,7 +476,6 @@
 				5AF78686208A702A0093498C /* IPv4Packet.swift */,
 				5AF4BEC5223FF191001F1F4D /* TCPPacket.swift */,
 				5AF7868C208A99640093498C /* UDPPacket.swift */,
-				5AF0C4162492D66900CD4DAE /* NetifDriver.swift */,
 				5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */,
 				5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */,
 				5A411E7F2523583E005EE351 /* ziti.c */,
@@ -1109,7 +1089,6 @@
 				5AF4BEC7223FF19B001F1F4D /* TCPPacket.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
 				5A91B4C82222E154006C4277 /* ZitiIdentityStore.swift in Sources */,
-				5AF0C4172492D66A00CD4DAE /* NetifDriver.swift in Sources */,
 				5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */,
 				5AF786932090967F0093498C /* DNSName.swift in Sources */,
 				5AF78695209096CD0093498C /* DNSResourceRecord.swift in Sources */,
@@ -1169,7 +1148,6 @@
 				5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */,
 				5A2EA2F2209B75C400437608 /* IPv4Packet.swift in Sources */,
 				5A2EA2F4209B75CD00437608 /* DNSPacket.swift in Sources */,
-				5AF0C4182492D66A00CD4DAE /* NetifDriver.swift in Sources */,
 				5A2EA2F6209B75D500437608 /* DNSName.swift in Sources */,
 				5A2EA2F7209B75DA00437608 /* DNSResourceRecord.swift in Sources */,
 				5A411E812523583F005EE351 /* ziti.c in Sources */,
@@ -1425,16 +1403,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/include",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/_deps/libuv-src/include",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/_deps/ziti-sdk-c-src/includes",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/_deps/uv-mbed-src/include/",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = PacketTunnelProvider/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/lib";
+				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-DLOCALHOST_PROXY";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_EXT_IDENTIFIER)";
@@ -1459,16 +1431,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_ARCHS = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/include",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/_deps/libuv-src/include",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/_deps/ziti-sdk-c-src/includes",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/_deps/uv-mbed-src/include/",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = PacketTunnelProvider/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-macos-$(CURRENT_ARCH)/lib";
+				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1542,20 +1508,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 428;
 				ENABLE_BITCODE = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/include",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/_deps/libuv-src/include",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/_deps/ziti-sdk-c-src/includes",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/_deps/uv-mbed-src/include/",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/lib",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "";
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1580,20 +1537,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 428;
 				ENABLE_BITCODE = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/include",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/_deps/libuv-src/include",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/_deps/ziti-sdk-c-src/includes",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/_deps/uv-mbed-src/include/",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/lib",
-					"$(PROJECT_DIR)/deps/ziti-tunneler-sdk-c/build-$(PLATFORM_NAME)-$(CURRENT_ARCH)/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "";
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
