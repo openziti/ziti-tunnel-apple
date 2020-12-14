@@ -186,7 +186,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelPacketWriter {
         return count
     }
     
-    var zitis:[Ziti] = [] //PIG TODO
     private func loadIdentites(_ loop:UnsafeMutablePointer<uv_loop_t>) -> ZitiError? {
         
         let zidStore = ZitiIdentityStore()
@@ -205,7 +204,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelPacketWriter {
                 zid.services = []
                 
                 let ziti = Ziti(zid: czid, loop: loop)
-                zitis.append(ziti)
                 zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 _ = zidStore.store(zid)
                 
