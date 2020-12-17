@@ -30,9 +30,10 @@ class LogsScreen: UIViewController, UIActivityItemSource {
         return "";
     }
     
-    @IBAction func ShoPacketLog(_ sender: UITapGestureRecognizer) {
+    @IBAction func ShowPacketLog(_ sender: UITapGestureRecognizer) {
         let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil)
         let logDetails = storyBoard.instantiateViewController(withIdentifier: "LogDetails") as! LogDetailScreen
+        logDetails.modalPresentationStyle = .fullScreen;
         logDetails.logType = "packet";
         self.present(logDetails, animated:true, completion:nil)
     }
@@ -40,6 +41,7 @@ class LogsScreen: UIViewController, UIActivityItemSource {
     @IBAction func ShowAppLog(_ sender: UITapGestureRecognizer) {
         let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil)
         let logDetails = storyBoard.instantiateViewController(withIdentifier: "LogDetails") as! LogDetailScreen
+        logDetails.modalPresentationStyle = .fullScreen;
         logDetails.logType = "application";
         self.present(logDetails, animated:true, completion:nil)
     }

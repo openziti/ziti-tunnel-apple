@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -11,7 +12,7 @@
         <scene sceneID="EHf-IW-A2E">
             <objects>
                 <viewController autoresizesArchivedViewToFullSize="NO" wantsFullScreenLayout="YES" modalPresentationStyle="fullScreen" id="01J-lp-oVM" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                    <view key="view" contentMode="center" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -19,10 +20,10 @@
                                 <rect key="frame" x="-50" y="-50" width="514" height="996"/>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon" translatesAutoresizingMaskIntoConstraints="NO" id="8mm-cW-iF8">
-                                <rect key="frame" x="87" y="294" width="240" height="200"/>
+                                <rect key="frame" x="137" y="378" width="140" height="140"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="200" id="00s-h5-RPa"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="200" id="q10-8l-HCq"/>
+                                    <constraint firstAttribute="width" constant="140" id="eRX-Jw-xwm"/>
+                                    <constraint firstAttribute="height" constant="140" id="q10-8l-HCq"/>
                                 </constraints>
                             </imageView>
                         </subviews>
@@ -32,11 +33,9 @@
                             <constraint firstItem="SDT-CT-81V" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="-50" id="0ol-LT-i4f"/>
                             <constraint firstAttribute="bottom" secondItem="SDT-CT-81V" secondAttribute="bottom" constant="-50" id="17G-LT-KeC"/>
                             <constraint firstItem="SDT-CT-81V" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" constant="-50" id="Oz2-lr-Hut"/>
-                            <constraint firstItem="8mm-cW-iF8" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="250" id="VPh-LU-C1k"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="8mm-cW-iF8" secondAttribute="trailing" constant="87" id="pcM-fg-BPA"/>
-                            <constraint firstItem="8mm-cW-iF8" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="87" id="rzX-7y-1E9"/>
+                            <constraint firstItem="8mm-cW-iF8" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="ee6-Wn-qZc"/>
+                            <constraint firstItem="8mm-cW-iF8" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="uBK-Fa-m9y"/>
                             <constraint firstAttribute="trailing" secondItem="SDT-CT-81V" secondAttribute="trailing" constant="-50" id="uIx-7v-eYP"/>
-                            <constraint firstItem="8mm-cW-iF8" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="87" id="wbB-5e-NGz"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>

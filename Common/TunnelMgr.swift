@@ -25,12 +25,31 @@ class TunnelMgr: NSObject {
     typealias TunnelStateChangedCallback = ((NEVPNStatus)->Void)
     var tsChangedCallbacks:[TunnelStateChangedCallback] = []
     
+    #if targetEnvironment(simulator)
+    var _status:NEVPNStatus = .disconnected
+    var status:NEVPNStatus {
+        get { return _status }
+        set {
+            _status = newValue
+            let zidStore = ZitiIdentityStore()
+            let (zids, _)  = zidStore.loadAll()
+            zids?.forEach { zid in
+                if zid.isEnabled {
+                    zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
+                }
+                _ = zidStore.store(zid)
+            }
+            tunnelStatusDidChange(Notification(name: NSNotification.Name.NEVPNStatusDidChange))
+        }
+    }
+    #else
     var status:NEVPNStatus {
         get {
             if let status = tpm?.connection.status { return status }
             return .invalid
         }
     }
+    #endif
     
     static let shared = TunnelMgr()
     private override init() {}
@@ -107,7 +126,7 @@ class TunnelMgr: NSObject {
                     }
                     
                     completionHandler?(tpm, nil)
-                    tmgr.tsChangedCallbacks.forEach { cb in cb(tpm.connection.status) }
+                    tmgr.tsChangedCallbacks.forEach { cb in cb(tmgr.status) }
                 } else {
                     completionHandler?(nil, ZitiError("Tunnel preferencecs load fail due to retain scope"))
                 }
@@ -158,11 +177,15 @@ class TunnelMgr: NSObject {
     }
     
     func restartTunnel() {
-        if let status = tpm?.connection.status, status != .disconnected {
+        #if targetEnvironment(simulator)
+        zLog.info("Simulator ignoring tunnel restart check")
+        #else
+        if self.status != .disconnected {
             zLog.info("Restarting tunnel")
             tunnelRestarting = true
             stopTunnel()
         }
+        #endif
     }
     
     func updateLogLevel(_ level:ZitiLog.LogLevel) {

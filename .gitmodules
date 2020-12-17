@@ -1,3 +1,0 @@
-[submodule "deps/ziti-tunneler-sdk-c"]
-	path = deps/ziti-tunneler-sdk-c
-	url = https://github.com/openziti/ziti-tunneler-sdk-c

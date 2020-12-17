@@ -28,7 +28,7 @@ class AdvancedScreen: UIViewController, UIActivityItemSource {
     }
     
     @IBAction func dismissVC(_ sender: Any) {
-         dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     

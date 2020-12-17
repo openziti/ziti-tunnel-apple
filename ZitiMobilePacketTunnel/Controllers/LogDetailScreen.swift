@@ -28,34 +28,59 @@ class LogDetailScreen: UIViewController, UIActivityItemSource {
         self.dismiss(animated: true, completion: nil)
     }
     
+    @objc func onRefresh() {
+        ShareButton?.isHidden = true
+        guard let url = logURL else { return }
+        
+        do {
+            try LogText.text = String(contentsOf: url, encoding: .utf8)
+            if LogText.text.count > 0 {
+                ShareButton?.isHidden = false
+            }
+        } catch {
+            LogText.text = error.localizedDescription
+            zLog.error("No content found for log, \(error.localizedDescription)")
+        }
+        LogText.layoutManager.allowsNonContiguousLayout = false
+        LogText.scrollRangeToVisible(NSMakeRange(LogText.text.count-1, 0))
+    }
+    
+    @objc func onShare() {
+        let items = [self]
+        let ac = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        present(ac, animated: true)
+    }
+    
+    var logURL:URL? {
+        if let logger = Logger.shared, let tag = self.logType, let url = logger.currLog(forTag: tag) {
+            return url
+        }
+        return nil
+    }
+    
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return "";
+        if let url = logURL {
+            return url
+        }
+        return "Log not available"
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        return "";
+        
+        return activityViewControllerPlaceholderItem(activityViewController)
     }
     
+    func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
+        
+        return logURL?.lastPathComponent ?? "\(logType ?? "ziti").log"
+    }
     
     override func viewDidLoad() {
-        let logger = Logger.shared;
-        guard let url = logger!.currLog(forTag: Logger.APP_TAG) else { return };
         LogTitle.text = "  Application Logs";
         if (logType=="packet") {
             LogTitle.text = "  Packet Tunnel Logs";
-            guard let url = logger!.currLog(forTag: Logger.TUN_TAG) else { return };
         }
-        
-        do {
-            try LogText.text = String(contentsOf: url, encoding: .utf8);
-            ShareButton?.isHidden = (LogText.text.count>0);
-        } catch {
-            LogText.text = error.localizedDescription
-            NSLog("No content found for log, \(error.localizedDescription)")
-        }
-        
-        LogText.layoutManager.allowsNonContiguousLayout = false;
-        LogText.scrollRangeToVisible(NSMakeRange(LogText.text.count-1, 0));
+        self.onRefresh();
     }
     
     

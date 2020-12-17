@@ -19,6 +19,9 @@ import Cocoa
 class ServicesViewController: NSViewController {
     @IBOutlet weak var tableView: NSTableView!
     
+    var sortKey:String? = "Name"
+    var ascending = true
+    
     weak var zid:ZitiIdentity? {
         get {
             return representedObject as? ZitiIdentity
@@ -36,8 +39,46 @@ class ServicesViewController: NSViewController {
         tableView.target = self
         tableView.doubleAction = #selector(tableViewDoubleClick(_:))
         
+        tableView.tableColumns[0].sortDescriptorPrototype = NSSortDescriptor(key: "Name", ascending: true)
+        tableView.tableColumns[1].sortDescriptorPrototype = NSSortDescriptor(key: "Protocol", ascending: true)
+        tableView.tableColumns[2].sortDescriptorPrototype = NSSortDescriptor(key: "Hostname", ascending: true)
+        tableView.tableColumns[3].sortDescriptorPrototype = NSSortDescriptor(key: "Port", ascending: true)
+        
         tableView.isEnabled = zid == nil ? false : true
-        tableView.reloadData()
+        self.reloadData()
+    }
+    
+    func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+        guard let sortDescriptor = tableView.sortDescriptors.first else {
+            zLog.wtf("invalid sortDescriptor")
+            return
+        }
+        sortKey = sortDescriptor.key
+        ascending = sortDescriptor.ascending
+        self.reloadData()
+    }
+    
+    func reloadData() {
+        if sortKey == "Name" {
+            zid?.services.sort(by: {
+                let a = $0.name ?? ""
+                let b = $1.name ?? ""
+                return ascending ? a < b : a > b
+            })
+        } else if sortKey == "Hostname" {
+            zid?.services.sort(by: {
+                let a = $0.dns?.hostname ?? ""
+                let b = $1.dns?.hostname ?? ""
+                return ascending ? a < b : a > b
+            })
+        } else if sortKey == "Port" {
+            zid?.services.sort(by: {
+                let a = $0.dns?.port ?? 0
+                let b = $1.dns?.port ?? 0
+                return ascending ? a < b : a > b
+            })
+        }
+        tableView?.reloadData()
     }
     
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
@@ -59,7 +100,7 @@ class ServicesViewController: NSViewController {
             tableView?.isEnabled = zid == nil ? false : true
             
             let selectedRow = tableView?.selectedRow ?? 0
-            tableView?.reloadData()
+            self.reloadData()
             tableView?.selectRowIndexes([selectedRow], byExtendingSelection: false)
         }
     }

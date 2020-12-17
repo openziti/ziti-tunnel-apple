@@ -53,7 +53,7 @@ class ZitiTunnelServerConfig : Codable {
     }
 }
 
-class PacketTunnelProvider: NEPacketTunnelProvider {
+class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelPacketWriter {
     
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
@@ -63,8 +63,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     var currPath:Network.NWPath?
     var ifname:String?
     var zids:[ZitiIdentity] = []    
-    var netifDriver:NetifDriver!
-    var tnlr_ctx:tunneler_context?
+    var zitiTunnel:ZitiTunnel!
     var loop:UnsafeMutablePointer<uv_loop_t>!
     var writeLock = NSLock()
     
@@ -81,7 +80,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         netMon.pathUpdateHandler = self.pathUpdateHandler
         netMon.start(queue: DispatchQueue.global())
         dnsResolver = DNSResolver(self)
-        netifDriver = NetifDriver(ptp: self)
     }
     
     func pathUpdateHandler(path: Network.NWPath) {
@@ -111,7 +109,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         }
                     }
                     if !isDNS {
-                        self.netifDriver.queuePacket(packet.data)
+                        self.zitiTunnel.queuePacket(packet.data)
                     }
                 }
             }
@@ -272,10 +270,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                             zLog.debug("service \(serviceName) CAN bind")
                             if let cfg = ZitiTunnelServerConfig.parseConfig(&zs) {
                                 zLog.debug("Bind config hostname:\(cfg.hostname), port:\(cfg.port), proto:\(cfg.proto)")
-                                ziti_tunneler_host_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.name,
-                                                      cfg.proto.cString(using: .utf8),
-                                                      cfg.hostname.cString(using: .utf8),
-                                                      Int32(cfg.port))
+                                _ = self.zitiTunnel.v1Host(ztx, zs.name,
+                                                   cfg.proto.cString(using: .utf8),
+                                                   cfg.hostname.cString(using: .utf8),
+                                                   Int32(cfg.port))
                             } else {
                                 zLog.error("Unable to parse server config for \(serviceName)")
                             }
@@ -306,15 +304,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                     svc.dns?.port = cfg.port
                                     
                                     // remove intercept
-                                    ziti_tunneler_stop_intercepting(self.tnlr_ctx, zs.id)
+                                    self.zitiTunnel.v1StopIntercepting(zs.id)
                                     
                                     // add it back with new info
                                     if let interceptIp = svc.dns?.interceptIp {
                                         zLog.debug("Updating intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
-                                        ziti_tunneler_intercept_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
+                                        _ = self.zitiTunnel.v1Intercept(ztx, zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
                                         svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
                                     }
-                                    
                                 } else {
                                     let newSvc = ZitiService()
                                     newSvc.name = serviceName
@@ -326,7 +323,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                                     self.updateHostsAndIntercepts(zid, newSvc)
                                     if let interceptIp = newSvc.dns?.interceptIp {
                                         zLog.debug("Adding intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
-                                        ziti_tunneler_intercept_v1(self.tnlr_ctx, UnsafeRawPointer(ztx), zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
+                                        _ = self.zitiTunnel.v1Intercept(ztx, zs.id, zs.name, interceptIp.cString(using: .utf8), Int32(cfg.port))
                                     }
                                     zid.services.append(newSvc)
                                 }
@@ -349,7 +346,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                             } else {
                                 zLog.debug("Leaving DNS entry, refCount was \(refCount)")
                             }
-                            ziti_tunneler_stop_intercepting(self.tnlr_ctx, zs.id)
+                            self.zitiTunnel.v1StopIntercepting(zs.id)
                             zid.services = zid.services.filter { $0.id != serviceId }
                         }
                         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
@@ -389,15 +386,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     @objc func runZiti() {
-        // make sure we have netif setup before returning or starting run loop
-        var tunneler_opts = tunneler_sdk_options(
-            netif_driver: self.netifDriver.open(),
-            ziti_dial: ziti_sdk_c_dial,
-            ziti_close: ziti_sdk_c_close,
-            ziti_write: ziti_sdk_c_write,
-            ziti_host_v1: ziti_sdk_c_host_v1_wrapper)
-        self.tnlr_ctx = ziti_tunneler_init(&tunneler_opts, self.loop)
-        
         let rStatus = uv_run(loop, UV_RUN_DEFAULT)
         guard rStatus == 0 else {
             let errStr = String(cString: uv_strerror(rStatus))
@@ -424,7 +412,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             ZitiLog.setLogLevel(appLogLevel)
         } else {
             let lvl = ZitiLog.LogLevel(rawValue: Int32(providerConfig.logLevel)) ?? ZitiLog.LogLevel.INFO
-            zLog.info("Updating log level to \(lvl)")
+            zLog.info("Setting log level to \(lvl)")
             ZitiLog.setLogLevel(lvl)
         }
                 
@@ -436,6 +424,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler(ZitiError("Unable to init uv_loop"))
             return
         }
+        
+        // setup ZitiTunnel
+        zitiTunnel = ZitiTunnel(self, loop)
         
         // load identities
         // for each svc aither update intercepts or add hostname to resolver
