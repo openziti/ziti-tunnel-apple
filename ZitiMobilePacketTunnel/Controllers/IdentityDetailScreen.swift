@@ -103,7 +103,9 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
                 serviceUrl.text = "\(service.dns?.hostname ?? ""):\(service.dns?.port ?? -1)";
                 
                 serviceName.font = UIFont(name: "Open Sans", size: 12);
+                serviceName.textColor = UIColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
                 serviceUrl.font = UIFont(name: "Open Sans", size: 11);
+                serviceUrl.textColor = UIColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 0.80);
                 
                 serviceName.isEditable = false;
                 serviceName.isScrollEnabled = false;

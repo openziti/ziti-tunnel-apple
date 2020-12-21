@@ -31,12 +31,14 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
     var timer = Timer();
     var timeLaunched:Int = 0;
     
+    @IBOutlet weak var IdList: UIStackView!
     @IBOutlet weak var ConnectButton: UIImageView!
     @IBOutlet weak var ConnectedButton: UIView!
     @IBOutlet weak var Dashboard: UIStackView!
     @IBOutlet weak var Background: UIView!
     @IBOutlet weak var IdentityList: UIScrollView!
     @IBOutlet weak var IdentityItem: IdentityRenderer!
+    @IBOutlet weak var IdView: UIView!
     
     @objc func UpdateTimer() {
         let formatter = DateComponentsFormatter();
@@ -153,6 +155,7 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         idDetails.zid = zidMgr.zids[tag];
         idDetails.zidMgr = zidMgr;
         idDetails.tunnelMgr = tunnelMgr;
+        idDetails.modalPresentationStyle = .fullScreen;
         self.present(idDetails, animated:true, completion:nil);
         
     }
@@ -175,20 +178,23 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
     }
     
     func reloadList() {
-        for view in IdentityList.subviews {
-            view.removeFromSuperview();
-        }
+        //if IdView.subviews != nil {
+            for view in IdentityList.subviews {
+                view.removeFromSuperview();
+            }
+        //}
         var index = 0;
         for identity in zidMgr.zids {
             
             
             // First Column of Identity Item Renderer
             let toggler = UISwitch(frame: CGRect(x: 0, y: 0, width: 75, height: 30));
+            toggler.heightAnchor.constraint(equalToConstant: 30).isActive = true;
             let connectLabel = UILabel();
             
             connectLabel.frame.size.height = 20;
             connectLabel.font = UIFont(name: "Open Sans", size: 10);
-            connectLabel.textColor = UIColor(named: "Light Gray Color");
+            connectLabel.textColor = UIColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
             
             toggler.isEnabled = identity.isEnrolled;
             toggler.isOn = identity.isEnabled;
@@ -214,24 +220,27 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             let col1 = UIStackView(arrangedSubviews: [leadLabel1,toggler,connectLabel]);
             
             col1.frame.size.width = 75;
-            col1.distribution = .fillProportionally;
+            col1.distribution = .fill;
             col1.alignment = .center;
             col1.spacing = 0;
             col1.axis = .vertical;
+            col1.widthAnchor.constraint(equalToConstant: 75).isActive = true;
+            col1.heightAnchor.constraint(equalToConstant: 50).isActive = true;
             
             
             // Label Column of Identity Item Renderer
             let idName = UILabel();
             
             idName.font = UIFont(name: "Open Sans", size: 22);
-            idName.textColor = UIColor(named: "White");
+            idName.textColor = UIColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
+            idName.heightAnchor.constraint(equalToConstant: 30).isActive = true;
             
             idName.text = String(String(identity.name).prefix(10));
             
             
             let idServer = UILabel();
             idServer.font = UIFont(name: "Open Sans", size: 10);
-            idServer.textColor = UIColor(named: "Light Gray Color");
+            idServer.textColor = UIColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
             idServer.frame.size.height = 20;
             idServer.text = identity.czid?.ztAPI;
             
@@ -239,13 +248,14 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             leadLabel2.text = " ";
             
             let col2 = UIStackView(arrangedSubviews: [leadLabel2, idName, idServer]);
-            col2.distribution = .fillProportionally;
+            col2.distribution = .fill;
             col2.alignment = .leading;
             col2.spacing = 0;
             col2.frame.size.width = 100;
             col2.axis = .vertical;
             col2.isUserInteractionEnabled = true;
             col2.tag = index;
+            col2.heightAnchor.constraint(equalToConstant: 50).isActive = true;
             col2.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
             
             
@@ -261,15 +271,16 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             let idServiceCount = UILabel();
             idServiceCount.textAlignment = .center;
             idServiceCount.font = UIFont(name: "Open Sans", size: 22);
-            idServiceCount.textColor = UIColor(named: "White");
+            idServiceCount.textColor = UIColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00)
             idServiceCount.text = String(identity.services.count);
+            idServiceCount.heightAnchor.constraint(equalToConstant: 30).isActive = true;
             
             let serviceLabel = UILabel();
             serviceLabel.textAlignment = .center;
             serviceLabel.text = "services";
             serviceLabel.frame.size.height = 20;
             serviceLabel.font = UIFont(name: "Open Sans", size: 10);
-            serviceLabel.textColor = UIColor(named: "Light Gray Color");
+            serviceLabel.textColor = UIColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.00)
             
             //serviceCountFrame.layer.addSublayer(shapeLayer);
             serviceCountFrame.addSubview(idServiceCount);
@@ -280,13 +291,16 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             
             let col3 = UIStackView(arrangedSubviews: [leadLabel3, idServiceCount, serviceLabel]);
             col3.frame.size.width = 50;
-            col3.distribution = .fillProportionally;
+            col3.distribution = .fill;
             col3.alignment = .center;
             col3.spacing = 0;
             col3.axis = .vertical;
             col3.isUserInteractionEnabled = true;
             col3.tag = index;
+            col3.heightAnchor.constraint(equalToConstant: 50).isActive = true;
             col3.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
+            col3.widthAnchor.constraint(equalToConstant: 50).isActive = true;
+            
             
             
             
@@ -297,6 +311,8 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             arrowView.frame = CGRect(x: 10, y: 10, width: 10, height: 10);
             arrowView.contentMode = .scaleAspectFit;
             arrowView.image = arrowImage;
+            arrowView.widthAnchor.constraint(equalToConstant: 20).isActive = true;
+            arrowView.heightAnchor.constraint(equalToConstant: 20).isActive = true;
             
             // These are simple margins because iOS keeps ignoring margin settings
             let leadLabel4 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 10));
@@ -311,6 +327,7 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             col4.isUserInteractionEnabled = true;
             col4.tag = index;
             col4.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
+            col4.widthAnchor.constraint(equalToConstant: 75).isActive = true;
             
 
 
@@ -319,11 +336,12 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             
             let renderer = UIStackView(arrangedSubviews: [col1,col2,col3,col4]);
             renderer.axis = .horizontal;
-            renderer.distribution = .fillProportionally;
-            renderer.alignment = .fill;
+            renderer.distribution = .fill;
+            renderer.backgroundColor = UIColor(red: 0.05, green: 0.06, blue: 0.13, alpha: 1.00);
+            renderer.alignment = .center;
             renderer.translatesAutoresizingMaskIntoConstraints = true;
-            renderer.spacing = 8;
-            renderer.frame = CGRect(x: 10, y: CGFloat(index*60), width: view.frame.size.width-40, height: 60)
+            renderer.spacing = 4;
+            renderer.frame = CGRect(x: 0, y: CGFloat((index*70)+(index*2)), width: view.frame.size.width, height: 70);
             // renderer.frame = CGRect(x: 0, y: CGFloat(index*60), width: view.frame.size.width, height: 60)
             // view.frame.size.width
             /*
@@ -336,7 +354,7 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             IdentityList.addSubview(renderer);
             index = index + 1;
         }
-        IdentityList.contentSize.height = CGFloat(index*60);
+        IdentityList.contentSize.height = CGFloat(index*72);
     }
     
     // Copied From Daves Controller
