@@ -17,11 +17,24 @@
 import UIKit
 
 class SpinnerViewController: UIViewController {
-    var spinner = UIActivityIndicatorView(style: .large)
+    var spinner:UIActivityIndicatorView?
 
     override func loadView() {
         view = UIView()
         view.backgroundColor = UIColor(white: 0, alpha: 0.7)
+        
+        if spinner == nil {
+            if #available(iOS 13, *) {
+                spinner = UIActivityIndicatorView(style: .large)
+            } else {
+                spinner = UIActivityIndicatorView(style:.whiteLarge)
+            }
+        }
+        
+        guard let spinner = spinner else {
+            zLog.wtf("invalid spinner")
+            return
+        }
 
         spinner.translatesAutoresizingMaskIntoConstraints = false
         spinner.color = .white
