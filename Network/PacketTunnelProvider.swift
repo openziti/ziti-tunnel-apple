@@ -364,7 +364,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelPacketWriter {
         routeCond.lock()
         while zidsToLoad > 0 {
             if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(15.0))) {
-                zLog.warn("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad)")
+                zLog.warn("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad))")
                 break
             }
         }
