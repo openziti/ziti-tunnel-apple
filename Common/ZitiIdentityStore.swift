@@ -189,15 +189,13 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
     func presentedSubitemDidChange(at url: URL) {
         guard let delegate = self.delegate else { return }
         if url.pathExtension == "zid" {
-            let split = url.lastPathComponent.split(separator: ".")
-            if let id = split.first {
-                let (zid, zErr) = load(String(id))
-                if zErr != nil, zErr?.errorCode == ZitiError.NoSuchFile {
-                    delegate.onRemovedId(String(id))
-                }
-                guard zid != nil else { return }
-                delegate.onNewOrChangedId(zid!)
+            let id = url.deletingPathExtension().lastPathComponent
+            let (zid, zErr) = load(String(id))
+            if zErr != nil, zErr?.errorCode == ZitiError.NoSuchFile {
+                delegate.onRemovedId(String(id))
             }
+            guard zid != nil else { return }
+            delegate.onNewOrChangedId(zid!)
         }
     }
     
