@@ -42,6 +42,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         zLog.debug("")
         zLog.info(versionString)
         
+        CZiti.Ziti.setAppInfo(Bundle.main.bundleIdentifier ?? "Ziti", Version.str)
+        
         netMon.pathUpdateHandler = self.pathUpdateHandler
         netMon.start(queue: DispatchQueue.global())
         dnsResolver = DNSResolver(self)
