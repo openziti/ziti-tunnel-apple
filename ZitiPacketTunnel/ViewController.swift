@@ -156,18 +156,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         if let svc = servicesViewController {
             svc.zid = zId
         }
-        
-        // if first time run, present dialog that App Store reviewer required
-        if !UserDefaults.standard.bool(forKey: "launchedBefore") {
-            UserDefaults.standard.set(true, forKey: "launchedBefore")
-            DispatchQueue.main.async {
-                let alert = NSAlert()
-                alert.messageText = "For Your Information"
-                alert.informativeText = "There is no user data collected by this app and shared with NetFoundry."
-                alert.alertStyle = NSAlert.Style.informational
-                alert.runModal()
-            }
-        }
     }
    
     override func viewDidLoad() {
@@ -194,6 +182,13 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         tableView.reloadData()
         representedObject = 0
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
+        
+        // for the case of leaving screen on a non-connected controller so the "as of" time periodically updates...
+        Timer.scheduledTimer(withTimeInterval: 300.0, repeats: true) { _ in
+            DispatchQueue.main.async {
+                self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+            }
+        }
     }
 
     override var representedObject: Any? {
@@ -233,14 +228,17 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                 self.zidMgr.zids.append(zid)
             }
             self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
-            let needsRestart = zid.services.filter {
-                if let status = $0.status, let needsRestart = status.needsRestart {
-                    return needsRestart
+            
+            if zid.isEnabled && zid.isEnrolled {
+                let needsRestart = zid.services.filter {
+                    if let status = $0.status, let needsRestart = status.needsRestart {
+                        return needsRestart
+                    }
+                    return false
                 }
-                return false
-            }
-            if needsRestart.count > 0 {
-                self.tunnelMgr.restartTunnel()
+                if needsRestart.count > 0 {
+                    self.tunnelMgr.restartTunnel()
+                }
             }
         }
     }

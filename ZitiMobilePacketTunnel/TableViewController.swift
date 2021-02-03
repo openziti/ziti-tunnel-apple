@@ -148,14 +148,16 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             self.tableView.reloadData()
             self.ivc?.tableView.reloadData()
             
-            let needsRestart = zid.services.filter {
-                if let status = $0.status, let needsRestart = status.needsRestart {
-                    return needsRestart
+            if zid.isEnabled && zid.isEnrolled {
+                let needsRestart = zid.services.filter {
+                    if let status = $0.status, let needsRestart = status.needsRestart {
+                        return needsRestart
+                    }
+                    return false
                 }
-                return false
-            }
-            if needsRestart.count > 0 {
-                self.tunnelMgr.restartTunnel()
+                if needsRestart.count > 0 {
+                    self.tunnelMgr.restartTunnel()
+                }
             }
         }
     }

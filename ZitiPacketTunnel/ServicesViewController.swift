@@ -19,7 +19,14 @@ import Cocoa
 class ServicesViewController: NSViewController {
     @IBOutlet weak var tableView: NSTableView!
     
-    var sortKey:String? = "Name"
+    fileprivate enum ColumnNames {
+        static let Name = "Name"
+        static let Proto = "Protocol"
+        static let Hostname = "Hostname"
+        static let Port = "Port"
+    }
+    
+    var sortKey = ColumnNames.Name
     var ascending = true
     
     weak var zid:ZitiIdentity? {
@@ -39,39 +46,39 @@ class ServicesViewController: NSViewController {
         tableView.target = self
         tableView.doubleAction = #selector(tableViewDoubleClick(_:))
         
-        tableView.tableColumns[0].sortDescriptorPrototype = NSSortDescriptor(key: "Name", ascending: true)
-        tableView.tableColumns[1].sortDescriptorPrototype = NSSortDescriptor(key: "Protocol", ascending: true)
-        tableView.tableColumns[2].sortDescriptorPrototype = NSSortDescriptor(key: "Hostname", ascending: true)
-        tableView.tableColumns[3].sortDescriptorPrototype = NSSortDescriptor(key: "Port", ascending: true)
+        tableView.tableColumns[0].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Name, ascending: true)
+        tableView.tableColumns[1].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Proto, ascending: true)
+        tableView.tableColumns[2].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Hostname, ascending: true)
+        tableView.tableColumns[3].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Port, ascending: true)
         
         tableView.isEnabled = zid == nil ? false : true
         self.reloadData()
     }
     
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
-        guard let sortDescriptor = tableView.sortDescriptors.first else {
+        guard let sortDescriptor = tableView.sortDescriptors.first, let key = sortDescriptor.key else {
             zLog.wtf("invalid sortDescriptor")
             return
         }
-        sortKey = sortDescriptor.key
+        sortKey = key
         ascending = sortDescriptor.ascending
         self.reloadData()
     }
     
     func reloadData() {
-        if sortKey == "Name" {
+        if sortKey == ColumnNames.Name {
             zid?.services.sort(by: {
                 let a = $0.name ?? ""
                 let b = $1.name ?? ""
                 return ascending ? a < b : a > b
             })
-        } else if sortKey == "Hostname" {
+        } else if sortKey == ColumnNames.Hostname {
             zid?.services.sort(by: {
                 let a = $0.dns?.hostname ?? ""
                 let b = $1.dns?.hostname ?? ""
                 return ascending ? a < b : a > b
             })
-        } else if sortKey == "Port" {
+        } else if sortKey == ColumnNames.Port {
             zid?.services.sort(by: {
                 let a = $0.dns?.port ?? 0
                 let b = $1.dns?.port ?? 0

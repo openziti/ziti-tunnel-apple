@@ -56,9 +56,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.8</string>
+	<string>2.12</string>
 	<key>CFBundleVersion</key>
-	<string>429</string>
+	<string>436</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
@@ -146,20 +146,20 @@
 		</dict>
 	</array>
 	<key>ZitiHelpURL</key>
-	<string>https://openziti.discourse.group/</string>
+	<string>$(HELP_URL)</string>
 	<key>ZitiSupportEmail</key>
 	<string>$(SUPPORT_EMAIL)</string>
 	<key>ZitiSupportSubject</key>
 	<string>Ziti Support (iOS)</string>
-    <key>TeamIdentifierPrefix</key>
-    <string>$(TeamIdentifierPrefix)</string>
-    <key>IOS_APP_IDENTIFIER</key>
-    <string>$(IOS_APP_IDENTIFIER)</string>
-    <key>IOS_EXT_IDENTIFIER</key>
-    <string>$(IOS_EXT_IDENTIFIER)</string>
-    <key>PRIVACY_POLICY_URL</key>
-    <string>$(PRIVACY_POLICY_URL)</string>
-    <key>TERMS_URL</key>
-    <string>$(TERMS_URL)</string>
+	<key>TeamIdentifierPrefix</key>
+	<string>$(TeamIdentifierPrefix)</string>
+	<key>IOS_APP_IDENTIFIER</key>
+	<string>$(IOS_APP_IDENTIFIER)</string>
+	<key>IOS_EXT_IDENTIFIER</key>
+	<string>$(IOS_EXT_IDENTIFIER)</string>
+	<key>PRIVACY_POLICY_URL</key>
+	<string>$(PRIVACY_POLICY_URL)</string>
+	<key>TERMS_URL</key>
+	<string>$(TERMS_URL)</string>
 </dict>
 </plist>
