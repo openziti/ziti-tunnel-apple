@@ -114,7 +114,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                 if routesLocked && !alreadyExists {
                     zLog.warn("*** Unable to add route for \(zid.name): \(hn) (port \(port)) to running tunnel. " +
                             "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
-                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
+                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: false) //true
                     
                 } else {
                     zLog.info("Adding route for \(zid.name): \(hn) (port \(port)).")
