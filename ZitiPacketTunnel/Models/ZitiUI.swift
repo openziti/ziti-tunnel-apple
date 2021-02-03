@@ -15,15 +15,7 @@
 //
 
 import Foundation
-import Cocoa
 
-class DashboardController: NSViewController {
+class ZitiUI {
     
-    @IBAction func AddId(_ sender: Any) {
-        
-    }
-    
-    @IBAction func AddIdentity(_ sender: NSClickGestureRecognizer) {
-        
-    }
 }

@@ -16,11 +16,11 @@
 
 import Cocoa
 
-//@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
-    var menuBar:MainMenuBar? = nil;
+@NSApplicationMain
+class UIDelegate: NSObject, NSApplicationDelegate {
     
     let statusItem =  NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength);
+    var menuBar:MainMenuBar? = nil;
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         menuBar = MainMenuBar.shared;

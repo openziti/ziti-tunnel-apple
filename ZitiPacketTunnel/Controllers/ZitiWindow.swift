@@ -14,16 +14,14 @@
 // limitations under the License.
 //
 
-import SwiftUI
+import Foundation
+import Cocoa
 
-struct Dashboard: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+class ZitiWindow: NSWindowController {
 
-struct Dashboard_Previews: PreviewProvider {
-    static var previews: some View {
-        Dashboard()
-    }
+   override func windowDidLoad() {
+      super.windowDidLoad()
+    self.window?.isMovableByWindowBackground = true;
+   }
+
 }

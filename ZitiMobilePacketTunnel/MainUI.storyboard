@@ -2543,7 +2543,7 @@
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="maW-L5-JkK" userLabel="FileButton">
-                                                                <rect key="frame" x="264.5" y="341.5" width="115" height="40"/>
+                                                                <rect key="frame" x="182" y="341.5" width="280" height="40"/>
                                                                 <color key="backgroundColor" name="PrimaryColor"/>
                                                                 <gestureRecognizers/>
                                                                 <constraints>
@@ -2617,7 +2617,7 @@
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ndy-R5-lnM" userLabel="QrButton">
-                                                                <rect key="frame" x="266.5" y="341.5" width="111" height="40"/>
+                                                                <rect key="frame" x="182" y="341.5" width="280" height="40"/>
                                                                 <color key="backgroundColor" name="PrimaryColor"/>
                                                                 <gestureRecognizers/>
                                                                 <constraints>

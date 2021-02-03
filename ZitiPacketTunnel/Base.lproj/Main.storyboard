@@ -40,7 +40,7 @@
                     </connections>
                 </application>
             </objects>
-            <point key="canvasLocation" x="-28" y="-107"/>
+            <point key="canvasLocation" x="-427" y="-196"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
@@ -62,7 +62,7 @@
                     </connections>
                 </windowController>
             </objects>
-            <point key="canvasLocation" x="-74" y="250"/>
+            <point key="canvasLocation" x="-419" y="265"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">

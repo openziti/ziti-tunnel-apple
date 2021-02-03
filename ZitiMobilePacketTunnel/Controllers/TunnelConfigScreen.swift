@@ -30,6 +30,7 @@ class TunnelConfigScreen: UIViewController, UIActivityItemSource {
     @IBOutlet weak var MTU: UITextField!
     @IBOutlet weak var Dns: UITextField!
     @IBOutlet weak var saveButton: UIButton!
+    @IBOutlet var SaveButton: NSTextField!
     
     var tunnelMgr = TunnelMgr.shared
     
