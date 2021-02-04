@@ -412,7 +412,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         // wait for services to be reported...
         routeCond.lock()
         while zidsToLoad > 0 {
-            if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(15.0))) {
+            if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(20.0))) {
                 zLog.warn("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad))")
                 break
             }
