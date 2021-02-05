@@ -23,7 +23,7 @@ class IdentityDetailScreen: NSViewController {
     var identity:ZitiIdentity?;
     var dash:DashboardScreen?;
     var enrollingIds:[ZitiIdentity] = [];
-    var zidMgr = ZidMgr();
+    var zidMgr:ZidMgr?;
     var tunnelMgr = TunnelMgr.shared;
     
     @IBOutlet var ToggleIdentity: NSSwitch!
@@ -48,6 +48,7 @@ class IdentityDetailScreen: NSViewController {
     @IBAction func Forget(_ sender: NSClickGestureRecognizer) {
         
         guard let zid = self.identity else { return };
+        guard let zidMgr = self.zidMgr else { return };
         
         let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
         if dialogOKCancel(question: "Are you sure?", text: text) == true {
@@ -94,50 +95,62 @@ class IdentityDetailScreen: NSViewController {
         IdServiceCount.stringValue = "\(zid.services.count) Services";
         
             
-        let serviceListView = NSStackView(frame: NSRect(x: 0, y: 0, width: 320, height: 70));
+        let serviceListView = NSStackView(frame: NSRect(x: 0, y: 0, width: self.view.frame.width-50, height: 70));
         serviceListView.orientation = .vertical;
+        serviceListView.spacing = 2;
         
         if (zid.isEnrolled) {
             var index = 0;
-            let rowHeight = 30;
+            let rowHeight = 32;
             for service in zid.services {
-                let serviceName = NSTextView(frame: CGRect(x: 0, y: 0, width: 300, height: 20));
-                let serviceUrl = NSTextView(frame: CGRect(x: 0, y: 0, width: 300, height: 20));
+                let serviceName = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 14));
+                let serviceUrl = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 12));
                 
                 serviceName.string = service.name ?? "";
                 serviceUrl.string = "\(service.dns?.hostname ?? ""):\(service.dns?.port ?? -1)";
                 
                 serviceName.font = NSFont(name: "Open Sans", size: 12);
-                serviceName.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
+                serviceName.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 1.00);
                 serviceUrl.font = NSFont(name: "Open Sans", size: 11);
-                serviceUrl.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 0.80);
+                serviceUrl.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.60);
                 
                 serviceName.isEditable = false;
-                //serviceName.isScrollEnabled = false;
                 serviceUrl.isEditable = false;
-                //serviceUrl.isScrollEnabled = false;
-                //serviceUrl.textAlignment = .right;
                 
                 serviceName.backgroundColor = NSColor.clear;
                 serviceUrl.backgroundColor = NSColor.clear;
                 
-                serviceName.widthAnchor.constraint(equalToConstant: self.view.frame.width).isActive = true
-                serviceName.heightAnchor.constraint(equalToConstant: CGFloat(rowHeight)).isActive = true
-                serviceUrl.widthAnchor.constraint(equalToConstant: self.view.frame.width).isActive = true
-                serviceUrl.heightAnchor.constraint(equalToConstant: CGFloat(rowHeight)).isActive = true
+                serviceName.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
+                serviceName.heightAnchor.constraint(equalToConstant: CGFloat(14)).isActive = true
+                serviceUrl.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
+                serviceUrl.heightAnchor.constraint(equalToConstant: CGFloat(12)).isActive = true
                 
                 let stack = NSStackView(views: [serviceName, serviceUrl]);
                 
-                stack.distribution = .fill;
+                stack.edgeInsets.top = 14;
+                stack.distribution = .fillProportionally;
                 stack.alignment = .leading;
-                stack.spacing = 5;
-                stack.orientation = .horizontal;
-                stack.frame = CGRect(x: 20, y: CGFloat(index*rowHeight), width: view.frame.size.width-CGFloat(rowHeight), height: 30);
+                stack.spacing = 0;
+                stack.orientation = .vertical;
+                stack.frame = CGRect(x: 0, y: CGFloat(index*rowHeight), width: view.frame.size.width-50, height: CGFloat(rowHeight));
 
                 serviceListView.addSubview(stack);
                 index = index + 1;
             }
-            //ServiceList.contentSize.height = CGFloat(index*rowHeight);
+            let clipView = FlippedClipView();
+            clipView.drawsBackground = false;
+            ServiceList.horizontalScrollElasticity = .none;
+            ServiceList.contentView = clipView
+            clipView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+              clipView.leftAnchor.constraint(equalTo: ServiceList.leftAnchor),
+              clipView.rightAnchor.constraint(equalTo: ServiceList.rightAnchor),
+              clipView.topAnchor.constraint(equalTo: ServiceList.topAnchor),
+              clipView.bottomAnchor.constraint(equalTo: ServiceList.bottomAnchor)
+            ]);
+            
+            serviceListView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width-50, height: CGFloat(((rowHeight*index))));
+            ServiceList.documentView = serviceListView;
             EnrollButton.isHidden = true;
         } else {
             EnrollButton.isHidden = false;
@@ -145,8 +158,13 @@ class IdentityDetailScreen: NSViewController {
         ServiceList.documentView = serviceListView;
     }
     
+    override func viewWillLayout() {
+        preferredContentSize = view.frame.size
+    }
+    
     @IBAction func Toggled(_ sender: NSClickGestureRecognizer) {
         guard let zid = self.identity else { return };
+        guard let zidMgr = self.zidMgr else { return };
         zid.enabled = ToggleIdentity.state != .on;
         zidMgr.zidStore.store(zid);
         Setup();
@@ -175,6 +193,7 @@ class IdentityDetailScreen: NSViewController {
     @IBAction func Enroll(_ sender: Any) {
         EnrollButton.isHidden = true;
         guard let zid = self.identity else { return };
+        guard let zidMgr = self.zidMgr else { return };
         enrollingIds.append(zid);
         // updateServiceUI(zId: zid)
         
@@ -192,7 +211,7 @@ class IdentityDetailScreen: NSViewController {
                 DispatchQueue.main.async {
                     self.enrollingIds.removeAll { $0.id == zid.id }
                     guard zErr == nil, let zidResp = zidResp else {
-                        _ = self.zidMgr.zidStore.store(zid);
+                        _ = zidMgr.zidStore.store(zid);
                         //self.updateServiceUI(zId:zid)
                         self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response");
                         return;
@@ -208,7 +227,7 @@ class IdentityDetailScreen: NSViewController {
                     
                     zid.enabled = true;
                     zid.enrolled = true;
-                    _ = self.zidMgr.zidStore.store(zid);
+                    _ = zidMgr.zidStore.store(zid);
                     //self.updateServiceUI(zId:zid)
                     self.tunnelMgr.restartTunnel();
                     self.Setup();

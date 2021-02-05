@@ -322,7 +322,7 @@
                                                         <constraint firstAttribute="height" constant="160" id="KUO-7R-rtW"/>
                                                     </constraints>
                                                 </box>
-                                                <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wpj-1q-2La">
+                                                <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wpj-1q-2La" userLabel="SpeedArea">
                                                     <rect key="frame" x="70" y="146" width="240" height="76"/>
                                                     <subviews>
                                                         <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="-5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sN5-sh-znZ">
@@ -566,6 +566,7 @@
                         <outlet property="MenuButton" destination="A1r-HE-ekJ" id="V65-sn-67p"/>
                         <outlet property="ParentView" destination="IZP-fV-y05" id="oV7-q8-bpc"/>
                         <outlet property="ShoMainMenu" destination="A1r-HE-ekJ" id="E5F-be-wtB"/>
+                        <outlet property="SpeedArea" destination="Wpj-1q-2La" id="1y5-li-Pju"/>
                         <outlet property="TimerLabel" destination="wXg-3T-Ay2" id="43H-Oa-lTU"/>
                         <outlet property="UpSpeed" destination="7PB-0z-f2F" id="iKe-ZC-Qds"/>
                         <outlet property="UpSpeedSize" destination="xps-KB-w6F" id="xMi-CC-376"/>
@@ -2058,7 +2059,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kt8-wn-tGH" userLabel="ServiceList">
+                                                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kt8-wn-tGH" userLabel="ServiceList">
                                                     <rect key="frame" x="0.0" y="24" width="338" height="117"/>
                                                     <clipView key="contentView" id="pIn-yy-GNl">
                                                         <rect key="frame" x="0.0" y="0.0" width="338" height="117"/>
@@ -2071,8 +2072,8 @@
                                                         </subviews>
                                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     </clipView>
-                                                    <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="t5f-cQ-rX1">
-                                                        <rect key="frame" x="0.0" y="101" width="338" height="16"/>
+                                                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="t5f-cQ-rX1">
+                                                        <rect key="frame" x="-100" y="-100" width="338" height="16"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Ker-Yr-oEa">

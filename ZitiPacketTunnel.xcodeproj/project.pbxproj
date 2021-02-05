@@ -130,6 +130,7 @@
 		824414DB25A91686007765A4 /* LogLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414DA25A91686007765A4 /* LogLevelScreen.swift */; };
 		824414E025ACA564007765A4 /* StartupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414DF25ACA564007765A4 /* StartupScreen.swift */; };
 		824414F425AD221A007765A4 /* ZitiWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414F325AD221A007765A4 /* ZitiWindow.swift */; };
+		8265A3B625CE11A80001A6AB /* FlippedClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8265A3B525CE11A80001A6AB /* FlippedClipView.swift */; };
 		826C192825A3BB970099CB66 /* DashboardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826C192725A3BB970099CB66 /* DashboardScreen.swift */; };
 		826EDFDE25C76B4000DA38B4 /* IdentityDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */; };
 		826EDFE325C88E6D00DA38B4 /* GoToDetailGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */; };
@@ -350,6 +351,7 @@
 		824414DA25A91686007765A4 /* LogLevelScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogLevelScreen.swift; sourceTree = "<group>"; };
 		824414DF25ACA564007765A4 /* StartupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupScreen.swift; sourceTree = "<group>"; };
 		824414F325AD221A007765A4 /* ZitiWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiWindow.swift; sourceTree = "<group>"; };
+		8265A3B525CE11A80001A6AB /* FlippedClipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlippedClipView.swift; sourceTree = "<group>"; };
 		826C192725A3BB970099CB66 /* DashboardScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardScreen.swift; sourceTree = "<group>"; };
 		826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityDetailScreen.swift; sourceTree = "<group>"; };
 		826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoToDetailGesture.swift; sourceTree = "<group>"; };
@@ -713,6 +715,7 @@
 				824414F325AD221A007765A4 /* ZitiWindow.swift */,
 				826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */,
 				826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */,
+				8265A3B525CE11A80001A6AB /* FlippedClipView.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1210,6 +1213,7 @@
 				824414D125A903D5007765A4 /* AboutScreen.swift in Sources */,
 				5A8702D922372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5A6BA265226F6AB400224F09 /* MainMenuBar.swift in Sources */,
+				8265A3B625CE11A80001A6AB /* FlippedClipView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

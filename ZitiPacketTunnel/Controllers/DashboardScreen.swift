@@ -34,6 +34,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var UpSpeedSize: NSTextField!
     @IBOutlet var DownSpeed: NSTextField!
     @IBOutlet var DownSpeedSize: NSTextField!
+    @IBOutlet var SpeedArea: NSStackView!
     var timer = Timer();
     var timeLaunched:Int = 0;
     
@@ -61,6 +62,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad();
+        
         Logger.initShared(Logger.APP_TAG);
         zLog.info(Version.verboseStr);
         
@@ -72,8 +75,17 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         SetupCursor();
         
         // init the manager
-        tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange)
-        tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier)
+        tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange);
+        tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier);
+        timeLaunched = 1;
+        timer.invalidate();
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
+        
+        do {
+            try tunnelMgr.startTunnel();
+        } catch {
+            dialogAlert("Tunnel Error", error.localizedDescription);
+        }
         
         // Load previous identities
         if let err = zidMgr.loadZids() {
@@ -91,40 +103,47 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         TimerLabel.stringValue = "00:00.00";
         ConnectButton.isHidden = true;
         ConnectedButton.isHidden = false;
+        timer.invalidate();
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
         
         switch status {
         case .connecting:
             ConnectButton.isHidden = true;
             ConnectedButton.isHidden = false;
+            SpeedArea.alphaValue = 1.0;
             //connectStatus.stringValue = "Connecting..."
             //connectButton.title = "Turn Ziti Off"
             break
         case .connected:
             ConnectButton.isHidden = true;
             ConnectedButton.isHidden = false;
+            SpeedArea.alphaValue = 1.0;
             //connectStatus.stringValue = "Connected"
             //connectButton.title = "Turn Ziti Off"
             break
         case .disconnecting:
             ConnectButton.isHidden = false;
             ConnectedButton.isHidden = true;
+            SpeedArea.alphaValue = 0.2;
             //connectStatus.stringValue = "Disconnecting..."
             break
         case .disconnected:
             ConnectButton.isHidden = false;
             ConnectedButton.isHidden = true;
+            SpeedArea.alphaValue = 0.2;
             //connectStatus.stringValue = "Not Connected"
             //connectButton.title = "Turn Ziti On"
             break
         case .invalid:
             ConnectButton.isHidden = false;
             ConnectedButton.isHidden = true;
+            SpeedArea.alphaValue = 0.2;
             //connectStatus.stringValue = "Invalid"
             break
         case .reasserting:
             ConnectButton.isHidden = false;
             ConnectedButton.isHidden = true;
+            SpeedArea.alphaValue = 0.2;
             //connectStatus.stringValue = "Reasserting..."
             //connectButton.isEnabled = false
             break
@@ -190,12 +209,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func Connect(_ sender: NSClickGestureRecognizer) {
+        timer.invalidate();
         TimerLabel.stringValue = "00:00.00";
         ConnectButton.isHidden = true;
         ConnectedButton.isHidden = false;
         do {
             try tunnelMgr.startTunnel();
             timeLaunched = 1;
+            timer.invalidate();
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
         } catch {
             dialogAlert("Tunnel Error", error.localizedDescription);
@@ -203,6 +224,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func Disconnect(_ sender: NSClickGestureRecognizer) {
+        timer.invalidate();
         TimerLabel.stringValue = "00:00.00";
         UpSpeed.stringValue = "0.0";
         UpSpeedSize.stringValue = "bps";
@@ -295,6 +317,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         detailView.identity = zidMgr.zids[index ?? 0];
         detailView.dash = self;
+        detailView.zidMgr = self.zidMgr;
         
         self.presentAsSheet(detailView);
     }
@@ -502,9 +525,18 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             idListView.addSubview(renderer);
             index = index + 1;
         }
+        let clipView = FlippedClipView();
+        clipView.drawsBackground = false;
+        IdentityList.contentView = clipView
+        clipView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+          clipView.leftAnchor.constraint(equalTo: IdentityList.leftAnchor),
+          clipView.rightAnchor.constraint(equalTo: IdentityList.rightAnchor),
+          clipView.topAnchor.constraint(equalTo: IdentityList.topAnchor),
+          clipView.bottomAnchor.constraint(equalTo: IdentityList.bottomAnchor)
+        ]);
         idListView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: CGFloat(((50*index)+(2*index))+2));
         IdentityList.documentView = idListView;
-        IdentityList.contentView.scroll(to: .zero);
         //IdentityList.contentSize.height = CGFloat(index*72);
     }
     
