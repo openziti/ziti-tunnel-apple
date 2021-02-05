@@ -36,7 +36,7 @@
                 </application>
                 <customObject id="kkB-q4-Rf9" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <customObject id="rNE-oq-bVd" customClass="NSFontManager"/>
-                <customObject id="cpo-9K-zHN" customClass="UIDelegate" customModule="Ziti_Desktop_Edge" customModuleProvider="target"/>
+                <customObject id="cpo-9K-zHN" customClass="AppDelegate" customModule="Ziti_Desktop_Edge" customModuleProvider="target"/>
             </objects>
             <point key="canvasLocation" x="-137" y="-401"/>
         </scene>
@@ -455,14 +455,13 @@
                                                         <real value="3.4028234663852886e+38"/>
                                                     </customSpacing>
                                                 </stackView>
-                                                <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="waY-FF-3b1" userLabel="IdList">
+                                                <scrollView autoresizesSubviews="NO" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="waY-FF-3b1" userLabel="IdList">
                                                     <rect key="frame" x="0.0" y="38" width="380" height="100"/>
                                                     <clipView key="contentView" id="Edr-Hu-kk4">
                                                         <rect key="frame" x="0.0" y="0.0" width="380" height="100"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <view id="ZGg-PJ-jVA">
-                                                                <rect key="frame" x="0.0" y="0.0" width="365" height="85"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             </view>
                                                         </subviews>
@@ -471,8 +470,8 @@
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="100" id="FiT-F6-Tzm"/>
                                                     </constraints>
-                                                    <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="axu-Qe-Xte">
-                                                        <rect key="frame" x="0.0" y="84" width="380" height="16"/>
+                                                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="axu-Qe-Xte">
+                                                        <rect key="frame" x="-100" y="-100" width="380" height="16"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="aMJ-l5-1ef">
@@ -2076,6 +2075,13 @@
                                                 </scrollView>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Ik-l7-mzJ" userLabel="ForgetButton">
                                                     <rect key="frame" x="-2" y="0.0" width="342" height="16"/>
+                                                    <gestureRecognizers>
+                                                        <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="FBV-fq-bzv" userLabel="Forget">
+                                                            <connections>
+                                                                <action selector="Forget:" target="hQa-UA-PO5" id="R6t-QX-KD9"/>
+                                                            </connections>
+                                                        </clickGestureRecognizer>
+                                                    </gestureRecognizers>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Forget This Identity" id="DOJ-Gs-0AB">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="SecondaryColor"/>
@@ -2168,6 +2174,7 @@
                     <connections>
                         <outlet property="CloseButton" destination="xXj-YT-QNa" id="PvO-Gk-GVR"/>
                         <outlet property="EnrollButton" destination="fdT-c0-Hnw" id="AWt-qK-Jpj"/>
+                        <outlet property="ForgotButton" destination="4Ik-l7-mzJ" id="Urv-W6-hXM"/>
                         <outlet property="IdEnrolled" destination="8jz-gh-XJz" id="3Bw-dK-tNX"/>
                         <outlet property="IdName" destination="LaG-Ec-Dab" id="3CF-x2-10u"/>
                         <outlet property="IdNetwork" destination="tZx-46-LZv" id="N6n-ja-uHE"/>

@@ -301,8 +301,10 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     func UpdateList() {
         
-        let idListView = NSStackView(frame: NSRect(x: 0, y: 0, width: 320, height: 70));
+        IdentityList.horizontalScrollElasticity = .none;
+        let idListView = NSStackView(frame: NSRect(x: 0, y: 0, width: 320, height: 500));
         idListView.orientation = .vertical;
+        idListView.spacing = 2;
         //if IdView.subviews != nil {
         //for view in IdentityList.subviews {
         //    view.removeFromSuperview();
@@ -310,7 +312,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         //}
         var index = 0;
         for identity in zidMgr.zids {
-            print("Index: "+identity.name);
             
             let clickGesture = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
             clickGesture.indexValue = index;
@@ -318,11 +319,15 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             // First Column of Identity Item Renderer
             let toggler = NSSwitch(frame: CGRect(x: 0, y: 0, width: 75, height: 30));
             toggler.heightAnchor.constraint(equalToConstant: 30).isActive = true;
-            let connectLabel = NSTextField();
+            let connectLabel = NSText();
             
+            connectLabel.isEditable = false;
+            connectLabel.isSelectable = false;
+            connectLabel.alignment = .center;
             connectLabel.frame.size.height = 20;
             connectLabel.font = NSFont(name: "Open Sans", size: 10);
             connectLabel.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
+            connectLabel.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
             toggler.isEnabled = identity.isEnrolled;
             if (identity.isEnabled) {
@@ -335,22 +340,18 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             
             if (identity.isEnrolled) {
                 if (identity.isEnabled) {
-                    connectLabel.stringValue = "connected";
+                    connectLabel.string = "connected";
                 } else {
-                    connectLabel.stringValue = "disconnected";
+                    connectLabel.string = "disconnected";
                 }
             } else {
-                connectLabel.stringValue = "not enrolled";
+                connectLabel.string = "not enrolled";
             }
             
+            let col1 = NSStackView(views: [toggler,connectLabel]);
+            col1.frame = CGRect(x: 0, y: 0, width: 75, height: 50);
             
-            let leadLabel1 = NSTextField(frame: CGRect(x: 0, y: 0, width: 30, height: 5));
-            leadLabel1.stringValue = " ";
-            
-            let col1 = NSStackView(views: [leadLabel1,toggler,connectLabel]);
-            
-            col1.frame.size.width = 75;
-            col1.distribution = .fill;
+            col1.distribution = .fillProportionally;
             col1.alignment = .centerX;
             col1.spacing = 0;
             col1.orientation = .vertical;
@@ -361,63 +362,74 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             // Label Column of Identity Item Renderer
             let idName = NSText();
             
-            idName.font = NSFont(name: "Open Sans", size: 22);
+            idName.font = NSFont(name: "Open Sans", size: 16);
             idName.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
             idName.heightAnchor.constraint(equalToConstant: 30).isActive = true;
-            
-            print("Ziti \(index)");
-            print(identity.name);
             idName.string = String(String(identity.name).prefix(10));
-            
+            idName.isEditable = false;
+            idName.isSelectable = false;
+            idName.backgroundColor = NSColor(calibratedRed: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
             let idServer = NSText();
             idServer.font = NSFont(name: "Open Sans", size: 10);
             idServer.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
             idServer.frame.size.height = 20;
+            idServer.isEditable = false;
+            idServer.isSelectable = false;
             idServer.string = identity.czid?.ztAPI ?? "no network";
+            idServer.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
-            let leadLabel2 = NSTextField(frame: CGRect(x: 0, y: 0, width: 30, height: 5));
-            leadLabel2.stringValue = " ";
-            
-            let col2 = NSStackView(views: [leadLabel2, idName, idServer]);
+            let col2 = NSStackView(views: [idName, idServer]);
+            col2.frame = CGRect(x: 0, y: 0, width: 180, height: 50);
             col2.distribution = .fill;
             col2.alignment = .leading;
             col2.spacing = 0;
-            col2.frame.size.width = 100;
+            col2.frame.size.width = 120;
             col2.orientation = .vertical;
             col2.heightAnchor.constraint(equalToConstant: 50).isActive = true;
             col2.addGestureRecognizer(clickGesture);
+            col2.widthAnchor.constraint(equalToConstant: 180).isActive = true;
             
             
             // Count column for the item renderer
             
-            let serviceCountFrame = NSView();
-            //let circlePath = NSBezierPath(arcCenter: CGPoint(x: 0, y: 15), radius: CGFloat(15), startAngle: CGFloat(0), endAngle: CGFloat(Double.pi * 2), clockwise: true);
-            let shapeLayer = CAShapeLayer();
-            serviceCountFrame.frame = CGRect(x: 0, y: 0, width: 50, height: 40)
-            //shapeLayer.path = circlePath.cgPath;
-            shapeLayer.fillColor = NSColor(named: "PrimaryColor")?.cgColor;
+            //let circleView = NSView();
+            //circleView.wantsLayer = true;
+            //circleView.layer?.cornerRadius = 7;
+            //circleView.layer?.backgroundColor = NSColor(named: "PrimaryColor")?.cgColor;
             
-            let idServiceCount = NSText();
+            //let serviceCountFrame = NSView();
+            //serviceCountFrame.frame = CGRect(x: 0, y: 0, width: 50, height: 30);
+            //serviceCountFrame.addSubview(circleView);
+            
+            let idServiceCount = NSText(frame: NSRect(x: 0, y: 0, width: 30, height: 40));
             idServiceCount.alignment = .center;
             idServiceCount.font = NSFont(name: "Open Sans", size: 22);
-            idServiceCount.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00)
+            idServiceCount.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
+            idServiceCount.isEditable = false;
+            idServiceCount.isSelectable = false;
+            idServiceCount.addGestureRecognizer(clickGesture);
             idServiceCount.string = String(identity.services.count);
-            idServiceCount.heightAnchor.constraint(equalToConstant: 30).isActive = true;
+            idServiceCount.heightAnchor.constraint(equalToConstant: 40).isActive = true;
+            idServiceCount.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
             let serviceLabel = NSText();
             serviceLabel.alignment = .center;
             serviceLabel.string = "services";
             serviceLabel.frame.size.height = 20;
+            serviceLabel.isEditable = false;
+            serviceLabel.isSelectable = false;
+            serviceLabel.addGestureRecognizer(clickGesture);
             serviceLabel.font = NSFont(name: "Open Sans", size: 10);
-            serviceLabel.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.00)
+            serviceLabel.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.00);
+            idServiceCount.heightAnchor.constraint(equalToConstant: 20).isActive = true;
+            serviceLabel.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
-            //serviceCountFrame.layer.addSublayer(shapeLayer);
-            serviceCountFrame.addSubview(idServiceCount);
+            //serviceCountFrame.addSubview(idServiceCount);
             
             let col3 = NSStackView(views: [idServiceCount, serviceLabel]);
-            col3.frame.size.width = 50;
-            col3.distribution = .fill;
+            col3.frame = CGRect(x: 0, y: 0, width: 50, height: 50);
+            col3.distribution = .gravityAreas;
             col3.alignment = .centerX;
             col3.spacing = 0;
             col3.orientation = .vertical;
@@ -438,6 +450,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             arrowView.heightAnchor.constraint(equalToConstant: 20).isActive = true;
             
             let col4 = NSStackView(views: [arrowView]);
+            col4.frame = CGRect(x: 0, y: 0, width: 50, height: 50);
             col4.distribution = .fillProportionally;
             col4.alignment = .centerX;
             col4.spacing = 0;
@@ -445,7 +458,30 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             //col4.isUserInteractionEnabled = true;
             //col4.tag = index;
             col4.addGestureRecognizer(clickGesture);
-            col4.widthAnchor.constraint(equalToConstant: 75).isActive = true;
+            idServiceCount.heightAnchor.constraint(equalToConstant: 50).isActive = true;
+            col4.widthAnchor.constraint(equalToConstant: 50).isActive = true;
+            
+            let items = [col2, col3, col4];
+            
+            pointingHand = NSCursor.pointingHand;
+            for item in items {
+                item.addCursorRect(item.bounds, cursor: pointingHand!);
+            }
+            
+            pointingHand!.setOnMouseEntered(true);
+            for item in items {
+                item.addTrackingRect(item.bounds, owner: pointingHand!, userData: nil, assumeInside: true);
+            }
+
+            arrow = NSCursor.arrow
+            for item in items {
+                item.addCursorRect(item.bounds, cursor: arrow!);
+            }
+            
+            arrow!.setOnMouseExited(true)
+            for item in items {
+                item.addTrackingRect(item.bounds, owner: arrow!, userData: nil, assumeInside: true);
+            }
             
 
             // Put all the columns into the parent frames
@@ -456,14 +492,16 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             //renderer.backgroundColor = NSColor(red: 0.05, green: 0.06, blue: 0.13, alpha: 1.00);
             renderer.alignment = .centerY;
             //renderer.translatesAutoresizingMaskIntoConstraints = true;
-            renderer.spacing = 4;
-            renderer.frame = CGRect(x: 0, y: CGFloat((index*70)+(index*2)), width: view.frame.size.width, height: 70);
+            renderer.spacing = 0;
+            renderer.frame = CGRect(x: 0, y: CGFloat((index*50)+(index*2)), width: view.frame.size.width, height: 50);
 
             //IdentityList.addSubview(renderer);
             idListView.addSubview(renderer);
             index = index + 1;
         }
+        idListView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: CGFloat(((50*index)+(2*index))+2));
         IdentityList.documentView = idListView;
+        IdentityList.contentView.scroll(to: .zero);
         //IdentityList.contentSize.height = CGFloat(index*72);
     }
     

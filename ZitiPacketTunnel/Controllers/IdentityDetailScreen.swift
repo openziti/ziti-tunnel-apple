@@ -35,9 +35,33 @@ class IdentityDetailScreen: NSViewController {
     @IBOutlet var CloseButton: NSImageView!
     @IBOutlet var EnrollButton: NSTextField!
     @IBOutlet var ServiceList: NSScrollView!
+    @IBOutlet var ForgotButton: NSTextField!
+    
+    private var pointingHand: NSCursor?
+    private var arrow : NSCursor?
     
     override func viewDidLoad() {
+        SetupCursor();
         Setup();
+    }
+    
+    @IBAction func Forget(_ sender: NSClickGestureRecognizer) {
+        
+        guard let zid = self.identity else { return };
+        
+        let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
+        if dialogOKCancel(question: "Are you sure?", text: text) == true {
+            let error = zidMgr.zidStore.remove(zid)
+            guard error == nil else {
+                dialogAlert("Unable to remove identity", error!.localizedDescription)
+                return
+            }
+            
+            // self.zidMgr.zids.remove(at: indx)
+            dash?.UpdateList();
+            dismiss(self);
+            
+        }
     }
     
     func Setup() {
@@ -121,6 +145,16 @@ class IdentityDetailScreen: NSViewController {
         alert.runModal()
     }
     
+    func dialogOKCancel(question: String, text: String) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = question
+        alert.informativeText = text
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+    
     @IBAction func Enroll(_ sender: Any) {
         EnrollButton.isHidden = true;
         guard let zid = self.identity else { return };
@@ -165,12 +199,32 @@ class IdentityDetailScreen: NSViewController {
         }
     }
     
-    @IBAction func Forget(_ sender: NSTextField) {
-
-    }
-    
     @IBAction func Close(_ sender: NSClickGestureRecognizer) {
         dismiss(self);
+    }
+    
+    func SetupCursor() {
+        let items = [CloseButton, EnrollButton, ForgotButton];
+        
+        pointingHand = NSCursor.pointingHand;
+        for item in items {
+            item!.addCursorRect(item!.bounds, cursor: pointingHand!);
+        }
+        
+        pointingHand!.setOnMouseEntered(true);
+        for item in items {
+            item!.addTrackingRect(item!.bounds, owner: pointingHand!, userData: nil, assumeInside: true);
+        }
+
+        arrow = NSCursor.arrow
+        for item in items {
+            item!.addCursorRect(item!.bounds, cursor: arrow!);
+        }
+        
+        arrow!.setOnMouseExited(true)
+        for item in items {
+            item!.addTrackingRect(item!.bounds, owner: arrow!, userData: nil, assumeInside: true);
+        }
     }
     
 }

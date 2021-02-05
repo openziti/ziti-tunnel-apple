@@ -16,7 +16,7 @@
 
 import Cocoa
 
-//@NSApplicationMain
+@NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     var menuBar:MainMenuBar? = nil;
     
@@ -25,11 +25,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         menuBar = MainMenuBar.shared;
         
-        if let button = statusItem.button {
-            button.image = NSImage(named: "zitiwhite");
-            button.image?.size = NSMakeSize(18.0, 18.0);
-            button.action = #selector(showApp(_:))
-        }
+       //if let button = statusItem.button {
+       //     button.image = NSImage(named: "zitiwhite");
+        //    button.image?.size = NSMakeSize(18.0, 18.0);
+       //     button.action = #selector(showApp(_:))
+       // }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

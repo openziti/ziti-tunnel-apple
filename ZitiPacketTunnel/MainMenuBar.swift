@@ -30,6 +30,12 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     private override init() {
         statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
+        
+        if let button = statusItem.button {
+            button.image = NSImage(named: "zitiwhite");
+            button.image?.size = NSMakeSize(18.0, 18.0);
+            button.action = #selector(showApp(_:))
+        }
         super.init()
                 
         let menu = NSMenu()
@@ -95,6 +101,10 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         
         getMainWindow()?.delegate = self
         TunnelMgr.shared.tsChangedCallbacks.append(self.tunnelStatusDidChange)
+    }
+    
+    @objc func showApp(_ sender: Any?) {
+        print("Hello");
     }
     
     func menuDidBeginTracking(n: Notification) {
