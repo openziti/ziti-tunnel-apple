@@ -316,9 +316,15 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             let clickGesture = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
             clickGesture.indexValue = index;
             
+            let clickGesture2 = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
+            clickGesture2.indexValue = index;
+            
+            let clickGesture3 = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
+            clickGesture3.indexValue = index;
+            
             // First Column of Identity Item Renderer
-            let toggler = NSSwitch(frame: CGRect(x: 0, y: 0, width: 75, height: 30));
-            toggler.heightAnchor.constraint(equalToConstant: 30).isActive = true;
+            let toggler = NSSwitch(frame: CGRect(x: 0, y: 0, width: 75, height: 22));
+            toggler.heightAnchor.constraint(equalToConstant: 22).isActive = true;
             let connectLabel = NSText();
             
             connectLabel.isEditable = false;
@@ -355,16 +361,16 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             col1.alignment = .centerX;
             col1.spacing = 0;
             col1.orientation = .vertical;
+            col1.edgeInsets.top = 8;
             col1.widthAnchor.constraint(equalToConstant: 75).isActive = true;
             col1.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            
             
             // Label Column of Identity Item Renderer
             let idName = NSText();
             
             idName.font = NSFont(name: "Open Sans", size: 16);
             idName.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
-            idName.heightAnchor.constraint(equalToConstant: 30).isActive = true;
+            idName.heightAnchor.constraint(equalToConstant: 22).isActive = true;
             idName.string = String(String(identity.name).prefix(10));
             idName.isEditable = false;
             idName.isSelectable = false;
@@ -380,15 +386,16 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             idServer.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
             let col2 = NSStackView(views: [idName, idServer]);
-            col2.frame = CGRect(x: 0, y: 0, width: 180, height: 50);
+            col2.frame = CGRect(x: 0, y: 0, width: 200, height: 50);
             col2.distribution = .fill;
             col2.alignment = .leading;
             col2.spacing = 0;
             col2.frame.size.width = 120;
             col2.orientation = .vertical;
+            col2.edgeInsets.top = 8;
             col2.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col2.addGestureRecognizer(clickGesture);
-            col2.widthAnchor.constraint(equalToConstant: 180).isActive = true;
+            col2.widthAnchor.constraint(equalToConstant: 200).isActive = true;
+            col2.addGestureRecognizer(clickGesture2);
             
             
             // Count column for the item renderer
@@ -402,15 +409,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             //serviceCountFrame.frame = CGRect(x: 0, y: 0, width: 50, height: 30);
             //serviceCountFrame.addSubview(circleView);
             
-            let idServiceCount = NSText(frame: NSRect(x: 0, y: 0, width: 30, height: 40));
+            let idServiceCount = NSText();
             idServiceCount.alignment = .center;
-            idServiceCount.font = NSFont(name: "Open Sans", size: 22);
+            idServiceCount.font = NSFont(name: "Open Sans", size: 16);
             idServiceCount.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
+            idServiceCount.heightAnchor.constraint(equalToConstant: 22).isActive = true;
+            idServiceCount.string = String(identity.services.count);
             idServiceCount.isEditable = false;
             idServiceCount.isSelectable = false;
-            idServiceCount.addGestureRecognizer(clickGesture);
-            idServiceCount.string = String(identity.services.count);
-            idServiceCount.heightAnchor.constraint(equalToConstant: 40).isActive = true;
             idServiceCount.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
             let serviceLabel = NSText();
@@ -433,10 +439,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             col3.alignment = .centerX;
             col3.spacing = 0;
             col3.orientation = .vertical;
-            //col3.isUserInteractionEnabled = true;
-            //col3.tag = index;
+            col3.edgeInsets.top = 8;
             col3.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col3.addGestureRecognizer(clickGesture);
+            col3.addGestureRecognizer(clickGesture3);
             col3.widthAnchor.constraint(equalToConstant: 50).isActive = true;
             
             // Arrow image for Item Renderer
@@ -450,16 +455,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             arrowView.heightAnchor.constraint(equalToConstant: 20).isActive = true;
             
             let col4 = NSStackView(views: [arrowView]);
-            col4.frame = CGRect(x: 0, y: 0, width: 50, height: 50);
+            col4.frame = CGRect(x: 0, y: 0, width: 30, height: 50);
             col4.distribution = .fillProportionally;
             col4.alignment = .centerX;
             col4.spacing = 0;
             col4.orientation = .vertical;
-            //col4.isUserInteractionEnabled = true;
-            //col4.tag = index;
             col4.addGestureRecognizer(clickGesture);
             idServiceCount.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col4.widthAnchor.constraint(equalToConstant: 50).isActive = true;
+            col4.widthAnchor.constraint(equalToConstant: 30).isActive = true;
             
             let items = [col2, col3, col4];
             

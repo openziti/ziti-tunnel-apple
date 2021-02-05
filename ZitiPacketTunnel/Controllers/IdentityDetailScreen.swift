@@ -66,6 +66,10 @@ class IdentityDetailScreen: NSViewController {
     
     func Setup() {
         guard let zid = self.identity else { return };
+        ToggleIdentity.isHidden = false;
+        ForgotButton.isHidden = false;
+        ServiceList.isHidden = false;
+        IdServiceCount.isHidden = false;
         if (zid.isEnabled) {
             ToggleIdentity.state = .on;
         } else {
@@ -80,6 +84,10 @@ class IdentityDetailScreen: NSViewController {
             IdEnrolled.stringValue = "enrolled";
         } else {
             IdEnrolled.stringValue = "not enrolled";
+            ToggleIdentity.isHidden = true;
+            ForgotButton.isHidden = true;
+            ServiceList.isHidden = true;
+            IdServiceCount.isHidden = true;
         }
         IdName.stringValue = zid.name;
         IdNetwork.stringValue = zid.czid?.ztAPI ?? "no network";
@@ -135,6 +143,15 @@ class IdentityDetailScreen: NSViewController {
             EnrollButton.isHidden = false;
         }
         ServiceList.documentView = serviceListView;
+    }
+    
+    @IBAction func Toggled(_ sender: NSClickGestureRecognizer) {
+        guard let zid = self.identity else { return };
+        zid.enabled = ToggleIdentity.state != .on;
+        zidMgr.zidStore.store(zid);
+        Setup();
+        tunnelMgr.restartTunnel();
+        self.dash?.UpdateList();
     }
     
     func dialogAlert(_ msg:String, _ text:String? = nil) {
@@ -194,6 +211,7 @@ class IdentityDetailScreen: NSViewController {
                     _ = self.zidMgr.zidStore.store(zid);
                     //self.updateServiceUI(zId:zid)
                     self.tunnelMgr.restartTunnel();
+                    self.Setup();
                 }
             }
         }

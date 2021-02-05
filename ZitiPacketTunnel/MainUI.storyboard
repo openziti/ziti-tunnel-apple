@@ -582,7 +582,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="420" height="520"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box wantsLayer="YES" misplaced="YES" boxType="custom" cornerRadius="14" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="JjY-hl-sY5">
+                            <box wantsLayer="YES" misplaced="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="JjY-hl-sY5">
                                 <rect key="frame" x="0.0" y="0.0" width="420" height="520"/>
                                 <view key="contentView" id="LfE-dC-7Ak">
                                     <rect key="frame" x="1" y="1" width="418" height="518"/>
@@ -1088,7 +1088,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box wantsLayer="YES" boxType="custom" cornerRadius="14" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="V6b-rS-yRC">
+                            <box wantsLayer="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="V6b-rS-yRC">
                                 <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                                 <view key="contentView" id="8pA-Ta-3Kl">
                                     <rect key="frame" x="1" y="1" width="378" height="478"/>
@@ -1360,7 +1360,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box boxType="custom" cornerRadius="14" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="5HO-T6-sil">
+                            <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="5HO-T6-sil">
                                 <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                                 <view key="contentView" id="x6i-Pe-T0R">
                                     <rect key="frame" x="1" y="1" width="378" height="478"/>
@@ -1786,7 +1786,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box fixedFrame="YES" boxType="custom" cornerRadius="14" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="r1m-PG-WcY">
+                            <box fixedFrame="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="r1m-PG-WcY">
                                 <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="HrI-vS-oxy">
@@ -1801,6 +1801,13 @@
                                                     <subviews>
                                                         <switch horizontalHuggingPriority="750" verticalHuggingPriority="750" baseWritingDirection="leftToRight" alignment="left" state="on" translatesAutoresizingMaskIntoConstraints="NO" id="bxQ-q9-Jcg" userLabel="ToggleIdentity">
                                                             <rect key="frame" x="-2" y="8" width="42" height="24"/>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="pUj-7h-ZLa" userLabel="Toggled">
+                                                                    <connections>
+                                                                        <action selector="Toggled:" target="hQa-UA-PO5" id="SYK-Yn-sS6"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
                                                         </switch>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JDX-04-0TT">
                                                             <rect key="frame" x="44" y="10" width="268" height="20"/>
@@ -2196,7 +2203,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box boxType="custom" cornerRadius="14" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="adH-7J-gif">
+                            <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="adH-7J-gif">
                                 <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                                 <view key="contentView" id="8AB-WU-B4W">
                                     <rect key="frame" x="1" y="1" width="378" height="478"/>
@@ -2624,7 +2631,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box boxType="custom" cornerRadius="14" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0c2-wg-2hS">
+                            <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0c2-wg-2hS">
                                 <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
                                 <view key="contentView" id="mq3-u6-5BB">
                                     <rect key="frame" x="1" y="1" width="378" height="478"/>

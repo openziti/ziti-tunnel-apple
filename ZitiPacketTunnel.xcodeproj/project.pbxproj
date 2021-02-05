@@ -129,7 +129,6 @@
 		824414D625A914E0007765A4 /* ConfigScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414D525A914E0007765A4 /* ConfigScreen.swift */; };
 		824414DB25A91686007765A4 /* LogLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414DA25A91686007765A4 /* LogLevelScreen.swift */; };
 		824414E025ACA564007765A4 /* StartupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414DF25ACA564007765A4 /* StartupScreen.swift */; };
-		824414E625ACD8B1007765A4 /* ZitiUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414E525ACD8B1007765A4 /* ZitiUI.swift */; };
 		824414F425AD221A007765A4 /* ZitiWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414F325AD221A007765A4 /* ZitiWindow.swift */; };
 		826C192825A3BB970099CB66 /* DashboardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826C192725A3BB970099CB66 /* DashboardScreen.swift */; };
 		826EDFDE25C76B4000DA38B4 /* IdentityDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */; };
@@ -350,7 +349,6 @@
 		824414D525A914E0007765A4 /* ConfigScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigScreen.swift; sourceTree = "<group>"; };
 		824414DA25A91686007765A4 /* LogLevelScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogLevelScreen.swift; sourceTree = "<group>"; };
 		824414DF25ACA564007765A4 /* StartupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupScreen.swift; sourceTree = "<group>"; };
-		824414E525ACD8B1007765A4 /* ZitiUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiUI.swift; sourceTree = "<group>"; };
 		824414F325AD221A007765A4 /* ZitiWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiWindow.swift; sourceTree = "<group>"; };
 		826C192725A3BB970099CB66 /* DashboardScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardScreen.swift; sourceTree = "<group>"; };
 		826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityDetailScreen.swift; sourceTree = "<group>"; };
@@ -473,7 +471,6 @@
 		5A02AAB6206EBD7E006261C6 /* ZitiPacketTunnel */ = {
 			isa = PBXGroup;
 			children = (
-				824414E425ACD886007765A4 /* Models */,
 				82C624BD2577D1FD00BCF212 /* Controllers */,
 				5A76B936226FB9CC00204A46 /* bundle */,
 				5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */,
@@ -665,14 +662,6 @@
 				5AF5113625842EDE0092DC47 /* W5hxDMTMg.zid */,
 			);
 			path = simdata;
-			sourceTree = "<group>";
-		};
-		824414E425ACD886007765A4 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				824414E525ACD8B1007765A4 /* ZitiUI.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		829692312558AFC200ED44AB /* Fonts */ = {
@@ -1217,7 +1206,6 @@
 				5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */,
 				5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */,
 				5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */,
-				824414E625ACD8B1007765A4 /* ZitiUI.swift in Sources */,
 				824414C425A9027E007765A4 /* AdvancedScreen.swift in Sources */,
 				824414D125A903D5007765A4 /* AboutScreen.swift in Sources */,
 				5A8702D922372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
