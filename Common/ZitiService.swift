@@ -15,13 +15,9 @@
 //
 
 import Foundation
+import CZiti
 
 class ZitiService : Codable {
-    class Dns : Codable {
-        var hostname:String?
-        var interceptIp:String?
-        var port:Int?
-    }
     class Status : Codable {
         let lastUpdatedAt:TimeInterval
         let status:ZitiIdentity.ConnectivityStatus
@@ -34,6 +30,28 @@ class ZitiService : Codable {
     }
     var name:String?
     var id:String?
-    var dns:Dns?
+    var protocols:String?
+    var addresses:String?
+    var portRanges:String?
     var status:Status?
+    
+    init(_ eSvc:CZiti.ZitiService) {
+        name = eSvc.name
+        id = eSvc.id
+        
+        if let cfg = eSvc.interceptConfigV1 {
+            protocols = cfg.protocols.joined(separator: ", ")
+            addresses = cfg.addresses.joined(separator: ", ")
+            var prArr:[String] = []
+            cfg.portRanges.forEach { pr in
+                prArr.append("\(pr.low)-\(pr.high)")
+            }
+            portRanges = prArr.joined(separator: ", ")
+        } else if let cfg = eSvc.tunnelClientConfigV1 {
+            protocols = "tcp, udp"
+            addresses = cfg.hostname
+            portRanges = "\(cfg.port)-\(cfg.port)"
+        }
+        status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: false)
+    }
 }

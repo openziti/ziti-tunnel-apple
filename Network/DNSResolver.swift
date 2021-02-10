@@ -21,16 +21,69 @@ class DNSResolver : NSObject {
     static let dnsPort:UInt16 = 53
     let tunnelProvider:PacketTunnelProvider
     
-    var hostnamesLock = NSLock()
-    var hostnames:[(name:String, ip:String, realIp:String?)] = []
+    class DnsEntry : NSObject {
+        let hostname:String
+        let ip:String
+        var serviceIds:[String] = []
+        
+        init(_ hostname:String, _ ip:String, _ serviceId:String) {
+            self.hostname = hostname
+            self.ip = ip
+            self.serviceIds.append(serviceId)
+        }
+    }
+    var dnsEntries:[DnsEntry] = []
+    var dnsLock = NSLock()
     
     init(_ tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
     }
     
     // must be locked
-    func findRecordsByName(_ name:String) -> [(name:String, ip:String, realIp:String?)] {
-        return hostnames.filter{ return $0.name.caseInsensitiveCompare(name) == .orderedSame }
+    func findRecordsByName(_ name:String) -> [(name:String, ip:String)] {
+        dnsLock.lock()
+        let entries = dnsEntries.filter{ return $0.hostname.caseInsensitiveCompare(name) == .orderedSame }
+        var matches:[(name:String, ip:String)] = []
+        entries.forEach { e in
+            matches.append((name:e.hostname, ip:e.ip))
+        }
+        dnsLock.unlock()
+        return matches
+    }
+    
+    func addDnsEntry(_ hostname:String, _ ip:String, _ serviceId: String) {
+        dnsLock.lock()
+        let matches = dnsEntries.filter{ return $0.hostname.caseInsensitiveCompare(hostname) == .orderedSame }
+        if matches.count > 0 {
+            matches.forEach { m in
+                m.serviceIds.append(serviceId)
+            }
+        } else {
+            let newEntry = DnsEntry(hostname, ip, serviceId)
+            dnsEntries.append(newEntry)
+        }
+        dnsLock.unlock()
+    }
+    
+    func removeDnsEntry(_ serviceId:String) {
+        dnsLock.lock()
+        
+        // drop this serviceId from all entries
+        dnsEntries.forEach { e in
+            e.serviceIds = e.serviceIds.filter { $0 != serviceId }
+        }
+        
+        // drop all entries with no service Id
+        dnsEntries = dnsEntries.filter { $0.serviceIds.count > 0 }
+        dnsLock.unlock()
+    }
+    
+    func dumpDns() {
+        dnsLock.lock()
+        dnsEntries.forEach { e in
+            zLog.debug("hostname: \(e.hostname), ip: \(e.ip), serviceIds: \(e.serviceIds)")
+        }
+        dnsLock.unlock()
     }
     
     func getIpRange(_ ip:Data, mask:Data) -> (first:Data, broadcast:Data) {
@@ -71,43 +124,6 @@ class DNSResolver : NSObject {
         return nil
     }
     
-    // must be locked
-    func addHostname(_ name:String) -> String? {
-        let ip = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.ipAddress)
-        let mask = IPUtils.ipV4AddressStringToData(self.tunnelProvider.providerConfig.subnetMask)
-        let (first, broadcast) = getIpRange(ip, mask:mask)
-        
-        var curr = Data(first)
-        repeat {
-            var inUse = false
-            let fakeIpStr = curr.map{String(format: "%d", $0)}.joined(separator: ".")
-            
-            // skip addresses we know are in use
-            let dnsSvrs = self.tunnelProvider.providerConfig.dnsAddresses
-            if curr == ip || dnsSvrs.contains(fakeIpStr) || hostnames.first(where:{$0.ip==fakeIpStr}) != nil {
-                inUse = true
-            }
-            
-            // add it and get outta here
-            if inUse == false {
-                let realIpStr = resolveHostname(name, .A)
-                if let rips = realIpStr {
-                    zLog.info("Real IP for \(name) = \(rips)")
-                }
-                hostnames.append((name:name, ip:fakeIpStr, realIp:realIpStr))
-                return fakeIpStr
-            }
-            
-            // advance to next ip addr
-            for i in (0..<4).reversed() {
-                if curr[i] == 255 { curr[i] = 0 }
-                else { curr[i] += 1 }
-                if curr[i] > 0 { break }
-            }
-        } while curr != broadcast
-        return nil
-    }
-    
     func needsResolution(_ udp:UDPPacket) -> Bool {
         let dnsAddresses = self.tunnelProvider.providerConfig.dnsAddresses
         if udp.destinationPort == DNSResolver.dnsPort &&
@@ -141,9 +157,7 @@ class DNSResolver : NSObject {
             // - if no match, reject
             //
             if (q.recordType == DNSRecordType.A || q.recordType == DNSRecordType.AAAA) && q.recordClass == DNSRecordClass.IN {
-                hostnamesLock.lock()
                 let matches = findRecordsByName(q.name.nameString)
-                hostnamesLock.unlock()
                 
                 if (matches.count > 0) {
                     if (q.recordType == DNSRecordType.A) {
