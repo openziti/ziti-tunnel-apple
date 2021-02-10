@@ -39,7 +39,6 @@ class DNSResolver : NSObject {
         self.tunnelProvider = tunnelProvider
     }
     
-    // must be locked
     func findRecordsByName(_ name:String) -> [(name:String, ip:String)] {
         dnsLock.lock()
         let entries = dnsEntries.filter{ return $0.hostname.caseInsensitiveCompare(name) == .orderedSame }
@@ -101,8 +100,7 @@ class DNSResolver : NSObject {
         return (first, broadcast)
     }
     
-    // Called before tunnel starts to save off the resolvedIp address if there is one
-    // We can then proxy non-intercpted ports to this IP address
+    // To resolve IP addresses we are not intercepting
     private func resolveHostname(_ hostname:String, _ recordType:DNSRecordType) -> String? {
         let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
         CFHostStartInfoResolution(host, .addresses, nil)
