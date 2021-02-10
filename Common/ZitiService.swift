@@ -52,6 +52,6 @@ class ZitiService : Codable {
             addresses = cfg.hostname
             portRanges = "\(cfg.port)-\(cfg.port)"
         }
-        status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: false)
+        status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
     }
 }
