@@ -40,17 +40,21 @@ class ZitiService : Codable {
         id = eSvc.id
         
         if let cfg = eSvc.interceptConfigV1 {
-            protocols = cfg.protocols.joined(separator: ", ")
+            protocols = cfg.protocols.joined(separator: ", ").uppercased()
             addresses = cfg.addresses.joined(separator: ", ")
             var prArr:[String] = []
             cfg.portRanges.forEach { pr in
-                prArr.append("\(pr.low)-\(pr.high)")
+                if pr.low == pr.high {
+                    prArr.append("\(pr.low)")
+                } else {
+                    prArr.append("\(pr.low)-\(pr.high)")
+                }
             }
             portRanges = prArr.joined(separator: ", ")
         } else if let cfg = eSvc.tunnelClientConfigV1 {
-            protocols = "tcp, udp"
+            protocols = "TCP, UDP"
             addresses = cfg.hostname
-            portRanges = "\(cfg.port)-\(cfg.port)"
+            portRanges = "\(cfg.port)"
         }
         status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
     }

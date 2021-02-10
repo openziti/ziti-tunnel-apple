@@ -23,7 +23,7 @@ class ServicesViewController: NSViewController {
         static let Name = "Name"
         static let Proto = "Protocols"
         static let Hostname = "Addresses"
-        static let Port = "Port Ranges"
+        static let Port = "Ports"
     }
     
     var sortKey = ColumnNames.Name
