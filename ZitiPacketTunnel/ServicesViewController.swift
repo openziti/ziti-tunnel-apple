@@ -21,9 +21,9 @@ class ServicesViewController: NSViewController {
     
     fileprivate enum ColumnNames {
         static let Name = "Name"
-        static let Proto = "Protocol"
-        static let Hostname = "Hostname"
-        static let Port = "Port"
+        static let Proto = "Protocols"
+        static let Hostname = "Addresses"
+        static let Port = "Ports"
     }
     
     var sortKey = ColumnNames.Name
@@ -46,9 +46,13 @@ class ServicesViewController: NSViewController {
         tableView.target = self
         tableView.doubleAction = #selector(tableViewDoubleClick(_:))
         
+        tableView.tableColumns[0].title = ColumnNames.Name
         tableView.tableColumns[0].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Name, ascending: true)
+        tableView.tableColumns[1].title = ColumnNames.Proto
         tableView.tableColumns[1].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Proto, ascending: true)
+        tableView.tableColumns[2].title = ColumnNames.Hostname
         tableView.tableColumns[2].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Hostname, ascending: true)
+        tableView.tableColumns[3].title = ColumnNames.Port
         tableView.tableColumns[3].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Port, ascending: true)
         
         tableView.isEnabled = zid == nil ? false : true
@@ -74,14 +78,20 @@ class ServicesViewController: NSViewController {
             })
         } else if sortKey == ColumnNames.Hostname {
             zid?.services.sort(by: {
-                let a = $0.dns?.hostname ?? ""
-                let b = $1.dns?.hostname ?? ""
+                let a = $0.addresses ?? ""
+                let b = $1.addresses ?? ""
                 return ascending ? a < b : a > b
             })
         } else if sortKey == ColumnNames.Port {
             zid?.services.sort(by: {
-                let a = $0.dns?.port ?? 0
-                let b = $1.dns?.port ?? 0
+                let a = $0.portRanges ?? ""
+                let b = $1.portRanges ?? ""
+                return ascending ? a < b : a > b
+            })
+        } else if sortKey == ColumnNames.Proto {
+            zid?.services.sort(by: {
+                let a = $0.protocols ?? ""
+                let b = $1.protocols ?? ""
                 return ascending ? a < b : a > b
             })
         }
@@ -94,9 +104,10 @@ class ServicesViewController: NSViewController {
         if zid?.isEnabled ?? false {
             zLog.info("\n   name: \(svc.name ?? "")\n" +
                         "   status: \(svc.status?.status ?? .None) (\(DateFormatter().timeSince(svc.status?.lastUpdatedAt ?? 0)))\n" +
-                        "   hostname: \(svc.dns?.hostname ?? "")\n" +
-                        "   current ip: \(svc.dns?.interceptIp ?? "")\n" +
-                        "   port: \(svc.dns?.port ?? 0)")
+                        "   protocols: \(svc.protocols ?? "")\n" +
+                        "   addresses: \(svc.addresses ?? "")\n" +
+                        /*"   current ip: \(svc.dns?.interceptIp ?? "")\n" + */
+                        "   portRanges: \(svc.portRanges ?? "")")
         } else {
             zLog.info("\(zid?.name ?? "") not enabled")
         }
@@ -139,13 +150,13 @@ extension ServicesViewController: NSTableViewDelegate {
             text = svc.name ?? "-"
             cellIdentifier = CellIdentifiers.NameCell
         } else if tableColumn == tableView.tableColumns[1] {
-            text = "TCP"
+            text = svc.protocols ?? ""
             cellIdentifier = CellIdentifiers.ProtocolCell
         } else if tableColumn == tableView.tableColumns[2] {
-            text = svc.dns?.hostname ?? "-"
+            text = svc.addresses ?? "-"
             cellIdentifier = CellIdentifiers.HostnameCell
         } else if tableColumn == tableView.tableColumns[3] {
-            text = String(svc.dns?.port ?? -1)
+            text = String(svc.portRanges ?? "")
             cellIdentifier = CellIdentifiers.PortCell
         }
         

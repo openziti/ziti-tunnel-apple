@@ -226,7 +226,12 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             if zid?.isEnrolled ?? false {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_SERVICE_CELL", for: indexPath)
                 cell?.textLabel?.text = zid?.services[indexPath.row].name
-                cell?.detailTextLabel?.text = "\(zid?.services[indexPath.row].dns?.hostname ?? ""):\(zid?.services[indexPath.row].dns?.port ?? -1)"
+                
+                var protoStr = ""
+                if let protos = zid?.services[indexPath.row].protocols {
+                    protoStr = "(\(protos))"
+                }
+                cell?.detailTextLabel?.text = "\(zid?.services[indexPath.row].addresses ?? ""):[\(zid?.services[indexPath.row].portRanges ?? "-1")] \(protoStr)"
             } else {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_ENROLL_CELL", for: indexPath)
                 if let ivCell = cell as? EnrollIdentityCell { ivCell.ivc = self }
