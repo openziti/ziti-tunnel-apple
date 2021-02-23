@@ -102,12 +102,11 @@ class ServicesViewController: NSViewController {
         guard tableView.selectedRow >= 0, let svc = zid?.services[tableView.selectedRow] else { return }
         
         if zid?.isEnabled ?? false {
-            zLog.info("\n   name: \(svc.name ?? "")\n" +
-                        "   status: \(svc.status?.status ?? .None) (\(DateFormatter().timeSince(svc.status?.lastUpdatedAt ?? 0)))\n" +
-                        "   protocols: \(svc.protocols ?? "")\n" +
-                        "   addresses: \(svc.addresses ?? "")\n" +
-                        /*"   current ip: \(svc.dns?.interceptIp ?? "")\n" + */
-                        "   portRanges: \(svc.portRanges ?? "")")
+            let e = JSONEncoder()
+            e.outputFormatting = .prettyPrinted
+            if let j = try? e.encode(svc), let jStr = String(data:j, encoding:.utf8) {
+                zLog.info(jStr)
+            }
         } else {
             zLog.info("\(zid?.name ?? "") not enabled")
         }
