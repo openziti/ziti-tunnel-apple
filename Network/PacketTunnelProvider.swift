@@ -133,6 +133,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         return 0
     }
     
+    func fallbackDns(_ name: String) -> String? {
+        zLog.warn("Fallback DNS called unexpectedly...")
+        return dnsResolver?.resolveHostname(name, .A)
+    }
+    
     override var debugDescription: String {
         return "PacketTunnelProvider \(self)\n\(self.providerConfig)"
     }
@@ -383,7 +388,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         }
         
         // setup ZitiTunnel
-        zitiTunnel = ZitiTunnel(self, loop, providerConfig.ipAddress, providerConfig.subnetMask)
+        let ipDNS = self.providerConfig.dnsAddresses.first ?? ""
+        zitiTunnel = ZitiTunnel(self, loop, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS)
         
         // load identities
         // for each svc aither update intercepts or add hostname to resolver
@@ -394,8 +400,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
-        dnsSettings.matchDomains = [""] //self.providerConfig.dnsMatchDomains
- 
+        
+        #if true // intercept_by_match_domains
+            // Add in all the hostnames we want to intercept as 'matchDomains'. We'll get some extras, but that's ok, we'll proxy 'em...
+            var matchDomains = self.dnsResolver?.hostnames
+            
+            // Make sure we don't become primary resolver (specified by having name = "")
+            matchDomains = matchDomains?.filter { $0 != "" }
+            if matchDomains == nil {
+                matchDomains = [ "ziti-test.netfoundry.io" ]
+            }
+            dnsSettings.matchDomains = matchDomains
+        #else
+            // intercept and proxy all...
+            dnsSettings.matchDomains = [""] //self.providerConfig.dnsMatchDomains
+        #endif
+        
         //print("----- matches: \(dnsSettings.matchDomains ?? [""])")
         tunnelNetworkSettings.dnsSettings = dnsSettings
         
