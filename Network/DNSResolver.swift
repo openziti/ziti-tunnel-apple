@@ -35,6 +35,14 @@ class DNSResolver : NSObject {
     var dnsEntries:[DnsEntry] = []
     var dnsLock = NSLock()
     
+    var hostnames:[String] {
+        var nms:[String] = []
+        dnsLock.lock()
+        dnsEntries.forEach { nms.append($0.hostname) }
+        dnsLock.unlock()
+        return nms
+    }
+    
     init(_ tunnelProvider:PacketTunnelProvider) {
         self.tunnelProvider = tunnelProvider
     }
@@ -101,7 +109,7 @@ class DNSResolver : NSObject {
     }
     
     // To resolve IP addresses we are not intercepting
-    private func resolveHostname(_ hostname:String, _ recordType:DNSRecordType) -> String? {
+    func resolveHostname(_ hostname:String, _ recordType:DNSRecordType) -> String? {
         let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
         CFHostStartInfoResolution(host, .addresses, nil)
         var success:DarwinBoolean = false
