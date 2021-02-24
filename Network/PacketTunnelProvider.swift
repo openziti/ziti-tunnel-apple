@@ -22,7 +22,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
     var dnsResolver:DNSResolver?
-    var currDnsServiceId:String?
     var interceptedRoutes:[NEIPv4Route] = []
     let netMon = NWPathMonitor()
     var currPath:Network.NWPath?
@@ -46,7 +45,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         
         netMon.pathUpdateHandler = self.pathUpdateHandler
         netMon.start(queue: DispatchQueue.global())
-        dnsResolver = DNSResolver(self)
+        dnsResolver = DNSResolver()
     }
     
     func pathUpdateHandler(path: Network.NWPath) {
@@ -62,22 +61,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         packetFlow.readPacketObjects { (packets:[NEPacket]) in
             for packet in packets {
                 if packet.data.count > 0 {
-                    var isDNS = false
-                    let version = packet.data[0] >> 4
-                    if version == 4 {
-                        if let ip = IPv4Packet(packet.data),
-                            ip.protocolId == IPProtocolId.UDP,
-                            let udp = UDPPacket(ip),
-                            let dnsResolver = self.dnsResolver,
-                            dnsResolver.needsResolution(udp) {
-                            
-                            isDNS = true
-                            dnsResolver.resolve(udp)
-                        }
-                    }
-                    if !isDNS {
                         self.zitiTunnel.queuePacket(packet.data)
-                    }
                 }
             }
             self.readPacketFlow()
@@ -101,9 +85,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             interceptedRoutes.append(route)
         }
         
-        // TODO: lookup service by currDnsServiceId and update
-        //svc.dns?.interceptIp = "\(hn)"
-        
         rlLock.lock()
         if routesLocked && !alreadyExists {
             zLog.warn("*** Unable to add route for \(dest) to running tunnel. " +
@@ -125,17 +106,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         return 0
     }
     
-    func applyDns(_ host: String, _ ip: String) -> Int32 {
-        zLog.debug("Apply DNS: \(host) -> \(ip)")
-        
-        // horrible hack for getting the service id.  works because all happens in contenxt of libuv loop...
-        dnsResolver?.addDnsEntry(host, ip, currDnsServiceId ?? "-1")
-        return 0
-    }
-    
     func fallbackDns(_ name: String) -> String? {
-        zLog.warn("Fallback DNS called unexpectedly...")
-        return dnsResolver?.resolveHostname(name, .A)
+        //zLog.warn("Fallback DNS called unexpectedly...")
+        return dnsResolver?.resolveHostname(name)
     }
     
     override var debugDescription: String {
@@ -176,13 +149,33 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         return (UInt32(eSvc.permFlags ?? 0x0) & ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
     }
     
-    private func handleServiceEvent(_ ziti:Ziti, _ zid:ZitiIdentity, _ zidStore:ZitiIdentityStore, _ zEvent:ZitiEvent) {
-        guard let event = zEvent.serviceEvent else {
-            zLog.wtf("invalid event")
+    private func processService(_ zid:ZitiIdentity, _ ztx:ziti_context, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) {
+        guard let cService = eSvc.cService, let serviceId = eSvc.id else {
+            zLog.error("invalid service for \(zid.name):(\(zid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
             return
         }
-        guard let ztx = ziti.ztx else {
-            zLog.wtf("invalid ziti context")
+        
+        if remove {
+            self.dnsResolver?.removeDnsEntry(serviceId)
+            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_SERVICE_UNAVAILABLE)
+            zid.services = zid.services.filter { $0.id != serviceId }
+        }
+        
+        if add {
+            let zSvc = ZitiService(eSvc)
+            zSvc.addresses?.components(separatedBy: ",").forEach { addr in
+                if !IPUtils.isValidIpV4Address(addr) {
+                    dnsResolver?.addDnsEntry(addr, "0.0.0.0", serviceId)
+                }
+            }
+            if canDial(eSvc) { zid.services.append(zSvc) }
+            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_OK)
+        }
+        
+    }
+    private func handleServiceEvent(_ ziti:Ziti, _ zid:ZitiIdentity, _ zidStore:ZitiIdentityStore, _ zEvent:ZitiEvent) {
+        guard let event = zEvent.serviceEvent, let ztx = ziti.ztx else {
+            zLog.wtf("invalid event")
             return
         }
         
@@ -190,46 +183,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             zLog.info("\(zid.name):(\(zid.id)) \(zEvent.debugDescription)")
         }
         
-        // REMOVE
-        for eSvc in event.removed {
-            guard let cService = eSvc.cService, let serviceId = eSvc.id else {
-                zLog.error("invalid service for \(zid.name):(\(zid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
-                continue
-            }
-            self.dnsResolver?.removeDnsEntry(serviceId)
-            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_SERVICE_UNAVAILABLE)
-            zid.services = zid.services.filter { $0.id != serviceId }
-        }
-        
-        // CHANGE
-        for eSvc in event.changed {
-            guard let cService = eSvc.cService, let serviceId = eSvc.id else {
-                zLog.error("invalid service for \(zid.name):(\(zid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
-                continue
-            }
-           
-            // Remove it
-            self.dnsResolver?.removeDnsEntry(serviceId)
-            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_SERVICE_UNAVAILABLE)
-            zid.services = zid.services.filter { $0.id != serviceId }
-            
-            // Add it back
-            self.currDnsServiceId = serviceId
-            if canDial(eSvc) { zid.services.append(ZitiService(eSvc)) }
-            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_OK)
-        }
-        
-        // ADD
-        for eSvc in event.added {
-            guard let cService = eSvc.cService else {
-                zLog.error("invalid service for \(zid.name):(\(zid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
-                continue
-            }
-            
-            self.currDnsServiceId = eSvc.id
-            if canDial(eSvc) { zid.services.append(ZitiService(eSvc)) }
-            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_OK)
-        }
+        for eSvc in event.removed { processService(zid, ztx, eSvc, remove:true) }
+        for eSvc in event.changed { processService(zid, ztx, eSvc, remove:true, add:true) }
+        for eSvc in event.added   { processService(zid, ztx, eSvc, add:true) }
 
         // Update controller status to .Available
         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
