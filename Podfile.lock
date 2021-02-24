@@ -1,10 +1,10 @@
 PODS:
-  - CZiti-iOS (0.20.0-beta.7)
-  - CZiti-macOS (0.20.0-beta.7)
+  - CZiti-iOS (0.20.0)
+  - CZiti-macOS (0.20.0)
 
 DEPENDENCIES:
-  - CZiti-iOS (~> 0.20.0-beta.6)
-  - CZiti-macOS (~> 0.20.0-beta.6)
+  - CZiti-iOS (~> 0.1)
+  - CZiti-macOS (~> 0.1)
 
 SPEC REPOS:
   trunk:
@@ -12,9 +12,9 @@ SPEC REPOS:
     - CZiti-macOS
 
 SPEC CHECKSUMS:
-  CZiti-iOS: d5758ca0cb40555366eef4ca86067cbdd9bac740
-  CZiti-macOS: a1a400eda73fcadcdfe3b6f1de462080742620ce
+  CZiti-iOS: 93e4a889f99e5677b552f308e8a5b6ead895140b
+  CZiti-macOS: 811d77d0cf6e86245a2517af298d5e3e9eb5b2cd
 
-PODFILE CHECKSUM: ba4c16f5f01b92268f1c6a31cf1abf34695cb30a
+PODFILE CHECKSUM: 1bb64ec1bebde78e670613a783110e6f27e08808
 
 COCOAPODS: 1.10.1
