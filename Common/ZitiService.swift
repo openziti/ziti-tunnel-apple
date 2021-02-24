@@ -41,7 +41,7 @@ class ZitiService : Codable {
         
         if let cfg = eSvc.interceptConfigV1 {
             protocols = cfg.protocols.joined(separator: ", ").uppercased()
-            addresses = cfg.addresses.joined(separator: ", ")
+            addresses = cfg.addresses.sorted().joined(separator: ", ")
             var prArr:[String] = []
             cfg.portRanges.forEach { pr in
                 if pr.low == pr.high {
@@ -50,7 +50,7 @@ class ZitiService : Codable {
                     prArr.append("\(pr.low)-\(pr.high)")
                 }
             }
-            portRanges = prArr.joined(separator: ", ")
+            portRanges = prArr.sorted().joined(separator: ", ")
         } else if let cfg = eSvc.tunnelClientConfigV1 {
             protocols = "TCP, UDP"
             addresses = cfg.hostname
