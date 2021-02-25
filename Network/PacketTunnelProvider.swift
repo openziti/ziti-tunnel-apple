@@ -19,7 +19,6 @@ import Network
 import CZiti
 
 class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
-    
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
     var dnsResolver:DNSResolver?
@@ -46,7 +45,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         
         netMon.pathUpdateHandler = self.pathUpdateHandler
         netMon.start(queue: DispatchQueue.global())
-        dnsResolver = DNSResolver(self)
+        dnsResolver = DNSResolver()
     }
     
     func pathUpdateHandler(path: Network.NWPath) {
@@ -62,22 +61,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         packetFlow.readPacketObjects { (packets:[NEPacket]) in
             for packet in packets {
                 if packet.data.count > 0 {
-                    var isDNS = false
-                    let version = packet.data[0] >> 4
-                    if version == 4 {
-                        if let ip = IPv4Packet(packet.data),
-                            ip.protocolId == IPProtocolId.UDP,
-                            let udp = UDPPacket(ip),
-                            let dnsResolver = self.dnsResolver,
-                            dnsResolver.needsResolution(udp) {
-                            
-                            isDNS = true
-                            dnsResolver.resolve(udp)
-                        }
-                    }
-                    if !isDNS {
                         self.zitiTunnel.queuePacket(packet.data)
-                    }
                 }
             }
             self.readPacketFlow()
@@ -90,66 +74,45 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         writeLock.unlock()
     }
     
+    func addRoute(_ dest: String) -> Int32 {
+        let route = NEIPv4Route(destinationAddress: dest,
+                                subnetMask: "255.255.255.255")
+        
+        // only add if haven't already.. (potential race condition now on interceptedRoutes...)
+        var alreadyExists = true
+        if interceptedRoutes.first(where: { $0.destinationAddress == route.destinationAddress }) == nil {
+            alreadyExists = false
+            interceptedRoutes.append(route)
+        }
+        
+        rlLock.lock()
+        if routesLocked && !alreadyExists {
+            zLog.warn("*** Unable to add route for \(dest) to running tunnel. " +
+                    "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
+            //svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: false) //true
+            
+        } else {
+            zLog.info("Adding route for \(dest).")
+            //svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
+        }
+        rlLock.unlock()
+        return 0
+    }
+    
+    func deleteRoute(_ dest: String) -> Int32 {
+        zLog.warn("*** Unable to remove route for \(dest) on running tunnel. " +
+                "If route not already available it must be manually removed (/sbin/route) or tunnel re-started ***")
+        //svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: false) //true
+        return 0
+    }
+    
+    func fallbackDns(_ name: String) -> String? {
+        //zLog.warn("Fallback DNS called unexpectedly...")
+        return dnsResolver?.resolveHostname(name)
+    }
+    
     override var debugDescription: String {
         return "PacketTunnelProvider \(self)\n\(self.providerConfig)"
-    }
-    
-    // Add hostnames to dns, routes to intercept, and set interceptIp
-    private func updateHostsAndIntercepts(_ zid:ZitiIdentity, _ svc:ZitiService) {
-        if let hn = svc.dns?.hostname {
-            let port = svc.dns?.port ?? 80
-            if IPUtils.isValidIpV4Address(hn) {
-                let route = NEIPv4Route(destinationAddress: hn,
-                                        subnetMask: "255.255.255.255")
-                
-                // only add if haven't already.. (potential race condition now on interceptedRoutes...)
-                var alreadyExists = true
-                if interceptedRoutes.first(where: { $0.destinationAddress == route.destinationAddress }) == nil {
-                    alreadyExists = false
-                    interceptedRoutes.append(route)
-                }
-                svc.dns?.interceptIp = "\(hn)"
-                
-                rlLock.lock()
-                if routesLocked && !alreadyExists {
-                    zLog.warn("*** Unable to add route for \(zid.name): \(hn) (port \(port)) to running tunnel. " +
-                            "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
-                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: false) //true
-                    
-                } else {
-                    zLog.info("Adding route for \(zid.name): \(hn) (port \(port)).")
-                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
-                }
-                rlLock.unlock()
-            } else {
-                svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
-                dnsResolver?.hostnamesLock.lock()
-                // See if we already have this DNS name
-                if let currIPs = dnsResolver?.findRecordsByName(hn), currIPs.count > 0 {
-                    svc.dns?.interceptIp = "\(currIPs.first!.ip)"
-                    zLog.info("Using DNS hostname \(hn): \(currIPs.first!.ip) (port \(port))")
-                } else if let ipStr = dnsResolver?.addHostname(hn) {
-                    svc.dns?.interceptIp = "\(ipStr)"
-                    zLog.info("Adding DNS hostname \(hn): \(ipStr) (port \(port))")
-                } else {
-                    zLog.info("Unable to add DNS hostname \(hn) for \(zid.name)")
-                    svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: false)
-                }
-                dnsResolver?.hostnamesLock.unlock()
-            }
-        }
-    }
-    
-    private func countInterceptRefs(_ zids:[ZitiIdentity], _ interceptIp:String) -> Int {
-        var count = 0
-        zids.forEach { zid in
-            zid.services.forEach { svc in
-                if let svcInterceptIp = svc.dns?.interceptIp, svcInterceptIp == interceptIp {
-                    count += 1
-                }
-            }
-        }
-        return count
     }
     
     private func handleContextEvent(_ ziti:Ziti, _ zid:ZitiIdentity, _ zidStore:ZitiIdentityStore, _ zEvent:ZitiEvent) {
@@ -169,7 +132,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
         } else {
             zLog.error("\(zid.name):(\(zid.id)) \(zEvent.debugDescription)")
-            zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+            zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
         }
         _ = zidStore.store(zid)
     }
@@ -182,13 +145,37 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         zLog.info("\(zid.name):(\(zid.id)) \(zEvent.debugDescription)")
     }
     
-    private func handleServiceEvent(_ ziti:Ziti, _ zid:ZitiIdentity, _ zidStore:ZitiIdentityStore, _ zEvent:ZitiEvent) {
-        guard let event = zEvent.serviceEvent else {
-            zLog.wtf("invalid event")
+    private func canDial(_ eSvc:CZiti.ZitiService) -> Bool {
+        return (UInt32(eSvc.permFlags ?? 0x0) & ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
+    }
+    
+    private func processService(_ zid:ZitiIdentity, _ ztx:ziti_context, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) {
+        guard let cService = eSvc.cService, let serviceId = eSvc.id else {
+            zLog.error("invalid service for \(zid.name):(\(zid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
             return
         }
-        guard let ztx = ziti.ztx else {
-            zLog.wtf("invalid ziti context")
+        
+        if remove {
+            self.dnsResolver?.removeDnsEntry(serviceId)
+            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_SERVICE_UNAVAILABLE)
+            zid.services = zid.services.filter { $0.id != serviceId }
+        }
+        
+        if add {
+            let zSvc = ZitiService(eSvc)
+            zSvc.addresses?.components(separatedBy: ",").forEach { addr in
+                if !IPUtils.isValidIpV4Address(addr) {
+                    dnsResolver?.addDnsEntry(addr, "0.0.0.0", serviceId)
+                }
+            }
+            if canDial(eSvc) { zid.services.append(zSvc) }
+            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_OK)
+        }
+        
+    }
+    private func handleServiceEvent(_ ziti:Ziti, _ zid:ZitiIdentity, _ zidStore:ZitiIdentityStore, _ zEvent:ZitiEvent) {
+        guard let event = zEvent.serviceEvent, let ztx = ziti.ztx else {
+            zLog.wtf("invalid event")
             return
         }
         
@@ -196,131 +183,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             zLog.info("\(zid.name):(\(zid.id)) \(zEvent.debugDescription)")
         }
         
-        // REMOVE
-        for eSvc in event.removed {
-            guard let serviceName = eSvc.name, let serviceId = eSvc.id else {
-                zLog.error("invalid service for \(zid.name):(\(zid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
-                continue
-            }
-            let serviceWas = zid.services.first(where: { $0.id == eSvc.id })
-            if serviceWas == nil {
-                zLog.warn("Unable to find existing service with id=\(serviceId) for removal, \(zid.name):(\(zid.id))")
-            }
-            zLog.debug("Service Unavailable \(zid.name)::\(serviceName)")
-            
-            let refCount = self.countInterceptRefs(zids, serviceWas?.dns?.interceptIp ?? "")
-            if refCount == 1 {
-                // remove from hostnames (locked) TODO: move DNS stuff into DnsResolver
-                if let interceptIp = serviceWas?.dns?.interceptIp, let dnsResolver = self.dnsResolver {
-                    let hn = serviceWas?.dns?.hostname ?? ""
-                    zLog.debug("Removing DNS entry for service \(serviceName), \(hn) != \(interceptIp)")
-                    dnsResolver.hostnamesLock.lock()
-                    dnsResolver.hostnames = dnsResolver.hostnames.filter { $0.ip != interceptIp }
-                    dnsResolver.hostnamesLock.unlock()
-                }
-            } else {
-                zLog.debug("Leaving DNS entry, refCount was \(refCount)")
-            }
-            
-            self.zitiTunnel.v1StopIntercepting(serviceId.cString(using: .utf8))
-            zid.services = zid.services.filter { $0.id != serviceId }
-        }
-        
-        // CHANGE
-        for eSvc in event.changed {
-            guard let serviceName = eSvc.name, let serviceId = eSvc.id else {
-                zLog.error("\(zid.name):(\(zid.id)) invalid service, name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
-                continue
-            }
-            guard let serviceWas = zid.services.first(where: { $0.id == serviceId }) else {
-                zLog.error("\(zid.name):(\(zid.id)) Unable to find existing service with id=\(serviceId)")
-                continue
-            }
-            guard let cfg = eSvc.tunnelClientConfigV1 else {
-                zLog.error("\(zid.name):(\(zid.id)) Unable to find configuration for service name=\(serviceName), id=\(serviceId)")
-                continue
-            }
-            
-            // Update all fields except interceptIP
-            serviceWas.name = serviceName
-            
-            // if dns changed we need to update DNS hostnames
-            if serviceWas.dns?.hostname != cfg.hostname {
-                if self.countInterceptRefs(zids, serviceWas.dns?.interceptIp ?? "") == 1 {
-                    if let interceptIp = serviceWas.dns?.interceptIp, let dnsResolver = self.dnsResolver {
-                        let hn = serviceWas.dns?.hostname ?? ""
-                        zLog.debug("Removing DNS entry for service \(serviceName), \(hn) != \(interceptIp)")
-                        dnsResolver.hostnamesLock.lock()
-                        dnsResolver.hostnames = dnsResolver.hostnames.filter { $0.ip != interceptIp }
-                        dnsResolver.hostnamesLock.unlock()
-                    }
-                }
-                serviceWas.dns?.hostname = cfg.hostname
-                self.updateHostsAndIntercepts(zid, serviceWas)
-            }
-            serviceWas.dns?.port = cfg.port
-            
-            // remove intercept
-            self.zitiTunnel.v1StopIntercepting(serviceId.cString(using: .utf8))
-            
-            // add it back with new info
-            if let interceptIp = serviceWas.dns?.interceptIp {
-                zLog.debug("\(zid.name):(\(zid.id)) Updating intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
-                _ = self.zitiTunnel.v1Intercept(ztx,
-                                                serviceId.cString(using: .utf8),
-                                                serviceName.cString(using: .utf8),
-                                                interceptIp.cString(using: .utf8),
-                                                Int32(cfg.port))
-                serviceWas.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available)
-            }
-        }
-        
-        // ADD
-        for eSvc in event.added {
-            guard let serviceName = eSvc.name, let serviceId = eSvc.id else {
-                zLog.error("\(zid.name):(\(zid.id)) invalid service, name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
-                continue
-            }
-            
-            if UInt32(eSvc.permFlags ?? 0x0) & ZITI_CAN_BIND != 0 {
-                zLog.debug("service \(serviceName) CAN_BIND")
-                if let cfg = eSvc.tunnelServerConfigV1 {
-                    zLog.debug("\(zid.name):(\(zid.id)) Bind config hostname:\(cfg.hostname), port:\(cfg.port), proto:\(cfg.proto)")
-                    _ = self.zitiTunnel.v1Host(ztx, serviceName.cString(using: .utf8),
-                                       cfg.proto.cString(using: .utf8),
-                                       cfg.hostname.cString(using: .utf8),
-                                       Int32(cfg.port))
-                } else {
-                    zLog.error("\(zid.name):(\(zid.id)) Unable to parse server config for \(serviceName)")
-                }
-            }
-            
-            if UInt32(eSvc.permFlags ?? 0x0) & ZITI_CAN_DIAL != 0 {
-                if let cfg = eSvc.tunnelClientConfigV1 {
-                    zLog.debug("Adding service \(zid.name)::\(serviceName)")
-                    let newSvc = ZitiService()
-                    newSvc.name = serviceName
-                    newSvc.id = serviceId
-                    newSvc.dns = ZitiService.Dns()
-                    newSvc.dns?.hostname = cfg.hostname
-                    newSvc.dns?.port = cfg.port
-                    
-                    self.updateHostsAndIntercepts(zid, newSvc)
-                    if let interceptIp = newSvc.dns?.interceptIp {
-                        zLog.debug("\(zid.name):(\(zid.id)) Adding intercept for \(serviceName), \(cfg.hostname)->\(interceptIp)")
-                        _ = self.zitiTunnel.v1Intercept(ztx,
-                                                        serviceId.cString(using: .utf8),
-                                                        serviceName.cString(using: .utf8),
-                                                        interceptIp.cString(using: .utf8),
-                                                        Int32(cfg.port))
-                    }
-                    zid.services.append(newSvc)
-                } else {
-                    zLog.error("\(zid.name):(\(zid.id)) Unable to parse client config for serivce \(serviceName):\(serviceId)")
-                }
-            }
-        }
-        
+        for eSvc in event.removed { processService(zid, ztx, eSvc, remove:true) }
+        for eSvc in event.changed { processService(zid, ztx, eSvc, remove:true, add:true) }
+        for eSvc in event.added   { processService(zid, ztx, eSvc, add:true) }
+
         // Update controller status to .Available
         zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
         _ = zidStore.store(zid)
@@ -423,6 +289,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         routesLocked = true
         rlLock.unlock()
         
+        // Debug dump of DNS...
+        // dnsResolver?.dumpDns()
+        
         return nil
     }
     
@@ -475,7 +344,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         }
         
         // setup ZitiTunnel
-        zitiTunnel = ZitiTunnel(self, loop)
+        let ipDNS = self.providerConfig.dnsAddresses.first ?? ""
+        zitiTunnel = ZitiTunnel(self, loop, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS)
         
         // load identities
         // for each svc aither update intercepts or add hostname to resolver
@@ -486,8 +356,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
-        dnsSettings.matchDomains = [""] //self.providerConfig.dnsMatchDomains
- 
+        
+        #if true // intercept_by_match_domains
+            // Add in all the hostnames we want to intercept as 'matchDomains'. We'll get some extras, but that's ok, we'll proxy 'em...
+            var matchDomains = self.dnsResolver?.hostnames
+            
+            // Make sure we don't become primary resolver (specified by having name = "")
+            matchDomains = matchDomains?.filter { $0 != "" }
+            if matchDomains == nil {
+                matchDomains = [ "ziti-test.netfoundry.io" ]
+            }
+            dnsSettings.matchDomains = matchDomains
+        #else
+            // intercept and proxy all...
+            dnsSettings.matchDomains = [""] //self.providerConfig.dnsMatchDomains
+        #endif
+        
         //print("----- matches: \(dnsSettings.matchDomains ?? [""])")
         tunnelNetworkSettings.dnsSettings = dnsSettings
         
