@@ -22,7 +22,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     static let shared = MainMenuBar()
     
     let appName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? "Ziti"
-    let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
+    public var statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
     private var tunStatusItem:NSMenuItem!
     private var tunConnectItem:NSMenuItem!
     private var showDocItem:NSMenuItem!

@@ -589,5 +589,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         }
     }
     
+    static func freshController() -> DashboardScreen {
+        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main.UI"), bundle: nil);
+        let identifier = NSStoryboard.SceneIdentifier("Dashboard");
+        guard let viewcontroller = storyboard.instantiateController(withIdentifier: identifier) as? DashboardScreen else {
+            fatalError("Controller Not Found")
+        }
+        return viewcontroller;
+    }
+    
 }
 
