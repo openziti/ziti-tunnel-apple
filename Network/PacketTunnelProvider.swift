@@ -165,14 +165,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             let zSvc = ZitiService(eSvc)
             zSvc.addresses?.components(separatedBy: ",").forEach { addr in
                 if !IPUtils.isValidIpV4Address(addr) {
-                    dnsResolver?.addDnsEntry(addr, "0.0.0.0", serviceId)
+                    dnsResolver?.addDnsEntry(addr, "", serviceId)
                 }
             }
             if canDial(eSvc) { zid.services.append(zSvc) }
             self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_OK)
         }
-        
     }
+    
     private func handleServiceEvent(_ ziti:Ziti, _ zid:ZitiIdentity, _ zidStore:ZitiIdentityStore, _ zEvent:ZitiEvent) {
         guard let event = zEvent.serviceEvent, let ztx = ziti.ztx else {
             zLog.wtf("invalid event")
