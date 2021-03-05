@@ -31,8 +31,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     var loop:UnsafeMutablePointer<uv_loop_t>!
     var writeLock = NSLock()
     
-    var routesLocked = false // when true, restart is required to update routes for services intercepted by IP
-    var rlLock = NSLock()
+    var hasStarted = false // when true, restart is required to update routes for services intercepted by IP
+    var startedAt:Date?
+    var startupLock = NSLock()
     
     override init() {
         super.init()
@@ -74,19 +75,37 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         writeLock.unlock()
     }
     
-    func addRoute(_ dest: String) -> Int32 {
+    func addRoute(_ destinationAddress: String) -> Int32 {
+        var dest = destinationAddress
+        var prefix:UInt32 = 32
+        
+        let parts = dest.components(separatedBy: "/")
+        guard (parts.count == 1 || parts.count == 2) && IPUtils.isValidIpV4Address(parts[0]) else {
+            // TODO: log
+            return -1
+        }
+        if parts.count == 2, let prefixPart = UInt32(parts[1]) {
+            dest = parts[0]
+            prefix = prefixPart
+        }
+        let mask:UInt32 = (0xffffffff << (32 - prefix)) & 0xffffffff
+        let subnetMask = "\(String((mask & 0xff000000) >> 24)).\(String((mask & 0x00ff0000) >> 16)).\(String((mask & 0x0000ff00) >> 8)).\(String(mask & 0x000000ff))"
+        
+        zLog.info("addRoute \(dest) => \(dest), \(subnetMask)")
         let route = NEIPv4Route(destinationAddress: dest,
-                                subnetMask: "255.255.255.255")
+                                subnetMask: subnetMask)
         
         // only add if haven't already.. (potential race condition now on interceptedRoutes...)
         var alreadyExists = true
-        if interceptedRoutes.first(where: { $0.destinationAddress == route.destinationAddress }) == nil {
+        if interceptedRoutes.first(where: {
+                                    $0.destinationAddress == route.destinationAddress &&
+                                    $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
             alreadyExists = false
             interceptedRoutes.append(route)
         }
         
-        rlLock.lock()
-        if routesLocked && !alreadyExists {
+        startupLock.lock()
+        if hasStarted && !alreadyExists {
             zLog.warn("*** Unable to add route for \(dest) to running tunnel. " +
                     "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
             //svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: false) //true
@@ -95,7 +114,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             zLog.info("Adding route for \(dest).")
             //svc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
         }
-        rlLock.unlock()
+        startupLock.unlock()
         return 0
     }
     
@@ -168,7 +187,23 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                     dnsResolver?.addDnsEntry(addr, "", serviceId)
                 }
             }
-            if canDial(eSvc) { zid.services.append(zSvc) }
+            if canDial(eSvc) {
+                var needsRestart = false
+
+                startupLock.lock()
+                if let startedAt = self.startedAt, abs(startedAt.timeIntervalSinceNow) > 30.0 {
+                    needsRestart = true
+                }
+                startupLock.unlock()
+                
+                if needsRestart {
+                    zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
+                } else {
+                    zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
+                }
+                
+                zid.services.append(zSvc)
+            }
             self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_OK)
         }
     }
@@ -217,7 +252,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         let (zids, zErr) = zidStore.loadAll()
         guard zErr == nil, zids != nil else { return zErr }
         
-        let routeCond = NSCondition() // so we can block waiting for services to be reported..
+        let zidsLoadedCond = NSCondition() // so we can block waiting for services to be reported..
         var zidsToLoad = zids!.filter { $0.czid != nil && $0.isEnabled }.count
         
         let postureChecks = ZitiPostureChecks()
@@ -239,10 +274,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                     if !gotServices {
                         gotServices = true
                         ziti.perform {
-                            routeCond.lock()
+                            zidsLoadedCond.lock()
                             zidsToLoad -= 1
-                            routeCond.signal()
-                            routeCond.unlock()
+                            zidsLoadedCond.signal()
+                            zidsLoadedCond.unlock()
                         }
                     }
                 }
@@ -260,10 +295,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                         _ = zidStore.store(zid)
                         
                         // dec the count (otherwise will need to wait for condition to timeout
-                        routeCond.lock()
+                        zidsLoadedCond.lock()
                         zidsToLoad -= 1
-                        routeCond.signal()
-                        routeCond.unlock()
+                        zidsLoadedCond.signal()
+                        zidsLoadedCond.unlock()
                         
                         return
                     }
@@ -276,18 +311,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         Thread(target: self, selector: #selector(self.runZiti), object: nil).start()
         
         // wait for services to be reported...
-        routeCond.lock()
+        zidsLoadedCond.lock()
         while zidsToLoad > 0 {
-            if !routeCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(20.0))) {
+            if !zidsLoadedCond.wait(until: Date(timeIntervalSinceNow: TimeInterval(20.0))) {
                 zLog.warn("Timed out waiting for zidToLoad == 0 (stuck at \(zidsToLoad))")
                 break
             }
         }
-        routeCond.unlock()
+        zidsLoadedCond.unlock()
                 
-        rlLock.lock()
-        routesLocked = true
-        rlLock.unlock()
+        startupLock.lock()
+        hasStarted = true
+        self.startedAt = Date()
+        startupLock.unlock()
         
         // Debug dump of DNS...
         // dnsResolver?.dumpDns()
