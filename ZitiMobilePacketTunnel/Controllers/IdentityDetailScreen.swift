@@ -100,7 +100,7 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
                 let serviceUrl = UITextView(frame: CGRect(x: 0, y: 0, width: 300, height: 20));
                 
                 serviceName.text = service.name;
-                serviceUrl.text = "\(service.dns?.hostname ?? ""):\(service.dns?.port ?? -1)";
+                serviceUrl.text = service.addresses;
                 
                 serviceName.font = UIFont(name: "Open Sans", size: 12);
                 serviceName.textColor = UIColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);

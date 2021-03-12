@@ -131,6 +131,14 @@
 		824414E025ACA564007765A4 /* StartupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414DF25ACA564007765A4 /* StartupScreen.swift */; };
 		824414F425AD221A007765A4 /* ZitiWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414F325AD221A007765A4 /* ZitiWindow.swift */; };
 		8265A3B625CE11A80001A6AB /* FlippedClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8265A3B525CE11A80001A6AB /* FlippedClipView.swift */; };
+		826B985025FA844B0064F774 /* MFASetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B984F25FA844B0064F774 /* MFASetupScreen.swift */; };
+		826B985525FA845A0064F774 /* AuthenticateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B985425FA845A0064F774 /* AuthenticateScreen.swift */; };
+		826B985A25FA846A0064F774 /* RecoveryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B985925FA846A0064F774 /* RecoveryScreen.swift */; };
+		826B986525FA86AD0064F774 /* ServiceDetailsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B986425FA86AD0064F774 /* ServiceDetailsScreen.swift */; };
+		826B986A25FA886C0064F774 /* ServiceDetailsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B986925FA886C0064F774 /* ServiceDetailsScreen.swift */; };
+		826B986F25FA887B0064F774 /* MFASetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B986E25FA887B0064F774 /* MFASetupScreen.swift */; };
+		826B987425FA888D0064F774 /* AuthenticateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B987325FA888D0064F774 /* AuthenticateScreen.swift */; };
+		826B987925FA88A00064F774 /* RecoveryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B987825FA88A00064F774 /* RecoveryScreen.swift */; };
 		826C192825A3BB970099CB66 /* DashboardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826C192725A3BB970099CB66 /* DashboardScreen.swift */; };
 		826EDFDE25C76B4000DA38B4 /* IdentityDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */; };
 		826EDFE325C88E6D00DA38B4 /* GoToDetailGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */; };
@@ -352,6 +360,14 @@
 		824414DF25ACA564007765A4 /* StartupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupScreen.swift; sourceTree = "<group>"; };
 		824414F325AD221A007765A4 /* ZitiWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiWindow.swift; sourceTree = "<group>"; };
 		8265A3B525CE11A80001A6AB /* FlippedClipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlippedClipView.swift; sourceTree = "<group>"; };
+		826B984F25FA844B0064F774 /* MFASetupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFASetupScreen.swift; sourceTree = "<group>"; };
+		826B985425FA845A0064F774 /* AuthenticateScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticateScreen.swift; sourceTree = "<group>"; };
+		826B985925FA846A0064F774 /* RecoveryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryScreen.swift; sourceTree = "<group>"; };
+		826B986425FA86AD0064F774 /* ServiceDetailsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceDetailsScreen.swift; sourceTree = "<group>"; };
+		826B986925FA886C0064F774 /* ServiceDetailsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceDetailsScreen.swift; sourceTree = "<group>"; };
+		826B986E25FA887B0064F774 /* MFASetupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFASetupScreen.swift; sourceTree = "<group>"; };
+		826B987325FA888D0064F774 /* AuthenticateScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticateScreen.swift; sourceTree = "<group>"; };
+		826B987825FA88A00064F774 /* RecoveryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryScreen.swift; sourceTree = "<group>"; };
 		826C192725A3BB970099CB66 /* DashboardScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardScreen.swift; sourceTree = "<group>"; };
 		826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityDetailScreen.swift; sourceTree = "<group>"; };
 		826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoToDetailGesture.swift; sourceTree = "<group>"; };
@@ -690,6 +706,10 @@
 				82969282255D4EDC00ED44AB /* LogDetailScreen.swift */,
 				82969287255D522000ED44AB /* ThirdPartyScreen.swift */,
 				82F96CF7258AE96800C88C95 /* LogLevelScreen.swift */,
+				826B986925FA886C0064F774 /* ServiceDetailsScreen.swift */,
+				826B986E25FA887B0064F774 /* MFASetupScreen.swift */,
+				826B987325FA888D0064F774 /* AuthenticateScreen.swift */,
+				826B987825FA88A00064F774 /* RecoveryScreen.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -716,6 +736,10 @@
 				826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */,
 				826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */,
 				8265A3B525CE11A80001A6AB /* FlippedClipView.swift */,
+				826B984F25FA844B0064F774 /* MFASetupScreen.swift */,
+				826B985425FA845A0064F774 /* AuthenticateScreen.swift */,
+				826B985925FA846A0064F774 /* RecoveryScreen.swift */,
+				826B986425FA86AD0064F774 /* ServiceDetailsScreen.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1196,13 +1220,16 @@
 				5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A8702CE2230B24B00314199 /* ZitiService.swift in Sources */,
 				826EDFE325C88E6D00DA38B4 /* GoToDetailGesture.swift in Sources */,
+				826B985025FA844B0064F774 /* MFASetupScreen.swift in Sources */,
 				824414DB25A91686007765A4 /* LogLevelScreen.swift in Sources */,
+				826B986525FA86AD0064F774 /* ServiceDetailsScreen.swift in Sources */,
 				5A34E95E2278F49100E221DD /* Version.swift in Sources */,
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
 				824414E025ACA564007765A4 /* StartupScreen.swift in Sources */,
 				5A78DEE325631E1000316CE9 /* AppGroup.swift in Sources */,
 				5A0D1D2C222B093F00D01F30 /* ZitiError.swift in Sources */,
 				5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */,
+				826B985525FA845A0064F774 /* AuthenticateScreen.swift in Sources */,
 				824414D625A914E0007765A4 /* ConfigScreen.swift in Sources */,
 				826EDFDE25C76B4000DA38B4 /* IdentityDetailScreen.swift in Sources */,
 				824414BC25A693E8007765A4 /* MenuScreen.swift in Sources */,
@@ -1213,6 +1240,7 @@
 				824414D125A903D5007765A4 /* AboutScreen.swift in Sources */,
 				5A8702D922372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5A6BA265226F6AB400224F09 /* MainMenuBar.swift in Sources */,
+				826B985A25FA846A0064F774 /* RecoveryScreen.swift in Sources */,
 				8265A3B625CE11A80001A6AB /* FlippedClipView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1258,14 +1286,17 @@
 				82969257255D49E700ED44AB /* TunnelConfigScreen.swift in Sources */,
 				5A6BA25D226DE5FB00224F09 /* AboutViewController.swift in Sources */,
 				5A051F622264183500B11CB2 /* ZidMgr.swift in Sources */,
+				826B987425FA888D0064F774 /* AuthenticateScreen.swift in Sources */,
 				82969245255D3FD400ED44AB /* DashboardScreen.swift in Sources */,
 				8296927E255D4E6200ED44AB /* IdentityDetailScreen.swift in Sources */,
+				826B986A25FA886C0064F774 /* ServiceDetailsScreen.swift in Sources */,
 				82969252255D498900ED44AB /* AdvancedScreen.swift in Sources */,
 				5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */,
 				82969279255D4D9700ED44AB /* LogsScreen.swift in Sources */,
 				5A8702DA22372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */,
 				5A91B4C92222E155006C4277 /* ZitiIdentityStore.swift in Sources */,
+				826B986F25FA887B0064F774 /* MFASetupScreen.swift in Sources */,
 				5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */,
 				5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */,
 				5A8702D02230B24B00314199 /* ZitiService.swift in Sources */,
@@ -1274,6 +1305,7 @@
 				8296924D255D418800ED44AB /* AddIdentityScreen.swift in Sources */,
 				82C624C9257EDA7A00BCF212 /* IdentityItemCell.swift in Sources */,
 				5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */,
+				826B987925FA88A00064F774 /* RecoveryScreen.swift in Sources */,
 				5AF50FE6257D82770092DC47 /* LogLevelViewController.swift in Sources */,
 				5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */,
 				82F96CF8258AE96800C88C95 /* LogLevelScreen.swift in Sources */,

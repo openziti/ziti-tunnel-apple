@@ -3195,6 +3195,741 @@
             </objects>
             <point key="canvasLocation" x="1706" y="17"/>
         </scene>
+        <!--ServiceDetailsScreen-->
+        <scene sceneID="STP-ic-T95">
+            <objects>
+                <viewController storyboardIdentifier="ServiceDetailsScreen" id="S7y-M2-KZs" userLabel="ServiceDetailsScreen" customClass="ServiceDetailsScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" misplaced="YES" id="s77-zT-k3q">
+                        <rect key="frame" x="0.0" y="0.0" width="380" height="364"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <box wantsLayer="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="1n0-Bh-2o5">
+                                <rect key="frame" x="0.0" y="0.0" width="380" height="326"/>
+                                <view key="contentView" id="2EY-1o-FvT">
+                                    <rect key="frame" x="1" y="1" width="378" height="324"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g0j-BW-FMP">
+                                            <rect key="frame" x="20" y="20" width="338" height="284"/>
+                                            <subviews>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="86w-7N-i6x" userLabel="MenuArea">
+                                                    <rect key="frame" x="0.0" y="244" width="338" height="40"/>
+                                                    <subviews>
+                                                        <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iZx-rw-2oE" userLabel="BackButton">
+                                                            <rect key="frame" x="0.0" y="20" width="20" height="20"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="20" id="csR-dt-fKZ"/>
+                                                                <constraint firstAttribute="height" constant="20" id="x7P-6y-Tlp"/>
+                                                            </constraints>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="eNP-5a-QS1" userLabel="BackGesture">
+                                                                    <connections>
+                                                                        <action selector="GoBack:" target="S7y-M2-KZs" id="hjh-9n-d3u"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="IDh-TS-LS3"/>
+                                                        </imageView>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cxS-vp-eH0">
+                                                            <rect key="frame" x="-2" y="10" width="314" height="20"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Details" id="p4e-hD-mA8">
+                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="af8-1c-jwU" userLabel="CloseButton">
+                                                            <rect key="frame" x="318" y="10" width="20" height="20"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="20" id="5kg-Yy-24W"/>
+                                                                <constraint firstAttribute="height" constant="20" id="MzL-b7-zWC"/>
+                                                            </constraints>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="bg8-sq-bgT" userLabel="CloseGesture">
+                                                                    <connections>
+                                                                        <action selector="Close:" target="S7y-M2-KZs" id="tU2-oG-vxh"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="x" id="a9d-hf-xmQ"/>
+                                                        </imageView>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="40" id="dXq-fR-rT7"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                                <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="J8x-A0-O5f">
+                                                    <rect key="frame" x="0.0" y="235" width="338" height="1"/>
+                                                    <view key="contentView" id="7AK-6A-dn2">
+                                                        <rect key="frame" x="1" y="1" width="336" height="0.0"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    </view>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="1" id="Ntb-AI-U0e"/>
+                                                    </constraints>
+                                                    <color key="borderColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </box>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oJ0-RN-V08" userLabel="NameArea">
+                                                    <rect key="frame" x="0.0" y="197" width="338" height="30"/>
+                                                    <subviews>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u6x-3z-0J6" userLabel="NameLabel">
+                                                            <rect key="frame" x="-2" y="6" width="253" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Name:" usesSingleLineMode="YES" id="Stu-MY-QI5">
+                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Bg-iB-3lA" userLabel="ServiceName">
+                                                            <rect key="frame" x="255" y="6" width="85" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="service name" usesSingleLineMode="YES" id="bE6-3g-p0K">
+                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="wd4-y6-u6B"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                                <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="fyy-H3-2go">
+                                                    <rect key="frame" x="0.0" y="188" width="338" height="1"/>
+                                                    <view key="contentView" id="pNN-QX-YhG">
+                                                        <rect key="frame" x="1" y="1" width="336" height="0.0"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    </view>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="1" id="UhH-9a-pC3"/>
+                                                    </constraints>
+                                                    <color key="borderColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </box>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WDi-hq-Yk3" userLabel="UrlArea">
+                                                    <rect key="frame" x="0.0" y="150" width="338" height="30"/>
+                                                    <subviews>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M9d-t9-UT4" userLabel="UrlLabel">
+                                                            <rect key="frame" x="-2" y="6" width="317" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Url:" usesSingleLineMode="YES" id="dDn-ft-F70">
+                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P4O-pd-OJv" userLabel="UrlName">
+                                                            <rect key="frame" x="319" y="6" width="21" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="url" usesSingleLineMode="YES" id="xYE-ne-Vit">
+                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="OpX-UU-RBt"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                                <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="UUe-Wp-MFd">
+                                                    <rect key="frame" x="0.0" y="141" width="338" height="1"/>
+                                                    <view key="contentView" id="2fm-Nh-zTa">
+                                                        <rect key="frame" x="1" y="1" width="336" height="0.0"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    </view>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="1" id="rka-Ox-3ef"/>
+                                                    </constraints>
+                                                    <color key="borderColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </box>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uoc-LM-Qgp" userLabel="AddressArea">
+                                                    <rect key="frame" x="0.0" y="103" width="338" height="30"/>
+                                                    <subviews>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xl7-aH-2yV" userLabel="AddressLabel">
+                                                            <rect key="frame" x="-2" y="6" width="272" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Addresses:" usesSingleLineMode="YES" id="ybG-vx-aI8">
+                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Lr-nJ-RNN" userLabel="Address">
+                                                            <rect key="frame" x="274" y="6" width="66" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="addresses" usesSingleLineMode="YES" id="DBD-QP-SjF">
+                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="IqA-r5-2dk"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                                <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="H4i-mq-RkZ">
+                                                    <rect key="frame" x="0.0" y="94" width="338" height="1"/>
+                                                    <view key="contentView" id="PSX-qh-qPr">
+                                                        <rect key="frame" x="1" y="1" width="336" height="0.0"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    </view>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="1" id="XCr-DK-XbI"/>
+                                                    </constraints>
+                                                    <color key="borderColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </box>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yX7-7W-AXQ" userLabel="PortsArea">
+                                                    <rect key="frame" x="0.0" y="56" width="338" height="30"/>
+                                                    <subviews>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zId-eu-qLD" userLabel="PortsLabel">
+                                                            <rect key="frame" x="-2" y="6" width="302" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Ports:" usesSingleLineMode="YES" id="q1F-yA-YRV">
+                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7st-GY-Zwr" userLabel="Ports">
+                                                            <rect key="frame" x="304" y="6" width="36" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="ports" usesSingleLineMode="YES" id="qQH-rM-FH2">
+                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="NSb-IU-EEF"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                                <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="DSl-GA-jkC">
+                                                    <rect key="frame" x="0.0" y="47" width="338" height="1"/>
+                                                    <view key="contentView" id="5ea-oZ-zJQ">
+                                                        <rect key="frame" x="1" y="1" width="336" height="0.0"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    </view>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="1" id="WE6-Al-N1B"/>
+                                                    </constraints>
+                                                    <color key="borderColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </box>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aKl-eR-dnq" userLabel="ProtocolArea">
+                                                    <rect key="frame" x="0.0" y="9" width="338" height="30"/>
+                                                    <subviews>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t84-4B-HrM" userLabel="ProtocolLabel">
+                                                            <rect key="frame" x="-2" y="6" width="276" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Protocols:" usesSingleLineMode="YES" id="5ZJ-av-ftj">
+                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9PX-nC-Cs7" userLabel="Protocols">
+                                                            <rect key="frame" x="278" y="6" width="62" height="18"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="protocols" usesSingleLineMode="YES" id="TSS-k2-4sx">
+                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="YQg-fQ-T9r"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                                <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="eFs-Gh-u0S">
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="1"/>
+                                                    <view key="contentView" id="Mll-a5-k21">
+                                                        <rect key="frame" x="1" y="1" width="336" height="0.0"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    </view>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="1" id="mah-hL-Zh6"/>
+                                                    </constraints>
+                                                    <color key="borderColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </box>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="WDi-hq-Yk3" firstAttribute="leading" secondItem="g0j-BW-FMP" secondAttribute="leading" id="2wf-x0-hig"/>
+                                                <constraint firstAttribute="trailing" secondItem="yX7-7W-AXQ" secondAttribute="trailing" id="BF0-WP-Au5"/>
+                                                <constraint firstAttribute="trailing" secondItem="aKl-eR-dnq" secondAttribute="trailing" id="Kr5-QF-lyl"/>
+                                                <constraint firstAttribute="trailing" secondItem="oJ0-RN-V08" secondAttribute="trailing" id="LiT-dN-mNH"/>
+                                                <constraint firstItem="aKl-eR-dnq" firstAttribute="leading" secondItem="g0j-BW-FMP" secondAttribute="leading" id="MXe-q2-tTD"/>
+                                                <constraint firstItem="oJ0-RN-V08" firstAttribute="leading" secondItem="g0j-BW-FMP" secondAttribute="leading" id="SUE-Df-ObB"/>
+                                                <constraint firstAttribute="trailing" secondItem="J8x-A0-O5f" secondAttribute="trailing" id="TkY-Ve-EVW"/>
+                                                <constraint firstItem="yX7-7W-AXQ" firstAttribute="leading" secondItem="g0j-BW-FMP" secondAttribute="leading" id="Wi3-o7-Wwi"/>
+                                                <constraint firstItem="J8x-A0-O5f" firstAttribute="leading" secondItem="g0j-BW-FMP" secondAttribute="leading" id="a08-t0-6yA"/>
+                                                <constraint firstItem="uoc-LM-Qgp" firstAttribute="leading" secondItem="g0j-BW-FMP" secondAttribute="leading" id="diF-5z-3Pv"/>
+                                                <constraint firstAttribute="trailing" secondItem="uoc-LM-Qgp" secondAttribute="trailing" id="gQ0-IC-Dct"/>
+                                                <constraint firstAttribute="trailing" secondItem="WDi-hq-Yk3" secondAttribute="trailing" id="jdy-Qj-ydR"/>
+                                                <constraint firstAttribute="trailing" secondItem="86w-7N-i6x" secondAttribute="trailing" id="jjZ-xR-Xvf"/>
+                                                <constraint firstItem="86w-7N-i6x" firstAttribute="leading" secondItem="g0j-BW-FMP" secondAttribute="leading" id="zDY-3z-b6R"/>
+                                            </constraints>
+                                            <visibilityPriorities>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                            </visibilityPriorities>
+                                            <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                            </customSpacing>
+                                        </stackView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="g0j-BW-FMP" secondAttribute="trailing" constant="20" id="6sC-Ln-dYt"/>
+                                        <constraint firstItem="g0j-BW-FMP" firstAttribute="top" secondItem="2EY-1o-FvT" secondAttribute="top" constant="20" id="Myd-fQ-IUc"/>
+                                        <constraint firstAttribute="bottom" secondItem="g0j-BW-FMP" secondAttribute="bottom" constant="20" id="gqB-AC-GK5"/>
+                                        <constraint firstItem="g0j-BW-FMP" firstAttribute="leading" secondItem="2EY-1o-FvT" secondAttribute="leading" constant="20" id="hND-xl-Ulg"/>
+                                    </constraints>
+                                </view>
+                                <shadow key="shadow" blurRadius="20">
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="1n0-Bh-2o5" firstAttribute="top" secondItem="s77-zT-k3q" secondAttribute="top" id="CQP-7S-sBB"/>
+                            <constraint firstAttribute="bottom" secondItem="1n0-Bh-2o5" secondAttribute="bottom" id="I34-Hx-dAf"/>
+                            <constraint firstAttribute="trailing" secondItem="1n0-Bh-2o5" secondAttribute="trailing" id="KW7-N8-1LC"/>
+                            <constraint firstItem="1n0-Bh-2o5" firstAttribute="leading" secondItem="s77-zT-k3q" secondAttribute="leading" id="TjI-40-rE1"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="AddressValue" destination="3Lr-nJ-RNN" id="78i-9R-lHV"/>
+                        <outlet property="BackButton" destination="iZx-rw-2oE" id="vQh-KR-T6T"/>
+                        <outlet property="CloseButton" destination="af8-1c-jwU" id="Y6E-nA-7MZ"/>
+                        <outlet property="PortValue" destination="7st-GY-Zwr" id="k2Z-DW-oX9"/>
+                        <outlet property="ProtocolsValue" destination="9PX-nC-Cs7" id="LeY-0Y-SkB"/>
+                        <outlet property="ServiceName" destination="4Bg-iB-3lA" id="sQX-Uh-GuX"/>
+                        <outlet property="UrlValue" destination="P4O-pd-OJv" id="RdG-KG-Gbt"/>
+                    </connections>
+                </viewController>
+                <customObject id="1sg-mf-f73" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1187" y="-1031"/>
+        </scene>
+        <!--MFASetupScreen-->
+        <scene sceneID="tkl-Ni-GoM">
+            <objects>
+                <viewController storyboardIdentifier="MFASetupScreen" id="H8X-ik-fkF" userLabel="MFASetupScreen" customClass="MFASetupScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="rSt-6x-3FR">
+                        <rect key="frame" x="0.0" y="0.0" width="380" height="82"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <box wantsLayer="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bmo-kS-tdU">
+                                <rect key="frame" x="0.0" y="0.0" width="380" height="82"/>
+                                <view key="contentView" id="jOU-ba-KXz">
+                                    <rect key="frame" x="1" y="1" width="378" height="80"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9k4-9k-nRT">
+                                            <rect key="frame" x="20" y="20" width="338" height="40"/>
+                                            <subviews>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eQk-EZ-Ssf" userLabel="MenuArea">
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="40"/>
+                                                    <subviews>
+                                                        <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="MNa-Jc-nNM" userLabel="BackButton">
+                                                            <rect key="frame" x="0.0" y="20" width="20" height="20"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="20" id="AMt-4O-rrS"/>
+                                                                <constraint firstAttribute="width" constant="20" id="ZNw-pK-6yc"/>
+                                                            </constraints>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="434-LL-ulH" userLabel="BackGesture">
+                                                                    <connections>
+                                                                        <action selector="GoBack:" target="H8X-ik-fkF" id="N1i-Jl-8Fy"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="Syv-1m-0X8"/>
+                                                        </imageView>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2G7-8Q-7v6">
+                                                            <rect key="frame" x="-2" y="10" width="314" height="20"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Setup MFA" id="l0T-Yy-pgr">
+                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="J4h-fd-znj" userLabel="CloseButton">
+                                                            <rect key="frame" x="318" y="10" width="20" height="20"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="20" id="1pu-6o-aby"/>
+                                                                <constraint firstAttribute="width" constant="20" id="ulu-yB-bRH"/>
+                                                            </constraints>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="nJY-yV-T1e" userLabel="CloseGesture">
+                                                                    <connections>
+                                                                        <action selector="Close:" target="H8X-ik-fkF" id="eOJ-ZQ-f3D"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="x" id="6SG-Pj-Gf0"/>
+                                                        </imageView>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="40" id="uEF-KU-wM7"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="eQk-EZ-Ssf" firstAttribute="leading" secondItem="9k4-9k-nRT" secondAttribute="leading" id="1tZ-Yv-Q0O"/>
+                                                <constraint firstAttribute="trailing" secondItem="eQk-EZ-Ssf" secondAttribute="trailing" id="BdQ-ln-GcM"/>
+                                            </constraints>
+                                            <visibilityPriorities>
+                                                <integer value="1000"/>
+                                            </visibilityPriorities>
+                                            <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
+                                            </customSpacing>
+                                        </stackView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottom" secondItem="9k4-9k-nRT" secondAttribute="bottom" constant="20" id="Jy0-gT-TOF"/>
+                                        <constraint firstItem="9k4-9k-nRT" firstAttribute="leading" secondItem="jOU-ba-KXz" secondAttribute="leading" constant="20" id="KJ3-YQ-9E8"/>
+                                        <constraint firstItem="9k4-9k-nRT" firstAttribute="top" secondItem="jOU-ba-KXz" secondAttribute="top" constant="20" id="hbv-Bx-KSt"/>
+                                        <constraint firstAttribute="trailing" secondItem="9k4-9k-nRT" secondAttribute="trailing" constant="20" id="ul3-Qc-tpI"/>
+                                    </constraints>
+                                </view>
+                                <shadow key="shadow" blurRadius="20">
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="Bmo-kS-tdU" firstAttribute="leading" secondItem="rSt-6x-3FR" secondAttribute="leading" id="AJz-ZS-tHf"/>
+                            <constraint firstAttribute="bottom" secondItem="Bmo-kS-tdU" secondAttribute="bottom" id="QJa-mu-cuC"/>
+                            <constraint firstAttribute="trailing" secondItem="Bmo-kS-tdU" secondAttribute="trailing" id="hNa-zw-RhJ"/>
+                            <constraint firstItem="Bmo-kS-tdU" firstAttribute="top" secondItem="rSt-6x-3FR" secondAttribute="top" id="uQz-uV-Z2U"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="BackButton" destination="MNa-Jc-nNM" id="RiQ-Lr-nMg"/>
+                        <outlet property="CloseButton" destination="J4h-fd-znj" id="NiD-vo-bX5"/>
+                    </connections>
+                </viewController>
+                <customObject id="ExU-VE-hQg" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1747" y="-1302"/>
+        </scene>
+        <!--AuthenticateScreen-->
+        <scene sceneID="WY6-aF-7I3">
+            <objects>
+                <viewController storyboardIdentifier="AuthenticateScreen" id="sxG-TB-aUX" userLabel="AuthenticateScreen" customClass="AuthenticateScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="owB-L1-aQz">
+                        <rect key="frame" x="0.0" y="0.0" width="380" height="82"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <box wantsLayer="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="iE3-ca-yhv">
+                                <rect key="frame" x="0.0" y="0.0" width="380" height="82"/>
+                                <view key="contentView" id="RZK-NF-Di3">
+                                    <rect key="frame" x="1" y="1" width="378" height="80"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iiR-jk-fUo">
+                                            <rect key="frame" x="20" y="20" width="338" height="40"/>
+                                            <subviews>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bP8-Ix-wCL" userLabel="MenuArea">
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="40"/>
+                                                    <subviews>
+                                                        <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="oCA-Gi-SZr" userLabel="BackButton">
+                                                            <rect key="frame" x="0.0" y="20" width="20" height="20"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="20" id="0c0-KX-ztY"/>
+                                                                <constraint firstAttribute="width" constant="20" id="1GQ-Gc-a3l"/>
+                                                            </constraints>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="Fcs-ch-TGC" userLabel="BackGesture">
+                                                                    <connections>
+                                                                        <action selector="GoBack:" target="sxG-TB-aUX" id="cGC-JM-FZp"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="ePl-Hz-rvh"/>
+                                                        </imageView>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9hX-Ir-pNS" userLabel="AuthenticateTitle">
+                                                            <rect key="frame" x="-2" y="10" width="314" height="20"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Authenticate" id="1EP-3o-RwL">
+                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="IVh-de-NTn" userLabel="CloseButton">
+                                                            <rect key="frame" x="318" y="10" width="20" height="20"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="20" id="FLG-uD-GXn"/>
+                                                                <constraint firstAttribute="width" constant="20" id="QDO-R6-cmX"/>
+                                                            </constraints>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="Q9A-M8-qT9" userLabel="CloseGesture">
+                                                                    <connections>
+                                                                        <action selector="Close:" target="sxG-TB-aUX" id="Jne-wo-POn"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="x" id="Nbx-kq-fUK"/>
+                                                        </imageView>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="40" id="POh-gL-1Hh"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="bP8-Ix-wCL" firstAttribute="leading" secondItem="iiR-jk-fUo" secondAttribute="leading" id="GLW-LR-4MX"/>
+                                                <constraint firstAttribute="trailing" secondItem="bP8-Ix-wCL" secondAttribute="trailing" id="JhC-LN-kHU"/>
+                                            </constraints>
+                                            <visibilityPriorities>
+                                                <integer value="1000"/>
+                                            </visibilityPriorities>
+                                            <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
+                                            </customSpacing>
+                                        </stackView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottom" secondItem="iiR-jk-fUo" secondAttribute="bottom" constant="20" id="1dS-vH-bvd"/>
+                                        <constraint firstItem="iiR-jk-fUo" firstAttribute="leading" secondItem="RZK-NF-Di3" secondAttribute="leading" constant="20" id="77l-BJ-uq6"/>
+                                        <constraint firstAttribute="trailing" secondItem="iiR-jk-fUo" secondAttribute="trailing" constant="20" id="wsi-gj-REy"/>
+                                        <constraint firstItem="iiR-jk-fUo" firstAttribute="top" secondItem="RZK-NF-Di3" secondAttribute="top" constant="20" id="x56-d8-4sy"/>
+                                    </constraints>
+                                </view>
+                                <shadow key="shadow" blurRadius="20">
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="iE3-ca-yhv" firstAttribute="top" secondItem="owB-L1-aQz" secondAttribute="top" id="SSE-To-47R"/>
+                            <constraint firstItem="iE3-ca-yhv" firstAttribute="leading" secondItem="owB-L1-aQz" secondAttribute="leading" id="X8j-N6-4ks"/>
+                            <constraint firstAttribute="bottom" secondItem="iE3-ca-yhv" secondAttribute="bottom" id="eMe-WJ-vz9"/>
+                            <constraint firstAttribute="trailing" secondItem="iE3-ca-yhv" secondAttribute="trailing" id="kuI-Ra-9eN"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="BackButton" destination="oCA-Gi-SZr" id="IOi-93-YpC"/>
+                        <outlet property="CloseButton" destination="IVh-de-NTn" id="Uf3-Hm-8he"/>
+                    </connections>
+                </viewController>
+                <customObject id="Uxg-CV-q9v" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2161" y="-1302"/>
+        </scene>
+        <!--AuthenticateScreen-->
+        <scene sceneID="0cx-eu-7Bv">
+            <objects>
+                <viewController storyboardIdentifier="RecoveryScreen" id="d0K-hm-cbf" userLabel="AuthenticateScreen" customClass="RecoveryScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="aX1-eM-6Bb">
+                        <rect key="frame" x="0.0" y="0.0" width="380" height="82"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <box wantsLayer="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="zpy-kv-rvg">
+                                <rect key="frame" x="0.0" y="0.0" width="380" height="82"/>
+                                <view key="contentView" id="HZF-Ug-hfT">
+                                    <rect key="frame" x="1" y="1" width="378" height="80"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f4c-db-Ipt">
+                                            <rect key="frame" x="20" y="20" width="338" height="40"/>
+                                            <subviews>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xpe-rm-zfv" userLabel="MenuArea">
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="40"/>
+                                                    <subviews>
+                                                        <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="A4o-mZ-eXi" userLabel="BackButton">
+                                                            <rect key="frame" x="0.0" y="20" width="20" height="20"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="width" constant="20" id="XI1-On-ALi"/>
+                                                                <constraint firstAttribute="height" constant="20" id="c6E-ek-1nL"/>
+                                                            </constraints>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="7kC-8S-cua" userLabel="BackGesture">
+                                                                    <connections>
+                                                                        <action selector="GoBack:" target="d0K-hm-cbf" id="ZdK-SQ-Ayw"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="cfs-vo-03n"/>
+                                                        </imageView>
+                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iqT-3h-XBD" userLabel="AuthenticateTitle">
+                                                            <rect key="frame" x="-2" y="10" width="314" height="20"/>
+                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Recovery Codes" id="agH-6l-RhD">
+                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="VgP-yn-Yij" userLabel="CloseButton">
+                                                            <rect key="frame" x="318" y="10" width="20" height="20"/>
+                                                            <constraints>
+                                                                <constraint firstAttribute="height" constant="20" id="e1E-No-5S4"/>
+                                                                <constraint firstAttribute="width" constant="20" id="hF6-hG-JX4"/>
+                                                            </constraints>
+                                                            <gestureRecognizers>
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="yID-S6-T4i" userLabel="CloseGesture">
+                                                                    <connections>
+                                                                        <action selector="Close:" target="d0K-hm-cbf" id="AHV-LP-8az"/>
+                                                                    </connections>
+                                                                </clickGestureRecognizer>
+                                                            </gestureRecognizers>
+                                                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="x" id="IV1-T9-eqm"/>
+                                                        </imageView>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="40" id="XVN-CE-d4m"/>
+                                                    </constraints>
+                                                    <visibilityPriorities>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                        <integer value="1000"/>
+                                                    </visibilityPriorities>
+                                                    <customSpacing>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                        <real value="3.4028234663852886e+38"/>
+                                                    </customSpacing>
+                                                </stackView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Xpe-rm-zfv" firstAttribute="leading" secondItem="f4c-db-Ipt" secondAttribute="leading" id="DxC-Hy-NLh"/>
+                                                <constraint firstAttribute="trailing" secondItem="Xpe-rm-zfv" secondAttribute="trailing" id="ZbQ-Ym-6YZ"/>
+                                            </constraints>
+                                            <visibilityPriorities>
+                                                <integer value="1000"/>
+                                            </visibilityPriorities>
+                                            <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
+                                            </customSpacing>
+                                        </stackView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="f4c-db-Ipt" firstAttribute="leading" secondItem="HZF-Ug-hfT" secondAttribute="leading" constant="20" id="7dS-zM-gSq"/>
+                                        <constraint firstItem="f4c-db-Ipt" firstAttribute="top" secondItem="HZF-Ug-hfT" secondAttribute="top" constant="20" id="Bks-Jw-IYX"/>
+                                        <constraint firstAttribute="trailing" secondItem="f4c-db-Ipt" secondAttribute="trailing" constant="20" id="gE6-su-hWj"/>
+                                        <constraint firstAttribute="bottom" secondItem="f4c-db-Ipt" secondAttribute="bottom" constant="20" id="uZt-Kw-lAY"/>
+                                    </constraints>
+                                </view>
+                                <shadow key="shadow" blurRadius="20">
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
+                                <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="zpy-kv-rvg" firstAttribute="top" secondItem="aX1-eM-6Bb" secondAttribute="top" id="STs-mQ-cPr"/>
+                            <constraint firstItem="zpy-kv-rvg" firstAttribute="leading" secondItem="aX1-eM-6Bb" secondAttribute="leading" id="VsL-kj-yCG"/>
+                            <constraint firstAttribute="bottom" secondItem="zpy-kv-rvg" secondAttribute="bottom" id="fQp-ab-YXr"/>
+                            <constraint firstAttribute="trailing" secondItem="zpy-kv-rvg" secondAttribute="trailing" id="qpX-0S-VeD"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="BackButton" destination="A4o-mZ-eXi" id="pXV-KS-4Ow"/>
+                        <outlet property="CloseButton" destination="VgP-yn-Yij" id="HAn-WU-2bN"/>
+                    </connections>
+                </viewController>
+                <customObject id="8bh-Hk-HQC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2583" y="-1302"/>
+        </scene>
     </scenes>
     <resources>
         <image name="Success" width="53" height="53"/>
