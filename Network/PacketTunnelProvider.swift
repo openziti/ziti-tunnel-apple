@@ -26,7 +26,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     let netMon = NWPathMonitor()
     var currPath:Network.NWPath?
     var ifname:String?
-    var zids:[ZitiIdentity] = []    
+    var zids:[ZitiIdentity] = []
+    var allZitis:[Ziti] = [] // for ziti.dump...
     var zitiTunnel:ZitiTunnel!
     var loop:UnsafeMutablePointer<uv_loop_t>!
     var writeLock = NSLock()
@@ -246,6 +247,33 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         }
     }
     
+    private func dumpZitis() -> String {
+        var str = ""
+        let cond = NSCondition()
+        var count = allZitis.count
+        
+        allZitis.forEach { z in
+            z.perform {
+                z.dump { str += $0; return 0 }
+                //zLog.info(str)
+                cond.lock()
+                count -= 1
+                cond.signal()
+                cond.unlock()
+            }
+        }
+        
+        cond.lock()
+        while (count > 0) {
+            if !cond.wait(until: Date(timeIntervalSinceNow: TimeInterval(10.0))) {
+                zLog.warn("Timed out waiting for logs == 0 (stuck at \(count))")
+                break
+            }
+        }
+        cond.unlock()
+        return str
+    }
+    
     private func loadIdentites(_ loop:UnsafeMutablePointer<uv_loop_t>) -> ZitiError? {
         
         let zidStore = ZitiIdentityStore()
@@ -264,6 +292,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                 zid.services = []
                 
                 let ziti = Ziti(zid: czid, loop: loop)
+                allZitis.append(ziti)
                 zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 _ = zidStore.store(zid)
                 
@@ -465,9 +494,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
-        zLog.info("")
+        let dumpStr = dumpZitis()
+        zLog.info(dumpStr)
         completionHandler()
         // Just exit - there are bugs in Apple macOS, plus makes sure we're 'clean' on restart
+        zLog.info("")
         exit(EXIT_SUCCESS)
     }
     
@@ -478,7 +509,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         }
         zLog.debug("PTP Got message from app... \(messageString)")
         let arr = messageString.components(separatedBy: "=")
-        if arr.count == 2 && arr.first == "logLevel" {
+        if arr.count == 1 && arr.first == "dump" {
+            let str = dumpZitis()
+            zLog.info(str)
+            completionHandler?(str.data(using: .utf8))
+        } else if arr.count == 2 && arr.first == "logLevel" {
             let lvlStr = arr.last ?? "3"
             let lvl:ZitiLog.LogLevel = ZitiLog.LogLevel(rawValue: Int32(lvlStr) ?? ZitiLog.LogLevel.INFO.rawValue) ?? ZitiLog.LogLevel.INFO
             zLog.info("Updating LogLevel to \(lvl)")
@@ -487,12 +522,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             // Can be a timing issue with App updating config and startTunnel().  If we get a logLevel here, cache it
             // in case startTunnel() is called after receiving this message...
             appLogLevel = lvl
+            completionHandler?(nil)
+        } else {
+            completionHandler?(nil)
         }
-        
-        completionHandler?(nil)
-        /*if let handler = completionHandler {
-            handler(messageData)
-        }*/
     }
     
     override func sleep(completionHandler: @escaping () -> Void) {
