@@ -110,33 +110,33 @@
             <objects>
                 <customObject id="8qG-TM-zhi" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="DashboardScreen" id="xIs-vq-bpn" userLabel="DashboardScreen" customClass="DashboardScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" misplaced="YES" id="IZP-fV-y05" userLabel="ParentView">
+                    <view key="view" wantsLayer="YES" id="IZP-fV-y05" userLabel="ParentView">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="480"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box misplaced="YES" boxType="custom" cornerRadius="20" title="Box" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vVS-ZC-RlN">
-                                <rect key="frame" x="0.0" y="0.0" width="420" height="480"/>
+                            <box boxType="custom" borderWidth="0.0" cornerRadius="20" title="Box" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vVS-ZC-RlN">
+                                <rect key="frame" x="20" y="20" width="380" height="440"/>
                                 <view key="contentView" id="W3c-1e-2tO" userLabel="MainView">
-                                    <rect key="frame" x="1" y="1" width="418" height="478"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="380" height="440"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F5c-GZ-U8e" userLabel="Background">
-                                            <rect key="frame" x="0.0" y="-228" width="420" height="894"/>
+                                            <rect key="frame" x="0.0" y="-266" width="420" height="894"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="top" imageScaling="proportionallyDown" image="background" id="0Bp-6p-v8v"/>
                                         </imageView>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7OL-ln-fVN" userLabel="Globe">
-                                            <rect key="frame" x="0.0" y="178" width="420" height="300"/>
+                                            <rect key="frame" x="0.0" y="140" width="420" height="300"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="300" id="A0J-JW-Sy8"/>
                                             </constraints>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="globe" id="cDp-mO-wX9"/>
                                         </imageView>
-                                        <stackView distribution="fillProportionally" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xfP-An-zVj" userLabel="MainArea">
-                                            <rect key="frame" x="0.0" y="0.0" width="380" height="478"/>
+                                        <stackView distribution="fillProportionally" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xfP-An-zVj" userLabel="MainArea">
+                                            <rect key="frame" x="0.0" y="-148" width="380" height="628"/>
                                             <subviews>
-                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qra-fI-o2I" userLabel="HeaderArea">
-                                                    <rect key="frame" x="20" y="398" width="340" height="80"/>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qra-fI-o2I" userLabel="HeaderArea">
+                                                    <rect key="frame" x="20" y="548" width="340" height="80"/>
                                                     <subviews>
                                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="-1" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A1r-HE-ekJ" userLabel="MenuButton">
                                                             <rect key="frame" x="0.0" y="18" width="50" height="45"/>
@@ -257,7 +257,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UYD-8P-Hgn" userLabel="ConnectButton">
-                                                    <rect key="frame" x="0.0" y="318" width="140" height="160"/>
+                                                    <rect key="frame" x="0.0" y="468" width="140" height="160"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="160" id="9Hz-Ay-Wby"/>
                                                         <constraint firstAttribute="width" constant="140" id="X8h-BU-l8P"/>
@@ -272,8 +272,8 @@
                                                     </gestureRecognizers>
                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="connect" id="Zy7-uQ-3eX"/>
                                                 </imageView>
-                                                <box boxType="custom" borderType="none" cornerRadius="4" title="Box" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k0p-7a-nGQ" userLabel="ConnectedButton">
-                                                    <rect key="frame" x="0.0" y="230" width="380" height="160"/>
+                                                <box ambiguous="YES" boxType="custom" borderType="none" cornerRadius="4" title="Box" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k0p-7a-nGQ" userLabel="ConnectedButton">
+                                                    <rect key="frame" x="0.0" y="380" width="380" height="160"/>
                                                     <view key="contentView" id="3DQ-jl-hbI">
                                                         <rect key="frame" x="0.0" y="0.0" width="380" height="160"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -322,8 +322,8 @@
                                                         <constraint firstAttribute="height" constant="160" id="KUO-7R-rtW"/>
                                                     </constraints>
                                                 </box>
-                                                <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wpj-1q-2La" userLabel="SpeedArea">
-                                                    <rect key="frame" x="70" y="146" width="240" height="76"/>
+                                                <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wpj-1q-2La" userLabel="SpeedArea">
+                                                    <rect key="frame" x="70" y="296" width="240" height="76"/>
                                                     <subviews>
                                                         <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="-5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sN5-sh-znZ">
                                                             <rect key="frame" x="0.0" y="0.0" width="125" height="76"/>
@@ -455,27 +455,25 @@
                                                         <real value="3.4028234663852886e+38"/>
                                                     </customSpacing>
                                                 </stackView>
-                                                <scrollView autoresizesSubviews="NO" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="waY-FF-3b1" userLabel="IdList">
-                                                    <rect key="frame" x="0.0" y="38" width="380" height="100"/>
-                                                    <clipView key="contentView" id="Edr-Hu-kk4">
-                                                        <rect key="frame" x="0.0" y="0.0" width="380" height="100"/>
+                                                <scrollView autoresizesSubviews="NO" ambiguous="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="waY-FF-3b1" userLabel="IdList">
+                                                    <rect key="frame" x="0.0" y="38" width="380" height="250"/>
+                                                    <clipView key="contentView" ambiguous="YES" id="Edr-Hu-kk4">
+                                                        <rect key="frame" x="0.0" y="0.0" width="380" height="250"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <view id="ZGg-PJ-jVA">
+                                                            <view ambiguous="YES" id="ZGg-PJ-jVA">
+                                                                <rect key="frame" x="0.0" y="0.0" width="0.0" height="150"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             </view>
                                                         </subviews>
                                                         <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     </clipView>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="100" id="FiT-F6-Tzm"/>
-                                                    </constraints>
                                                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="axu-Qe-Xte">
                                                         <rect key="frame" x="-100" y="-100" width="380" height="16"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="aMJ-l5-1ef">
-                                                        <rect key="frame" x="364" y="0.0" width="16" height="100"/>
+                                                        <rect key="frame" x="364" y="0.0" width="16" height="250"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                 </scrollView>
@@ -546,10 +544,10 @@
                             </box>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="vVS-ZC-RlN" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" id="KQ0-et-hcQ"/>
-                            <constraint firstItem="vVS-ZC-RlN" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" id="QKD-ok-qGs"/>
-                            <constraint firstAttribute="trailing" secondItem="vVS-ZC-RlN" secondAttribute="trailing" id="uel-t4-p6p"/>
-                            <constraint firstAttribute="bottom" secondItem="vVS-ZC-RlN" secondAttribute="bottom" id="wds-ve-4NY"/>
+                            <constraint firstItem="vVS-ZC-RlN" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="3ep-4k-Sf3"/>
+                            <constraint firstAttribute="trailing" secondItem="vVS-ZC-RlN" secondAttribute="trailing" constant="20" id="jK3-jb-Slj"/>
+                            <constraint firstItem="vVS-ZC-RlN" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="shz-9x-SzG"/>
+                            <constraint firstAttribute="bottom" secondItem="vVS-ZC-RlN" secondAttribute="bottom" constant="20" id="vrU-R2-oyM"/>
                         </constraints>
                     </view>
                     <connections>

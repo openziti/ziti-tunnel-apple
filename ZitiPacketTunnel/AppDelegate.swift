@@ -21,7 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var menuBar:MainMenuBar? = nil;
     
     let statusItem =  NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength);
-    let popover = NSPopover();
+    //let popover = NSPopover();
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         menuBar = MainMenuBar.shared;
@@ -31,12 +31,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         //    button.image?.size = NSMakeSize(18.0, 18.0);
        //     button.action = #selector(showApp(_:))
        // }
-        popover.contentViewController = DashboardScreen.freshController();
+        // popover.contentViewController = DashboardScreen.freshController();
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
     }
-    
+    /*
     @objc func togglePopover(_ sender: Any?) {
         if (popover.isShown) {
             closePopover(sender: sender);
@@ -54,5 +54,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func closePopover(sender: Any?) {
         popover.performClose(sender);
     }
+ */
 }
 

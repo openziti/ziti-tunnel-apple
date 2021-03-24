@@ -59,6 +59,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         Background.layer?.cornerRadius = 30;
         Background.layer?.masksToBounds = true;
+        self.view.window?.isOpaque = false;
+        self.view.window?.hasShadow = false;
+        self.view.window?.backgroundColor = NSColor.clear;
     }
     
     override func viewDidLoad() {
@@ -266,7 +269,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         UpSpeedSize.stringValue = upSize;
         
         var downSize = "bps";
-        var downSpeed = bytesUp;
+        var downSpeed = bytesDown;
         if (downSpeed>gigs) {
             downSize = "gps";
             downSpeed = downSpeed/gigs;
@@ -537,8 +540,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         ]);
         idListView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: CGFloat(((50*index)+(2*index))+2));
         IdentityList.documentView = idListView;
+        
+        IdentityList.frame.size.height = CGFloat(index*50);
+        let height = 520 + (index*50);
+        guard let appWindow = NSApplication.shared.mainWindow else { return }
+        self.view.window?.setFrame(NSRect(x:1024, y:-150, width: 420, height: height), display: true);
         //IdentityList.contentSize.height = CGFloat(index*72);
     }
+    
     
     /* Daves Methods */
     
