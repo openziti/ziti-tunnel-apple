@@ -15,6 +15,7 @@
 //
 
 import UIKit
+import NetworkExtension
 
 class AdvancedViewController: UITableViewController {
     
@@ -33,7 +34,7 @@ class AdvancedViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 3
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -46,8 +47,10 @@ class AdvancedViewController: UITableViewController {
         // Prob need two Identifiers to make seque act the way I want..
         if indexPath.section == 0 {
             cell = tableView.dequeueReusableCell(withIdentifier: "TUNNEL_CONFIG_CELL", for: indexPath)
-        } else {
+        } else if indexPath.section == 1 {
             cell = tableView.dequeueReusableCell(withIdentifier: "LOGS_CELL", for: indexPath)
+        } else {
+            cell = tableView.dequeueReusableCell(withIdentifier: "SNAPSHOT_CELL", for: indexPath)
         }
         return cell
     }
@@ -61,6 +64,8 @@ class AdvancedViewController: UITableViewController {
             return "Advanced tunnel settings that will impact tunnel availability and performace."
         } else if section == 1 {
             return "Diagnostic logs that help us debug if you are having problems."
+        } else if section == 2 {
+            return "Snapshot of current connectivity state"
         }
         return nil
     }
@@ -70,6 +75,18 @@ class AdvancedViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let tsvc = segue.destination as? TunnelSettingsViewController {
             tsvc.tvc = tvc
+        } else if let svc = segue.destination as? SnapshotViewController {
+            do {
+                try (TunnelMgr.shared.tpm?.connection as? NETunnelProviderSession)?.sendProviderMessage("dump".data(using: .utf8)!) { resp in
+                    if let resp = resp, var str = String(data: resp, encoding: .utf8) {
+                        zLog.info(str)
+                        if str == "" { str = "No connection data available" }
+                        svc.textView.text = str
+                    }
+                }
+            } catch {
+                zLog.error("Unable to send provider message: \(error)")
+            }
         }
     }
 }

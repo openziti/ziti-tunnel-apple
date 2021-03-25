@@ -209,7 +209,16 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         do {
             try (TunnelMgr.shared.tpm?.connection as? NETunnelProviderSession)?.sendProviderMessage("dump".data(using: .utf8)!) { resp in
                 if let resp = resp, let str = String(data: resp, encoding: .utf8) {
-                    zLog.info(str) // TODO: pop it up in a window...
+                    zLog.info(str)
+                    
+                    if let wc = NSStoryboard(name: "Main", bundle: nil).instantiateController(withIdentifier: "SNAPSHOT_WINDOW") as? NSWindowController {
+                        wc.window?.title = "Ziti Snapshot \(Date())"
+                        if let vc = wc.contentViewController as? SnapshotViewController {
+                            vc.textView.textStorage?.mutableString.setString(str)
+                        }
+                        wc.showWindow(self)
+                        NSApp.activate(ignoringOtherApps: true)
+                    }
                 }
             }
         } catch {
