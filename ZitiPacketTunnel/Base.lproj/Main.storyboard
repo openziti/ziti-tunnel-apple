@@ -612,6 +612,111 @@ Gw
             </objects>
             <point key="canvasLocation" x="112" y="1510"/>
         </scene>
+        <!--Snapshot Window Controller-->
+        <scene sceneID="hsq-tL-Dza">
+            <objects>
+                <windowController storyboardIdentifier="SNAPSHOT_WINDOW" showSeguePresentationStyle="single" id="uhh-ZI-7bb" userLabel="Snapshot Window Controller" sceneMemberID="viewController">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="euJ-pE-xI9">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="245" y="301" width="806" height="270"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+                        <view key="contentView" id="jfG-yo-WCV">
+                            <rect key="frame" x="0.0" y="0.0" width="806" height="270"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <toolbar key="toolbar" implicitIdentifier="957457AB-E8BF-4AFA-95D3-CD0D551E20E0" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="fLi-5k-7It">
+                            <allowedToolbarItems>
+                                <toolbarItem implicitItemIdentifier="NSToolbarShowColorsItem" id="Adc-Wq-mPn"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarShowFontsItem" id="jcL-Cr-2Xb"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarPrintItem" id="FiQ-Ut-ZTz"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="ens-wf-wEC"/>
+                                <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="dri-bp-WTe"/>
+                                <toolbarItem implicitItemIdentifier="BB0FC4F9-3187-4E13-8099-1980083BDB7F" label="Reload" paletteLabel="Reload" tag="-1" image="NSRefreshTemplate" id="D8K-5W-dUf">
+                                    <size key="minSize" width="33.5" height="29"/>
+                                    <size key="maxSize" width="33.5" height="29"/>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="A2AF2010-7516-4F4A-BFD2-FB7CC4C2464C" label="Share" paletteLabel="Share" tag="-1" image="NSShareTemplate" id="CrZ-8n-un6">
+                                    <size key="minSize" width="35.5" height="30"/>
+                                    <size key="maxSize" width="35.5" height="30"/>
+                                </toolbarItem>
+                            </allowedToolbarItems>
+                            <defaultToolbarItems>
+                                <toolbarItem reference="CrZ-8n-un6"/>
+                            </defaultToolbarItems>
+                        </toolbar>
+                        <connections>
+                            <outlet property="delegate" destination="uhh-ZI-7bb" id="5B9-bk-VLT"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="aGB-cj-k9e" kind="relationship" relationship="window.shadowedContentViewController" id="FkB-1l-gkr"/>
+                    </connections>
+                </windowController>
+                <customObject id="Sve-b8-aTe" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="854" y="1544"/>
+        </scene>
+        <!--Snapshot View Controller-->
+        <scene sceneID="DyJ-IB-PYj">
+            <objects>
+                <viewController id="aGB-cj-k9e" userLabel="Snapshot View Controller" customClass="SnapshotViewController" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="wLM-zw-taZ">
+                        <rect key="frame" x="0.0" y="0.0" width="823" height="679"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l5x-cB-icd">
+                                <rect key="frame" x="0.0" y="0.0" width="823" height="679"/>
+                                <clipView key="contentView" drawsBackground="NO" id="n3G-b9-YVL">
+                                    <rect key="frame" x="0.0" y="0.0" width="823" height="679"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="tBH-xT-6aU">
+                                            <rect key="frame" x="0.0" y="0.0" width="823" height="679"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="823" height="679"/>
+                                            <size key="maxSize" width="937" height="10000000"/>
+                                            <attributedString key="textStorage">
+                                                <fragment content="Loading...">
+                                                    <attributes>
+                                                        <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                        <font key="NSFont" size="12" name="Helvetica"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
+                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                        </textView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ASD-2b-Cij">
+                                    <rect key="frame" x="-100" y="-100" width="240" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="dia-4v-rdm">
+                                    <rect key="frame" x="807" y="0.0" width="16" height="679"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="l5x-cB-icd" secondAttribute="bottom" id="419-Eo-8j0"/>
+                            <constraint firstItem="l5x-cB-icd" firstAttribute="leading" secondItem="wLM-zw-taZ" secondAttribute="leading" id="Aeb-XA-NYB"/>
+                            <constraint firstAttribute="trailing" secondItem="l5x-cB-icd" secondAttribute="trailing" id="Oqw-pw-Vvk"/>
+                            <constraint firstItem="l5x-cB-icd" firstAttribute="top" secondItem="wLM-zw-taZ" secondAttribute="top" id="hQW-gt-N57"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="scrollView" destination="l5x-cB-icd" id="z3W-zV-iK7"/>
+                        <outlet property="textView" destination="tBH-xT-6aU" id="UhM-RX-VMf"/>
+                    </connections>
+                </viewController>
+                <customObject id="0EE-zb-t1k" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="854.5" y="2109.5"/>
+        </scene>
         <!--Services View Controller-->
         <scene sceneID="3Cb-vg-Bcp">
             <objects>
@@ -808,7 +913,9 @@ Gw
     <resources>
         <image name="NSActionTemplate" width="15" height="15"/>
         <image name="NSAddTemplate" width="14" height="13"/>
+        <image name="NSRefreshTemplate" width="14" height="16"/>
         <image name="NSRemoveTemplate" width="14" height="4"/>
+        <image name="NSShareTemplate" width="15" height="17"/>
         <image name="NSStatusAvailable" width="16" height="16"/>
         <image name="ZitiLogo64" width="64" height="64"/>
     </resources>
