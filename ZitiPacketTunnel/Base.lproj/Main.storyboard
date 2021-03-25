@@ -639,6 +639,9 @@ Gw
                                 <toolbarItem implicitItemIdentifier="A2AF2010-7516-4F4A-BFD2-FB7CC4C2464C" label="Share" paletteLabel="Share" tag="-1" image="NSShareTemplate" id="CrZ-8n-un6">
                                     <size key="minSize" width="35.5" height="30"/>
                                     <size key="maxSize" width="35.5" height="30"/>
+                                    <connections>
+                                        <action selector="handleShareButton:" target="Sve-b8-aTe" id="Fvw-PU-UJt"/>
+                                    </connections>
                                 </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
@@ -671,7 +674,7 @@ Gw
                                     <rect key="frame" x="0.0" y="0.0" width="823" height="679"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="tBH-xT-6aU">
+                                        <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" id="tBH-xT-6aU">
                                             <rect key="frame" x="0.0" y="0.0" width="823" height="679"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
