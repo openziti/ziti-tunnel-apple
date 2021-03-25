@@ -16,7 +16,7 @@
 
 import Cocoa
 
-class SnapshotViewController: NSViewController {
+class SnapshotViewController: NSViewController, NSSharingServicePickerDelegate {
 
     @IBOutlet weak var scrollView: NSScrollView!
     @IBOutlet var textView: NSTextView!
@@ -26,4 +26,12 @@ class SnapshotViewController: NSViewController {
         // Do view setup here.
     }
     
+    @IBAction func handleShareButton(_ sender: NSToolbarItem) {
+        let text = textView.textStorage?.mutableString ?? "no connectivity status data available"
+        let sharingPicker = NSSharingServicePicker(items: [text])
+        let bounds = NSRect(x: view.bounds.width - 30, y: view.bounds.minY + 15, width: 30, height: view.bounds.height)
+        
+        sharingPicker.delegate = self
+        sharingPicker.show(relativeTo: bounds, of: self.view, preferredEdge: .minY)
+    }
 }

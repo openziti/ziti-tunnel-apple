@@ -16,23 +16,34 @@
 
 import UIKit
 
-class SnapshotViewController: UIViewController {
+class SnapshotViewController: UIViewController, UIActivityItemSource {
     @IBOutlet weak var textView: UITextView!
+    
+    var shareBtn:UIBarButtonItem?
         
     override func viewDidLoad() {
         super.viewDidLoad()
+        shareBtn = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.action, target: self, action: #selector(onShare))
+        navigationItem.rightBarButtonItems = [shareBtn!]
         textView.layoutManager.allowsNonContiguousLayout = false
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @objc func onShare() {
+        let items = [self]
+        let ac = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        present(ac, animated: true)
     }
-    */
+    
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return textView.text
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        return activityViewControllerPlaceholderItem(activityViewController)
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
+        return "Ziti Mobile Edge Snapsot"
+    }
 
 }
