@@ -35,6 +35,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var DownSpeed: NSTextField!
     @IBOutlet var DownSpeedSize: NSTextField!
     @IBOutlet var SpeedArea: NSStackView!
+    @IBOutlet var MainView: NSView!
+    @IBOutlet var ParentBox: NSBox!
     var timer = Timer();
     var timeLaunched:Int = 0;
     
@@ -49,19 +51,29 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     override func viewWillAppear() {
         self.view.window?.titleVisibility = .hidden;
         self.view.window?.titlebarAppearsTransparent = true;
-
         self.view.window?.styleMask.insert(.fullSizeContentView);
-
         self.view.window?.styleMask.remove(.closable);
         self.view.window?.styleMask.remove(.fullScreen);
         self.view.window?.styleMask.remove(.miniaturizable);
         self.view.window?.styleMask.remove(.resizable);
-        
-        Background.layer?.cornerRadius = 30;
-        Background.layer?.masksToBounds = true;
+
         self.view.window?.isOpaque = false;
         self.view.window?.hasShadow = false;
         self.view.window?.backgroundColor = NSColor.clear;
+        self.view.layer?.shadowOpacity = 0;
+        self.view.layer?.shadowColor = NSColor.green.cgColor;
+        self.view.layer?.shadowOffset = NSMakeSize(0, 0);
+        let rect = self.view.layer?.bounds.insetBy(dx: -5, dy: 5);
+        self.view.layer?.shadowPath = CGPath(rect: rect!, transform: nil);
+        self.view.layer?.shadowRadius = 5;
+        self.view.window?.invalidateShadow();
+        self.view.window?.isMovableByWindowBackground = true;
+        self.view.window?.makeKeyAndOrderFront(self);
+        
+        MainView.wantsLayer = true;
+        MainView.layer?.borderWidth = 0;
+        MainView.layer?.cornerRadius = 20;
+        MainView.layer?.masksToBounds = true;
     }
     
     override func viewDidLoad() {
@@ -544,7 +556,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         IdentityList.frame.size.height = CGFloat(index*50);
         let height = 520 + (index*50);
         guard let appWindow = NSApplication.shared.mainWindow else { return }
-        self.view.window?.setFrame(NSRect(x:1024, y:-150, width: 420, height: height), display: true);
+        self.view.window?.setFrame(NSRect(x:1024, y:550, width: 420, height: height), display: true);
         //IdentityList.contentSize.height = CGFloat(index*72);
     }
     

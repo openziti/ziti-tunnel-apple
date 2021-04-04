@@ -101,6 +101,9 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         
         getMainWindow()?.delegate = self
         TunnelMgr.shared.tsChangedCallbacks.append(self.tunnelStatusDidChange)
+        
+        NSApp.setActivationPolicy(.regular)
+        showDocItem.state = .on
     }
     
     @objc func showApp(_ sender: Any?) {

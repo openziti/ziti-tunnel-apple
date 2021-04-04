@@ -36,6 +36,10 @@ class IdentityDetailScreen: NSViewController {
     @IBOutlet var EnrollButton: NSTextField!
     @IBOutlet var ServiceList: NSScrollView!
     @IBOutlet var ForgotButton: NSTextField!
+    @IBOutlet var MFAOn: NSImageView!
+    @IBOutlet var MFAOff: NSImageView!
+    @IBOutlet var MFARecovery: NSImageView!
+    @IBOutlet var MFAToggle: NSSwitch!
     
     private var pointingHand: NSCursor?
     private var arrow : NSCursor?
@@ -93,6 +97,10 @@ class IdentityDetailScreen: NSViewController {
         IdName.stringValue = zid.name;
         IdNetwork.stringValue = zid.czid?.ztAPI ?? "no network";
         IdServiceCount.stringValue = "\(zid.services.count) Services";
+        
+        MFAOn.isHidden = true; // Show is enabled and authenticated
+        // MFAOff.isHidden = true; - show if enabled
+        // MFARecovery.isHidden = true; - show if authenticated
         
             
         let serviceListView = NSStackView(frame: NSRect(x: 0, y: 0, width: self.view.frame.width-50, height: 70));
@@ -185,8 +193,37 @@ class IdentityDetailScreen: NSViewController {
         ServiceList.documentView = serviceListView;
     }
     
+    @IBAction func AuthClicked(_ sender: NSClickGestureRecognizer) {
+        let storyBoard : NSStoryboard = NSStoryboard(name: "MainUI", bundle:nil);
+        let mfa = storyBoard.instantiateController(withIdentifier: "AuthenticateScreen") as! AuthenticateScreen;
+        
+        self.presentAsSheet(mfa);
+    }
+    
     override func viewWillLayout() {
         preferredContentSize = view.frame.size
+    }
+    
+    @IBAction func ShowRecoveryScreen(_ sender: NSClickGestureRecognizer) {
+        let storyBoard : NSStoryboard = NSStoryboard(name: "MainUI", bundle:nil);
+        let mfa = storyBoard.instantiateController(withIdentifier: "RecoveryScreen") as! RecoveryScreen;
+        
+        self.presentAsSheet(mfa);
+    }
+    
+    @IBAction func ToggleMFA(_ sender: NSClickGestureRecognizer) {
+        if (MFAToggle.state == .off) {
+            // prompt to turn off mfa if it is enabled
+        } else {
+            // prompty to setup MFA
+            
+            let storyBoard : NSStoryboard = NSStoryboard(name: "MainUI", bundle:nil);
+            let mfa = storyBoard.instantiateController(withIdentifier: "MFASetupScreen") as! MFASetupScreen;
+            
+            // Send in the url and secret code to setup MFA
+            
+            self.presentAsSheet(mfa);
+        }
     }
     
     @IBAction func Toggled(_ sender: NSClickGestureRecognizer) {

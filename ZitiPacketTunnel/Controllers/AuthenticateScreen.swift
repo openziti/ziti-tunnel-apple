@@ -20,5 +20,34 @@ import Cocoa
 
 class AuthenticateScreen: NSViewController {
     
+    @IBOutlet var AuthCode: NSTextField!
+    @IBOutlet var AuthTypeTitle: NSTextField!
+    
+    var isRecovery = false;
+    
+    override func viewDidLoad() {
+        isRecovery = false;
+    }
+    
+    @IBAction func Close(_ sender: NSClickGestureRecognizer) {
+        dismiss(self);
+    }
+    
+    @IBAction func SwitchClicked(_ sender: NSClickGestureRecognizer) {
+        isRecovery = !isRecovery;
+    }
+    
+    func setType() {
+        if (isRecovery) {
+            AuthTypeTitle.stringValue = "Recovery Code";
+        } else {
+            AuthTypeTitle.stringValue = "Authentication Code";
+        }
+    }
+    
+    @IBAction func AuthClicked(_ sender: NSClickGestureRecognizer) {
+        var code = AuthCode.stringValue;
+        // Do authentication
+    }
     
 }
