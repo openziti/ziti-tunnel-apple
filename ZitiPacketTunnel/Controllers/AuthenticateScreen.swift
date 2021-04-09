@@ -20,34 +20,49 @@ import Cocoa
 
 class AuthenticateScreen: NSViewController {
     
+    @IBOutlet var AuthButton: NSBox!
     @IBOutlet var AuthCode: NSTextField!
     @IBOutlet var AuthTypeTitle: NSTextField!
+    @IBOutlet var CloseButton: NSImageView!
     
-    var isRecovery = false;
+    private var pointingHand: NSCursor?
+    private var arrow : NSCursor?
     
     override func viewDidLoad() {
-        isRecovery = false;
+        SetupCursor();
     }
     
     @IBAction func Close(_ sender: NSClickGestureRecognizer) {
         dismiss(self);
     }
     
-    @IBAction func SwitchClicked(_ sender: NSClickGestureRecognizer) {
-        isRecovery = !isRecovery;
-    }
-    
-    func setType() {
-        if (isRecovery) {
-            AuthTypeTitle.stringValue = "Recovery Code";
-        } else {
-            AuthTypeTitle.stringValue = "Authentication Code";
-        }
-    }
-    
     @IBAction func AuthClicked(_ sender: NSClickGestureRecognizer) {
         var code = AuthCode.stringValue;
         // Do authentication
+    }
+    
+    func SetupCursor() {
+        let items = [AuthButton, CloseButton];
+        
+        pointingHand = NSCursor.pointingHand;
+        for item in items {
+            item!.addCursorRect(item!.bounds, cursor: pointingHand!);
+        }
+        
+        pointingHand!.setOnMouseEntered(true);
+        for item in items {
+            item!.addTrackingRect(item!.bounds, owner: pointingHand!, userData: nil, assumeInside: true);
+        }
+
+        arrow = NSCursor.arrow
+        for item in items {
+            item!.addCursorRect(item!.bounds, cursor: arrow!);
+        }
+        
+        arrow!.setOnMouseExited(true)
+        for item in items {
+            item!.addTrackingRect(item!.bounds, owner: arrow!, userData: nil, assumeInside: true);
+        }
     }
     
 }

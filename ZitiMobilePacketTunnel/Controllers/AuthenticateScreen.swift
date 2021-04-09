@@ -18,7 +18,31 @@ import Foundation
 import UIKit
 import CZiti
 
-class AuthenticateScreen: UIViewController, UIActivityItemSource {
+class AuthenticateScreen: UIViewController, UIActivityItemSource, UITextFieldDelegate {
+    
+    @IBOutlet var AuthCode: UITextField!
+    
+    var identity:ZitiIdentity?;
+    var idDetails:IdentityDetailScreen?;
+    var zidMgr:ZidMgr?
+    var tunnelMgr:TunnelMgr?
+    var dashScreen:DashboardScreen?;
+    
+    override func viewDidLoad() {
+        AuthCode.smartInsertDeleteType = UITextSmartInsertDeleteType.no
+        AuthCode.delegate = self
+        AuthCode.text = "";
+    }
+    
+    @IBAction func DoClose(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func DoAuth(_ sender: Any) {
+        var code = AuthCode.text;
+        // Do the authenticate and somehow tell the id details page to update UIs, I will figure out when Dave sends me the event
+        dismiss(animated: true, completion: nil)
+    }
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return "";
@@ -26,6 +50,16 @@ class AuthenticateScreen: UIViewController, UIActivityItemSource {
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
         return "";
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let textFieldText = textField.text,
+            let rangeOfTextToReplace = Range(range, in: textFieldText) else {
+                return false
+        }
+        let substringToReplace = textFieldText[rangeOfTextToReplace]
+        let count = textFieldText.count - substringToReplace.count + string.count
+        return count <= 8
     }
 }
 

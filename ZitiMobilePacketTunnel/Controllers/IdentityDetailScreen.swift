@@ -29,47 +29,15 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
     @IBOutlet weak var IdServiceCount: UILabel!
     @IBOutlet weak var ServiceList: UIScrollView!
     @IBOutlet weak var EnrollButton: UIButton!
+    @IBOutlet var MFAToggle: UISwitch!
+    @IBOutlet var MFAOff: UIImageView!
+    @IBOutlet var MFAOn: UIImageView!
+    @IBOutlet var MFARecovery: UIImageView!
     
     var zid:ZitiIdentity?
     var zidMgr:ZidMgr?
     var tunnelMgr:TunnelMgr?
     var dash:DashboardScreen?
-    
-    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return "";
-    }
-    
-    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        return "";
-    }
-    
-    @IBAction func dismissVC(_ sender: Any) {
-         dismiss(animated: true, completion: nil)
-    }
-    
-    @IBAction func ForgetAction(_ sender: UITapGestureRecognizer) {
-        let alert = UIAlertController(
-            title:"Are you sure?",
-            message: "Deleting identity \(zid?.name ?? "") cannot be undone.",
-            preferredStyle: .alert)
-        
-        alert.addAction(UIAlertAction(
-            title: NSLocalizedString("OK", comment: "Default action"),
-            style: .default,
-            handler: { _ in
-                if let zid = self.zid {
-                    _ = self.zidMgr?.zidStore.remove(zid)
-                    if let indx = self.zidMgr?.zids.firstIndex(of: zid) {
-                        self.zidMgr?.zids.remove(at: indx)
-                    }
-                }
-                self.dash?.reloadList();
-                self.dismiss(animated: true, completion: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "Cancel"), style: .cancel))
-        present(alert, animated: true, completion: nil)
-    }
     
     override func viewDidLoad() {
         IdName.text = zid?.name;
@@ -77,6 +45,8 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         IdVersion.text = zid?.controllerVersion ?? "unknown";
         IdEnrollment.text = zid?.enrollmentStatus.rawValue;
         IdServiceCount.text = "\(String(describing: zid?.services.count)) Services";
+        // Determine toggle state and MFA images based on MFAInfo enabled/authenticated etc
+        // MFAOn.isHidden = !zid.mfa.isAuthenticated etc
         
         let cs = zid?.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
         var csStr = ""
@@ -137,6 +107,92 @@ class IdentityDetailScreen: UIViewController, UIActivityItemSource {
         }
         csStr += " (as of \(DateFormatter().timeSince(cs.lastContactAt)))"
         IdStatus.text = csStr;
+    }
+    
+    @IBAction func MFAToggled(_ sender: Any) {
+        if (MFAToggle.isOn) {
+            if #available(iOS 13.0, *) {
+                let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil);
+                let mfa = storyBoard.instantiateViewController(withIdentifier: "MFASetupScreen") as! MFASetupScreen;
+                mfa.identity = self.zid;
+                mfa.zidMgr = zidMgr;
+                mfa.tunnelMgr = tunnelMgr;
+                mfa.dashScreen = dash;
+                mfa.modalPresentationStyle = .fullScreen;
+                self.present(mfa, animated:true, completion:nil);
+            } else {
+                // Need a blurb about not bring able to use MFA unless on iOS 13 or maybe use secret code only
+            };
+        } else {
+            // Must authenticate to remove Auth
+            let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil);
+            let mfa = storyBoard.instantiateViewController(withIdentifier: "AuthenticateScreen") as! AuthenticateScreen;
+            mfa.identity = self.zid;
+            mfa.zidMgr = zidMgr;
+            mfa.tunnelMgr = tunnelMgr;
+            mfa.dashScreen = dash;
+            mfa.modalPresentationStyle = .fullScreen;
+            self.present(mfa, animated:true, completion:nil);
+        }
+    }
+    
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return "";
+    }
+    
+    @IBAction func DoShowRecovery(_ sender: UITapGestureRecognizer) {
+        let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil);
+        let mfa = storyBoard.instantiateViewController(withIdentifier: "RecoveryScreen") as! RecoveryScreen;
+        mfa.identity = self.zid;
+        mfa.zidMgr = zidMgr;
+        mfa.tunnelMgr = tunnelMgr;
+        mfa.dashScreen = dash;
+        mfa.modalPresentationStyle = .fullScreen;
+        self.present(mfa, animated:true, completion:nil);
+        
+    }
+    
+    @IBAction func DoAuthorization(_ sender: UITapGestureRecognizer) {
+        let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil);
+        let mfa = storyBoard.instantiateViewController(withIdentifier: "AuthenticateScreen") as! AuthenticateScreen;
+        mfa.identity = self.zid;
+        mfa.zidMgr = zidMgr;
+        mfa.tunnelMgr = tunnelMgr;
+        mfa.dashScreen = dash;
+        mfa.modalPresentationStyle = .fullScreen;
+        self.present(mfa, animated:true, completion:nil);
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        return "";
+    }
+    
+    @IBAction func dismissVC(_ sender: Any) {
+         dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func ForgetAction(_ sender: UITapGestureRecognizer) {
+        let alert = UIAlertController(
+            title:"Are you sure?",
+            message: "Deleting identity \(zid?.name ?? "") cannot be undone.",
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("OK", comment: "Default action"),
+            style: .default,
+            handler: { _ in
+                if let zid = self.zid {
+                    _ = self.zidMgr?.zidStore.remove(zid)
+                    if let indx = self.zidMgr?.zids.firstIndex(of: zid) {
+                        self.zidMgr?.zids.remove(at: indx)
+                    }
+                }
+                self.dash?.reloadList();
+                self.dismiss(animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "Cancel"), style: .cancel))
+        present(alert, animated: true, completion: nil)
     }
     
     @IBAction func DoEnrollment(_ sender: UITapGestureRecognizer) {

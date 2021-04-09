@@ -18,7 +18,8 @@ import Foundation
 import Cocoa
 
 class RecoveryScreen: NSViewController {
-    var codes = [String]()
+    
+    var codes = [String]();
     
     @IBOutlet var Code1: NSTextField!
     @IBOutlet var Code2: NSTextField!

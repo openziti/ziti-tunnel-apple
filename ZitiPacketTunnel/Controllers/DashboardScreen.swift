@@ -37,6 +37,12 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var SpeedArea: NSStackView!
     @IBOutlet var MainView: NSView!
     @IBOutlet var ParentBox: NSBox!
+    @IBOutlet var IntroBox: NSBox!
+    @IBOutlet var IntroView: NSView!
+    @IBOutlet var DashboardBox: NSBox!
+    @IBOutlet var LogoArea: NSStackView!
+    @IBOutlet var MainArea: NSStackView!
+    
     var timer = Timer();
     var timeLaunched:Int = 0;
     
@@ -49,6 +55,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     private var bytesUp:Float = 0.0;
     
     override func viewWillAppear() {
+        self.view.shadow = NSShadow();
+        self.view.layer?.shadowOpacity = 0.6;
+        self.view.layer?.shadowColor = NSColor.black.cgColor;
+        self.view.layer?.shadowOffset = NSMakeSize(0, 0);
+        let rect = self.view.layer?.bounds.insetBy(dx: 30, dy: 30);
+        self.view.layer?.shadowPath = CGPath(rect: rect!, transform: nil);
+        self.view.layer?.shadowRadius = 13;
+        
         self.view.window?.titleVisibility = .hidden;
         self.view.window?.titlebarAppearsTransparent = true;
         self.view.window?.styleMask.insert(.fullSizeContentView);
@@ -56,24 +70,31 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.view.window?.styleMask.remove(.fullScreen);
         self.view.window?.styleMask.remove(.miniaturizable);
         self.view.window?.styleMask.remove(.resizable);
-
         self.view.window?.isOpaque = false;
         self.view.window?.hasShadow = false;
         self.view.window?.backgroundColor = NSColor.clear;
-        self.view.layer?.shadowOpacity = 0;
-        self.view.layer?.shadowColor = NSColor.green.cgColor;
-        self.view.layer?.shadowOffset = NSMakeSize(0, 0);
-        let rect = self.view.layer?.bounds.insetBy(dx: -5, dy: 5);
-        self.view.layer?.shadowPath = CGPath(rect: rect!, transform: nil);
-        self.view.layer?.shadowRadius = 5;
         self.view.window?.invalidateShadow();
+        self.view.window?.isMovable = true;
         self.view.window?.isMovableByWindowBackground = true;
         self.view.window?.makeKeyAndOrderFront(self);
         
-        MainView.wantsLayer = true;
-        MainView.layer?.borderWidth = 0;
-        MainView.layer?.cornerRadius = 20;
-        MainView.layer?.masksToBounds = true;
+        DashboardBox.wantsLayer = true;
+        DashboardBox.layer?.borderWidth = 0;
+        DashboardBox.layer?.cornerRadius = 20;
+        DashboardBox.layer?.masksToBounds = true;
+        
+        IntroView.wantsLayer = true;
+        IntroView.layer?.borderWidth = 0;
+        IntroView.layer?.cornerRadius = 18;
+        IntroView.layer?.masksToBounds = true;
+        
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 3
+            self.IntroView.animator().alphaValue = 0
+        } completionHandler: {
+            self.IntroView.isHidden = true
+            self.IntroView.alphaValue = 1
+        }
     }
     
     override func viewDidLoad() {
@@ -554,9 +575,17 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         IdentityList.documentView = idListView;
         
         IdentityList.frame.size.height = CGFloat(index*50);
-        let height = 520 + (index*50);
-        guard let appWindow = NSApplication.shared.mainWindow else { return }
-        self.view.window?.setFrame(NSRect(x:1024, y:550, width: 420, height: height), display: true);
+        let height = 720 + (index*50);
+        self.ParentView.window?.setFrame(NSRect(x:0.0, y: 0.0, width: 420, height: 2014), display: true);
+        self.DashboardBox.window?.setFrame(NSRect(x:0.0, y: 0.0, width: 420, height: 2014), display: true);
+        self.MainView.window?.setFrame(NSRect(x:0.0, y: 0.0, width: 420, height: 2014), display: true);
+        self.MainArea.window?.setFrame(NSRect(x:0.0, y: 0.0, width: 420, height: 2014), display: true);
+        self.view.window?.center()
+        self.view.window?.aspectRatio = NSSize(width: 420, height: 2014)
+        self.view.window?.minSize = NSSize(width: 420, height: 2014)
+        self.view.window?.setFrameAutosaveName("Main Window")
+        self.view.window?.makeKeyAndOrderFront(nil)
+        
         //IdentityList.contentSize.height = CGFloat(index*72);
     }
     

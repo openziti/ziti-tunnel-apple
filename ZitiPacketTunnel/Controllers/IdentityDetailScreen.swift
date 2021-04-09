@@ -25,6 +25,7 @@ class IdentityDetailScreen: NSViewController {
     var enrollingIds:[ZitiIdentity] = [];
     var zidMgr:ZidMgr?;
     var tunnelMgr = TunnelMgr.shared;
+    var heig = CGFloat(0.0);
     
     @IBOutlet var ToggleIdentity: NSSwitch!
     @IBOutlet var IdName: NSTextField!
@@ -45,6 +46,9 @@ class IdentityDetailScreen: NSViewController {
     private var arrow : NSCursor?
     
     override func viewDidLoad() {
+        MFAToggle.layer?.backgroundColor = NSColor.red.cgColor;
+        MFAToggle.layer?.masksToBounds = true;
+        MFAToggle.layer?.cornerRadius = 10;
         SetupCursor();
         Setup();
     }
@@ -213,8 +217,7 @@ class IdentityDetailScreen: NSViewController {
     
     @IBAction func ToggleMFA(_ sender: NSClickGestureRecognizer) {
         if (MFAToggle.state == .off) {
-            // prompt to turn off mfa if it is enabled
-        } else {
+            MFAToggle.state = .on;
             // prompty to setup MFA
             
             let storyBoard : NSStoryboard = NSStoryboard(name: "MainUI", bundle:nil);
@@ -223,6 +226,9 @@ class IdentityDetailScreen: NSViewController {
             // Send in the url and secret code to setup MFA
             
             self.presentAsSheet(mfa);
+        } else {
+            // prompt to turn off mfa if it is enabled
+            MFAToggle.state = .off;
         }
     }
     
@@ -305,7 +311,7 @@ class IdentityDetailScreen: NSViewController {
     }
     
     func SetupCursor() {
-        let items = [CloseButton, EnrollButton, ForgotButton];
+        let items = [CloseButton, EnrollButton, ForgotButton, ToggleIdentity, MFAToggle, MFAOff, MFARecovery];
         
         pointingHand = NSCursor.pointingHand;
         for item in items {
