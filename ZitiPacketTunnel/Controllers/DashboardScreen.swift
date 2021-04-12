@@ -21,6 +21,17 @@ import CZiti
 
 class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDelegate {
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     @IBOutlet var AddButton: NSStackView!
     @IBOutlet var AddIdButton: NSTextField!
     @IBOutlet var ConnectButton: NSImageView!
@@ -42,6 +53,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var DashboardBox: NSBox!
     @IBOutlet var LogoArea: NSStackView!
     @IBOutlet var MainArea: NSStackView!
+    
+    var state = "dashboard";
     
     var timer = Timer();
     var timeLaunched:Int = 0;
@@ -317,32 +330,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
 
         TimerLabel.stringValue = formatter.string(from: TimeInterval(timeLaunched))!;
         timeLaunched += 1;
-    }
-    
-    /* Jeremys Methods */
-    
-    func SetupCursor() {
-        let items = [AddButton, AddIdButton, ConnectButton, ConnectedButton, MenuButton];
-        
-        pointingHand = NSCursor.pointingHand;
-        for item in items {
-            item!.addCursorRect(item!.bounds, cursor: pointingHand!);
-        }
-        
-        pointingHand!.setOnMouseEntered(true);
-        for item in items {
-            item!.addTrackingRect(item!.bounds, owner: pointingHand!, userData: nil, assumeInside: true);
-        }
-
-        arrow = NSCursor.arrow
-        for item in items {
-            item!.addCursorRect(item!.bounds, cursor: arrow!);
-        }
-        
-        arrow!.setOnMouseExited(true)
-        for item in items {
-            item!.addTrackingRect(item!.bounds, owner: arrow!, userData: nil, assumeInside: true);
-        }
     }
     
     @objc func GoToDetails(gesture : GoToDetailGesture) {
@@ -646,6 +633,55 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             fatalError("Controller Not Found")
         }
         return viewcontroller;
+    }
+    
+    
+    
+    @IBAction func Close(_ sender: NSClickGestureRecognizer) {
+        var view =
+        
+        switch self.state {
+        case "details":
+            
+        default:
+            <#code#>
+        }
+        
+        
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 3
+            self.IntroView.animator().alphaValue = 0
+        } completionHandler: {
+            self.IntroView.isHidden = true
+            self.IntroView.alphaValue = 1
+        }
+    }
+    
+    /**
+        Setup the cursor for rollover state to fade the elements and show the pointer cursor
+     */
+    func SetupCursor() {
+        let items = [AddButton, AddIdButton, ConnectButton, ConnectedButton, MenuButton, CloseButton, EnrollButton, ForgotButton, ToggleIdentity, MFAToggle, MFAOff, MFARecovery];
+        
+        pointingHand = NSCursor.pointingHand;
+        for item in items {
+            item!.addCursorRect(item!.bounds, cursor: pointingHand!);
+        }
+        
+        pointingHand!.setOnMouseEntered(true);
+        for item in items {
+            item!.addTrackingRect(item!.bounds, owner: pointingHand!, userData: nil, assumeInside: true);
+        }
+
+        arrow = NSCursor.arrow
+        for item in items {
+            item!.addCursorRect(item!.bounds, cursor: arrow!);
+        }
+        
+        arrow!.setOnMouseExited(true)
+        for item in items {
+            item!.addTrackingRect(item!.bounds, owner: arrow!, userData: nil, assumeInside: true);
+        }
     }
     
 }

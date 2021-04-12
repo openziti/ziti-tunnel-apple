@@ -20,7 +20,7 @@ import CZiti
 import CoreImage.CIFilterBuiltins
 
 @available(iOS 13.0, *)
-class MFASetupScreen: UIViewController, UIActivityItemSource {
+class MFASetupScreen: UIViewController, UIActivityItemSource, UITextFieldDelegate {
     
     @IBOutlet var IdentityName: UILabel!
     @IBOutlet var BarCode: UIImageView!
@@ -43,6 +43,8 @@ class MFASetupScreen: UIViewController, UIActivityItemSource {
     var dashScreen:DashboardScreen?;
     
     override func viewDidLoad() {
+        AuthCode.smartInsertDeleteType = UITextSmartInsertDeleteType.no
+        AuthCode.delegate = self
         AuthCode.text = "";
         IdentityName.text = identity?.name;
         url = "https://netfoundry.io"; // get url from MFA object
@@ -76,7 +78,35 @@ class MFASetupScreen: UIViewController, UIActivityItemSource {
     @IBAction func CopySecret(_ sender: UITapGestureRecognizer) {
         let pasteboard = UIPasteboard.general;
         pasteboard.string = secret;
-        // Jeremy Show the blurb here that secret copied
+        showToast(message: "\(secret) copied to clipboard")
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let textFieldText = textField.text,
+            let rangeOfTextToReplace = Range(range, in: textFieldText) else {
+                return false
+        }
+        let substringToReplace = textFieldText[rangeOfTextToReplace]
+        let count = textFieldText.count - substringToReplace.count + string.count
+        return count <= 6
+    }
+    
+    func showToast(message : String) {
+
+        let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 160, y: self.view.frame.size.height-100, width: 320, height: 35))
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        toastLabel.textColor = UIColor.white
+        toastLabel.textAlignment = .center;
+        toastLabel.text = message
+        toastLabel.alpha = 1.0
+        toastLabel.layer.cornerRadius = 10;
+        toastLabel.clipsToBounds  =  true
+        self.view.addSubview(toastLabel)
+        UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
+             toastLabel.alpha = 0.0
+        }, completion: {(isCompleted) in
+            toastLabel.removeFromSuperview()
+        });
     }
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {

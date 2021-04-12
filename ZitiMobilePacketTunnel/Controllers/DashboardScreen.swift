@@ -167,14 +167,12 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         zid.enabled = !zid.enabled!;
     }
     
-    func switchValueDidChange(sender:UISwitch!)
-    {
-        if (sender.isOn == true){
-            print("on")
-        }
-        else{
-            print("off")
-        }
+    @IBAction func switchValueDidChange(sender:UISwitch!) {
+        let tag = sender.tag;
+        let zid = zidMgr.zids[tag];
+        zid.enabled = sender.isOn;
+        _ = self.zidMgr.zidStore.store(zid);
+        self.tunnelMgr.restartTunnel();
     }
     
     func reloadList() {
@@ -201,7 +199,7 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             toggler.isUserInteractionEnabled = true;
             toggler.tag = index;
             toggler.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
-            //toggler.addTarget(self, action: Selector(("switchValueDidChange:")), for: UIControl.Event.valueChanged);
+            toggler.addTarget(self, action: #selector(switchValueDidChange), for: .valueChanged)
             
             if (identity.isEnrolled) {
                 if (identity.isEnabled) {

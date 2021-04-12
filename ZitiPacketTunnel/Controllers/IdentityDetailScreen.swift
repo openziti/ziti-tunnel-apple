@@ -311,7 +311,7 @@ class IdentityDetailScreen: NSViewController {
     }
     
     func SetupCursor() {
-        let items = [CloseButton, EnrollButton, ForgotButton, ToggleIdentity, MFAToggle, MFAOff, MFARecovery];
+        let items = [];
         
         pointingHand = NSCursor.pointingHand;
         for item in items {
