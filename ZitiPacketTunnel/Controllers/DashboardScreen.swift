@@ -21,6 +21,46 @@ import CZiti
 
 class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDelegate {
     
+    /**
+     Ziti SDK Variables
+     */
+    let appName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? "Ziti"
+    var tunnelMgr = TunnelMgr.shared;
+    var zidMgr = ZidMgr();
+    var identity = ZitiIdentity();
+    var enrollingIds:[ZitiIdentity] = [];
+    
+    /**
+     Cursor UI variables
+     */
+    private var pointingHand: NSCursor?
+    private var arrow : NSCursor?
+    
+    /**
+     Timer and values for updating speed labels
+     */
+    var timer = Timer();
+    var timeLaunched:Int = 0;
+    private var bytesDown:Float = 0.0;
+    private var bytesUp:Float = 0.0;
+    
+    /**
+     The Screens of the application controlled by the state
+     */
+    var state = "dashboard";
+    @IBOutlet var DashboardBox: NSBox!
+    @IBOutlet var MenuBox: NSBox!
+    @IBOutlet var AdvancedBox: NSBox!
+    @IBOutlet var AboutBox: NSBox!
+    @IBOutlet var LogLevelBox: NSBox!
+    @IBOutlet var ConfigBox: NSBox!
+    @IBOutlet var RecoveryBox: NSBox!
+    @IBOutlet var AuthBox: NSBox!
+    @IBOutlet var MFASetupBox: NSBox!
+    @IBOutlet var ServiceBox: NSBox!
+    @IBOutlet var DetailsBox: NSBox!
+    @IBOutlet var IntroBox: NSBox!
+    var allViews:[NSBox] = [];
     
     
     
@@ -32,6 +72,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     
     
+    /**
+     Main Dashboard Screen Functionality
+     */
     @IBOutlet var AddButton: NSStackView!
     @IBOutlet var AddIdButton: NSTextField!
     @IBOutlet var ConnectButton: NSImageView!
@@ -48,24 +91,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var SpeedArea: NSStackView!
     @IBOutlet var MainView: NSView!
     @IBOutlet var ParentBox: NSBox!
-    @IBOutlet var IntroBox: NSBox!
     @IBOutlet var IntroView: NSView!
-    @IBOutlet var DashboardBox: NSBox!
     @IBOutlet var LogoArea: NSStackView!
     @IBOutlet var MainArea: NSStackView!
-    
-    var state = "dashboard";
-    
-    var timer = Timer();
-    var timeLaunched:Int = 0;
-    
-    let appName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? "Ziti"
-    var tunnelMgr = TunnelMgr.shared;
-    var zidMgr = ZidMgr();
-    private var pointingHand: NSCursor?
-    private var arrow : NSCursor?
-    private var bytesDown:Float = 0.0;
-    private var bytesUp:Float = 0.0;
     
     override func viewWillAppear() {
         self.view.shadow = NSShadow();
@@ -101,29 +129,23 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         IntroView.layer?.cornerRadius = 18;
         IntroView.layer?.masksToBounds = true;
         
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 3
-            self.IntroView.animator().alphaValue = 0
-        } completionHandler: {
-            self.IntroView.isHidden = true
-            self.IntroView.alphaValue = 1
-        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad();
+        IntroBox.isHidden = false;
+        IntroBox.alphaValue = 1;
+        self.allViews =  [MenuBox,AdvancedBox,AboutBox,LogLevelBox,ConfigBox,RecoveryBox,AuthBox,MFASetupBox,ServiceBox,DetailsBox,IntroBox];
         
         Logger.initShared(Logger.APP_TAG);
         zLog.info(Version.verboseStr);
-        
         zidMgr.zidStore.delegate = self;
         
-        self.view.window?.setFrame(NSRect(x:0,y:0,width: 420, height: 520), display: true);
-        MenuButton.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(self.ShowMenu(gesture:))));
-        getMainWindow()?.delegate = self;
-        SetupCursor();
+        VersionString.stringValue = "v"+Version.str;
         
-        // init the manager
+        self.view.window?.setFrame(NSRect(x:0,y:0,width: 420, height: 520), display: true);
+        getMainWindow()?.delegate = self;
+        
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange);
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier);
         timeLaunched = 1;
@@ -145,7 +167,409 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.bytesUp = 0.0;
         
         UpdateList();
+        SetupCursor();
+        
+        // Details Setup
+        MFAToggle.layer?.backgroundColor = NSColor.red.cgColor;
+        MFAToggle.layer?.masksToBounds = true;
+        MFAToggle.layer?.cornerRadius = 10;
+        
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 3;
+            self.IntroView.animator().alphaValue = 0;
+        } completionHandler: {
+            self.HideAll();
+        }
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     Detail Screen Functionality
+     */
+    @IBOutlet var IdDetailCloseButton: NSImageView!
+    @IBOutlet var ToggleIdentity: NSSwitch!
+    @IBOutlet var IdName: NSTextField!
+    @IBOutlet var IdNetwork: NSTextField!
+    @IBOutlet var IdEnrolled: NSTextField!
+    @IBOutlet var IdStatus: NSTextField!
+    @IBOutlet var IdServiceCount: NSTextField!
+    @IBOutlet var EnrollButton: NSTextField!
+    @IBOutlet var ServiceList: NSScrollView!
+    @IBOutlet var ForgotButton: NSTextField!
+    @IBOutlet var MFAOn: NSImageView!
+    @IBOutlet var MFAOff: NSImageView!
+    @IBOutlet var MFARecovery: NSImageView!
+    @IBOutlet var MFAToggle: NSSwitch!
+    
+    /**
+     Show the details view and fill in the UI elements
+     */
+    func ShowDetails() {
+        ToggleIdentity.isHidden = false;
+        ForgotButton.isHidden = false;
+        ServiceList.isHidden = false;
+        IdServiceCount.isHidden = false;
+        if (self.identity.isEnabled) {
+            ToggleIdentity.state = .on;
+        } else {
+            ToggleIdentity.state = .off;
+        }
+        if (self.identity.isEnabled) {
+            IdStatus.stringValue = "active";
+        } else {
+            IdStatus.stringValue = "inactive";
+        }
+        if (self.identity.isEnrolled) {
+            IdEnrolled.stringValue = "enrolled";
+        } else {
+            IdEnrolled.stringValue = "not enrolled";
+            ToggleIdentity.isHidden = true;
+            ForgotButton.isHidden = true;
+            ServiceList.isHidden = true;
+            IdServiceCount.isHidden = true;
+        }
+        IdName.stringValue = self.identity.name;
+        IdNetwork.stringValue = self.identity.czid?.ztAPI ?? "no network";
+        IdServiceCount.stringValue = "\(self.identity.services.count) Services";
+        
+        MFAOn.isHidden = true; // Show is enabled and authenticated
+        // MFAOff.isHidden = true; - show if enabled
+        // MFARecovery.isHidden = true; - show if authenticated
+            
+        let serviceListView = NSStackView(frame: NSRect(x: 0, y: 0, width: self.view.frame.width-50, height: 70));
+        serviceListView.orientation = .vertical;
+        serviceListView.spacing = 2;
+        var baseHeight = 480;
+        var index = 0;
+        
+        if (self.identity.isEnrolled) {
+            let rowHeight = 50;
+            for service in self.identity.services {
+                let serviceName = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 14));
+                let serviceUrl = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 12));
+                let serviceProtocol = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 12));
+                let servicePorts = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 12));
+                
+                serviceName.string = service.name ?? "";
+                serviceUrl.string = service.addresses ?? "None";
+                serviceUrl.string = service.protocols ?? "None";
+                serviceUrl.string = service.portRanges ?? "None";
+                
+                serviceName.font = NSFont(name: "Open Sans", size: 12);
+                serviceName.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 1.00);
+                serviceUrl.font = NSFont(name: "Open Sans", size: 11);
+                serviceUrl.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.60);
+                serviceProtocol.font = NSFont(name: "Open Sans", size: 11);
+                serviceProtocol.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.60);
+                servicePorts.font = NSFont(name: "Open Sans", size: 11);
+                servicePorts.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.60);
+                
+                serviceName.isEditable = false;
+                serviceUrl.isEditable = false;
+                serviceProtocol.isEditable = false;
+                servicePorts.isEditable = false;
+                
+                serviceName.backgroundColor = NSColor.clear;
+                serviceUrl.backgroundColor = NSColor.clear;
+                serviceProtocol.backgroundColor = NSColor.clear;
+                servicePorts.backgroundColor = NSColor.clear;
+                
+                serviceName.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
+                serviceName.heightAnchor.constraint(equalToConstant: CGFloat(14)).isActive = true
+                serviceUrl.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
+                serviceUrl.heightAnchor.constraint(equalToConstant: CGFloat(12)).isActive = true
+                serviceProtocol.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
+                serviceProtocol.heightAnchor.constraint(equalToConstant: CGFloat(12)).isActive = true
+                servicePorts.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
+                servicePorts.heightAnchor.constraint(equalToConstant: CGFloat(12)).isActive = true
+                
+                let stack = NSStackView(views: [serviceName, serviceUrl, serviceProtocol, servicePorts]);
+                
+                stack.edgeInsets.top = 14;
+                stack.distribution = .fillProportionally;
+                stack.alignment = .leading;
+                stack.spacing = 0;
+                stack.orientation = .vertical;
+                stack.frame = CGRect(x: 0, y: CGFloat(index*rowHeight), width: view.frame.size.width-90, height: CGFloat(rowHeight));
+
+                serviceListView.addSubview(stack);
+                index = index + 1;
+            }
+            
+            let clipView = FlippedClipView();
+            clipView.drawsBackground = false;
+            ServiceList.horizontalScrollElasticity = .none;
+            ServiceList.contentView = clipView
+            clipView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+              clipView.leftAnchor.constraint(equalTo: ServiceList.leftAnchor),
+              clipView.rightAnchor.constraint(equalTo: ServiceList.rightAnchor),
+              clipView.topAnchor.constraint(equalTo: ServiceList.topAnchor),
+              clipView.bottomAnchor.constraint(equalTo: ServiceList.bottomAnchor)
+            ]);
+            
+            serviceListView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width-50, height: CGFloat(((rowHeight*index))));
+            ServiceList.documentView = serviceListView;
+            EnrollButton.isHidden = true;
+        } else {
+            EnrollButton.isHidden = false;
+        }
+        
+        if (index>3) {
+            index = index-2;
+            baseHeight = baseHeight+(50*index);
+        }
+        guard var frame = self.view.window?.frame else { return };
+        frame.size = NSMakeSize(CGFloat(420), CGFloat(baseHeight));
+        self.view.window?.setFrame(frame, display: true);
+        
+        ServiceList.documentView = serviceListView;
+        showArea(state: "details");
+    }
+    
+    /**
+     Connect the client and restart the timer
+     */
+    @IBAction func Connect(_ sender: NSClickGestureRecognizer) {
+        timer.invalidate();
+        TimerLabel.stringValue = "00:00.00";
+        ConnectButton.isHidden = true;
+        ConnectedButton.isHidden = false;
+        do {
+            try tunnelMgr.startTunnel();
+            timeLaunched = 1;
+            timer.invalidate();
+            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
+        } catch {
+            dialogAlert("Tunnel Error", error.localizedDescription);
+        }
+    }
+    
+    /**
+     Disconnct the client and stop the tunnel
+     */
+    @IBAction func Disconnect(_ sender: NSClickGestureRecognizer) {
+        timer.invalidate();
+        TimerLabel.stringValue = "00:00.00";
+        UpSpeed.stringValue = "0.0";
+        UpSpeedSize.stringValue = "bps";
+        DownSpeed.stringValue = "0.0";
+        DownSpeedSize.stringValue = "bps";
+        ConnectButton.isHidden = false;
+        ConnectedButton.isHidden = true;
+        tunnelMgr.stopTunnel();
+    }
+    
+    /**
+     Toggle the state of the identity
+     */
+    @IBAction func Toggled(_ sender: NSClickGestureRecognizer) {
+        identity.enabled = ToggleIdentity.state != .on;
+        _ = zidMgr.zidStore.store(identity);
+        ShowDetails();
+        tunnelMgr.restartTunnel();
+        self.UpdateList();
+    }
+    
+    /**
+     Forget the identity and update the main list closing the details view
+     */
+    @IBAction func Forget(_ sender: NSClickGestureRecognizer) {
+        let text = "Deleting identity \(identity.name) (\(identity.id)) can't be undone"
+        if dialogOKCancel(question: "Are you sure?", text: text) == true {
+            let error = zidMgr.zidStore.remove(identity)
+            guard error == nil else {
+                dialogAlert("Unable to remove identity", error!.localizedDescription)
+                return
+            }
+            UpdateList();
+            Close(sender);
+        }
+    }
+    
+    /**
+     Show the identity details
+     */
+    @objc func GoToDetails(gesture : GoToDetailGesture) {
+        let index = gesture.indexValue;
+        self.identity = zidMgr.zids[index ?? 0];
+        ShowDetails();
+    }
+    
+    /**
+     Enroll the currnt identity
+     */
+    @IBAction func Enroll(_ sender: Any) {
+        EnrollButton.isHidden = true;
+        enrollingIds.append(identity);
+        
+        guard let presentedItemURL = zidMgr.zidStore.presentedItemURL else {
+            self.dialogAlert("Unable to enroll \(identity.name)", "Unable to access group container");
+            return;
+        }
+        
+        let url = presentedItemURL.appendingPathComponent("\(identity.id).jwt", isDirectory:false);
+        let jwtFile = url.path;
+        
+        DispatchQueue.global().async {
+            Ziti.enroll(jwtFile) { zidResp, zErr in
+                DispatchQueue.main.async { [self] in
+                    self.enrollingIds.removeAll { $0.id == identity.id }
+                    guard zErr == nil, let zidResp = zidResp else {
+                        _ = zidMgr.zidStore.store(self.identity);
+                        self.dialogAlert("Unable to enroll \(identity.name)", zErr != nil ? zErr!.localizedDescription : "invalid response");
+                        return;
+                    }
+                    
+                    if self.identity.czid == nil {
+                        identity.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPI: zidResp.ztAPI);
+                    }
+                    identity.czid?.ca = zidResp.ca;
+                    if zidResp.name != nil {
+                        identity.czid?.name = zidResp.name;
+                    }
+                    
+                    identity.enabled = true;
+                    identity.enrolled = true;
+                    _ = zidMgr.zidStore.store(identity);
+                    self.tunnelMgr.restartTunnel();
+                    self.ShowDetails();
+                }
+            }
+        }
+    }
+    
+    
+    @IBAction func AuthClicked(_ sender: NSClickGestureRecognizer) {
+        showArea(state: "area");
+    }
+    
+    
+    @IBAction func ShowRecoveryScreen(_ sender: NSClickGestureRecognizer) {
+        showArea(state: "recovery");
+    }
+    
+    @IBAction func ToggleMFA(_ sender: NSClickGestureRecognizer) {
+        if (MFAToggle.state == .off) {
+            // prompty to setup MF
+            
+            showArea(state: "mfa");
+            
+            // Send in the url and secret code to setup MFA
+            
+        } else {
+            // prompt to turn off mfa if it is enabled
+            showArea(state: "auth");
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     Main Menu Screen Functionality
+     */
+    @IBOutlet var AdvancedButton: NSStackView!
+    @IBOutlet var AboutButton: NSStackView!
+    @IBOutlet var FeedbackButton: NSStackView!
+    @IBOutlet var SupportButton: NSStackView!
+    @IBOutlet var DetachButton: NSStackView!
+    @IBOutlet var QuitButton: NSTextField!
+    
+    /**
+     Close the app down
+     */
+    @IBAction func Exit(_ sender: NSClickGestureRecognizer) {
+        exit(0);
+    }
+    
+    @IBAction func ShowFeedback(_ sender: NSClickGestureRecognizer) {
+        
+    }
+    
+    @IBAction func ShowSupport(_ sender: NSClickGestureRecognizer) {
+        let url = URL (string: "https://openziti.discourse.group")!;
+        NSWorkspace.shared.open(url);
+    }
+    
+    
+    @IBAction func DetachApp(_ sender: NSClickGestureRecognizer) {
+        
+    }
+    
+    @IBAction func ShowAbout(_ sender: NSClickGestureRecognizer) {
+        showArea(state: "about")
+    }
+    
+    @IBAction func ShowAdvanced(_ sender: NSClickGestureRecognizer) {
+        showArea(state: "advanced")
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     About Screen functionality
+     */
+    @IBOutlet var AboutBackButton: NSImageView!
+    @IBOutlet var AboutCloseButton: NSImageView!
+    @IBOutlet var PrivacyButton: NSStackView!
+    @IBOutlet var TermsButton: NSStackView!
+    @IBOutlet var VersionString: NSTextField!
+    
+    @IBAction func OpenPrivacy(_ sender: NSClickGestureRecognizer) {
+        let url = URL (string: "https://netfoundry.io/privacy")!;
+        NSWorkspace.shared.open(url);
+    }
+    
+    @IBAction func OpenTerms(_ sender: NSClickGestureRecognizer) {
+        let url = URL (string: "https://netfoundry.io/terms")!;
+        NSWorkspace.shared.open(url);
+    }
+    
+    @IBAction func DoAboutBack(_ sender: NSClickGestureRecognizer) {
+        Close(sender);
+    }
+    
+    @IBAction func DoAboutClose(_ sender: NSClickGestureRecognizer) {
+        Close(sender);
+        Close(sender);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
         
@@ -219,10 +643,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         AddIdentity();
     }
     
-    @objc func ShowMenu(gesture : NSClickGestureRecognizer) {
-        let storyBoard : NSStoryboard = NSStoryboard(name: "MainUI", bundle:nil);
-        let mainMenu = storyBoard.instantiateController(withIdentifier: "MainMenuScreen") as! MenuScreen;
-        self.presentAsSheet(mainMenu);
+    @IBAction func ShowMenu(_ sender: NSClickGestureRecognizer) {
+        showArea(state: "menu");
     }
     
     func getMainWindow() -> NSWindow? {
@@ -255,33 +677,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         } else {
             NSApp.setActivationPolicy(.regular)
         }
-    }
-    
-    @IBAction func Connect(_ sender: NSClickGestureRecognizer) {
-        timer.invalidate();
-        TimerLabel.stringValue = "00:00.00";
-        ConnectButton.isHidden = true;
-        ConnectedButton.isHidden = false;
-        do {
-            try tunnelMgr.startTunnel();
-            timeLaunched = 1;
-            timer.invalidate();
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
-        } catch {
-            dialogAlert("Tunnel Error", error.localizedDescription);
-        }
-    }
-    
-    @IBAction func Disconnect(_ sender: NSClickGestureRecognizer) {
-        timer.invalidate();
-        TimerLabel.stringValue = "00:00.00";
-        UpSpeed.stringValue = "0.0";
-        UpSpeedSize.stringValue = "bps";
-        DownSpeed.stringValue = "0.0";
-        DownSpeedSize.stringValue = "bps";
-        ConnectButton.isHidden = false;
-        ConnectedButton.isHidden = true;
-        tunnelMgr.stopTunnel();
     }
     
     @objc func UpdateTimer() {
@@ -332,28 +727,16 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         timeLaunched += 1;
     }
     
-    @objc func GoToDetails(gesture : GoToDetailGesture) {
-        let index = gesture.indexValue;
-        
-        let storyBoard : NSStoryboard = NSStoryboard(name: "MainUI", bundle:nil);
-        let detailView = storyBoard.instantiateController(withIdentifier: "IdentityDetail") as! IdentityDetailScreen;
-        
-        detailView.identity = zidMgr.zids[index ?? 0];
-        detailView.dash = self;
-        detailView.zidMgr = self.zidMgr;
-        
-        self.presentAsSheet(detailView);
-    }
-    
     func UpdateList() {
         
         IdentityList.horizontalScrollElasticity = .none;
+        IdentityList.horizontalScroller = .none;
         let idListView = NSStackView(frame: NSRect(x: 0, y: 0, width: 320, height: 500));
         idListView.orientation = .vertical;
         idListView.spacing = 2;
         //if IdView.subviews != nil {
         //for view in IdentityList.subviews {
-        //    view.removeFromSuperview();
+        //  view.removeFromSuperview();
         //}
         //}
         var index = 0;
@@ -577,7 +960,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     
-    /* Daves Methods */
     
     func dialogAlert(_ msg:String, _ text:String? = nil) {
         let alert = NSAlert()
@@ -626,34 +1008,98 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         }
     }
     
-    static func freshController() -> DashboardScreen {
-        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main.UI"), bundle: nil);
-        let identifier = NSStoryboard.SceneIdentifier("Dashboard");
-        guard let viewcontroller = storyboard.instantiateController(withIdentifier: identifier) as? DashboardScreen else {
-            fatalError("Controller Not Found")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     Hide and kill the clickability of all fields
+     */
+    func HideAll() {
+        for view in allViews {
+            view.isHidden = true;
+            view.alphaValue = 1;
+            view.shadow = .none;
         }
-        return viewcontroller;
     }
     
-    
-    
-    @IBAction func Close(_ sender: NSClickGestureRecognizer) {
-        var view =
+    /**
+     Return the current view area for the state we are in
+     */
+    func GetStateView() -> NSView {
+        var view = MenuBox;
         
         switch self.state {
         case "details":
-            
+            view = DetailsBox;
+        case "menu":
+            view = MenuBox;
+        case "advanced":
+            view = AdvancedBox;
+        case "about":
+            view = AboutBox;
+        case "config":
+            view = ConfigBox;
+        case "mfa":
+            view = MFASetupBox;
+        case "loglevel":
+            view = LogLevelBox;
+        case "auth":
+            view = AuthBox;
+        case "recovery":
+            view = RecoveryBox;
         default:
-            <#code#>
+            view = MenuBox;
+        }
+        
+        return view!;
+    }
+    
+    /**
+     Show the area defined by the state we are in
+     */
+    func showArea(state: String) {
+        self.state = state;
+        
+        let view = GetStateView();
+        view.isHidden = false;
+        view.alphaValue = 0;
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 1.5
+            view.animator().alphaValue = 1
+        } completionHandler: {
+            view.alphaValue = 1;
+            view.isHidden = false;
+        }
+    }
+    
+    /**
+     Close the current view
+     */
+    @IBAction func Close(_ sender: NSClickGestureRecognizer) {
+        let view = GetStateView();
+        if (state=="about"||state=="advanced") {
+            state = "menu";
+        } else if (state=="config"||state=="loglevel") {
+            state = "advanced";
+        } else if (state=="mfa"||state=="recovery") {
+            state = "details";
+        } else {
+            state = "dashboard";
         }
         
         
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = 3
-            self.IntroView.animator().alphaValue = 0
+            context.duration = 0.3
+            view.animator().alphaValue = 0
         } completionHandler: {
-            self.IntroView.isHidden = true
-            self.IntroView.alphaValue = 1
+            view.alphaValue = 1;
+            view.isHidden = true;
         }
     }
     
@@ -661,7 +1107,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         Setup the cursor for rollover state to fade the elements and show the pointer cursor
      */
     func SetupCursor() {
-        let items = [AddButton, AddIdButton, ConnectButton, ConnectedButton, MenuButton, CloseButton, EnrollButton, ForgotButton, ToggleIdentity, MFAToggle, MFAOff, MFARecovery];
+        let items = [AddButton, AddIdButton, ConnectButton, ConnectedButton, MenuButton,
+                     IdDetailCloseButton, EnrollButton, ForgotButton, ToggleIdentity, MFAToggle, MFAOff, MFARecovery, QuitButton, AdvancedButton, AboutButton, FeedbackButton, SupportButton, DetachButton,
+                     AboutBackButton, AboutCloseButton, PrivacyButton, TermsButton];
         
         pointingHand = NSCursor.pointingHand;
         for item in items {

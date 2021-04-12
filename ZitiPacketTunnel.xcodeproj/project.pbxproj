@@ -109,9 +109,7 @@
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
 		82182B9E25521146002D4F5F /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 82182B9D25521146002D4F5F /* MainUI.storyboard */; };
-		824414BC25A693E8007765A4 /* MenuScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414BB25A693E8007765A4 /* MenuScreen.swift */; };
 		824414C425A9027E007765A4 /* AdvancedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414C325A9027E007765A4 /* AdvancedScreen.swift */; };
-		824414D125A903D5007765A4 /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414D025A903D5007765A4 /* AboutScreen.swift */; };
 		824414D625A914E0007765A4 /* ConfigScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414D525A914E0007765A4 /* ConfigScreen.swift */; };
 		824414DB25A91686007765A4 /* LogLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414DA25A91686007765A4 /* LogLevelScreen.swift */; };
 		824414E025ACA564007765A4 /* StartupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824414DF25ACA564007765A4 /* StartupScreen.swift */; };
@@ -126,7 +124,6 @@
 		826B987425FA888D0064F774 /* AuthenticateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B987325FA888D0064F774 /* AuthenticateScreen.swift */; };
 		826B987925FA88A00064F774 /* RecoveryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826B987825FA88A00064F774 /* RecoveryScreen.swift */; };
 		826C192825A3BB970099CB66 /* DashboardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826C192725A3BB970099CB66 /* DashboardScreen.swift */; };
-		826EDFDE25C76B4000DA38B4 /* IdentityDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */; };
 		826EDFE325C88E6D00DA38B4 /* GoToDetailGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */; };
 		8274A548261D1FCC008FE6E8 /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8274A547261D1FCC008FE6E8 /* DragView.swift */; };
 		829692172558A8D000ED44AB /* RussoOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 829692162558A8D000ED44AB /* RussoOne-Regular.ttf */; };
@@ -332,9 +329,7 @@
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
 		7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_macos_targets_Ziti_Desktop_Edge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		82182B9D25521146002D4F5F /* MainUI.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
-		824414BB25A693E8007765A4 /* MenuScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScreen.swift; sourceTree = "<group>"; };
 		824414C325A9027E007765A4 /* AdvancedScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedScreen.swift; sourceTree = "<group>"; };
-		824414D025A903D5007765A4 /* AboutScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
 		824414D525A914E0007765A4 /* ConfigScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigScreen.swift; sourceTree = "<group>"; };
 		824414DA25A91686007765A4 /* LogLevelScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogLevelScreen.swift; sourceTree = "<group>"; };
 		824414DF25ACA564007765A4 /* StartupScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupScreen.swift; sourceTree = "<group>"; };
@@ -349,7 +344,6 @@
 		826B987325FA888D0064F774 /* AuthenticateScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticateScreen.swift; sourceTree = "<group>"; };
 		826B987825FA88A00064F774 /* RecoveryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryScreen.swift; sourceTree = "<group>"; };
 		826C192725A3BB970099CB66 /* DashboardScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardScreen.swift; sourceTree = "<group>"; };
-		826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityDetailScreen.swift; sourceTree = "<group>"; };
 		826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoToDetailGesture.swift; sourceTree = "<group>"; };
 		8274A547261D1FCC008FE6E8 /* DragView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragView.swift; sourceTree = "<group>"; };
 		829692162558A8D000ED44AB /* RussoOne-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RussoOne-Regular.ttf"; sourceTree = "<group>"; };
@@ -709,14 +703,11 @@
 			isa = PBXGroup;
 			children = (
 				826C192725A3BB970099CB66 /* DashboardScreen.swift */,
-				824414BB25A693E8007765A4 /* MenuScreen.swift */,
 				824414C325A9027E007765A4 /* AdvancedScreen.swift */,
-				824414D025A903D5007765A4 /* AboutScreen.swift */,
 				824414D525A914E0007765A4 /* ConfigScreen.swift */,
 				824414DA25A91686007765A4 /* LogLevelScreen.swift */,
 				824414DF25ACA564007765A4 /* StartupScreen.swift */,
 				824414F325AD221A007765A4 /* ZitiWindow.swift */,
-				826EDFDD25C76B4000DA38B4 /* IdentityDetailScreen.swift */,
 				826EDFE225C88E6D00DA38B4 /* GoToDetailGesture.swift */,
 				8265A3B525CE11A80001A6AB /* FlippedClipView.swift */,
 				826B984F25FA844B0064F774 /* MFASetupScreen.swift */,
@@ -1215,13 +1206,10 @@
 				5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */,
 				826B985525FA845A0064F774 /* AuthenticateScreen.swift in Sources */,
 				824414D625A914E0007765A4 /* ConfigScreen.swift in Sources */,
-				826EDFDE25C76B4000DA38B4 /* IdentityDetailScreen.swift in Sources */,
-				824414BC25A693E8007765A4 /* MenuScreen.swift in Sources */,
 				5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */,
 				5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */,
 				5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */,
 				824414C425A9027E007765A4 /* AdvancedScreen.swift in Sources */,
-				824414D125A903D5007765A4 /* AboutScreen.swift in Sources */,
 				5A8702D922372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5A6BA265226F6AB400224F09 /* MainMenuBar.swift in Sources */,
 				826B985A25FA846A0064F774 /* RecoveryScreen.swift in Sources */,
