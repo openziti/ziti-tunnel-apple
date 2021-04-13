@@ -19,11 +19,5 @@ import Cocoa
 
 class ServiceDetailsScreen: NSViewController {
     
-    @IBOutlet var ServiceName: NSTextField!
-    @IBOutlet var UrlValue: NSTextField!
-    @IBOutlet var AddressValue: NSTextField!
-    @IBOutlet var PortValue: NSTextField!
-    @IBOutlet var ProtocolsValue: NSTextField!
-    
     
 }
