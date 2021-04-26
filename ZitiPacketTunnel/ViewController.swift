@@ -186,7 +186,9 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         // for the case of leaving screen on a non-connected controller so the "as of" time periodically updates...
         Timer.scheduledTimer(withTimeInterval: 300.0, repeats: true) { _ in
             DispatchQueue.main.async {
-                self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+                if self.zidMgr.zids.count > 0 {
+                    self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+                }
             }
         }
     }
