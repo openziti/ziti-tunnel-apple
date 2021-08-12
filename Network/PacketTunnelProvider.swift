@@ -29,7 +29,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     var zids:[ZitiIdentity] = []
     var allZitis:[Ziti] = [] // for ziti.dump...
     var zitiTunnel:ZitiTunnel!
-    var loop:UnsafeMutablePointer<uv_loop_t>!
+    var loop:Ziti.ZitiRunloop!
     var writeLock = NSLock()
     
     var hasStarted = false // when true, restart is required to update routes for services intercepted by IP
@@ -147,7 +147,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             zid.controllerVersion = cVersion
         }
         
-        if event.status == ZITI_OK {
+        if event.status == Ziti.ZITI_OK {
             zLog.info("\(zid.name):(\(zid.id)) \(zEvent.debugDescription)")
             zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
         } else {
@@ -166,18 +166,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     private func canDial(_ eSvc:CZiti.ZitiService) -> Bool {
-        return (UInt32(eSvc.permFlags ?? 0x0) & ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
+        return (Int(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
     }
     
-    private func processService(_ zid:ZitiIdentity, _ ztx:ziti_context, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) {
-        guard let cService = eSvc.cService, let serviceId = eSvc.id else {
+    private func processService(_ zid:ZitiIdentity, _ ztx:OpaquePointer, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) {
+        guard let cService = eSvc.cServicePtr, let serviceId = eSvc.id else {
             zLog.error("invalid service for \(zid.name):(\(zid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
             return
         }
         
         if remove {
             self.dnsResolver?.removeDnsEntry(serviceId)
-            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_SERVICE_UNAVAILABLE)
+            self.zitiTunnel.onService(ztx, cService, Int32(Ziti.ZITI_SERVICE_UNAVAILABLE)) // cService.pointee, ZITI_SERVICE_UNAVAILABLE
             zid.services = zid.services.filter { $0.id != serviceId }
         }
         
@@ -205,7 +205,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                 
                 zid.services.append(zSvc)
             }
-            self.zitiTunnel.onService(ztx, &cService.pointee, ZITI_OK)
+            self.zitiTunnel.onService(ztx, cService, Int32(Ziti.ZITI_OK)) // &cService.pointee, ZITI_OK)
         }
     }
     
@@ -247,6 +247,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         }
     }
     
+    private let onMfaQuery:Ziti.MfaAuthQueryCallback = { ziti, mfaCtx, authQuery in
+        zLog.info("TODO: onMfaQuery(\(ziti): provider=\(String(describing: authQuery.provider)), httpUrl=\(String(describing: authQuery.httpUrl))")
+    }
+    
     private func dumpZitis() -> String {
         var str = ""
         let cond = NSCondition()
@@ -274,7 +278,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         return str
     }
     
-    private func loadIdentites(_ loop:UnsafeMutablePointer<uv_loop_t>) -> ZitiError? {
+    private func loadIdentites(_ loop:Ziti.ZitiRunloop) -> ZitiError? {
         
         let zidStore = ZitiIdentityStore()
         let (zids, zErr) = zidStore.loadAll()
@@ -291,8 +295,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                 // blank out services before registering to hear back what they are..
                 zid.services = []
                 
-                let ziti = Ziti(zid: czid, loop: loop)
+                let ziti = Ziti(zid: czid, loopPtr: loop)
                 allZitis.append(ziti)
+                ziti.mfaAuthQueryCallback = onMfaQuery
                 zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 _ = zidStore.store(zid)
                 
@@ -369,13 +374,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     @objc func runZiti() {
-        let rStatus = uv_run(loop, UV_RUN_DEFAULT)
-        guard rStatus == 0 else {
-            let errStr = String(cString: uv_strerror(rStatus))
-            zLog.wtf("error running uv loop: \(rStatus) \(errStr)")
-            return
-        }
-        zLog.info("runZiti - loop exited with status 0")
+        Ziti.executeRunloop(loopPtr: loop)
     }
 
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
@@ -399,14 +398,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             ZitiLog.setLogLevel(lvl)
         }
                 
-        //loop = uv_default_loop()
-        loop = UnsafeMutablePointer<uv_loop_t>.allocate(capacity: 1)
-        loop.initialize(to: uv_loop_t())
-        let lstat = uv_loop_init(loop)
-        guard lstat == 0 else {
-            completionHandler(ZitiError("Unable to init uv_loop"))
-            return
-        }
+        loop = CZiti.Ziti.ZitiRunloop()
         
         // setup ZitiTunnel
         let ipDNS = self.providerConfig.dnsAddresses.first ?? ""
