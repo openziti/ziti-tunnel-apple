@@ -130,14 +130,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         DashboardBox.wantsLayer = true;
         DashboardBox.layer?.borderWidth = 0;
         DashboardBox.layer?.cornerRadius = 20;
-        DashboardBox.layer?.masksToBounds = true;
-        
-        IntroView.wantsLayer = true;
-        IntroView.layer?.borderWidth = 0;
-        IntroView.layer?.cornerRadius = 18;
-        IntroView.layer?.masksToBounds = true;
-        
-    }
+        Dashboarddxd
     
     override func viewDidLoad() {
         super.viewDidLoad();
