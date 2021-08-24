@@ -25,6 +25,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     public var statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
     private var tunStatusItem:NSMenuItem!
     private var tunConnectItem:NSMenuItem!
+    private var snapshotItem:NSMenuItem!
     private var showDocItem:NSMenuItem!
     private var logLevelMenu:NSMenu!
     
@@ -58,7 +59,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         logMenu.addItem(newMenuItem(title: "Packet Tunnel...", action: #selector(MainMenuBar.showPacketTunnelLog(_:))))
         logMenu.addItem(newMenuItem(title: "Application...", action: #selector(MainMenuBar.showApplicationLog(_:))))
         logMenu.addItem(NSMenuItem.separator())
-        
+                
         let logLevelMenuItem = newMenuItem(title: "Level", action: nil)
         logMenu.addItem(logLevelMenuItem)
         logLevelMenu = NSMenu()
@@ -89,6 +90,9 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         menu.setSubmenu(logMenu, for: logMenuItem)
         // End Log Menu
         
+        snapshotItem = newMenuItem(title: "Snapshot...", action: nil)
+        menu.addItem(snapshotItem)
+        
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
         menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))
@@ -115,6 +119,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
+        snapshotItem.action = nil
         switch status {
         case .connecting:
             tunStatusItem.title = "Status: Connecting..."
@@ -123,6 +128,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         case .connected:
             tunStatusItem.title = "Status: Connected"
             tunConnectItem.title = "Disconnect"
+            snapshotItem.action = #selector(MainMenuBar.showSnapshot(_:))
             statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
             break
         case .disconnecting:
@@ -210,6 +216,27 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     @objc func showApplicationLog(_ sender:Any?) {
         openConsole(Logger.APP_TAG)
+    }
+    
+    @objc func showSnapshot(_ sender:Any?) {
+        do {
+            try (TunnelMgr.shared.tpm?.connection as? NETunnelProviderSession)?.sendProviderMessage("dump".data(using: .utf8)!) { resp in
+                if let resp = resp, let str = String(data: resp, encoding: .utf8) {
+                    zLog.info(str)
+                    
+                    if let wc = NSStoryboard(name: "Main", bundle: nil).instantiateController(withIdentifier: "SNAPSHOT_WINDOW") as? NSWindowController {
+                        wc.window?.title = "Ziti Snapshot \(Date())"
+                        if let vc = wc.contentViewController as? SnapshotViewController {
+                            vc.textView.textStorage?.mutableString.setString(str)
+                        }
+                        wc.showWindow(self)
+                        NSApp.activate(ignoringOtherApps: true)
+                    }
+                }
+            }
+        } catch {
+            zLog.error("Unable to send provider message: \(error)")
+        }
     }
     
     func updateLogLevelMenu() {
