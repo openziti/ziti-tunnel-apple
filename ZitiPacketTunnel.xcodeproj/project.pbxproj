@@ -118,11 +118,10 @@
 		826F65AF26D64DD100D830DC /* Gestures in Resources */ = {isa = PBXBuildFile; fileRef = 826F65AE26D64DD100D830DC /* Gestures */; };
 		826F65B126D64E3000D830DC /* Views in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B026D64E3000D830DC /* Views */; };
 		826F65B326D64E4000D830DC /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B226D64E4000D830DC /* MainUI.storyboard */; };
-		826F65B526D651C900D830DC /* Controllers in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B426D651C900D830DC /* Controllers */; };
-		826F65B726D651D200D830DC /* Controls in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B626D651D200D830DC /* Controls */; };
-		826F65B926D651E200D830DC /* View in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B826D651E200D830DC /* View */; };
-		826F65BB26D6525700D830DC /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 826F65BA26D6525700D830DC /* MainUI.storyboard */; };
-		826F65BE26D65A7900D830DC /* App.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 826F65BD26D65A7900D830DC /* App.storyboard */; };
+		82B6EFA026DCEC93009C5BED /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 826F65BA26D6525700D830DC /* MainUI.storyboard */; };
+		82B6EFA126DCEE2C009C5BED /* Controllers in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B426D651C900D830DC /* Controllers */; };
+		82B6EFA226DCEE31009C5BED /* Controls in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B626D651D200D830DC /* Controls */; };
+		82B6EFA326DCEE35009C5BED /* View in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B826D651E200D830DC /* View */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
 /* End PBXBuildFile section */
@@ -314,7 +313,6 @@
 		826F65B626D651D200D830DC /* Controls */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Controls; sourceTree = "<group>"; };
 		826F65B826D651E200D830DC /* View */ = {isa = PBXFileReference; lastKnownFileType = folder; path = View; sourceTree = "<group>"; };
 		826F65BA26D6525700D830DC /* MainUI.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
-		826F65BD26D65A7900D830DC /* App.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = App.storyboard; sourceTree = "<group>"; };
 		976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; sourceTree = "<group>"; };
 		A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobileShare.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobileShare/Pods-ios_targets-MobileShare.release.xcconfig"; sourceTree = "<group>"; };
 		A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; sourceTree = "<group>"; };
@@ -514,7 +512,6 @@
 				5A2EA2D2209B750C00437608 /* Assets.xcassets */,
 				5A2EA2D4209B750C00437608 /* LaunchScreen.storyboard */,
 				5A2EA2D7209B750C00437608 /* Info.plist */,
-				826F65BD26D65A7900D830DC /* App.storyboard */,
 			);
 			path = ZitiMobilePacketTunnel;
 			sourceTree = "<group>";
@@ -861,11 +858,7 @@
 			files = (
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
-				826F65B526D651C900D830DC /* Controllers in Resources */,
-				826F65BB26D6525700D830DC /* MainUI.storyboard in Resources */,
-				826F65B926D651E200D830DC /* View in Resources */,
 				826F65AD26D64DC000D830DC /* Controllers in Resources */,
-				826F65B726D651D200D830DC /* Controls in Resources */,
 				826F65B126D64E3000D830DC /* Views in Resources */,
 				5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */,
 				826F65AF26D64DD100D830DC /* Gestures in Resources */,
@@ -887,9 +880,12 @@
 				5AF5113E25842EDE0092DC47 /* MMjge6vGg.zid in Resources */,
 				5AF5113C25842EDE0092DC47 /* oWHiHdhGR.zid in Resources */,
 				5A2EA2D6209B750C00437608 /* LaunchScreen.storyboard in Resources */,
-				826F65BE26D65A7900D830DC /* App.storyboard in Resources */,
+				82B6EFA026DCEC93009C5BED /* MainUI.storyboard in Resources */,
+				82B6EFA126DCEE2C009C5BED /* Controllers in Resources */,
 				5AF5113F25842EDE0092DC47 /* sPxn6MJGR.zid in Resources */,
 				5AF5113D25842EDE0092DC47 /* DT87L-oGR.zid in Resources */,
+				82B6EFA326DCEE35009C5BED /* View in Resources */,
+				82B6EFA226DCEE31009C5BED /* Controls in Resources */,
 				5AF5113B25842EDE0092DC47 /* W5hxDMTMg.zid in Resources */,
 				5AF9C24C226B6FAC009CFD71 /* Default-568h@2x.png in Resources */,
 				5A2EA2D3209B750C00437608 /* Assets.xcassets in Resources */,
