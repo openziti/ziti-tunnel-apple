@@ -114,9 +114,6 @@
 		5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76C225D644A0048B2F6 /* TableViewController.swift */; };
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
-		826F65AD26D64DC000D830DC /* Controllers in Resources */ = {isa = PBXBuildFile; fileRef = 826F65AC26D64DC000D830DC /* Controllers */; };
-		826F65AF26D64DD100D830DC /* Gestures in Resources */ = {isa = PBXBuildFile; fileRef = 826F65AE26D64DD100D830DC /* Gestures */; };
-		826F65B126D64E3000D830DC /* Views in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B026D64E3000D830DC /* Views */; };
 		826F65B326D64E4000D830DC /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B226D64E4000D830DC /* MainUI.storyboard */; };
 		82B6EFB326DCF0FE009C5BED /* LogLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFA526DCF0FE009C5BED /* LogLevelScreen.swift */; };
 		82B6EFB426DCF0FE009C5BED /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFA626DCF0FE009C5BED /* AboutScreen.swift */; };
@@ -135,6 +132,11 @@
 		82B6EFC326DCF10D009C5BED /* IdentityRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFC226DCF10D009C5BED /* IdentityRenderer.swift */; };
 		82B6EFC626DCF11F009C5BED /* IdentityItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFC526DCF11F009C5BED /* IdentityItemCell.swift */; };
 		82B6EFC826DCF12D009C5BED /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 82B6EFC726DCF12D009C5BED /* MainUI.storyboard */; };
+		82B6EFCC26DCF416009C5BED /* DashboardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFCA26DCF416009C5BED /* DashboardScreen.swift */; };
+		82B6EFCD26DCF416009C5BED /* ServiceDetailsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFCB26DCF416009C5BED /* ServiceDetailsScreen.swift */; };
+		82B6EFD026DCF422009C5BED /* GoToDetailGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFCF26DCF422009C5BED /* GoToDetailGesture.swift */; };
+		82B6EFD426DCF42A009C5BED /* FlippedClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFD226DCF42A009C5BED /* FlippedClipView.swift */; };
+		82B6EFD526DCF42A009C5BED /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFD326DCF42A009C5BED /* DragView.swift */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
 /* End PBXBuildFile section */
@@ -318,9 +320,6 @@
 		5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewController.swift; sourceTree = "<group>"; };
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
 		7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_macos_targets_Ziti_Desktop_Edge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		826F65AC26D64DC000D830DC /* Controllers */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Controllers; sourceTree = "<group>"; };
-		826F65AE26D64DD100D830DC /* Gestures */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Gestures; sourceTree = "<group>"; };
-		826F65B026D64E3000D830DC /* Views */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Views; sourceTree = "<group>"; };
 		826F65B226D64E4000D830DC /* MainUI.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
 		82B6EFA526DCF0FE009C5BED /* LogLevelScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogLevelScreen.swift; sourceTree = "<group>"; };
 		82B6EFA626DCF0FE009C5BED /* AboutScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
@@ -339,6 +338,11 @@
 		82B6EFC226DCF10D009C5BED /* IdentityRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityRenderer.swift; sourceTree = "<group>"; };
 		82B6EFC526DCF11F009C5BED /* IdentityItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityItemCell.swift; sourceTree = "<group>"; };
 		82B6EFC726DCF12D009C5BED /* MainUI.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
+		82B6EFCA26DCF416009C5BED /* DashboardScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardScreen.swift; sourceTree = "<group>"; };
+		82B6EFCB26DCF416009C5BED /* ServiceDetailsScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceDetailsScreen.swift; sourceTree = "<group>"; };
+		82B6EFCF26DCF422009C5BED /* GoToDetailGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoToDetailGesture.swift; sourceTree = "<group>"; };
+		82B6EFD226DCF42A009C5BED /* FlippedClipView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlippedClipView.swift; sourceTree = "<group>"; };
+		82B6EFD326DCF42A009C5BED /* DragView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DragView.swift; sourceTree = "<group>"; };
 		976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; sourceTree = "<group>"; };
 		A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobileShare.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobileShare/Pods-ios_targets-MobileShare.release.xcconfig"; sourceTree = "<group>"; };
 		A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; sourceTree = "<group>"; };
@@ -438,10 +442,10 @@
 		5A02AAB6206EBD7E006261C6 /* ZitiPacketTunnel */ = {
 			isa = PBXGroup;
 			children = (
+				82B6EFD126DCF42A009C5BED /* Views */,
+				82B6EFCE26DCF422009C5BED /* Gestures */,
+				82B6EFC926DCF416009C5BED /* Controllers */,
 				826F65B226D64E4000D830DC /* MainUI.storyboard */,
-				826F65B026D64E3000D830DC /* Views */,
-				826F65AE26D64DD100D830DC /* Gestures */,
-				826F65AC26D64DC000D830DC /* Controllers */,
 				5A76B936226FB9CC00204A46 /* bundle */,
 				5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */,
 				5A6BA264226F6AB400224F09 /* MainMenuBar.swift */,
@@ -663,6 +667,32 @@
 				82B6EFC526DCF11F009C5BED /* IdentityItemCell.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		82B6EFC926DCF416009C5BED /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				82B6EFCA26DCF416009C5BED /* DashboardScreen.swift */,
+				82B6EFCB26DCF416009C5BED /* ServiceDetailsScreen.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		82B6EFCE26DCF422009C5BED /* Gestures */ = {
+			isa = PBXGroup;
+			children = (
+				82B6EFCF26DCF422009C5BED /* GoToDetailGesture.swift */,
+			);
+			path = Gestures;
+			sourceTree = "<group>";
+		};
+		82B6EFD126DCF42A009C5BED /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				82B6EFD226DCF42A009C5BED /* FlippedClipView.swift */,
+				82B6EFD326DCF42A009C5BED /* DragView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		9235754F7BC4BDA731BD7317 /* Pods */ = {
@@ -921,10 +951,7 @@
 			files = (
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
-				826F65AD26D64DC000D830DC /* Controllers in Resources */,
-				826F65B126D64E3000D830DC /* Views in Resources */,
 				5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */,
-				826F65AF26D64DD100D830DC /* Gestures in Resources */,
 				826F65B326D64E4000D830DC /* MainUI.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1128,12 +1155,16 @@
 			files = (
 				5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */,
 				5A051F612264183500B11CB2 /* ZidMgr.swift in Sources */,
+				82B6EFD526DCF42A009C5BED /* DragView.swift in Sources */,
 				5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */,
 				5ABA5EDA2274D2EB00B2221D /* Logger.swift in Sources */,
+				82B6EFCC26DCF416009C5BED /* DashboardScreen.swift in Sources */,
+				82B6EFD026DCF422009C5BED /* GoToDetailGesture.swift in Sources */,
 				5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */,
 				5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5AB0FDD6265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5A8702CE2230B24B00314199 /* ZitiService.swift in Sources */,
+				82B6EFD426DCF42A009C5BED /* FlippedClipView.swift in Sources */,
 				5A34E95E2278F49100E221DD /* Version.swift in Sources */,
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
 				5A78DEE325631E1000316CE9 /* AppGroup.swift in Sources */,
@@ -1142,6 +1173,7 @@
 				5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */,
 				5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */,
 				5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */,
+				82B6EFCD26DCF416009C5BED /* ServiceDetailsScreen.swift in Sources */,
 				5A8702D922372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5ABF9863260C13EF00AA982F /* SnapshotViewController.swift in Sources */,
 				5A6BA265226F6AB400224F09 /* MainMenuBar.swift in Sources */,
