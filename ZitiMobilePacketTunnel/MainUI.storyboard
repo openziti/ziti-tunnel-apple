@@ -205,25 +205,22 @@
                                 <rect key="frame" x="0.0" y="44" width="414" height="852"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="background" translatesAutoresizingMaskIntoConstraints="NO" id="SfN-xI-HAg">
-                                        <rect key="frame" x="0.0" y="300" width="414" height="552"/>
+                                        <rect key="frame" x="0.0" y="-42" width="414" height="894"/>
                                     </imageView>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="globe" translatesAutoresizingMaskIntoConstraints="NO" id="QW6-JI-I2w">
-                                        <rect key="frame" x="0.0" y="-40" width="464" height="340"/>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="globe" translatesAutoresizingMaskIntoConstraints="NO" id="6eU-kB-Aqi">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="300"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="340" id="Bsj-Up-Va3"/>
+                                            <constraint firstAttribute="height" constant="300" id="z41-uk-kWE"/>
                                         </constraints>
                                     </imageView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="SfN-xI-HAg" firstAttribute="top" secondItem="QW6-JI-I2w" secondAttribute="bottom" id="4fV-Yu-Vrn"/>
                                     <constraint firstAttribute="bottom" secondItem="SfN-xI-HAg" secondAttribute="bottom" id="5bg-37-kBo"/>
-                                    <constraint firstItem="QW6-JI-I2w" firstAttribute="leading" secondItem="4pG-Ok-Mau" secondAttribute="leading" constant="-50" id="GR8-wS-P1L"/>
-                                    <constraint firstAttribute="trailing" secondItem="QW6-JI-I2w" secondAttribute="trailing" id="JHS-7r-DlB"/>
                                     <constraint firstAttribute="trailing" secondItem="SfN-xI-HAg" secondAttribute="trailing" id="OwQ-rf-Rl4"/>
-                                    <constraint firstItem="QW6-JI-I2w" firstAttribute="leading" secondItem="4pG-Ok-Mau" secondAttribute="leading" id="Zpo-l4-Fcu"/>
-                                    <constraint firstItem="QW6-JI-I2w" firstAttribute="top" secondItem="4pG-Ok-Mau" secondAttribute="top" constant="-40" id="fBt-Q8-nzD"/>
+                                    <constraint firstItem="6eU-kB-Aqi" firstAttribute="top" secondItem="4pG-Ok-Mau" secondAttribute="top" id="VLx-my-dnz"/>
                                     <constraint firstItem="SfN-xI-HAg" firstAttribute="leading" secondItem="4pG-Ok-Mau" secondAttribute="leading" id="mMU-PO-72o"/>
-                                    <constraint firstAttribute="trailing" secondItem="QW6-JI-I2w" secondAttribute="trailing" constant="-50" id="vPS-Iu-HhS"/>
+                                    <constraint firstItem="6eU-kB-Aqi" firstAttribute="leading" secondItem="4pG-Ok-Mau" secondAttribute="leading" id="pmX-YR-G6t"/>
+                                    <constraint firstAttribute="trailing" secondItem="6eU-kB-Aqi" secondAttribute="trailing" id="uKz-qe-ntX"/>
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="OkY-uM-p2B" userLabel="Dashboard">
