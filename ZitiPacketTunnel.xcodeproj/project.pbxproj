@@ -118,10 +118,23 @@
 		826F65AF26D64DD100D830DC /* Gestures in Resources */ = {isa = PBXBuildFile; fileRef = 826F65AE26D64DD100D830DC /* Gestures */; };
 		826F65B126D64E3000D830DC /* Views in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B026D64E3000D830DC /* Views */; };
 		826F65B326D64E4000D830DC /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B226D64E4000D830DC /* MainUI.storyboard */; };
-		82B6EFA026DCEC93009C5BED /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 826F65BA26D6525700D830DC /* MainUI.storyboard */; };
-		82B6EFA126DCEE2C009C5BED /* Controllers in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B426D651C900D830DC /* Controllers */; };
-		82B6EFA226DCEE31009C5BED /* Controls in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B626D651D200D830DC /* Controls */; };
-		82B6EFA326DCEE35009C5BED /* View in Resources */ = {isa = PBXBuildFile; fileRef = 826F65B826D651E200D830DC /* View */; };
+		82B6EFB326DCF0FE009C5BED /* LogLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFA526DCF0FE009C5BED /* LogLevelScreen.swift */; };
+		82B6EFB426DCF0FE009C5BED /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFA626DCF0FE009C5BED /* AboutScreen.swift */; };
+		82B6EFB526DCF0FE009C5BED /* DashboardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFA726DCF0FE009C5BED /* DashboardScreen.swift */; };
+		82B6EFB626DCF0FE009C5BED /* ServiceDetailsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFA826DCF0FE009C5BED /* ServiceDetailsScreen.swift */; };
+		82B6EFB726DCF0FE009C5BED /* RecoveryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFA926DCF0FE009C5BED /* RecoveryScreen.swift */; };
+		82B6EFB826DCF0FE009C5BED /* MFASetupScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFAA26DCF0FE009C5BED /* MFASetupScreen.swift */; };
+		82B6EFB926DCF0FE009C5BED /* LogsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFAB26DCF0FE009C5BED /* LogsScreen.swift */; };
+		82B6EFBA26DCF0FE009C5BED /* AddIdentityScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFAC26DCF0FE009C5BED /* AddIdentityScreen.swift */; };
+		82B6EFBB26DCF0FE009C5BED /* AuthenticateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFAD26DCF0FE009C5BED /* AuthenticateScreen.swift */; };
+		82B6EFBC26DCF0FE009C5BED /* ThirdPartyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFAE26DCF0FE009C5BED /* ThirdPartyScreen.swift */; };
+		82B6EFBD26DCF0FE009C5BED /* AdvancedScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFAF26DCF0FE009C5BED /* AdvancedScreen.swift */; };
+		82B6EFBE26DCF0FE009C5BED /* TunnelConfigScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFB026DCF0FE009C5BED /* TunnelConfigScreen.swift */; };
+		82B6EFBF26DCF0FE009C5BED /* LogDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFB126DCF0FE009C5BED /* LogDetailScreen.swift */; };
+		82B6EFC026DCF0FE009C5BED /* IdentityDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFB226DCF0FE009C5BED /* IdentityDetailScreen.swift */; };
+		82B6EFC326DCF10D009C5BED /* IdentityRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFC226DCF10D009C5BED /* IdentityRenderer.swift */; };
+		82B6EFC626DCF11F009C5BED /* IdentityItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFC526DCF11F009C5BED /* IdentityItemCell.swift */; };
+		82B6EFC826DCF12D009C5BED /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 82B6EFC726DCF12D009C5BED /* MainUI.storyboard */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
 /* End PBXBuildFile section */
@@ -309,10 +322,23 @@
 		826F65AE26D64DD100D830DC /* Gestures */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Gestures; sourceTree = "<group>"; };
 		826F65B026D64E3000D830DC /* Views */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Views; sourceTree = "<group>"; };
 		826F65B226D64E4000D830DC /* MainUI.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
-		826F65B426D651C900D830DC /* Controllers */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Controllers; sourceTree = "<group>"; };
-		826F65B626D651D200D830DC /* Controls */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Controls; sourceTree = "<group>"; };
-		826F65B826D651E200D830DC /* View */ = {isa = PBXFileReference; lastKnownFileType = folder; path = View; sourceTree = "<group>"; };
-		826F65BA26D6525700D830DC /* MainUI.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
+		82B6EFA526DCF0FE009C5BED /* LogLevelScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogLevelScreen.swift; sourceTree = "<group>"; };
+		82B6EFA626DCF0FE009C5BED /* AboutScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
+		82B6EFA726DCF0FE009C5BED /* DashboardScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardScreen.swift; sourceTree = "<group>"; };
+		82B6EFA826DCF0FE009C5BED /* ServiceDetailsScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceDetailsScreen.swift; sourceTree = "<group>"; };
+		82B6EFA926DCF0FE009C5BED /* RecoveryScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoveryScreen.swift; sourceTree = "<group>"; };
+		82B6EFAA26DCF0FE009C5BED /* MFASetupScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MFASetupScreen.swift; sourceTree = "<group>"; };
+		82B6EFAB26DCF0FE009C5BED /* LogsScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsScreen.swift; sourceTree = "<group>"; };
+		82B6EFAC26DCF0FE009C5BED /* AddIdentityScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddIdentityScreen.swift; sourceTree = "<group>"; };
+		82B6EFAD26DCF0FE009C5BED /* AuthenticateScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticateScreen.swift; sourceTree = "<group>"; };
+		82B6EFAE26DCF0FE009C5BED /* ThirdPartyScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThirdPartyScreen.swift; sourceTree = "<group>"; };
+		82B6EFAF26DCF0FE009C5BED /* AdvancedScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedScreen.swift; sourceTree = "<group>"; };
+		82B6EFB026DCF0FE009C5BED /* TunnelConfigScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunnelConfigScreen.swift; sourceTree = "<group>"; };
+		82B6EFB126DCF0FE009C5BED /* LogDetailScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogDetailScreen.swift; sourceTree = "<group>"; };
+		82B6EFB226DCF0FE009C5BED /* IdentityDetailScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityDetailScreen.swift; sourceTree = "<group>"; };
+		82B6EFC226DCF10D009C5BED /* IdentityRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityRenderer.swift; sourceTree = "<group>"; };
+		82B6EFC526DCF11F009C5BED /* IdentityItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityItemCell.swift; sourceTree = "<group>"; };
+		82B6EFC726DCF12D009C5BED /* MainUI.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
 		976448384551E768BA611AC6 /* Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.debug.xcconfig"; sourceTree = "<group>"; };
 		A1F669A33272C2A4C12F5FC3 /* Pods-ios_targets-MobileShare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobileShare.release.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobileShare/Pods-ios_targets-MobileShare.release.xcconfig"; sourceTree = "<group>"; };
 		A27E81A124A9A066519599E5 /* Pods-macos_targets-Ziti Desktop Edge.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-Ziti Desktop Edge/Pods-macos_targets-Ziti Desktop Edge.release.xcconfig"; sourceTree = "<group>"; };
@@ -488,10 +514,10 @@
 		5A2EA2CA209B750A00437608 /* ZitiMobilePacketTunnel */ = {
 			isa = PBXGroup;
 			children = (
-				826F65BA26D6525700D830DC /* MainUI.storyboard */,
-				826F65B826D651E200D830DC /* View */,
-				826F65B626D651D200D830DC /* Controls */,
-				826F65B426D651C900D830DC /* Controllers */,
+				82B6EFC726DCF12D009C5BED /* MainUI.storyboard */,
+				82B6EFC426DCF11F009C5BED /* View */,
+				82B6EFC126DCF10D009C5BED /* Controls */,
+				82B6EFA426DCF0FE009C5BED /* Controllers */,
 				5AF5113525842EB50092DC47 /* simdata */,
 				5A6BA25E226DF25A00224F09 /* bundle */,
 				5A2EA2EF209B758800437608 /* ZitiMobilePacketTunnel.entitlements */,
@@ -600,6 +626,43 @@
 				5AF5113625842EDE0092DC47 /* W5hxDMTMg.zid */,
 			);
 			path = simdata;
+			sourceTree = "<group>";
+		};
+		82B6EFA426DCF0FE009C5BED /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				82B6EFA526DCF0FE009C5BED /* LogLevelScreen.swift */,
+				82B6EFA626DCF0FE009C5BED /* AboutScreen.swift */,
+				82B6EFA726DCF0FE009C5BED /* DashboardScreen.swift */,
+				82B6EFA826DCF0FE009C5BED /* ServiceDetailsScreen.swift */,
+				82B6EFA926DCF0FE009C5BED /* RecoveryScreen.swift */,
+				82B6EFAA26DCF0FE009C5BED /* MFASetupScreen.swift */,
+				82B6EFAB26DCF0FE009C5BED /* LogsScreen.swift */,
+				82B6EFAC26DCF0FE009C5BED /* AddIdentityScreen.swift */,
+				82B6EFAD26DCF0FE009C5BED /* AuthenticateScreen.swift */,
+				82B6EFAE26DCF0FE009C5BED /* ThirdPartyScreen.swift */,
+				82B6EFAF26DCF0FE009C5BED /* AdvancedScreen.swift */,
+				82B6EFB026DCF0FE009C5BED /* TunnelConfigScreen.swift */,
+				82B6EFB126DCF0FE009C5BED /* LogDetailScreen.swift */,
+				82B6EFB226DCF0FE009C5BED /* IdentityDetailScreen.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		82B6EFC126DCF10D009C5BED /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				82B6EFC226DCF10D009C5BED /* IdentityRenderer.swift */,
+			);
+			path = Controls;
+			sourceTree = "<group>";
+		};
+		82B6EFC426DCF11F009C5BED /* View */ = {
+			isa = PBXGroup;
+			children = (
+				82B6EFC526DCF11F009C5BED /* IdentityItemCell.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		9235754F7BC4BDA731BD7317 /* Pods */ = {
@@ -880,12 +943,9 @@
 				5AF5113E25842EDE0092DC47 /* MMjge6vGg.zid in Resources */,
 				5AF5113C25842EDE0092DC47 /* oWHiHdhGR.zid in Resources */,
 				5A2EA2D6209B750C00437608 /* LaunchScreen.storyboard in Resources */,
-				82B6EFA026DCEC93009C5BED /* MainUI.storyboard in Resources */,
-				82B6EFA126DCEE2C009C5BED /* Controllers in Resources */,
+				82B6EFC826DCF12D009C5BED /* MainUI.storyboard in Resources */,
 				5AF5113F25842EDE0092DC47 /* sPxn6MJGR.zid in Resources */,
 				5AF5113D25842EDE0092DC47 /* DT87L-oGR.zid in Resources */,
-				82B6EFA326DCEE35009C5BED /* View in Resources */,
-				82B6EFA226DCEE31009C5BED /* Controls in Resources */,
 				5AF5113B25842EDE0092DC47 /* W5hxDMTMg.zid in Resources */,
 				5AF9C24C226B6FAC009CFD71 /* Default-568h@2x.png in Resources */,
 				5A2EA2D3209B750C00437608 /* Assets.xcassets in Resources */,
@@ -1113,27 +1173,43 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82B6EFB326DCF0FE009C5BED /* LogLevelScreen.swift in Sources */,
 				5A2EA2F0209B75B700437608 /* ProviderConfig.swift in Sources */,
 				5A6BA263226DF65C00224F09 /* NoticesViewController.swift in Sources */,
 				5A34E96522791FCA00E221DD /* LogViewController.swift in Sources */,
 				5A91B4CB2222E19E006C4277 /* ZitiIdentity.swift in Sources */,
 				5AB0FDD8265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5A6BA25D226DE5FB00224F09 /* AboutViewController.swift in Sources */,
+				82B6EFBA26DCF0FE009C5BED /* AddIdentityScreen.swift in Sources */,
 				5A051F622264183500B11CB2 /* ZidMgr.swift in Sources */,
 				5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */,
+				82B6EFC026DCF0FE009C5BED /* IdentityDetailScreen.swift in Sources */,
+				82B6EFBB26DCF0FE009C5BED /* AuthenticateScreen.swift in Sources */,
 				5A8702DA22372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */,
+				82B6EFC626DCF11F009C5BED /* IdentityItemCell.swift in Sources */,
 				5A91B4C92222E155006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */,
+				82B6EFB526DCF0FE009C5BED /* DashboardScreen.swift in Sources */,
 				5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */,
+				82B6EFBF26DCF0FE009C5BED /* LogDetailScreen.swift in Sources */,
 				5A8702D02230B24B00314199 /* ZitiService.swift in Sources */,
 				5A34E963227916BA00E221DD /* LogsTableViewController.swift in Sources */,
+				82B6EFB726DCF0FE009C5BED /* RecoveryScreen.swift in Sources */,
+				82B6EFBC26DCF0FE009C5BED /* ThirdPartyScreen.swift in Sources */,
 				5AF9C24A2268F84A009CFD71 /* IdentityViewController.swift in Sources */,
 				5ABF986B260C2DED00AA982F /* SnapshotViewController.swift in Sources */,
+				82B6EFBE26DCF0FE009C5BED /* TunnelConfigScreen.swift in Sources */,
+				82B6EFB826DCF0FE009C5BED /* MFASetupScreen.swift in Sources */,
 				5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */,
+				82B6EFB626DCF0FE009C5BED /* ServiceDetailsScreen.swift in Sources */,
+				82B6EFBD26DCF0FE009C5BED /* AdvancedScreen.swift in Sources */,
+				82B6EFB426DCF0FE009C5BED /* AboutScreen.swift in Sources */,
 				5AF50FE6257D82770092DC47 /* LogLevelViewController.swift in Sources */,
 				5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */,
+				82B6EFC326DCF10D009C5BED /* IdentityRenderer.swift in Sources */,
 				5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */,
+				82B6EFB926DCF0FE009C5BED /* LogsScreen.swift in Sources */,
 				5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */,
 				5A2D2FE124AA6CB900D154AA /* SpinnerViewController.swift in Sources */,
 				5A34E9602278F49100E221DD /* Version.swift in Sources */,
