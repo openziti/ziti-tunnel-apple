@@ -59,12 +59,22 @@
 	<string>2.19</string>
 	<key>CFBundleVersion</key>
 	<string>445</string>
+	<key>IOS_APP_IDENTIFIER</key>
+	<string>$(IOS_APP_IDENTIFIER)</string>
+	<key>IOS_EXT_IDENTIFIER</key>
+	<string>$(IOS_EXT_IDENTIFIER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Enable camera access for scanning JWT GR Code?</string>
+	<key>PRIVACY_POLICY_URL</key>
+	<string>$(PRIVACY_POLICY_URL)</string>
+	<key>TERMS_URL</key>
+	<string>$(TERMS_URL)</string>
+	<key>TeamIdentifierPrefix</key>
+	<string>$(TeamIdentifierPrefix)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>RussoOne-Regular.ttf</string>
@@ -75,7 +85,7 @@
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
-	<string>MainUI</string>
+	<string>App</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -151,15 +161,5 @@
 	<string>$(SUPPORT_EMAIL)</string>
 	<key>ZitiSupportSubject</key>
 	<string>Ziti Support (iOS)</string>
-	<key>TeamIdentifierPrefix</key>
-	<string>$(TeamIdentifierPrefix)</string>
-	<key>IOS_APP_IDENTIFIER</key>
-	<string>$(IOS_APP_IDENTIFIER)</string>
-	<key>IOS_EXT_IDENTIFIER</key>
-	<string>$(IOS_EXT_IDENTIFIER)</string>
-	<key>PRIVACY_POLICY_URL</key>
-	<string>$(PRIVACY_POLICY_URL)</string>
-	<key>TERMS_URL</key>
-	<string>$(TERMS_URL)</string>
 </dict>
 </plist>

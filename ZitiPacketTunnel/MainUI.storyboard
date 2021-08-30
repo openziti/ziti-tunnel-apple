@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="xIs-vq-bpn">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="xIs-vq-bpn">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -2533,7 +2533,7 @@
                                                     <rect key="frame" x="0.0" y="398" width="338" height="40"/>
                                                     <subviews>
                                                         <switch horizontalHuggingPriority="750" verticalHuggingPriority="750" baseWritingDirection="leftToRight" alignment="left" state="on" translatesAutoresizingMaskIntoConstraints="NO" id="bxQ-q9-Jcg" userLabel="ToggleIdentity">
-                                                            <rect key="frame" x="-2" y="8" width="42" height="24"/>
+                                                            <rect key="frame" x="-2" y="7" width="42" height="25"/>
                                                             <gestureRecognizers>
                                                                 <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="pUj-7h-ZLa" userLabel="Toggled">
                                                                     <connections>
@@ -2686,7 +2686,7 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="recovery" id="30R-Kh-35f"/>
                                                         </imageView>
                                                         <switch horizontalHuggingPriority="750" verticalHuggingPriority="750" baseWritingDirection="leftToRight" alignment="left" translatesAutoresizingMaskIntoConstraints="NO" id="Nfv-hL-4sP" userLabel="MFASwitch">
-                                                            <rect key="frame" x="298" y="3" width="42" height="24"/>
+                                                            <rect key="frame" x="298" y="2" width="42" height="25"/>
                                                             <gestureRecognizers>
                                                                 <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="5UL-Vb-YAb" userLabel="MFAClick">
                                                                     <connections>
@@ -3276,7 +3276,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9UF-hj-uxB" userLabel="SubTitle">
-                                                    <rect key="frame" x="-2" y="374" width="342" height="16"/>
+                                                    <rect key="frame" x="-2" y="376" width="342" height="14"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Identity Name" id="0s7-xI-JIk">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -3295,7 +3295,7 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pOd-HL-t7g" userLabel="BarCode">
-                                                    <rect key="frame" x="94" y="216" width="150" height="150"/>
+                                                    <rect key="frame" x="94" y="218" width="150" height="150"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="150" id="J9A-hX-gfN"/>
                                                         <constraint firstAttribute="height" constant="150" id="aRY-e1-K9H"/>
@@ -3303,7 +3303,7 @@
                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="MLN-L7-qLm"/>
                                                 </imageView>
                                                 <stackView distribution="fillProportionally" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4m6-ue-Fzl" userLabel="OptionsView">
-                                                    <rect key="frame" x="79" y="192" width="180" height="16"/>
+                                                    <rect key="frame" x="79" y="194" width="180" height="16"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Bap-b1-VJY">
                                                             <rect key="frame" x="-2" y="0.0" width="68" height="16"/>
@@ -3356,7 +3356,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="n5W-qd-xAt">
-                                                    <rect key="frame" x="56" y="170" width="226" height="14"/>
+                                                    <rect key="frame" x="56" y="170" width="226" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="enter the code below to finish setup" id="IXK-TL-GTN">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

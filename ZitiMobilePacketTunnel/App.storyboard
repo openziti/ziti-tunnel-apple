@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Be6-zG-vnf">
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -24,7 +25,7 @@
         <!--Dashboard Screen-->
         <scene sceneID="4Ld-VB-yse">
             <objects>
-                <viewController storyboardIdentifier="Dashboard" id="Be6-zG-vnf" customClass="DashboardScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="Dashboard" id="Be6-zG-vnf" customClass="DashboardScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="ge4-rq-x5v"/>
                         <viewControllerLayoutGuide type="bottom" id="APS-cf-JwN"/>
@@ -554,7 +555,7 @@
         <!--Advanced Screen-->
         <scene sceneID="PyY-IS-vUo">
             <objects>
-                <viewController id="uAX-mq-CNs" customClass="AdvancedScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="uAX-mq-CNs" customClass="AdvancedScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="fKs-Nc-ruI"/>
                         <viewControllerLayoutGuide type="bottom" id="ldI-A6-32a"/>
@@ -828,7 +829,7 @@
         <!--About Screen-->
         <scene sceneID="LOR-fk-GNa">
             <objects>
-                <viewController storyboardIdentifier="About" useStoryboardIdentifierAsRestorationIdentifier="YES" id="w4M-CW-3vR" customClass="AboutScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="About" useStoryboardIdentifierAsRestorationIdentifier="YES" id="w4M-CW-3vR" customClass="AboutScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="npE-P8-ovc"/>
                         <viewControllerLayoutGuide type="bottom" id="32a-D5-yoN"/>
@@ -1096,7 +1097,7 @@
         <!--Tunnel Config Screen-->
         <scene sceneID="oKf-zN-X5h">
             <objects>
-                <viewController id="Xe9-wv-8Qr" customClass="TunnelConfigScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Xe9-wv-8Qr" customClass="TunnelConfigScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="0nt-Nl-JFv"/>
                         <viewControllerLayoutGuide type="bottom" id="XUM-jl-qsx"/>
@@ -1407,7 +1408,7 @@
         <!--Logs Screen-->
         <scene sceneID="veh-EX-eAl">
             <objects>
-                <viewController storyboardIdentifier="Logs" id="XYZ-K7-gGQ" customClass="LogsScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="Logs" id="XYZ-K7-gGQ" customClass="LogsScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="JM5-AK-HtK"/>
                         <viewControllerLayoutGuide type="bottom" id="8UP-fg-x3p"/>
@@ -1753,7 +1754,7 @@
         <!--Log Level Screen-->
         <scene sceneID="nHG-pL-G22">
             <objects>
-                <viewController storyboardIdentifier="LogLevel" id="S7J-uD-jsW" customClass="LogLevelScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LogLevel" id="S7J-uD-jsW" customClass="LogLevelScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="F2U-eV-DNX"/>
                         <viewControllerLayoutGuide type="bottom" id="PXf-H0-Xmh"/>
@@ -2242,7 +2243,7 @@
         <!--Log Detail Screen-->
         <scene sceneID="UJH-Lm-jxI">
             <objects>
-                <viewController storyboardIdentifier="LogDetails" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2f6-7G-Icj" customClass="LogDetailScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LogDetails" useStoryboardIdentifierAsRestorationIdentifier="YES" id="2f6-7G-Icj" customClass="LogDetailScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="2b4-aH-wHJ"/>
                         <viewControllerLayoutGuide type="bottom" id="Aza-c2-dCe"/>
@@ -2415,7 +2416,7 @@
         <!--Add Identity Screen-->
         <scene sceneID="gnr-ue-azk">
             <objects>
-                <viewController storyboardIdentifier="AddIdentity" useStoryboardIdentifierAsRestorationIdentifier="YES" id="QH1-Xl-opX" customClass="AddIdentityScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddIdentity" useStoryboardIdentifierAsRestorationIdentifier="YES" id="QH1-Xl-opX" customClass="AddIdentityScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="ilo-6X-1Fq"/>
                         <viewControllerLayoutGuide type="bottom" id="bLR-9g-6AQ"/>
@@ -2715,7 +2716,7 @@
         <!--Third Party Screen-->
         <scene sceneID="piq-GL-LZq">
             <objects>
-                <viewController storyboardIdentifier="ThirdPArty" id="XRQ-5W-Oz1" customClass="ThirdPartyScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ThirdPArty" id="XRQ-5W-Oz1" customClass="ThirdPartyScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Ql4-Cz-9oI"/>
                         <viewControllerLayoutGuide type="bottom" id="bdj-dM-uIG"/>
@@ -2862,7 +2863,7 @@
         <!--Identity Detail Screen-->
         <scene sceneID="IBn-a9-TU6">
             <objects>
-                <viewController storyboardIdentifier="IdentityDetail" useStoryboardIdentifierAsRestorationIdentifier="YES" id="VsP-KN-OaD" customClass="IdentityDetailScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="IdentityDetail" useStoryboardIdentifierAsRestorationIdentifier="YES" id="VsP-KN-OaD" customClass="IdentityDetailScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="nGi-K9-ZFB"/>
                         <viewControllerLayoutGuide type="bottom" id="hTo-3U-fKj"/>
@@ -3353,7 +3354,7 @@
         <!--ServiceDetailsScreen-->
         <scene sceneID="Klk-Vt-EWt">
             <objects>
-                <viewController storyboardIdentifier="ServiceDetailsScreen" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Ht2-fk-TeB" userLabel="ServiceDetailsScreen" customClass="SericeDetailScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ServiceDetailsScreen" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Ht2-fk-TeB" userLabel="ServiceDetailsScreen" customClass="SericeDetailScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="vDI-AS-b4D"/>
                         <viewControllerLayoutGuide type="bottom" id="vS6-m8-ORl"/>
@@ -3697,7 +3698,7 @@
         <!--MFASetupScreen-->
         <scene sceneID="1sc-7Z-oRp">
             <objects>
-                <viewController storyboardIdentifier="MFASetupScreen" useStoryboardIdentifierAsRestorationIdentifier="YES" id="RLG-fO-VTK" userLabel="MFASetupScreen" customClass="MFASetupScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MFASetupScreen" useStoryboardIdentifierAsRestorationIdentifier="YES" id="RLG-fO-VTK" userLabel="MFASetupScreen" customClass="MFASetupScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="jnI-Ug-uzJ"/>
                         <viewControllerLayoutGuide type="bottom" id="nI7-Fe-iA9"/>
@@ -3990,7 +3991,7 @@
         <!--AuthenticateScreen-->
         <scene sceneID="4Lz-HS-jOJ">
             <objects>
-                <viewController storyboardIdentifier="AuthenticateScreen" useStoryboardIdentifierAsRestorationIdentifier="YES" id="RRT-km-36M" userLabel="AuthenticateScreen" customClass="AuthenticateScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AuthenticateScreen" useStoryboardIdentifierAsRestorationIdentifier="YES" id="RRT-km-36M" userLabel="AuthenticateScreen" customClass="AuthenticateScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="yWT-hK-pde"/>
                         <viewControllerLayoutGuide type="bottom" id="Sfe-1e-dm9"/>
@@ -4240,7 +4241,7 @@
         <!--ServiceDetailsScreen-->
         <scene sceneID="qHh-0N-Lbd">
             <objects>
-                <viewController storyboardIdentifier="RecoveryScreen" useStoryboardIdentifierAsRestorationIdentifier="YES" id="GxL-8J-9aW" userLabel="ServiceDetailsScreen" customClass="RecoveryScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="RecoveryScreen" useStoryboardIdentifierAsRestorationIdentifier="YES" id="GxL-8J-9aW" userLabel="ServiceDetailsScreen" customClass="RecoveryScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="hQ5-Ev-FQj"/>
                         <viewControllerLayoutGuide type="bottom" id="pgd-Dh-V1a"/>
