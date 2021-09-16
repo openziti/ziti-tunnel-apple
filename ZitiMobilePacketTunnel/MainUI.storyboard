@@ -298,7 +298,7 @@
                                             <fragment content="Tap To Connect">
                                                 <attributes>
                                                     <color key="NSColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <font key="NSFont" size="25" name="RussoOne-Regular"/>
+                                                    <font key="NSFont" metaFont="system" size="25"/>
                                                     <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineSpacing="4" tighteningFactorForTruncation="0.0"/>
                                                 </attributes>
                                             </fragment>
@@ -640,7 +640,7 @@
                                                     <fragment content="Tunnel Configuration">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -686,7 +686,7 @@
                                                     <fragment content="Advanced tunnel settings that will impact tunnel availability and performance">
                                                         <attributes>
                                                             <color key="NSColor" red="0.40153077411167515" green="0.40153077411167515" blue="0.40153077411167515" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="16" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="16"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -709,7 +709,7 @@
                                                     <fragment content="Logs">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -754,7 +754,7 @@
                                                     <fragment content="Diagnostic logs that help you debug if you are having problems">
                                                         <attributes>
                                                             <color key="NSColor" red="0.40153077411167515" green="0.40153077411167515" blue="0.40153077411167515" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="16" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="16"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -914,7 +914,7 @@
                                                     <fragment content="Privacy Policy">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -957,7 +957,7 @@
                                                     <fragment content="Terms of Service">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1000,7 +1000,7 @@
                                                     <fragment content="Third Party Licenses">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1178,12 +1178,12 @@
                                         <rect key="frame" x="0.0" y="142" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="j7D-85-KSr" userLabel="IPLabel">
-                                                <rect key="frame" x="0.0" y="0.0" width="112.66666666666667" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="110.33333333333333" height="50"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="IP Address">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1191,7 +1191,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="167.254.0.1" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wCZ-Va-Wdk" userLabel="IP">
-                                                <rect key="frame" x="112.66666666666666" y="0.0" width="281.33333333333337" height="50"/>
+                                                <rect key="frame" x="110.33333333333334" y="0.0" width="283.66666666666663" height="50"/>
                                                 <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -1219,12 +1219,12 @@
                                         <rect key="frame" x="0.0" y="193" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tMc-GO-qBt" userLabel="SubnetLabel">
-                                                <rect key="frame" x="0.0" y="0.0" width="132.33333333333334" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="130.66666666666666" height="50"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="Subnet Mask">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1232,7 +1232,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="255.255.255.0" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="w3O-dk-Taq" userLabel="Subnet">
-                                                <rect key="frame" x="132.33333333333334" y="0.0" width="261.66666666666663" height="50"/>
+                                                <rect key="frame" x="130.66666666666666" y="0.0" width="263.33333333333337" height="50"/>
                                                 <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -1265,7 +1265,7 @@
                                                     <fragment content="MTU">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1301,12 +1301,12 @@
                                         <rect key="frame" x="0.0" y="295" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NeY-i9-WXe" userLabel="DnsLabel">
-                                                <rect key="frame" x="0.0" y="0.0" width="119.66666666666667" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="118.33333333333333" height="50"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="DNS Server">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1314,7 +1314,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="167.254.0.2" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="1Mr-gt-oiL" userLabel="Dns">
-                                                <rect key="frame" x="119.66666666666666" y="0.0" width="274.33333333333337" height="50"/>
+                                                <rect key="frame" x="118.33333333333334" y="0.0" width="275.66666666666663" height="50"/>
                                                 <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -1493,7 +1493,7 @@
                                                     <fragment content="Packet Tunnel">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1539,7 +1539,7 @@
                                                     <fragment content="Log messages for the packet tunneling extension">
                                                         <attributes>
                                                             <color key="NSColor" red="0.40153077411167515" green="0.40153077411167515" blue="0.40153077411167515" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="16" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="16"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1562,7 +1562,7 @@
                                                     <fragment content="Application">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1607,7 +1607,7 @@
                                                     <fragment content="Log messages for this application">
                                                         <attributes>
                                                             <color key="NSColor" red="0.40153077411167515" green="0.40153077411167515" blue="0.40153077411167515" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="16" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="16"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1631,7 +1631,7 @@
                                                     <fragment content="Level">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1676,7 +1676,7 @@
                                                     <fragment content="Logging level for app and extension">
                                                         <attributes>
                                                             <color key="NSColor" red="0.40153077411167515" green="0.40153077411167515" blue="0.40153077411167515" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="16" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="16"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1844,7 +1844,7 @@
                                                     <fragment content="Select a level below to set application and extension logging level">
                                                         <attributes>
                                                             <color key="NSColor" red="0.40153077411167515" green="0.40153077411167515" blue="0.40153077411167515" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="16" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="16"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -1871,7 +1871,7 @@
                                                             <fragment content="Fatal">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -1913,7 +1913,7 @@
                                                             <fragment content="Error">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -1955,7 +1955,7 @@
                                                             <fragment content="Warn">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -1997,7 +1997,7 @@
                                                             <fragment content="Info">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -2039,7 +2039,7 @@
                                                             <fragment content="Debug">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -2081,7 +2081,7 @@
                                                             <fragment content="Verbose">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -2123,7 +2123,7 @@
                                                             <fragment content="Trace">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -2449,7 +2449,7 @@
                                                             <fragment content="   Add Identity">
                                                                 <attributes>
                                                                     <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="32" name="RussoOne-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="32"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="truncatingHead" baseWritingDirection="natural" lineSpacing="21" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -2993,12 +2993,12 @@
                                         <rect key="frame" x="0.0" y="132" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oo2-nT-vRD">
-                                                <rect key="frame" x="0.0" y="0.0" width="70.333333333333329" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="70" height="50"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="Name">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -3006,7 +3006,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Id Name" textAlignment="right" translatesAutoresizingMaskIntoConstraints="NO" id="L5P-I9-xoB" userLabel="IdName">
-                                                <rect key="frame" x="70.333333333333343" y="0.0" width="323.66666666666663" height="50"/>
+                                                <rect key="frame" x="70" y="0.0" width="324" height="50"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -3030,12 +3030,12 @@
                                         <rect key="frame" x="0.0" y="183" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4oR-Ad-gmX" userLabel="NameLabel">
-                                                <rect key="frame" x="0.0" y="13.999999999999998" width="230" height="22.333333333333329"/>
+                                                <rect key="frame" x="0.0" y="13.666666666666657" width="230" height="23"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="MFA:">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -3098,12 +3098,12 @@
                                         <rect key="frame" x="0.0" y="234" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jhf-j9-fPL">
-                                                <rect key="frame" x="0.0" y="0.0" width="91.666666666666671" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="91.333333333333329" height="50"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="Network">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -3111,7 +3111,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="openziti.com:389" textAlignment="right" translatesAutoresizingMaskIntoConstraints="NO" id="Ffy-02-9VG" userLabel="IdNetwork">
-                                                <rect key="frame" x="91.666666666666657" y="0.0" width="302.33333333333337" height="50"/>
+                                                <rect key="frame" x="91.333333333333343" y="0.0" width="302.66666666666663" height="50"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -3135,12 +3135,12 @@
                                         <rect key="frame" x="0.0" y="285" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LlI-TL-AfC">
-                                                <rect key="frame" x="0.0" y="0.0" width="74.666666666666671" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="74.333333333333329" height="50"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="Status">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -3148,7 +3148,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="active" textAlignment="right" translatesAutoresizingMaskIntoConstraints="NO" id="Tz4-81-1u9" userLabel="IdStatus">
-                                                <rect key="frame" x="74.666666666666657" y="0.0" width="319.33333333333337" height="50"/>
+                                                <rect key="frame" x="74.333333333333343" y="0.0" width="319.66666666666663" height="50"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -3172,12 +3172,12 @@
                                         <rect key="frame" x="0.0" y="336" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oPK-bj-xB0" userLabel="Version">
-                                                <rect key="frame" x="0.0" y="0.0" width="82.333333333333329" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="83" height="50"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="Version">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -3185,7 +3185,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="1.0.0.0" textAlignment="right" translatesAutoresizingMaskIntoConstraints="NO" id="YRS-eT-SnF">
-                                                <rect key="frame" x="82.333333333333343" y="0.0" width="311.66666666666663" height="50"/>
+                                                <rect key="frame" x="83" y="0.0" width="311" height="50"/>
                                                 <inset key="scrollIndicatorInsets" minX="0.0" minY="21" maxX="0.0" maxY="0.0"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -3210,12 +3210,12 @@
                                         <rect key="frame" x="0.0" y="387" width="414" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0EL-Ph-dnY">
-                                                <rect key="frame" x="0.0" y="0.0" width="110.66666666666667" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="110.33333333333333" height="50"/>
                                                 <attributedString key="attributedText">
                                                     <fragment content="Enrollment">
                                                         <attributes>
                                                             <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                            <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                            <font key="NSFont" metaFont="system" size="19"/>
                                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                         </attributes>
                                                     </fragment>
@@ -3223,7 +3223,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="enrolled" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="0TY-e9-d01">
-                                                <rect key="frame" x="110.66666666666666" y="0.0" width="283.33333333333337" height="50"/>
+                                                <rect key="frame" x="110.33333333333334" y="0.0" width="283.66666666666663" height="50"/>
                                                 <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -3387,7 +3387,7 @@
                                                             <fragment content="  Service Details">
                                                                 <attributes>
                                                                     <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="32" name="RussoOne-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="32"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="truncatingHead" baseWritingDirection="natural" lineSpacing="21" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -3455,12 +3455,12 @@
                                                 <rect key="frame" x="0.0" y="40" width="414" height="50"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="29q-uF-SQ9" userLabel="NameLabel">
-                                                        <rect key="frame" x="0.0" y="0.0" width="75.666666666666671" height="50"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="75" height="50"/>
                                                         <attributedString key="attributedText">
                                                             <fragment content="Name:">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -3468,7 +3468,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="167.254.0.2" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="0Cd-zH-gqq" userLabel="ServiceName">
-                                                        <rect key="frame" x="75.666666666666657" y="0.0" width="318.33333333333337" height="50"/>
+                                                        <rect key="frame" x="75" y="0.0" width="319" height="50"/>
                                                         <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -3501,7 +3501,7 @@
                                                             <fragment content="Url:">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -3537,12 +3537,12 @@
                                                 <rect key="frame" x="0.0" y="140" width="414" height="50"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qdV-cz-E0I" userLabel="AddressLabel">
-                                                        <rect key="frame" x="0.0" y="0.0" width="115.33333333333333" height="50"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="114.33333333333333" height="50"/>
                                                         <attributedString key="attributedText">
                                                             <fragment content="Addresses:">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -3550,7 +3550,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="4000" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="xYU-LC-7Xz" userLabel="AddressValue">
-                                                        <rect key="frame" x="115.33333333333334" y="0.0" width="278.66666666666663" height="50"/>
+                                                        <rect key="frame" x="114.33333333333334" y="0.0" width="279.66666666666663" height="50"/>
                                                         <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -3578,12 +3578,12 @@
                                                 <rect key="frame" x="0.0" y="190" width="414" height="50"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="r1e-2f-TcY" userLabel="PortsLabel">
-                                                        <rect key="frame" x="0.0" y="0.0" width="70.333333333333329" height="50"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="70" height="50"/>
                                                         <attributedString key="attributedText">
                                                             <fragment content="Ports:">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -3591,7 +3591,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="167.254.0.1" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="U99-ZP-1gH" userLabel="PortsValue">
-                                                        <rect key="frame" x="70.333333333333343" y="0.0" width="323.66666666666663" height="50"/>
+                                                        <rect key="frame" x="70" y="0.0" width="324" height="50"/>
                                                         <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -3619,12 +3619,12 @@
                                                 <rect key="frame" x="0.0" y="240" width="414" height="50"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sSX-D4-HXI" userLabel="TCPLabel">
-                                                        <rect key="frame" x="0.0" y="0.0" width="106.33333333333333" height="50"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="105" height="50"/>
                                                         <attributedString key="attributedText">
                                                             <fragment content="Protocols:">
                                                                 <attributes>
                                                                     <color key="NSColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="19" name="OpenSans-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="19"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" firstLineHeadIndent="20" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -3632,7 +3632,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="TCP" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="6mu-1W-no9" userLabel="TCPValue">
-                                                        <rect key="frame" x="106.33333333333334" y="0.0" width="287.66666666666663" height="50"/>
+                                                        <rect key="frame" x="105" y="0.0" width="289" height="50"/>
                                                         <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="17"/>
@@ -3740,7 +3740,7 @@
                                                             <fragment content="Setup MFA">
                                                                 <attributes>
                                                                     <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="32" name="RussoOne-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="32"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="truncatingHead" baseWritingDirection="natural" lineSpacing="21" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -3800,10 +3800,10 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="414" height="717"/>
                                                 <subviews>
                                                     <stackView opaque="NO" contentMode="scaleAspectFill" axis="vertical" alignment="center" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="BRS-TB-RJY" userLabel="SetupItemArea">
-                                                        <rect key="frame" x="20" y="20" width="374" height="529.66666666666663"/>
+                                                        <rect key="frame" x="0.0" y="20" width="414" height="529.66666666666663"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Identity Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SJG-ZC-fvN" userLabel="IdName">
-                                                                <rect key="frame" x="118.66666666666666" y="0.0" width="137" height="40"/>
+                                                                <rect key="frame" x="138.66666666666666" y="0.0" width="136.99999999999997" height="40"/>
                                                                 <constraints>
                                                                     <constraint firstAttribute="height" constant="40" id="9kH-oq-ZmE"/>
                                                                 </constraints>
@@ -3812,7 +3812,7 @@
                                                                 <color key="highlightedColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </label>
                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aXp-sl-iVo" userLabel="BarCode">
-                                                                <rect key="frame" x="87" y="44" width="200" height="200"/>
+                                                                <rect key="frame" x="107" y="44" width="200" height="200"/>
                                                                 <constraints>
                                                                     <constraint firstAttribute="height" constant="200" id="WHE-p1-fap"/>
                                                                     <constraint firstAttribute="width" constant="200" id="bwi-ar-IcS"/>
@@ -3820,7 +3820,7 @@
                                                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                                             </imageView>
                                                             <stackView opaque="NO" contentMode="center" alignment="center" spacing="13" translatesAutoresizingMaskIntoConstraints="NO" id="ZeA-uM-niU" userLabel="SetupOptions">
-                                                                <rect key="frame" x="67.666666666666686" y="248" width="239" height="20"/>
+                                                                <rect key="frame" x="87.666666666666686" y="248" width="239" height="20"/>
                                                                 <subviews>
                                                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Go To Link" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IsX-yI-ZBZ" userLabel="GoToUrl">
                                                                         <rect key="frame" x="0.0" y="0.66666666666668561" width="76.666666666666671" height="18.666666666666668"/>
@@ -3851,13 +3851,13 @@
                                                                 </subviews>
                                                             </stackView>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="enter the code below to finish setup" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cqf-Dj-Lq7">
-                                                                <rect key="frame" x="58.666666666666657" y="272" width="256.66666666666674" height="18.666666666666686"/>
+                                                                <rect key="frame" x="78.666666666666657" y="272" width="256.66666666666674" height="18.666666666666686"/>
                                                                 <fontDescription key="fontDescription" name="OpenSans-Regular" family="Open Sans" pointSize="16"/>
                                                                 <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d9G-5Z-d3G">
-                                                                <rect key="frame" x="0.0" y="294.66666666666669" width="374" height="235.00000000000006"/>
+                                                                <rect key="frame" x="20" y="294.66666666666669" width="374" height="235.00000000000006"/>
                                                                 <subviews>
                                                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="t1e-rt-GVI">
                                                                         <rect key="frame" x="10" y="20" width="354" height="195"/>
@@ -3921,9 +3921,9 @@
                                                 <gestureRecognizers/>
                                                 <constraints>
                                                     <constraint firstItem="BRS-TB-RJY" firstAttribute="top" secondItem="id4-zg-6x0" secondAttribute="top" constant="20" id="Jyb-uE-Hed"/>
-                                                    <constraint firstItem="BRS-TB-RJY" firstAttribute="leading" secondItem="id4-zg-6x0" secondAttribute="leading" constant="20" id="KZT-am-udO"/>
+                                                    <constraint firstItem="BRS-TB-RJY" firstAttribute="leading" secondItem="id4-zg-6x0" secondAttribute="leading" id="KZT-am-udO"/>
                                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="300" id="X9b-iT-eHw"/>
-                                                    <constraint firstAttribute="trailing" secondItem="BRS-TB-RJY" secondAttribute="trailing" constant="20" id="fyf-qb-opW"/>
+                                                    <constraint firstAttribute="trailing" secondItem="BRS-TB-RJY" secondAttribute="trailing" id="fyf-qb-opW"/>
                                                 </constraints>
                                             </view>
                                         </subviews>
@@ -4024,7 +4024,7 @@
                                                             <fragment content="  Authenticate">
                                                                 <attributes>
                                                                     <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="32" name="RussoOne-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="32"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="truncatingHead" baseWritingDirection="natural" lineSpacing="21" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>
@@ -4274,7 +4274,7 @@
                                                             <fragment content="  Recovery Codes">
                                                                 <attributes>
                                                                     <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                                    <font key="NSFont" size="32" name="RussoOne-Regular"/>
+                                                                    <font key="NSFont" metaFont="system" size="32"/>
                                                                     <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="truncatingHead" baseWritingDirection="natural" lineSpacing="21" lineHeightMultiple="1" tighteningFactorForTruncation="0.0"/>
                                                                 </attributes>
                                                             </fragment>

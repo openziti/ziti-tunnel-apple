@@ -763,8 +763,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Connect the client and restart the timer
      */
     @IBAction func Connect(_ sender: NSClickGestureRecognizer) {
+        let alert = UIAlertController(title: "Did you bring your towel?", message: "It's recommended you bring your towel before continuing.", preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
+
+        self.present(alert, animated: true)
         timer.invalidate();
-        TimerLabel.stringValue = "00:00.00";
+        TimerLabel.stringValue = "07:00.00";
         ConnectButton.isHidden = true;
         ConnectedButton.isHidden = false;
         do {

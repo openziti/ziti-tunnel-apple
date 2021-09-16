@@ -44,7 +44,7 @@
         <scene sceneID="Lm0-fL-zGs">
             <objects>
                 <customObject id="8qG-TM-zhi" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="DashboardScreen" id="xIs-vq-bpn" userLabel="DashboardScreen" customClass="DashboardScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="DashboardScreen" showSeguePresentationStyle="single" id="xIs-vq-bpn" userLabel="DashboardScreen" customClass="DashboardScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="IZP-fV-y05" userLabel="ParentView">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="520"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -67,10 +67,10 @@
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="globe" id="cDp-mO-wX9"/>
                                         </imageView>
                                         <stackView distribution="fillProportionally" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xfP-An-zVj" userLabel="MainArea">
-                                            <rect key="frame" x="0.0" y="-148" width="380" height="628"/>
+                                            <rect key="frame" x="0.0" y="-140" width="380" height="620"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qra-fI-o2I" userLabel="HeaderArea">
-                                                    <rect key="frame" x="20" y="548" width="340" height="80"/>
+                                                    <rect key="frame" x="20" y="540" width="340" height="80"/>
                                                     <subviews>
                                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="-1" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A1r-HE-ekJ" userLabel="MenuButton">
                                                             <rect key="frame" x="0.0" y="18" width="50" height="45"/>
@@ -125,7 +125,7 @@
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nNg-mN-OTq">
                                                                     <rect key="frame" x="-2" y="0.0" width="228" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Tap To Connect" id="w9Y-Jh-USG">
-                                                                        <font key="font" size="13" name="RussoOne-Regular"/>
+                                                                        <font key="font" metaFont="system"/>
                                                                         <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
@@ -199,7 +199,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UYD-8P-Hgn" userLabel="ConnectButton">
-                                                    <rect key="frame" x="0.0" y="468" width="140" height="160"/>
+                                                    <rect key="frame" x="0.0" y="460" width="140" height="160"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="160" id="9Hz-Ay-Wby"/>
                                                         <constraint firstAttribute="width" constant="140" id="X8h-BU-l8P"/>
@@ -215,7 +215,7 @@
                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="connect" id="Zy7-uQ-3eX"/>
                                                 </imageView>
                                                 <box boxType="custom" borderType="none" cornerRadius="4" title="Box" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k0p-7a-nGQ" userLabel="ConnectedButton">
-                                                    <rect key="frame" x="0.0" y="380" width="380" height="160"/>
+                                                    <rect key="frame" x="0.0" y="372" width="380" height="160"/>
                                                     <view key="contentView" id="3DQ-jl-hbI">
                                                         <rect key="frame" x="0.0" y="0.0" width="380" height="160"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -225,9 +225,9 @@
                                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="connected" id="h7X-CC-jvo"/>
                                                             </imageView>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wXg-3T-Ay2" userLabel="TimerLabel">
-                                                                <rect key="frame" x="-2" y="45" width="384" height="19"/>
+                                                                <rect key="frame" x="-2" y="45" width="384" height="17"/>
                                                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="00:00:00" id="6ZS-S9-E2w">
-                                                                    <font key="font" size="14" name="OpenSans-Regular"/>
+                                                                    <font key="font" metaFont="system" size="14"/>
                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
@@ -236,7 +236,7 @@
                                                                 <rect key="frame" x="-2" y="34" width="382" height="16"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="STOP" id="eWC-Wz-Rew">
-                                                                    <font key="font" size="12" name="OpenSans-Regular"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
                                                                     <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
@@ -265,18 +265,18 @@
                                                     </constraints>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wpj-1q-2La" userLabel="SpeedArea">
-                                                    <rect key="frame" x="70" y="296" width="240" height="76"/>
+                                                    <rect key="frame" x="70" y="296" width="241" height="68"/>
                                                     <subviews>
                                                         <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="-5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sN5-sh-znZ">
-                                                            <rect key="frame" x="0.0" y="0.0" width="125" height="76"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="125" height="68"/>
                                                             <subviews>
                                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="2" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XTa-7N-3gK">
-                                                                    <rect key="frame" x="0.0" y="56" width="125" height="20"/>
+                                                                    <rect key="frame" x="0.0" y="48" width="125" height="20"/>
                                                                     <subviews>
                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="52i-io-Kbl">
-                                                                            <rect key="frame" x="-2" y="1" width="107" height="18"/>
+                                                                            <rect key="frame" x="-2" y="2" width="107" height="16"/>
                                                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Download Speed" id="z61-C2-hh0">
-                                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                                <font key="font" metaFont="system"/>
                                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
@@ -300,17 +300,17 @@
                                                                     </customSpacing>
                                                                 </stackView>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EAm-ME-UbI" userLabel="DownSpeed">
-                                                                    <rect key="frame" x="34" y="9" width="58" height="52"/>
+                                                                    <rect key="frame" x="33" y="8" width="59" height="45"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="0.0" id="a2U-CL-h2i">
-                                                                        <font key="font" size="38" name="OpenSans-Regular"/>
+                                                                        <font key="font" metaFont="system" size="38"/>
                                                                         <color key="textColor" name="PrimaryColor"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Edq-Z6-gw1" userLabel="DownSpeedSize">
-                                                                    <rect key="frame" x="52" y="0.0" width="22" height="14"/>
+                                                                    <rect key="frame" x="51" y="0.0" width="22" height="13"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="bps" id="jhk-5B-PyZ">
-                                                                        <font key="font" size="10" name="OpenSans-Regular"/>
+                                                                        <font key="font" metaFont="system" size="10"/>
                                                                         <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
@@ -328,21 +328,21 @@
                                                             </customSpacing>
                                                         </stackView>
                                                         <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="-5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qGB-rF-1Ir">
-                                                            <rect key="frame" x="133" y="0.0" width="107" height="76"/>
+                                                            <rect key="frame" x="133" y="0.0" width="108" height="68"/>
                                                             <subviews>
                                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="2" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9ci-jc-fRR">
-                                                                    <rect key="frame" x="0.0" y="56" width="107" height="20"/>
+                                                                    <rect key="frame" x="0.0" y="48" width="108" height="20"/>
                                                                     <subviews>
                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Zrk-5p-Xtt">
-                                                                            <rect key="frame" x="-2" y="1" width="89" height="18"/>
+                                                                            <rect key="frame" x="-2" y="2" width="90" height="16"/>
                                                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Upload Speed" id="hLg-uI-ujB">
-                                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                                <font key="font" metaFont="system"/>
                                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                         </textField>
                                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="eZf-iR-rdX">
-                                                                            <rect key="frame" x="87" y="0.0" width="20" height="20"/>
+                                                                            <rect key="frame" x="88" y="0.0" width="20" height="20"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="width" constant="20" id="BLl-vu-Fm1"/>
                                                                                 <constraint firstAttribute="height" constant="20" id="ljh-lF-nYD"/>
@@ -360,17 +360,17 @@
                                                                     </customSpacing>
                                                                 </stackView>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7PB-0z-f2F" userLabel="UpSpeed">
-                                                                    <rect key="frame" x="25" y="9" width="58" height="52"/>
+                                                                    <rect key="frame" x="24" y="8" width="59" height="45"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="0.0" id="HEq-ay-c7f">
-                                                                        <font key="font" size="38" name="OpenSans-Regular"/>
+                                                                        <font key="font" metaFont="system" size="38"/>
                                                                         <color key="textColor" name="SecondaryColor"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xps-KB-w6F" userLabel="UpSpeedSize">
-                                                                    <rect key="frame" x="43" y="0.0" width="22" height="14"/>
+                                                                    <rect key="frame" x="43" y="0.0" width="22" height="13"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="bps" id="zBU-rW-GGY">
-                                                                        <font key="font" size="10" name="OpenSans-Regular"/>
+                                                                        <font key="font" metaFont="system" size="10"/>
                                                                         <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
@@ -435,7 +435,7 @@
                                                         </clickGestureRecognizer>
                                                     </gestureRecognizers>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Add Identity" id="CoE-zv-Qn7">
-                                                        <font key="font" size="16" name="OpenSans-Regular"/>
+                                                        <font key="font" metaFont="system" size="16"/>
                                                         <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -509,9 +509,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="npM-Sp-jGw"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="V5N-I8-LN8" userLabel="MenuTitle">
-                                                            <rect key="frame" x="26" y="10" width="286" height="20"/>
+                                                            <rect key="frame" x="26" y="11" width="286" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Main Menu" id="YI3-x2-BiF">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -570,9 +570,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="advanced" id="8jT-4t-rXK"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kn3-Dx-K4p">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Advanced Settings" usesSingleLineMode="YES" id="ksZ-P5-9xs">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -631,9 +631,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="about" id="h5D-U5-lP5"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ped-lp-G6N">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="About" usesSingleLineMode="YES" id="Kz4-xt-7TA">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -692,9 +692,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="feedbackIcon" id="lWH-JE-TDF"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="78u-4B-tHN">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Feedback" usesSingleLineMode="YES" id="eJ6-Vq-mc0">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -753,9 +753,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="supporticon" id="APC-P8-Z4E"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Adn-3W-OTi">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Support" usesSingleLineMode="YES" id="hJ1-ny-e55">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -814,9 +814,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="detach" id="zoK-GK-1UT"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xk3-xR-Vnz">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Detach App" usesSingleLineMode="YES" id="IsA-ns-rwp">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -864,7 +864,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMz-Gu-TDq">
-                                                    <rect key="frame" x="-2" y="128" width="342" height="18"/>
+                                                    <rect key="frame" x="-2" y="130" width="342" height="16"/>
                                                     <gestureRecognizers>
                                                         <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="BRJ-uf-BsE" userLabel="CloseAppGesture">
                                                             <connections>
@@ -873,7 +873,7 @@
                                                         </clickGestureRecognizer>
                                                     </gestureRecognizers>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Quit Ziti Desktop Edge" id="W2q-Dv-gzi">
-                                                        <font key="font" size="13" name="OpenSans-Regular"/>
+                                                        <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="SecondaryColor"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <userDefinedRuntimeAttributes>
@@ -885,9 +885,9 @@
                                                     </connections>
                                                 </textField>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="SLY-PP-Xld">
-                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="120"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="122"/>
                                                     <view key="contentView" id="FCb-fg-3Yk">
-                                                        <rect key="frame" x="1" y="1" width="336" height="118"/>
+                                                        <rect key="frame" x="1" y="1" width="336" height="120"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </view>
                                                 </box>
@@ -994,9 +994,9 @@
                                                             </connections>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bJ2-Nl-70R" userLabel="MenuTitle">
-                                                            <rect key="frame" x="26" y="10" width="286" height="20"/>
+                                                            <rect key="frame" x="26" y="11" width="286" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="About" id="eoo-iG-Xtz">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1047,9 +1047,9 @@
                                                     <rect key="frame" x="0.0" y="351" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1SZ-gc-HBS">
-                                                            <rect key="frame" x="-2" y="6" width="308" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="308" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Privacy Policy" usesSingleLineMode="YES" id="0Vo-5E-Dft">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1098,9 +1098,9 @@
                                                     <rect key="frame" x="0.0" y="304" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wd1-ua-w8x">
-                                                            <rect key="frame" x="-2" y="6" width="308" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="308" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Terms of Service" usesSingleLineMode="YES" id="dOe-gm-QYt">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1240,9 +1240,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="qJc-La-f1G"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fOR-7h-auG" userLabel="MenuTitle">
-                                                            <rect key="frame" x="26" y="10" width="286" height="20"/>
+                                                            <rect key="frame" x="26" y="11" width="286" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Advanced" id="8Zh-Pn-qFg">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1301,9 +1301,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="wrench" id="PXW-vo-JvQ"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="82u-IR-sqT">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Tunnel Configuration" usesSingleLineMode="YES" id="y1o-CA-MS3">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1362,9 +1362,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="logs" id="r5z-kJ-6Xc"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qHS-Lj-qrs">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Service Logs" usesSingleLineMode="YES" id="s2F-9H-Yrb">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1423,9 +1423,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="logs" id="6R7-kX-VwO"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HCf-pz-SMq">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Application Logs" usesSingleLineMode="YES" id="70V-vg-z9l">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1484,9 +1484,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="advanced" id="oMo-Zo-wQm"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Uu7-ER-7ub">
-                                                            <rect key="frame" x="32" y="6" width="274" height="18"/>
+                                                            <rect key="frame" x="32" y="7" width="274" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Set Logging Level" usesSingleLineMode="YES" id="Kcs-cq-IzG">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1628,9 +1628,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="OYp-yT-T9d"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f5S-U5-UZB">
-                                                            <rect key="frame" x="26" y="10" width="286" height="20"/>
+                                                            <rect key="frame" x="26" y="11" width="286" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Set Log Level" id="ssy-oz-vcv">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1681,9 +1681,9 @@
                                                     <rect key="frame" x="0.0" y="351" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4jQ-JT-KFL">
-                                                            <rect key="frame" x="-2" y="6" width="314" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="314" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Fatal" usesSingleLineMode="YES" id="guH-oO-FFu">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1732,9 +1732,9 @@
                                                     <rect key="frame" x="0.0" y="304" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9JV-kS-Q9k">
-                                                            <rect key="frame" x="-2" y="6" width="314" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="314" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Error" usesSingleLineMode="YES" id="cEy-FQ-ccg">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1783,9 +1783,9 @@
                                                     <rect key="frame" x="0.0" y="257" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ski-kX-PV7">
-                                                            <rect key="frame" x="-2" y="6" width="314" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="314" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Warn" usesSingleLineMode="YES" id="Y5K-8r-s9Y">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1834,9 +1834,9 @@
                                                     <rect key="frame" x="0.0" y="210" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7TI-w5-QQd">
-                                                            <rect key="frame" x="-2" y="6" width="314" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="314" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Info" usesSingleLineMode="YES" id="32J-i9-yaI">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1885,9 +1885,9 @@
                                                     <rect key="frame" x="0.0" y="163" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IGs-iK-72j">
-                                                            <rect key="frame" x="-2" y="6" width="314" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="314" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Debug" usesSingleLineMode="YES" id="E6Y-cu-XvI">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1936,9 +1936,9 @@
                                                     <rect key="frame" x="0.0" y="116" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ypB-RJ-QY9">
-                                                            <rect key="frame" x="-2" y="6" width="314" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="314" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Verbose" usesSingleLineMode="YES" id="aTE-m8-vK2">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -1987,9 +1987,9 @@
                                                     <rect key="frame" x="0.0" y="69" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d1b-Ey-uOo">
-                                                            <rect key="frame" x="-2" y="6" width="314" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="314" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Trace" usesSingleLineMode="YES" id="g6Z-9I-30f">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -2157,9 +2157,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="hSH-a9-GS1"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TfR-zf-FvP">
-                                                            <rect key="frame" x="26" y="10" width="286" height="20"/>
+                                                            <rect key="frame" x="26" y="11" width="286" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Tunnel Configuration" id="cTK-KJ-mgw">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -2210,15 +2210,15 @@
                                                     <rect key="frame" x="0.0" y="351" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vG0-I4-cHz">
-                                                            <rect key="frame" x="-2" y="6" width="91" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="88" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="IPv4 Address:" usesSingleLineMode="YES" id="4xI-yG-bQ0">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d89-i1-quA" userLabel="IPAddress">
-                                                            <rect key="frame" x="95" y="7" width="243" height="16"/>
+                                                            <rect key="frame" x="92" y="7" width="246" height="16"/>
                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="right" drawsBackground="YES" id="Giq-z7-bqO">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2254,15 +2254,15 @@
                                                     <rect key="frame" x="0.0" y="304" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="n6y-ln-03R">
-                                                            <rect key="frame" x="-2" y="6" width="92" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="87" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Subnet Mask:" usesSingleLineMode="YES" id="lq0-6e-pMd">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AVF-M0-4w4" userLabel="SubnetMask">
-                                                            <rect key="frame" x="96" y="7" width="242" height="16"/>
+                                                            <rect key="frame" x="91" y="7" width="247" height="16"/>
                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="right" drawsBackground="YES" id="bnK-Fx-e6e">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2298,15 +2298,15 @@
                                                     <rect key="frame" x="0.0" y="257" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C8H-Na-Xhd">
-                                                            <rect key="frame" x="-2" y="6" width="38" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="37" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="MTU:" usesSingleLineMode="YES" id="owm-a5-9QG">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="76p-oC-0fA" userLabel="Mtu">
-                                                            <rect key="frame" x="42" y="7" width="296" height="16"/>
+                                                            <rect key="frame" x="41" y="7" width="297" height="16"/>
                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="right" drawsBackground="YES" id="oOf-Qd-TYC">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2342,15 +2342,15 @@
                                                     <rect key="frame" x="0.0" y="210" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aQh-rl-74t">
-                                                            <rect key="frame" x="-2" y="6" width="87" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="85" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="DNS Servers:" usesSingleLineMode="YES" id="Rmw-zY-BTk">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ku7-vP-eYp" userLabel="Dns">
-                                                            <rect key="frame" x="91" y="7" width="247" height="16"/>
+                                                            <rect key="frame" x="89" y="7" width="249" height="16"/>
                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="right" drawsBackground="YES" id="XZE-HH-K9Q">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2383,18 +2383,18 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="edk-6T-mcJ" userLabel="MatchedArea">
-                                                    <rect key="frame" x="0.0" y="163" width="338" height="30"/>
+                                                    <rect key="frame" x="8" y="163" width="330" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LIh-1A-DGR">
-                                                            <rect key="frame" x="-2" y="6" width="126" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="118" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Matched Domains:" usesSingleLineMode="YES" id="V8h-4X-PyU">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZO3-06-yZq" userLabel="MatchedDomains">
-                                                            <rect key="frame" x="130" y="7" width="208" height="16"/>
+                                                            <rect key="frame" x="122" y="7" width="208" height="16"/>
                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="right" drawsBackground="YES" id="Lyo-Q1-IvA">
                                                                 <font key="font" metaFont="system"/>
                                                                 <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -2543,9 +2543,9 @@
                                                             </gestureRecognizers>
                                                         </switch>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JDX-04-0TT">
-                                                            <rect key="frame" x="44" y="10" width="268" height="20"/>
+                                                            <rect key="frame" x="44" y="11" width="268" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Identity" id="8XN-fP-gGH">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -2596,17 +2596,17 @@
                                                     <rect key="frame" x="0.0" y="351" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Iqt-Po-LmT">
-                                                            <rect key="frame" x="-2" y="6" width="284" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="286" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Name:" usesSingleLineMode="YES" id="bvD-Kb-U4c">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LaG-Ec-Dab" userLabel="IdName">
-                                                            <rect key="frame" x="286" y="6" width="54" height="18"/>
+                                                            <rect key="frame" x="288" y="7" width="52" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="id name" usesSingleLineMode="YES" id="LPz-NT-Hh2">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -2640,9 +2640,9 @@
                                                     <rect key="frame" x="0.0" y="304" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LaA-3s-XE0">
-                                                            <rect key="frame" x="-2" y="6" width="230" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="230" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="MFA:" usesSingleLineMode="YES" id="OLl-eB-VSf">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -2733,17 +2733,17 @@
                                                     <rect key="frame" x="0.0" y="257" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vir-c4-YLf">
-                                                            <rect key="frame" x="-2" y="6" width="223" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="224" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Network:" usesSingleLineMode="YES" id="x55-un-xt0">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tZx-46-LZv" userLabel="IdNetwork">
-                                                            <rect key="frame" x="225" y="6" width="115" height="18"/>
+                                                            <rect key="frame" x="226" y="7" width="114" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="demo.openziti.org" usesSingleLineMode="YES" id="tFo-Dw-MTd">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -2777,17 +2777,17 @@
                                                     <rect key="frame" x="0.0" y="210" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Crh-RM-gzG">
-                                                            <rect key="frame" x="-2" y="6" width="298" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="297" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Status:" usesSingleLineMode="YES" id="oh4-0K-bjc">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f6c-Ba-vmh" userLabel="IdStatus">
-                                                            <rect key="frame" x="300" y="6" width="40" height="18"/>
+                                                            <rect key="frame" x="299" y="7" width="41" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="active" usesSingleLineMode="YES" id="A6P-2z-M6B">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -2821,17 +2821,17 @@
                                                     <rect key="frame" x="0.0" y="163" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jR6-QY-MN3">
-                                                            <rect key="frame" x="-2" y="6" width="283" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="285" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Enrollment:" usesSingleLineMode="YES" id="yct-tq-Ov4">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField identifier="IdentityDetail" horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8jz-gh-XJz" userLabel="IdEnrolled">
-                                                            <rect key="frame" x="285" y="6" width="55" height="18"/>
+                                                            <rect key="frame" x="287" y="7" width="53" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="enrolled" usesSingleLineMode="YES" id="EKU-2i-HIT">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -2877,21 +2877,21 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SCO-Zw-EHg" userLabel="IdServiceCount">
-                                                    <rect key="frame" x="-2" y="102" width="342" height="20"/>
+                                                    <rect key="frame" x="-2" y="103" width="342" height="19"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="0 Services" id="Yer-Da-ROf">
-                                                        <font key="font" size="15" name="OpenSans-Bold"/>
+                                                        <font key="font" metaFont="system" size="15"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
                                                 <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kt8-wn-tGH" userLabel="ServiceList">
-                                                    <rect key="frame" x="0.0" y="24" width="338" height="70"/>
+                                                    <rect key="frame" x="0.0" y="24" width="338" height="71"/>
                                                     <clipView key="contentView" id="pIn-yy-GNl">
-                                                        <rect key="frame" x="0.0" y="0.0" width="338" height="70"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="338" height="71"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <view id="nNx-Nd-M2W">
-                                                                <rect key="frame" x="0.0" y="0.0" width="323" height="55"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="323" height="56"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             </view>
                                                         </subviews>
@@ -2902,7 +2902,7 @@
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Ker-Yr-oEa">
-                                                        <rect key="frame" x="322" y="0.0" width="16" height="70"/>
+                                                        <rect key="frame" x="322" y="0.0" width="16" height="71"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                 </scrollView>
@@ -3020,9 +3020,9 @@
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9hX-Ir-pNS" userLabel="AuthenticateTitle">
-                                                            <rect key="frame" x="26" y="10" width="286" height="20"/>
+                                                            <rect key="frame" x="26" y="11" width="286" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Authenticate" id="1EP-3o-RwL">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -3075,26 +3075,26 @@
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yuY-qJ-ClI">
-                                                                <rect key="frame" x="5" y="13" width="326" height="140"/>
+                                                                <rect key="frame" x="5" y="22" width="326" height="131"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JiN-e7-ZIk">
-                                                                        <rect key="frame" x="-2" y="118" width="330" height="22"/>
+                                                                        <rect key="frame" x="-2" y="110" width="330" height="21"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Authentication Code" id="bAa-Kl-5TI">
-                                                                            <font key="font" size="18" name="RussoOne-Regular"/>
+                                                                            <font key="font" metaFont="system" size="18"/>
                                                                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <box boxType="custom" cornerRadius="7" translatesAutoresizingMaskIntoConstraints="NO" id="wLV-sv-RED">
-                                                                        <rect key="frame" x="0.0" y="43" width="326" height="67"/>
+                                                                        <rect key="frame" x="0.0" y="43" width="326" height="59"/>
                                                                         <view key="contentView" id="W1c-3s-wcr">
-                                                                            <rect key="frame" x="1" y="1" width="324" height="65"/>
+                                                                            <rect key="frame" x="1" y="1" width="324" height="57"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                             <subviews>
                                                                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1sz-MD-lGW" userLabel="AuthCode">
-                                                                                    <rect key="frame" x="5" y="5" width="314" height="55"/>
+                                                                                    <rect key="frame" x="5" y="5" width="314" height="47"/>
                                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="center" placeholderString="******" drawsBackground="YES" id="gpS-Ci-3WD">
-                                                                                        <font key="font" size="40" name="OpenSans-Regular"/>
+                                                                                        <font key="font" metaFont="system" size="40"/>
                                                                                         <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                                     </textFieldCell>
@@ -3238,9 +3238,9 @@
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2G7-8Q-7v6">
-                                                            <rect key="frame" x="26" y="10" width="286" height="20"/>
+                                                            <rect key="frame" x="26" y="11" width="286" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Setup MFA" id="l0T-Yy-pgr">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -3275,8 +3275,8 @@
                                                         <real value="3.4028234663852886e+38"/>
                                                     </customSpacing>
                                                 </stackView>
-                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9UF-hj-uxB" userLabel="SubTitle">
-                                                    <rect key="frame" x="-2" y="376" width="342" height="14"/>
+                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9UF-hj-uxB" userLabel="SubTitle">
+                                                    <rect key="frame" x="-2" y="374" width="342" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Identity Name" id="0s7-xI-JIk">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -3284,26 +3284,26 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KXw-fQ-bDk" userLabel="SecretCode">
-                                                    <rect key="frame" x="-2" y="288" width="233" height="150"/>
+                                                    <rect key="frame" x="-2" y="288" width="212" height="150"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="150" id="O1J-0B-Dqi"/>
                                                     </constraints>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" alignment="center" title="SecretCode" id="y1l-Ix-TbU">
-                                                        <font key="font" size="40" name="OpenSans-Bold"/>
+                                                        <font key="font" metaFont="system" size="40"/>
                                                         <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pOd-HL-t7g" userLabel="BarCode">
-                                                    <rect key="frame" x="94" y="218" width="150" height="150"/>
+                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="pOd-HL-t7g" userLabel="BarCode">
+                                                    <rect key="frame" x="94" y="216" width="150" height="150"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="150" id="J9A-hX-gfN"/>
                                                         <constraint firstAttribute="height" constant="150" id="aRY-e1-K9H"/>
                                                     </constraints>
                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="MLN-L7-qLm"/>
                                                 </imageView>
-                                                <stackView distribution="fillProportionally" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4m6-ue-Fzl" userLabel="OptionsView">
-                                                    <rect key="frame" x="79" y="194" width="180" height="16"/>
+                                                <stackView distribution="fillProportionally" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4m6-ue-Fzl" userLabel="OptionsView">
+                                                    <rect key="frame" x="79" y="192" width="180" height="16"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Bap-b1-VJY">
                                                             <rect key="frame" x="-2" y="0.0" width="68" height="16"/>
@@ -3355,41 +3355,41 @@
                                                         <real value="3.4028234663852886e+38"/>
                                                     </customSpacing>
                                                 </stackView>
-                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="n5W-qd-xAt">
-                                                    <rect key="frame" x="56" y="170" width="226" height="16"/>
+                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="n5W-qd-xAt">
+                                                    <rect key="frame" x="56" y="168" width="226" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="enter the code below to finish setup" id="IXK-TL-GTN">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <box ambiguous="YES" boxType="custom" borderType="bezel" cornerRadius="14" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="uyM-5I-1qe">
-                                                    <rect key="frame" x="10" y="10" width="318" height="152"/>
-                                                    <view key="contentView" ambiguous="YES" id="vUt-Tm-e2p">
-                                                        <rect key="frame" x="1" y="1" width="316" height="150"/>
+                                                <box boxType="custom" borderType="bezel" cornerRadius="14" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="uyM-5I-1qe">
+                                                    <rect key="frame" x="10" y="10" width="318" height="150"/>
+                                                    <view key="contentView" id="vUt-Tm-e2p">
+                                                        <rect key="frame" x="1" y="1" width="316" height="148"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ccd-jm-RqL">
-                                                                <rect key="frame" x="5" y="5" width="306" height="140"/>
+                                                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ccd-jm-RqL">
+                                                                <rect key="frame" x="5" y="5" width="306" height="138"/>
                                                                 <subviews>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EJt-88-5kn">
-                                                                        <rect key="frame" x="-2" y="118" width="310" height="22"/>
+                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EJt-88-5kn">
+                                                                        <rect key="frame" x="-2" y="117" width="310" height="21"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Authentication Code" id="qB1-hW-yHj">
-                                                                            <font key="font" size="18" name="RussoOne-Regular"/>
+                                                                            <font key="font" metaFont="system" size="18"/>
                                                                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
                                                                     </textField>
-                                                                    <box ambiguous="YES" boxType="custom" cornerRadius="14" translatesAutoresizingMaskIntoConstraints="NO" id="2yJ-7v-iBV">
-                                                                        <rect key="frame" x="0.0" y="43" width="306" height="67"/>
-                                                                        <view key="contentView" ambiguous="YES" id="eJ7-ju-wGE">
-                                                                            <rect key="frame" x="1" y="1" width="304" height="65"/>
+                                                                    <box boxType="custom" cornerRadius="14" translatesAutoresizingMaskIntoConstraints="NO" id="2yJ-7v-iBV">
+                                                                        <rect key="frame" x="0.0" y="43" width="306" height="66"/>
+                                                                        <view key="contentView" id="eJ7-ju-wGE">
+                                                                            <rect key="frame" x="1" y="1" width="304" height="64"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                             <subviews>
-                                                                                <textField verticalHuggingPriority="750" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZSa-yW-ZzQ" userLabel="AuthCode">
-                                                                                    <rect key="frame" x="5" y="5" width="280" height="55"/>
+                                                                                <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZSa-yW-ZzQ" userLabel="AuthCode">
+                                                                                    <rect key="frame" x="5" y="4" width="280" height="55"/>
                                                                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="center" placeholderString="******" drawsBackground="YES" id="yAh-WP-U0F">
-                                                                                        <font key="font" size="40" name="OpenSans-Regular"/>
+                                                                                        <font key="font" metaFont="system" size="40"/>
                                                                                         <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                                     </textFieldCell>
@@ -3532,9 +3532,9 @@
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iqT-3h-XBD" userLabel="AuthenticateTitle">
-                                                            <rect key="frame" x="26" y="10" width="286" height="20"/>
+                                                            <rect key="frame" x="26" y="11" width="286" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Recovery Codes" id="agH-6l-RhD">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -4001,9 +4001,9 @@
                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="IDh-TS-LS3"/>
                                                         </imageView>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cxS-vp-eH0">
-                                                            <rect key="frame" x="-2" y="10" width="314" height="20"/>
+                                                            <rect key="frame" x="-2" y="11" width="314" height="19"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Details" id="p4e-hD-mA8">
-                                                                <font key="font" size="15" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system" size="15"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -4050,17 +4050,17 @@
                                                     <rect key="frame" x="0.0" y="244" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u6x-3z-0J6" userLabel="NameLabel">
-                                                            <rect key="frame" x="-2" y="6" width="253" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="253" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Name:" usesSingleLineMode="YES" id="Stu-MY-QI5">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Bg-iB-3lA" userLabel="ServiceName">
-                                                            <rect key="frame" x="255" y="6" width="85" height="18"/>
+                                                            <rect key="frame" x="255" y="7" width="85" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="service name" usesSingleLineMode="YES" id="bE6-3g-p0K">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -4094,17 +4094,17 @@
                                                     <rect key="frame" x="0.0" y="197" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M9d-t9-UT4" userLabel="UrlLabel">
-                                                            <rect key="frame" x="-2" y="6" width="317" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="318" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Url:" usesSingleLineMode="YES" id="dDn-ft-F70">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P4O-pd-OJv" userLabel="UrlName">
-                                                            <rect key="frame" x="319" y="6" width="21" height="18"/>
+                                                            <rect key="frame" x="320" y="7" width="20" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="url" usesSingleLineMode="YES" id="xYE-ne-Vit">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -4138,17 +4138,17 @@
                                                     <rect key="frame" x="0.0" y="150" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xl7-aH-2yV" userLabel="AddressLabel">
-                                                            <rect key="frame" x="-2" y="6" width="272" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="271" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Addresses:" usesSingleLineMode="YES" id="ybG-vx-aI8">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Lr-nJ-RNN" userLabel="Address">
-                                                            <rect key="frame" x="274" y="6" width="66" height="18"/>
+                                                            <rect key="frame" x="273" y="7" width="67" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="addresses" usesSingleLineMode="YES" id="DBD-QP-SjF">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -4182,17 +4182,17 @@
                                                     <rect key="frame" x="0.0" y="103" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zId-eu-qLD" userLabel="PortsLabel">
-                                                            <rect key="frame" x="-2" y="6" width="302" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="302" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Ports:" usesSingleLineMode="YES" id="q1F-yA-YRV">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7st-GY-Zwr" userLabel="Ports">
-                                                            <rect key="frame" x="304" y="6" width="36" height="18"/>
+                                                            <rect key="frame" x="304" y="7" width="36" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="ports" usesSingleLineMode="YES" id="qQH-rM-FH2">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -4226,17 +4226,17 @@
                                                     <rect key="frame" x="0.0" y="56" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t84-4B-HrM" userLabel="ProtocolLabel">
-                                                            <rect key="frame" x="-2" y="6" width="276" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="276" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Protocols:" usesSingleLineMode="YES" id="5ZJ-av-ftj">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9PX-nC-Cs7" userLabel="Protocols">
-                                                            <rect key="frame" x="278" y="6" width="62" height="18"/>
+                                                            <rect key="frame" x="278" y="7" width="62" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="protocols" usesSingleLineMode="YES" id="TSS-k2-4sx">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
@@ -4267,20 +4267,20 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IDA-W5-cf3" userLabel="PostureArea">
-                                                    <rect key="frame" x="0.0" y="9" width="131" height="30"/>
+                                                    <rect key="frame" x="0.0" y="9" width="128" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pB7-BD-zGY" userLabel="PostureLabel">
-                                                            <rect key="frame" x="-2" y="6" width="69" height="18"/>
+                                                            <rect key="frame" x="-2" y="7" width="66" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Protocols:" usesSingleLineMode="YES" id="bri-Xq-U5a">
-                                                                <font key="font" size="13" name="OpenSans-Bold"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
                                                         </textField>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="BAc-Y1-DvX" userLabel="PostureInfo">
-                                                            <rect key="frame" x="71" y="6" width="62" height="18"/>
+                                                            <rect key="frame" x="68" y="7" width="62" height="16"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="protocols" usesSingleLineMode="YES" id="6ve-Ge-IbL">
-                                                                <font key="font" size="13" name="OpenSans-Regular"/>
+                                                                <font key="font" metaFont="system"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             </textFieldCell>
