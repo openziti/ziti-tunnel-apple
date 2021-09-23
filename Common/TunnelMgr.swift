@@ -21,6 +21,7 @@ import CZiti
 class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager?
     var tunnelRestarting = false
+    let ipcClient = IpcAppClient()
     
     typealias TunnelStateChangedCallback = ((NEVPNStatus)->Void)
     var tsChangedCallbacks:[TunnelStateChangedCallback] = []
@@ -127,6 +128,7 @@ class TunnelMgr: NSObject {
                     
                     completionHandler?(tpm, nil)
                     tmgr.tsChangedCallbacks.forEach { cb in cb(tmgr.status) }
+                    if tmgr.status == .connected { tmgr.ipcClient.startPolling() }
                 } else {
                     completionHandler?(nil, ZitiError("Tunnel preferencecs load fail due to retain scope"))
                 }
@@ -143,6 +145,12 @@ class TunnelMgr: NSObject {
             tsChangedCallbacks.forEach { cb in cb(.reasserting) }
         } else {
             tsChangedCallbacks.forEach { cb in cb(status) }
+        }
+        
+        if status == .connected {
+            ipcClient.startPolling()
+        } else {
+            ipcClient.stopPolling()
         }
     }
     
@@ -209,12 +217,12 @@ class TunnelMgr: NSObject {
                 } else {
                     // sendProviderMessage
                     zLog.info("Sending logLevel \(level) to provider")
-                    do {
-                        try (tpm.connection as? NETunnelProviderSession)?.sendProviderMessage("logLevel=\(level.rawValue)".data(using: .utf8)!) {_ in
-                            zLog.debug("provider responded")
+                    let msg = IpcSetLogLevelMessage(level.rawValue)
+                    self.ipcClient.sendToAppex(msg) { _, zErr in
+                        guard zErr == nil else {
+                            zLog.error("Unable to send provider message to update logLevel to \(level): \(zErr!.localizedDescription)")
+                            return
                         }
-                    } catch {
-                        zLog.error("Unable to send provider message: \(error)")
                     }
                 }
             }

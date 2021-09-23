@@ -31,6 +31,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     var zitiTunnel:ZitiTunnel!
     var loop:Ziti.ZitiRunloop!
     var writeLock = NSLock()
+    var ipcServer:IpcAppexServer?
     
     var hasStarted = false // when true, restart is required to update routes for services intercepted by IP
     var startedAt:Date?
@@ -48,6 +49,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         netMon.pathUpdateHandler = self.pathUpdateHandler
         netMon.start(queue: DispatchQueue.global())
         dnsResolver = DNSResolver()
+        
+        ipcServer = IpcAppexServer(self)
     }
     
     func pathUpdateHandler(path: Network.NWPath) {
@@ -241,17 +244,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             case .Service:
                 gotServices() // hack to wait for services to be reported to allow us to add intercept-by-ip routes
                 self.handleServiceEvent(ziti, zid, zidStore, zEvent)
+            case .MfaAuth:
+                zLog.debug("onMfaQuery(\(ziti): provider=\(String(describing: zEvent.mfaAuthEvent?.mfaAuthQuery.provider)), httpUrl=\(String(describing: zEvent.mfaAuthEvent?.mfaAuthQuery.httpUrl))")
+                if let mfaAuthQuery = zEvent.mfaAuthEvent?.mfaAuthQuery {
+                    self.ipcServer?.queueMsg(IpcMfaAuthQueryMessage(zid.id, mfaAuthQuery))
+                }
             case .Invalid: zLog.error("Invalid event")
             @unknown default: zLog.error("unrecognized event type \(zEvent.type.debug)")
             }
         }
     }
     
-    private let onMfaQuery:Ziti.MfaAuthQueryCallback = { ziti, mfaCtx, authQuery in
-        zLog.info("TODO: onMfaQuery(\(ziti): provider=\(String(describing: authQuery.provider)), httpUrl=\(String(describing: authQuery.httpUrl))")
-    }
-    
-    private func dumpZitis() -> String {
+    func dumpZitis() -> String {
         var str = ""
         let cond = NSCondition()
         var count = allZitis.count
@@ -297,7 +301,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                 
                 let ziti = Ziti(zid: czid, loopPtr: loop)
                 allZitis.append(ziti)
-                ziti.mfaAuthQueryCallback = onMfaQuery
                 zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 _ = zidStore.store(zid)
                 
@@ -495,29 +498,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?) {
-        guard let messageString = NSString(data: messageData, encoding: String.Encoding.utf8.rawValue) else {
-            completionHandler?(nil)
+        guard let ipcServer = self.ipcServer else {
+            zLog.wtf("Invalid/unitialized ipcServer")
             return
         }
-        zLog.debug("PTP Got message from app... \(messageString)")
-        let arr = messageString.components(separatedBy: "=")
-        if arr.count == 1 && arr.first == "dump" {
-            let str = dumpZitis()
-            zLog.info(str)
-            completionHandler?(str.data(using: .utf8))
-        } else if arr.count == 2 && arr.first == "logLevel" {
-            let lvlStr = arr.last ?? "3"
-            let lvl:ZitiLog.LogLevel = ZitiLog.LogLevel(rawValue: Int32(lvlStr) ?? ZitiLog.LogLevel.INFO.rawValue) ?? ZitiLog.LogLevel.INFO
-            zLog.info("Updating LogLevel to \(lvl)")
-            ZitiLog.setLogLevel(lvl)
-            
-            // Can be a timing issue with App updating config and startTunnel().  If we get a logLevel here, cache it
-            // in case startTunnel() is called after receiving this message...
-            appLogLevel = lvl
-            completionHandler?(nil)
-        } else {
-            completionHandler?(nil)
-        }
+        ipcServer.processMessage(messageData, completionHandler: completionHandler)
     }
     
     override func sleep(completionHandler: @escaping () -> Void) {
