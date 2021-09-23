@@ -65,6 +65,8 @@
 		5A6BA261226DF2E300224F09 /* Notices.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 5A6BA25F226DF2C500224F09 /* Notices.rtf */; };
 		5A6BA263226DF65C00224F09 /* NoticesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6BA262226DF65C00224F09 /* NoticesViewController.swift */; };
 		5A6BA265226F6AB400224F09 /* MainMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6BA264226F6AB400224F09 /* MainMenuBar.swift */; };
+		5A6C80BA26F63DC000F283AE /* IpcAppexServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6C80B926F63DC000F283AE /* IpcAppexServer.swift */; };
+		5A6C80BB26F63DC000F283AE /* IpcAppexServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6C80B926F63DC000F283AE /* IpcAppexServer.swift */; };
 		5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 5A76B939226FBAE100204A46 /* Credits.rtf */; };
 		5A78DEE325631E1000316CE9 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A78DEE225631E1000316CE9 /* AppGroup.swift */; };
 		5A78DEE425631E1000316CE9 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A78DEE225631E1000316CE9 /* AppGroup.swift */; };
@@ -90,6 +92,8 @@
 		5AB0FDD7265B2E0700B41D58 /* IpcMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */; };
 		5AB0FDD8265B2E0700B41D58 /* IpcMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */; };
 		5AB0FDD9265B2E0700B41D58 /* IpcMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */; };
+		5AB5F9F926ED46D700F198F2 /* IpcAppClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB5F9F826ED46D600F198F2 /* IpcAppClient.swift */; };
+		5AB5F9FB26ED46D700F198F2 /* IpcAppClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB5F9F826ED46D600F198F2 /* IpcAppClient.swift */; };
 		5ABA5EDA2274D2EB00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5ABA5EDB2274D2EB00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
@@ -247,6 +251,7 @@
 		5A6BA25F226DF2C500224F09 /* Notices.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Notices.rtf; sourceTree = "<group>"; };
 		5A6BA262226DF65C00224F09 /* NoticesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticesViewController.swift; sourceTree = "<group>"; };
 		5A6BA264226F6AB400224F09 /* MainMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuBar.swift; sourceTree = "<group>"; };
+		5A6C80B926F63DC000F283AE /* IpcAppexServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcAppexServer.swift; sourceTree = "<group>"; };
 		5A76B939226FBAE100204A46 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
 		5A78DEE225631E1000316CE9 /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
 		5A8702CD2230B24B00314199 /* ZitiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiService.swift; sourceTree = "<group>"; };
@@ -254,6 +259,7 @@
 		5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentityStore.swift; sourceTree = "<group>"; };
 		5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelMgr.swift; sourceTree = "<group>"; };
 		5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcMessages.swift; sourceTree = "<group>"; };
+		5AB5F9F826ED46D600F198F2 /* IpcAppClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcAppClient.swift; sourceTree = "<group>"; };
 		5ABA5EC422727AEE00B2221D /* libuv_a.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuv_a.a; path = "../ziti-sdk-c/build/deps/uv-mbed/libuv/libuv_a.a"; sourceTree = "<group>"; };
 		5ABA5EC522727AEE00B2221D /* libuv_mbed.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuv_mbed.a; path = "../ziti-sdk-c/build/deps/uv-mbed/libuv_mbed.a"; sourceTree = "<group>"; };
 		5ABA5EC622727AEE00B2221D /* libziti.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti.a; path = "../ziti-sdk-c/build/library/libziti.a"; sourceTree = "<group>"; };
@@ -533,6 +539,8 @@
 				5A55390F2558425900C02F03 /* ZitiPostureChecks.swift */,
 				5A78DEE225631E1000316CE9 /* AppGroup.swift */,
 				5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */,
+				5AB5F9F826ED46D600F198F2 /* IpcAppClient.swift */,
+				5A6C80B926F63DC000F283AE /* IpcAppexServer.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1034,6 +1042,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AB5F9F926ED46D700F198F2 /* IpcAppClient.swift in Sources */,
 				5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */,
 				5A051F612264183500B11CB2 /* ZidMgr.swift in Sources */,
 				5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */,
@@ -1070,6 +1079,7 @@
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
 				5A78DEE425631E1000316CE9 /* AppGroup.swift in Sources */,
 				5A34E95F2278F49100E221DD /* Version.swift in Sources */,
+				5A6C80BA26F63DC000F283AE /* IpcAppexServer.swift in Sources */,
 				5A02AACE206EBDD5006261C6 /* PacketTunnelProvider.swift in Sources */,
 				5A91B4C82222E154006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A2EA2A62097890400437608 /* ProviderConfig.swift in Sources */,
@@ -1097,6 +1107,7 @@
 				5A8702D02230B24B00314199 /* ZitiService.swift in Sources */,
 				5A34E963227916BA00E221DD /* LogsTableViewController.swift in Sources */,
 				5AF9C24A2268F84A009CFD71 /* IdentityViewController.swift in Sources */,
+				5AB5F9FB26ED46D700F198F2 /* IpcAppClient.swift in Sources */,
 				5ABF986B260C2DED00AA982F /* SnapshotViewController.swift in Sources */,
 				5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */,
 				5AF50FE6257D82770092DC47 /* LogLevelViewController.swift in Sources */,
@@ -1124,6 +1135,7 @@
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
 				5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */,
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,
+				5A6C80BB26F63DC000F283AE /* IpcAppexServer.swift in Sources */,
 				5A78DEE625631E1000316CE9 /* AppGroup.swift in Sources */,
 				5A34E9612278F49100E221DD /* Version.swift in Sources */,
 				5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */,
@@ -1432,7 +1444,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 445;
+				CURRENT_PROJECT_VERSION = 446;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1457,7 +1469,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 445;
+				CURRENT_PROJECT_VERSION = 446;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1482,7 +1494,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 445;
+				CURRENT_PROJECT_VERSION = 446;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
@@ -1511,7 +1523,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 445;
+				CURRENT_PROJECT_VERSION = 446;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;

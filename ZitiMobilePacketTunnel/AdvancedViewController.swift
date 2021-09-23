@@ -76,16 +76,20 @@ class AdvancedViewController: UITableViewController {
         if let tsvc = segue.destination as? TunnelSettingsViewController {
             tsvc.tvc = tvc
         } else if let svc = segue.destination as? SnapshotViewController {
-            do {
-                try (TunnelMgr.shared.tpm?.connection as? NETunnelProviderSession)?.sendProviderMessage("dump".data(using: .utf8)!) { resp in
-                    if let resp = resp, var str = String(data: resp, encoding: .utf8) {
-                        zLog.info(str)
-                        if str == "" { str = "No connection data available" }
-                        svc.textView.text = str
-                    }
+            TunnelMgr.shared.ipcClient.sendToAppex(IpcDumpRequestMessage()) { respMsg, zErr in
+                guard zErr == nil else {
+                    zLog.error("Unable to send provider message for snapshot (dump): \(zErr!.localizedDescription)")
+                    return
                 }
-            } catch {
-                zLog.error("Unable to send provider message: \(error)")
+                guard let dumpResp = respMsg as? IpcDumpResponseMessage,
+                      let str = dumpResp.dump else {
+                    zLog.error("Unable to parse snapshot (dump) string from response message")
+                    return
+                }
+                
+                if str == "" { str = "No connection data available" }
+                zLog.info(str)
+                svc.textView.text = str
             }
         }
     }
