@@ -34,10 +34,12 @@ class ZitiService : Codable {
     var addresses:String?
     var portRanges:String?
     var status:Status?
+    var postureQuerySets:[CZiti.ZitiPostureQuerySet]?
     
     init(_ eSvc:CZiti.ZitiService) {
         name = eSvc.name
         id = eSvc.id
+        postureQuerySets = eSvc.postureQuerySets
         
         if let cfg = eSvc.interceptConfigV1 {
             protocols = cfg.protocols.joined(separator: ", ").uppercased()
