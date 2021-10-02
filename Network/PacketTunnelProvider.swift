@@ -245,10 +245,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                 gotServices() // hack to wait for services to be reported to allow us to add intercept-by-ip routes
                 self.handleServiceEvent(ziti, zid, zidStore, zEvent)
             case .MfaAuth:
-                zLog.debug("onMfaQuery(\(ziti): provider=\(String(describing: zEvent.mfaAuthEvent?.mfaAuthQuery.provider)), httpUrl=\(String(describing: zEvent.mfaAuthEvent?.mfaAuthQuery.httpUrl))")
-                if let mfaAuthQuery = zEvent.mfaAuthEvent?.mfaAuthQuery {
-                    self.ipcServer?.queueMsg(IpcMfaAuthQueryMessage(zid.id, mfaAuthQuery))
-                }
+                self.ipcServer?.queueMsg(IpcMfaAuthQueryMessage(zid.id, zEvent.mfaAuthEvent?.mfaAuthQuery))
             case .Invalid: zLog.error("Invalid event")
             @unknown default: zLog.error("unrecognized event type \(zEvent.type.debug)")
             }
@@ -379,8 +376,15 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     @objc func runZiti() {
         Ziti.executeRunloop(loopPtr: loop)
     }
-
+    
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+        // call async so we can handle IPC calls while tunnel is starting up
+        DispatchQueue.global().async {
+            self.startTunnelAsync(options: options, completionHandler: completionHandler)
+        }
+    }
+
+    func startTunnelAsync(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         zLog.info("startTunnel: options=\(options?.debugDescription ?? "nil")")
         
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
