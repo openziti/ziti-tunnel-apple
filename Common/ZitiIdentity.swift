@@ -75,6 +75,9 @@ class ZitiIdentity : NSObject, Codable {
 
     var expDate:Date { return Date(timeIntervalSince1970: TimeInterval(claims?.exp ?? 0)) }
     
+    var mfaEnabled:Bool? = false
+    var mfaVerified:Bool? = false
+    var lastMfaAuth:Date?
     var enabled:Bool? = false
     var enrolled:Bool? = false
     var enrollmentStatus:EnrollmentStatus {
@@ -89,6 +92,8 @@ class ZitiIdentity : NSObject, Codable {
         return EnrollmentMethod.ott
     }
     
+    var isMfaEnabled:Bool { return mfaEnabled ?? false }
+    var isMfaVerified:Bool { return isMfaEnabled && (mfaVerified ?? false) }
     var isEnabled:Bool { return enabled ?? false }
     var isEnrolled:Bool { return enrolled ?? false }
     var edgeStatus:EdgeStatus?

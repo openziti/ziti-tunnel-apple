@@ -40,20 +40,34 @@ class IpcAppClient : NSObject {
             }
             
             try conn.sendProviderMessage(data) { respData in
-                if msg.meta.respType == nil && respData != nil {
-                    zLog.warn("Unexpected IPC response received for message type \(msg.meta.msgType)")
-                }
                 var respMsg:IpcMessage? = nil
-                if let respType = msg.meta.respType, let data = respData {
-                    guard let msg = try? self.decoder.decode(respType, from: data) else {
-                        let errStr = "Unable to decode response message for message type \(msg.meta.msgType)"
-                        zLog.error(errStr)
-                        cb?(nil, ZitiError(errStr))
-                        return
+                var zErr:ZitiError? = nil
+                
+                if let data = respData {
+                    if let errMsg = try? self.decoder.decode(IpcErrorResponseMessage.self, from: data), errMsg.meta.msgType == .ErrorResponse {
+                        let errorDescription = errMsg.errorDescription ?? "\(errMsg.errorCode)"
+                        zLog.error("Error message received from IPC server: \"\(errorDescription)\"")
+                        zErr = ZitiError(errorDescription, errorCode: errMsg.errorCode)
+                    } else if let respType = msg.meta.respType {
+                        guard let rMsg = try? self.decoder.decode(respType, from: data) else {
+                            let errStr = "Unable to decode response message for message type \(msg.meta.msgType)"
+                            zLog.error(errStr)
+                            cb?(nil, ZitiError(errStr))
+                            return
+                        }
+                        respMsg = rMsg
+                    } else {
+                        // We don't know the type at this point. May need to come up with something better...
+                        guard let rMsg = try? self.decoder.decode(IpcMessage.self, from: data) else {
+                            let errStr = "Unable to decode response message for \(msg.meta.msgType) message"
+                            zLog.error(errStr)
+                            cb?(nil, ZitiError(errStr))
+                            return
+                        }
+                        respMsg = rMsg
                     }
-                    respMsg = msg
                 }
-                cb?(respMsg, nil)
+                cb?(respMsg, zErr)
             }
         } catch {
             let errStr = "Unable to send provider message type \(msg.meta.msgType): \(error)"
@@ -62,21 +76,26 @@ class IpcAppClient : NSObject {
         }
     }
     
+    func sendPollMsg() {
+        sendToAppex(IpcPollMessage()) { respMsg, zErr in
+            guard zErr == nil else {
+                zLog.error(zErr!.localizedDescription)
+                return
+            }
+            guard let respMsg = respMsg else { // perfectly legit
+                return
+            }
+            
+            zLog.info("IpcMessage received of type \(respMsg.meta.msgType)")
+            NotificationCenter.default.post(name: .onZitiPollResponse, object: self, userInfo: ["ipcMessage":respMsg])
+        }
+    }
     func startPolling() {
         DispatchQueue.main.async { [weak self] in
-            if self?.pollTimer != nil { self?.pollTimer?.invalidate() }
-            self?.pollTimer = Timer.scheduledTimer(withTimeInterval: self?.pollInterval ?? 0.0, repeats: true) { _ in
-                self?.sendToAppex(IpcPollMessage()) { respMsg, zErr in
-                    guard zErr == nil else {
-                        zLog.error(zErr!.localizedDescription)
-                        return
-                    }
-                    guard let respMsg = respMsg else { // perfectly legit
-                        return
-                    }
-                    
-                    zLog.info("IpcMessage received of type \(respMsg.meta.msgType)")
-                    NotificationCenter.default.post(name: .onZitiPollResponse, object: self, userInfo: ["ipcMessage":respMsg])
+            self?.sendPollMsg()
+            if self?.pollTimer == nil {
+                self?.pollTimer = Timer.scheduledTimer(withTimeInterval: self?.pollInterval ?? 0.0, repeats: true) { _ in
+                    self?.sendPollMsg()
                 }
             }
         }
@@ -84,7 +103,8 @@ class IpcAppClient : NSObject {
     
     func stopPolling() {
         DispatchQueue.main.async { [weak self] in
-            if self?.pollTimer != nil { self?.pollTimer?.invalidate() }
+            self?.pollTimer?.invalidate()
+            self?.pollTimer = nil
         }
     }
 }

@@ -18,6 +18,7 @@ import CZiti
 
 enum IpcMessageType : Int32, Codable {
     case Poll = 0
+    case ErrorResponse
     case SetLogLevel
     case DumpRequest
     case DumpResponse
@@ -42,6 +43,7 @@ class IpcMessage : NSObject, Codable {
         var msgId = UUID().uuidString
         var msgType:IpcMessageType
         var respType:IpcMessage.Type? = nil
+        var createdAt = Date()
         
         init(_ zid:String?, _ msgType:IpcMessageType, _ respType:IpcMessage.Type?=nil) {
             self.zid = zid
@@ -63,6 +65,31 @@ class IpcPollMessage : IpcMessage {
     }
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
+    }
+}
+
+class IpcErrorResponseMessage : IpcMessage {
+    enum CodingKeys: String, CodingKey { case errorDescription, errorCode }
+    var errorDescription:String?
+    var errorCode:Int = -1
+    
+    init(_ errorDescription:String, _ errorCode:Int=Int(-1)) {
+        let m = Meta(nil, .ErrorResponse)
+        self.errorDescription = errorDescription
+        self.errorCode = errorCode
+        super.init(m)
+    }
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        errorDescription = try c.decode(String.self, forKey: .errorDescription)
+        errorCode = try c.decode(Int.self, forKey: .errorCode)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(errorDescription, forKey: .errorDescription)
+        try c.encodeIfPresent(errorCode, forKey: .errorCode)
     }
 }
 
@@ -223,7 +250,7 @@ class IpcMfaAuthQueryMessage : IpcMessage {
     enum CodingKeys: String, CodingKey { case query }
     var query:ZitiMfaAuthQuery?
     
-    init(_ zid:String, _ query:ZitiMfaAuthQuery) {
+    init(_ zid:String, _ query:ZitiMfaAuthQuery?) {
         let m = Meta(zid, .MfaAuthQuery, nil) //IpcMfaAuthQueryResponseMessage.self)
         self.query = query
         super.init(m)

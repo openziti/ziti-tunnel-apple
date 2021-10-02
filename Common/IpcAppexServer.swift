@@ -31,14 +31,27 @@ class IpcAppexServer : NSObject {
     
     func queueMsg(_ msg:IpcMessage) {
         qLock.lock()
-        queue.append(msg) // TODO: need to time out messages since the app might not be running all the time...
+        pruneMsgQueue()
+        queue.append(msg)
         qLock.unlock()
+    }
+    
+    func pruneMsgQueue() {
+        queue = queue.filter {
+            let age = -($0.meta.createdAt.timeIntervalSinceNow)
+            return age < TimeInterval(60.0)
+        }
+    }
+    
+    func errData(_ errStr:String) -> Data? {
+        return try? encoder.encode(IpcErrorResponseMessage(errStr))
     }
     
     func processMessage(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
         guard let ipcMsg = try? decoder.decode(IpcMessage.self, from: messageData) else {
-            zLog.error("Unable to decode IpcMessage")
-            completionHandler?(nil)
+            let errStr = "Unable to decode IpcMessage"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         zLog.debug("processing message of type \(ipcMsg.meta.msgType)")
@@ -54,8 +67,9 @@ class IpcAppexServer : NSObject {
         case .MfaGetRecoveryCodesRequest: processMfaGetRecoveryCodesRequest(messageData, completionHandler: completionHandler)
         case .MfaNewRecoveryCodesRequest: processMfaNewRecoveryCodesRequest(messageData, completionHandler: completionHandler)
         default:
-            zLog.error("Unsupported IpcMessageType \(ipcMsg.meta.msgType)")
-            completionHandler?(nil)
+            let errStr = "Unsupported IpcMessageType \(ipcMsg.meta.msgType)"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
         }
     }
     
@@ -63,15 +77,17 @@ class IpcAppexServer : NSObject {
         var msg:IpcMessage?
         
         qLock.lock()
+        pruneMsgQueue()
         if queue.count > 0 {
-            msg = queue.removeFirst() // TODO: need to time out messages since the app might not be running all the time...
+            msg = queue.removeFirst()
         }
         qLock.unlock()
         
         if let msg = msg {
             guard let data = try? encoder.encode(msg) else {
-                zLog.error("Unable to encode popped IpcMessage of type \(msg.meta.msgType)")
-                completionHandler?(nil)
+                let errStr = "Unable to encode popped IpcMessage of type \(msg.meta.msgType)"
+                zLog.error(errStr)
+                completionHandler?(errData(errStr))
                 return
             }
             completionHandler?(data)
@@ -83,7 +99,9 @@ class IpcAppexServer : NSObject {
     func processSetLogLevel(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
         guard let msg = try? decoder.decode(IpcSetLogLevelMessage.self, from: messageData),
               let logLevel = msg.logLevel else {
-            zLog.error("Unable to decode .SetLogLevel message")
+            let errStr = "Unable to decode .SetLogLevel message"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
 
@@ -99,8 +117,9 @@ class IpcAppexServer : NSObject {
         zLog.info(dumpStr)
         
         guard let data = try? encoder.encode(IpcDumpResponseMessage(dumpStr)) else {
-            zLog.error("Unable to encode IpcDumpResponseMessage")
-            completionHandler?(nil)
+            let errStr = "Unable to encode IpcDumpResponseMessage"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         completionHandler?(data)
@@ -108,21 +127,24 @@ class IpcAppexServer : NSObject {
     
     func processMfaEnrollRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
         guard let msg = try? decoder.decode(IpcMfaEnrollRequestMessage.self, from: messageData) else {
-            zLog.error("Unable to decode message")
-            completionHandler?(nil)
+            let errStr = "Unable to decode message"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
-            zLog.error("Unable to lookup identity with id = \(msg.meta.zid ?? "nil")")
-            completionHandler?(nil)
+            let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         
         ziti.mfaEnroll { _, status, mfaEnrollment in
             let respMsg = IpcMfaEnrollResponseMessage(status, mfaEnrollment: mfaEnrollment)
             guard let data = try? self.encoder.encode(respMsg) else {
-                zLog.error("Unable to encode response message")
-                completionHandler?(nil)
+                let errStr = "Unable to encode response message"
+                zLog.error(errStr)
+                completionHandler?(self.errData(errStr))
                 return
             }
             completionHandler?(data)
@@ -131,26 +153,30 @@ class IpcAppexServer : NSObject {
     
     func processMfaVerifyRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
         guard let msg = try? decoder.decode(IpcMfaVerifyRequestMessage.self, from: messageData) else {
-            zLog.error("Unable to decode message")
-            completionHandler?(nil)
+            let errStr = "Unable to decode message"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
-            zLog.error("Unable to lookup identity with id = \(msg.meta.zid ?? "nil")")
-            completionHandler?(nil)
+            let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let code = msg.code else {
-            zLog.error("Invalid (nil) code")
-            completionHandler?(nil)
+            let errStr = "Invalid (nil) code"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         
         ziti.mfaVerify(code) { _, status in
             let respMsg = IpcMfaStatusResponseMessage(status)
             guard let data = try? self.encoder.encode(respMsg) else {
-                zLog.error("Unable to encode response message")
-                completionHandler?(nil)
+                let errStr = "Unable to encode response message"
+                zLog.error(errStr)
+                completionHandler?(self.errData(errStr))
                 return
             }
             completionHandler?(data)
@@ -159,26 +185,30 @@ class IpcAppexServer : NSObject {
     
     func processMfaRemoveRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
         guard let msg = try? decoder.decode(IpcMfaRemoveRequestMessage.self, from: messageData) else {
-            zLog.error("Unable to decode message")
-            completionHandler?(nil)
+            let errStr = "Unable to decode message"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
-            zLog.error("Unable to lookup identity with id = \(msg.meta.zid ?? "nil")")
-            completionHandler?(nil)
+            let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let code = msg.code else {
-            zLog.error("Invalid (nil) code")
-            completionHandler?(nil)
+            let errStr = "Invalid (nil) code"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         
         ziti.mfaRemove(code) { _, status in
             let respMsg = IpcMfaStatusResponseMessage(status)
             guard let data = try? self.encoder.encode(respMsg) else {
-                zLog.error("Unable to encode response message")
-                completionHandler?(nil)
+                let errStr = "Unable to encode response message"
+                zLog.error(errStr)
+                completionHandler?(self.errData(errStr))
                 return
             }
             completionHandler?(data)
@@ -187,26 +217,30 @@ class IpcAppexServer : NSObject {
     
     func processMfaAuthQueryResponse(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
         guard let msg = try? decoder.decode(IpcMfaAuthQueryResponseMessage.self, from: messageData) else {
-            zLog.error("Unable to decode message")
-            completionHandler?(nil)
+            let errStr = "Unable to decode message"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
-            zLog.error("Unable to lookup identity with id = \(msg.meta.zid ?? "nil")")
-            completionHandler?(nil)
+            let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let code = msg.code else {
-            zLog.error("Invalid (nil) code")
-            completionHandler?(nil)
+            let errStr = "Invalid (nil) code"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         
         ziti.mfaAuth(code) { _, status in
             let respMsg = IpcMfaStatusResponseMessage(status)
             guard let data = try? self.encoder.encode(respMsg) else {
-                zLog.error("Unable to encode response message")
-                completionHandler?(nil)
+                let errStr = "Unable to encode response message"
+                zLog.error(errStr)
+                completionHandler?(self.errData(errStr))
                 return
             }
             completionHandler?(data)
@@ -215,26 +249,30 @@ class IpcAppexServer : NSObject {
     
     func processMfaGetRecoveryCodesRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
         guard let msg = try? decoder.decode(IpcMfaGetRecoveryCodesRequestMessage.self, from: messageData) else {
-            zLog.error("Unable to decode message")
-            completionHandler?(nil)
+            let errStr = "Unable to decode message"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
-            zLog.error("Unable to lookup identity with id = \(msg.meta.zid ?? "nil")")
-            completionHandler?(nil)
+            let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let code = msg.code else {
-            zLog.error("Invalid (nil) code")
-            completionHandler?(nil)
+            let errStr = "Invalid (nil) code"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         
         ziti.mfaGetRecoveryCodes(code) { _, status, codes in
             let respMsg = IpcMfaRecoveryCodesResponseMessage(status, codes)
             guard let data = try? self.encoder.encode(respMsg) else {
-                zLog.error("Unable to encode response message")
-                completionHandler?(nil)
+                let errStr = "Unable to encode response message"
+                zLog.error(errStr)
+                completionHandler?(self.errData(errStr))
                 return
             }
             completionHandler?(data)
@@ -243,26 +281,30 @@ class IpcAppexServer : NSObject {
     
     func processMfaNewRecoveryCodesRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
         guard let msg = try? decoder.decode(IpcMfaNewRecoveryCodesRequestMessage.self, from: messageData) else {
-            zLog.error("Unable to decode message")
-            completionHandler?(nil)
+            let errStr = "Unable to decode message"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
-            zLog.error("Unable to lookup identity with id = \(msg.meta.zid ?? "nil")")
-            completionHandler?(nil)
+            let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         guard let code = msg.code else {
-            zLog.error("Invalid (nil) code")
-            completionHandler?(nil)
+            let errStr = "Invalid (nil) code"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
             return
         }
         
         ziti.mfaNewRecoveryCodes(code) { _, status, codes in
             let respMsg = IpcMfaRecoveryCodesResponseMessage(status, codes)
             guard let data = try? self.encoder.encode(respMsg) else {
-                zLog.error("Unable to encode response message")
-                completionHandler?(nil)
+                let errStr = "Unable to encode response message"
+                zLog.error(errStr)
+                completionHandler?(self.errData(errStr))
                 return
             }
             completionHandler?(data)
