@@ -24,6 +24,7 @@ class ServicesViewController: NSViewController {
         static let Proto = "Protocols"
         static let Hostname = "Addresses"
         static let Port = "Ports"
+        static let Posture = "Posture Checks"
     }
     
     var sortKey = ColumnNames.Name
@@ -54,6 +55,7 @@ class ServicesViewController: NSViewController {
         tableView.tableColumns[2].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Hostname, ascending: true)
         tableView.tableColumns[3].title = ColumnNames.Port
         tableView.tableColumns[3].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Port, ascending: true)
+        tableView.tableColumns[4].title = ColumnNames.Posture
         
         tableView.isEnabled = zid == nil ? false : true
         self.reloadData()
@@ -135,6 +137,7 @@ extension ServicesViewController: NSTableViewDelegate {
         static let ProtocolCell = "ProtocolCellID"
         static let HostnameCell = "HostnameCellID"
         static let PortCell = "PortCellID"
+        static let PostureCell = "PostureCellID"
     }
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
@@ -157,6 +160,18 @@ extension ServicesViewController: NSTableViewDelegate {
         } else if tableColumn == tableView.tableColumns[3] {
             text = String(svc.portRanges ?? "")
             cellIdentifier = CellIdentifiers.PortCell
+        } else if tableColumn == tableView.tableColumns[4] {
+            text = "FAIL"
+            if let pqs = svc.postureQuerySets {
+                for q in pqs {
+                    if q.isPassing ?? false {
+                        text = "PASS"
+                        break
+                    }
+                }
+                
+            }
+            cellIdentifier = CellIdentifiers.PostureCell
         }
         
         if let cell = tableView.makeView(

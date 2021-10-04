@@ -219,23 +219,29 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     }
     
     @objc func showSnapshot(_ sender:Any?) {
-        do {
-            try (TunnelMgr.shared.tpm?.connection as? NETunnelProviderSession)?.sendProviderMessage("dump".data(using: .utf8)!) { resp in
-                if let resp = resp, let str = String(data: resp, encoding: .utf8) {
-                    zLog.info(str)
-                    
-                    if let wc = NSStoryboard(name: "Main", bundle: nil).instantiateController(withIdentifier: "SNAPSHOT_WINDOW") as? NSWindowController {
-                        wc.window?.title = "Ziti Snapshot \(Date())"
-                        if let vc = wc.contentViewController as? SnapshotViewController {
-                            vc.textView.textStorage?.mutableString.setString(str)
-                        }
-                        wc.showWindow(self)
-                        NSApp.activate(ignoringOtherApps: true)
-                    }
-                }
+        TunnelMgr.shared.ipcClient.sendToAppex(IpcDumpRequestMessage()) { respMsg, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message for snapshot (dump): \(zErr!.localizedDescription)")
+                return
             }
-        } catch {
-            zLog.error("Unable to send provider message: \(error)")
+            guard let dumpResp = respMsg as? IpcDumpResponseMessage,
+                  let str = dumpResp.dump else {
+                zLog.error("Unable to parse snapshot (dump) string from response message")
+                return
+            }
+            
+            zLog.info(str)
+            guard let wc = NSStoryboard(name: "Main", bundle: nil).instantiateController(withIdentifier: "SNAPSHOT_WINDOW") as? NSWindowController else {
+                zLog.wtf("Unable to access SNAPSHOT_WINDOW from Main Storyboard")
+                return
+            }
+            
+            wc.window?.title = "Ziti Snapshot \(Date())"
+            if let vc = wc.contentViewController as? SnapshotViewController {
+                vc.textView.textStorage?.mutableString.setString(str)
+            }
+            wc.showWindow(self)
+            NSApp.activate(ignoringOtherApps: true)
         }
     }
     
