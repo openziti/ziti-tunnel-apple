@@ -306,8 +306,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         speedFormetter.maximumFractionDigits = 1;
         speedFormetter.minimumFractionDigits = 1;
         
-        bytesUp = Float.random(in: 0.8 ... 4500000000);
-        bytesDown = bytesUp*1000;
+        bytesDown = bytesUp*100;
         
         var upSize = "bps";
         var upSpeed = bytesUp;
@@ -496,8 +495,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             arrowView.frame = CGRect(x: 10, y: 10, width: 10, height: 10);
             arrowView.imageScaling = .scaleProportionallyUpOrDown;
             arrowView.image = arrowImage;
-            arrowView.widthAnchor.constraint(equalToConstant: 20).isActive = true;
-            arrowView.heightAnchor.constraint(equalToConstant: 20).isActive = true;
+            arrowView.widthAnchor.constraint(equalToConstant: 16).isActive = true;
+            arrowView.heightAnchor.constraint(equalToConstant: 16).isActive = true;
             
             let col4 = NSStackView(views: [arrowView]);
             col4.frame = CGRect(x: 0, y: 0, width: 30, height: 50);
@@ -1605,7 +1604,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             state = "menu";
         } else if (state=="config"||state=="loglevel") {
             state = "advanced";
-        } else if (state=="mfa"||state=="recovery") {
+        } else if (state=="mfa"||state=="recovery"||state=="auth") {
             state = "details";
         } else {
             state = "dashboard";
@@ -1613,17 +1612,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         view.alphaValue = 1;
         view.isHidden = true;
-        
-        /*
-         Mac doesnt like this for some reason
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.3;
-            view.animator().alphaValue = 0;
-        } completionHandler: {
-            view.alphaValue = 1;
-            view.isHidden = true;
-        }
-         */
     }
     
     /**
@@ -1638,7 +1626,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                      LogCloseButton, ErrorButton, FatalButton, WarnButton, InfoButton, DebugButton, VerboseButton, TraceButton,
                      ConfigBackButton, ConfigCloseButton, SaveButton,
                      RecoveryCloseButton, RegenButton, SaveCodesButton,
-                     SecretToggle, LinkButton, MFACloseButton, AuthButton, CloseServiceButton];
+                     SecretToggle, LinkButton, MFACloseButton, AuthButton, AuthCloseButton, CloseServiceButton];
         
         pointingHand = NSCursor.pointingHand;
         for item in items {
