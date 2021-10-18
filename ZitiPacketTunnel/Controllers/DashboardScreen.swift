@@ -1469,16 +1469,43 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var AuthMFAButton: NSBox!
     @IBOutlet var AuthCode: NSTextField!
     @IBOutlet var AuthCloseButton: NSImageView!
+    @IBOutlet var AuthCodeText: NSTextField!
     
     func ShowAuthentication() {
+        AuthCodeText.stringValue = " ";
         showArea(state: "auth");
     }
     
     @IBAction func AuthorizeClicked(_ sender: NSClickGestureRecognizer) {
-        let code = AuthCode.stringValue;
+        let code = AuthCodeText.stringValue;
         let authCode = code.trimmingCharacters(in: CharacterSet(charactersIn: "0123456789.").inverted)
-        AuthCode.stringValue = authCode;
-        
+        AuthCodeText.stringValue = authCode;
+        if (authCode.count == 6 || authCode.count == 8) {
+            let msg = IpcMfaAuthQueryResponseMessage(self.identity.id, code)
+            self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                DispatchQueue.main.async {
+                    guard zErr == nil else {
+                        self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                        return
+                    }
+                    guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage, let status = statusMsg.status else {
+                        self.dialogAlert("IPC Error", "Unable to parse auth response message")
+                        return
+                    }
+                    guard status == Ziti.ZITI_OK else {
+                        self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
+                        return
+                    }
+                    
+                    // Success!
+                    self.identity.lastMfaAuth = Date();
+                    _ = self.zidMgr.zidStore.store(self.identity);
+                    self.ShowDetails();
+                }
+            }
+        } else {
+            self.dialogAlert("Invalid", "Invalid Authorization Code")
+        }
     }
     
     
@@ -1801,31 +1828,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     func doMfaAuth(_ zid:ZitiIdentity) {
         if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
-            let msg = IpcMfaAuthQueryResponseMessage(zid.id, code)
-            self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-                DispatchQueue.main.async {
-                    guard zErr == nil else {
-                        self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
-                        return
-                    }
-                    guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage,
-                          let status = statusMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse auth response message")
-                        return
-                    }
-                    guard status == Ziti.ZITI_OK else {
-                        self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
-                        self.doMfaAuth(zid)
-                        return
-                    }
-                    
-                    // Success!
-                    zid.lastMfaAuth = Date()
-                    _ = self.zidMgr.zidStore.store(zid)
-                    self.identity = zid;
-                    self.ShowDetails();
-                }
-            }
+            
         }
     }
     

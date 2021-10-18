@@ -4446,7 +4446,7 @@
                         <outlet property="AuthButton" destination="ASv-hf-O3g" id="fEV-rd-UED"/>
                         <outlet property="AuthCloseButton" destination="IVh-de-NTn" id="nqX-kz-OQA"/>
                         <outlet property="AuthCode" destination="ZSa-yW-ZzQ" id="rRE-GV-1MQ"/>
-                        <outlet property="AuthCodeText" destination="gpS-Ci-3WD" id="vGe-J8-1rd"/>
+                        <outlet property="AuthCodeText" destination="1sz-MD-lGW" id="S17-hk-iuI"/>
                         <outlet property="AuthMFAButton" destination="Vhg-pI-hnO" id="mHP-IK-c0A"/>
                         <outlet property="Background" destination="F5c-GZ-U8e" id="UdW-4O-74E"/>
                         <outlet property="BarCode" destination="pOd-HL-t7g" id="2bt-0E-NyU"/>
