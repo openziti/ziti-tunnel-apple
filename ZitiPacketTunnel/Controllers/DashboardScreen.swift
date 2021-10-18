@@ -151,7 +151,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         VersionString.stringValue = "v"+Version.str;
         
-        self.view.window?.setFrame(NSRect(x:0,y:0,width: 420, height: 520), display: true);
+        self.view.window?.setFrame(NSRect(x:0,y:0,width: 480, height: 520), display: true);
         getMainWindow()?.delegate = self;
         
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange);
@@ -590,6 +590,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.view.window?.makeKeyAndOrderFront(nil)
         
         //IdentityList.contentSize.height = CGFloat(index*72);
+        NSApp.activate(ignoringOtherApps: true);
     }
     
     func AddIdentity() {
@@ -639,7 +640,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var ToggleIdentity: NSSwitch!
     @IBOutlet var IdName: NSTextField!
     @IBOutlet var IdNetwork: NSTextField!
-    @IBOutlet var IdEnrolled: NSTextField!
     @IBOutlet var IdStatus: NSTextField!
     @IBOutlet var IdServiceCount: NSTextField!
     @IBOutlet var EnrollButton: NSTextField!
@@ -649,6 +649,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFAOff: NSImageView!
     @IBOutlet var MFARecovery: NSImageView!
     @IBOutlet var MFAToggle: NSSwitch!
+    @IBOutlet var MFAArea: NSStackView!
+    @IBOutlet var MFALine: NSBox!
     
     /**
      Show the details view and fill in the UI elements
@@ -658,6 +660,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         ForgotButton.isHidden = false;
         ServiceList.isHidden = false;
         IdServiceCount.isHidden = false;
+        MFAArea.isHidden = false;
+        MFALine.isHidden = false;
         if (self.identity.isEnabled) {
             ToggleIdentity.state = .on;
         } else {
@@ -669,21 +673,33 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             IdStatus.stringValue = "inactive";
         }
         if (self.identity.isEnrolled) {
-            IdEnrolled.stringValue = "enrolled";
+            IdStatus.stringValue += "/enrolled";
         } else {
-            IdEnrolled.stringValue = "not enrolled";
+            IdStatus.stringValue += "/not enrolled";
             ToggleIdentity.isHidden = true;
             ForgotButton.isHidden = true;
             ServiceList.isHidden = true;
             IdServiceCount.isHidden = true;
+            MFAArea.isHidden = true;
+            MFALine.isHidden = true;
         }
         IdName.stringValue = self.identity.name;
         IdNetwork.stringValue = self.identity.czid?.ztAPI ?? "no network";
         IdServiceCount.stringValue = "\(self.identity.services.count) Services";
         
-        MFAOn.isHidden = !self.identity.isMfaEnabled;
-        MFAOff.isHidden = self.identity.isMfaEnabled;
-        MFARecovery.isHidden = self.identity.isMfaEnabled;
+        MFAOn.isHidden = true;
+        MFAOff.isHidden = true;
+        MFARecovery.isHidden = true;
+        
+        if (self.identity.isMfaEnabled) {
+            MFAToggle.state = .on;
+            if (self.identity.isMfaVerified) {
+                MFAOn.isHidden = false;
+                MFARecovery.isHidden = false;
+            } else {
+                MFAOff.isHidden = false;
+            }
+        }
             
         let serviceListView = NSStackView(frame: NSRect(x: 0, y: 0, width: self.view.frame.width-50, height: 70));
         serviceListView.orientation = .vertical;
@@ -899,20 +915,66 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func ToggleMFA(_ sender: NSClickGestureRecognizer) {
-        self.onMfaToggle(sender);
+        if MFAToggle.state == .off {
+            ShowMFASetup();
+        } else {
+            // only need to prompt for code if enrollment is verified (else can just send empty string)
+            var code:String?
+            if !self.identity.isMfaVerified {
+                code = ""
+            } else {
+                code = dialogForString(question: "Authorize MFA", text: "Enter code to disable MFA for \(self.identity.name):\(self.identity.id)")
+            }
+            
+            if let code = code { // will be nil if user hit Cancel when prompted...
+                let msg = IpcMfaRemoveRequestMessage(self.identity.id, code)
+                tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                    DispatchQueue.main.async {
+                        guard zErr == nil else {
+                            self.dialogAlert("Error sending provider message to disable MFA", zErr!.localizedDescription)
+                            self.toggleMfa(self.identity, .on)
+                            return
+                        }
+                        guard let removeResp = respMsg as? IpcMfaStatusResponseMessage,
+                              let status = removeResp.status else {
+                            self.dialogAlert("IPC Error", "Unable to parse MFA removal response message")
+                            self.toggleMfa(self.identity, .on)
+                            return
+                        }
+                        
+                        if status != Ziti.ZITI_OK {
+                            self.dialogAlert("MFA Removal Error",
+                                             "Status code: \(status)\nDescription: \(Ziti.zitiErrorString(status: status))")
+                            self.toggleMfa(self.identity, .on)
+                        } else {
+                            zLog.info("MFA removed for \(self.identity.name):\(self.identity.id)")
+                            self.identity.mfaEnabled = false
+                            _ = self.zidMgr.zidStore.store(self.identity)
+                            self.ShowDetails();
+                        }
+                    }
+                }
+            }
+        }
         
         /*
-        if (MFAToggle.state == .off) {
-            // prompty to setup MF
-            ShowMFA();
-            
-            // Send in the url and secret code to setup MFA
-            
-        } else {
-            // prompt to turn off mfa if it is enabled
-            ShowAuthentication();
-        }
+         if (MFAToggle.state == .off) {
+         // prompty to setup MF
+         ShowMFA();
+         
+         // Send in the url and secret code to setup MFA
+         
+         } else {
+         // prompt to turn off mfa if it is enabled
+         ShowAuthentication();
+         }
          */
+    }
+    
+    func doMfaAuth(_ zid:ZitiIdentity) {
+        if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
+            
+        }
     }
     
     
@@ -1351,6 +1413,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         Code18.stringValue = codes.count>17 ? codes[17] : "";
         Code19.stringValue = codes.count>18 ? codes[18] : "";
         Code20.stringValue = codes.count>19 ? codes[19] : "";
+        showArea(state: "recovery");
     }
     
     @IBAction func RegenClicked(_ sender: NSClickGestureRecognizer) {
@@ -1382,12 +1445,50 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var AuthButton: NSBox!
     @IBOutlet var SetupAuthCode: NSTextField!
     
-    func ShowMFA() {
+    func ShowMFASetup() {
         SetupCursor();
-        url = "https://netfoundry.io"; // get url from MFA object
-        SecretCode.stringValue = "3143423423"; // get from MFA object
         
-        let data = Data(url.utf8);
+        
+        let msg = IpcMfaEnrollRequestMessage(self.identity.id)
+        tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    self.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
+                    self.toggleMfa(self.identity, .off)
+                    return
+                }
+                guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage, let mfaEnrollment = enrollResp.mfaEnrollment else {
+                    self.dialogAlert("IPC Error", "Unable to parse enrollment response message")
+                    self.toggleMfa(self.identity, .off)
+                    return
+                }
+                
+                self.identity.mfaEnabled = true
+                self.identity.mfaVerified = mfaEnrollment.isVerified
+                _ = self.zidMgr.zidStore.store(self.identity);
+                
+                if !self.identity.isMfaVerified {
+                    self.VerifyMfa(self.identity, mfaEnrollment)
+                } else {
+                    self.ShowDetails();
+                }
+            }
+        }
+    }
+    
+    func VerifyMfa(_ zId:ZitiIdentity, _ mfaEnrollment:ZitiMfaEnrollment) {
+        guard let provisioningUrl = mfaEnrollment.provisioningUrl else {
+            zLog.error("Invalid provisioning URL")
+            return
+        }
+    
+        let parts = provisioningUrl.components(separatedBy: "/")
+        let secret = parts.last;
+        SecretCode.stringValue = secret!;
+        
+        self.codes = mfaEnrollment.recoveryCodes!;
+        
+        let data = Data(provisioningUrl.utf8);
         filter.setValue(data, forKey: "inputMessage");
         let transform = CGAffineTransform(scaleX: 3, y: 3)
         if let qrCodeImage = filter.outputImage?.transformed(by: transform) {
@@ -1396,6 +1497,39 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             }
         }
         showArea(state: "mfa");
+    }
+    
+    @IBAction func SetupClicked(_ sender: NSClickGestureRecognizer) {
+        // Need to call the setup MFA service and get a response
+        let code = SetupAuthCode.stringValue;
+        let msg = IpcMfaVerifyRequestMessage(self.identity.id, code)
+        tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    self.dialogAlert("Error sending provider message to verify MFA", zErr!.localizedDescription)
+                    self.toggleMfa(self.identity, .off)
+                    return
+                }
+                guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage, let status = statusMsg.status else {
+                    self.dialogAlert("IPC Error", "Unable to parse verification response message")
+                    self.toggleMfa(self.identity, .off)
+                    return
+                }
+                guard status == Ziti.ZITI_OK else {
+                    self.dialogAlert("MFA Verification Error", Ziti.zitiErrorString(status: status))
+                    self.toggleMfa(self.identity, .off)
+                    return
+                }
+                
+                // Success!
+                self.identity.mfaVerified = true
+                self.identity.lastMfaAuth = Date()
+                _ = self.zidMgr.zidStore.store(self.identity);
+                self.ShowDetails();
+                
+                self.ShowRecovery();
+            }
+        }
     }
     
     func redimensionaNSImage(image: NSImage, size: NSSize) -> NSImage {
@@ -1446,11 +1580,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         }
     }
     
-    @IBAction func SetupClicked(_ sender: NSClickGestureRecognizer) {
-        // Need to call the setup MFA service and get a response
-        var code = SetupAuthCode.stringValue;
-    }
-    
     
     
     
@@ -1472,7 +1601,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var AuthCodeText: NSTextField!
     
     func ShowAuthentication() {
-        AuthCodeText.stringValue = " ";
+        AuthCodeText.stringValue = "";
         showArea(state: "auth");
     }
     
@@ -1611,8 +1740,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.state = state;
         
         let view = GetStateView();
-        view.isHidden = false;
-        view.alphaValue = 0;
         
         view.alphaValue = 1;
         view.isHidden = false;
@@ -1712,124 +1839,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.MFAToggle.state = flag
         self.identity = zId;
         self.ShowDetails();
-    }
-    
-    func mfaVerify(_ zId:ZitiIdentity, _ mfaEnrollment:ZitiMfaEnrollment) {
-        guard let provisioningUrl = mfaEnrollment.provisioningUrl else {
-            zLog.error("Invalid provisioning URL")
-            return
-        }
-        
-        // TODO: create a 'real' screen with QR code and whatnot
-        if let code = dialogForString(question: "Setup MFA", text: provisioningUrl) {
-            let msg = IpcMfaVerifyRequestMessage(zId.id, code)
-            tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-                DispatchQueue.main.async {
-                    guard zErr == nil else {
-                        self.dialogAlert("Error sending provider message to verify MFA", zErr!.localizedDescription)
-                        self.toggleMfa(zId, .off)
-                        return
-                    }
-                    guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage,
-                          let status = statusMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse verification response message")
-                        self.toggleMfa(zId, .off)
-                        return
-                    }
-                    guard status == Ziti.ZITI_OK else {
-                        self.dialogAlert("MFA Verification Error", Ziti.zitiErrorString(status: status))
-                        self.toggleMfa(zId, .off)
-                        return
-                    }
-                    
-                    // Success!
-                    zId.mfaVerified = true
-                    zId.lastMfaAuth = Date()
-                    _ = self.zidMgr.zidStore.store(zId);
-                    self.identity = zId;
-                    self.ShowDetails();
-                    
-                    // TODO: Show recovery codes to a "real" screen
-                    let codes = mfaEnrollment.recoveryCodes?.joined(separator: ", ")
-                    self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
-                }
-            }
-        }
-    }
-    
-    @IBAction func onMfaToggle(_ sender: Any) {
-            
-            if MFAToggle.state == .on {
-                let msg = IpcMfaEnrollRequestMessage(self.identity.id)
-                tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-                    DispatchQueue.main.async {
-                        guard zErr == nil else {
-                            self.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
-                            self.toggleMfa(self.identity, .off)
-                            return
-                        }
-                        guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage,
-                            let mfaEnrollment = enrollResp.mfaEnrollment else {
-                            self.dialogAlert("IPC Error", "Unable to parse enrollment response message")
-                            self.toggleMfa(self.identity, .off)
-                            return
-                        }
-                        
-                        self.identity.mfaEnabled = true
-                        self.identity.mfaVerified = mfaEnrollment.isVerified
-                        _ = self.zidMgr.zidStore.store(self.identity);
-                        self.ShowDetails();
-                        
-                        if !self.identity.isMfaVerified {
-                            self.mfaVerify(self.identity, mfaEnrollment)
-                        }
-                    }
-                }
-            } else {
-                // only need to prompt for code if enrollment is verified (else can just send empty string)
-                var code:String?
-                if !self.identity.isMfaVerified {
-                    code = ""
-                } else {
-                    code = dialogForString(question: "Authorize MFA", text: "Enter code to disable MFA for \(self.identity.name):\(self.identity.id)")
-                }
-                
-                if let code = code { // will be nil if user hit Cancel when prompted...
-                    let msg = IpcMfaRemoveRequestMessage(self.identity.id, code)
-                    tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-                        DispatchQueue.main.async {
-                            guard zErr == nil else {
-                                self.dialogAlert("Error sending provider message to disable MFA", zErr!.localizedDescription)
-                                self.toggleMfa(self.identity, .on)
-                                return
-                            }
-                            guard let removeResp = respMsg as? IpcMfaStatusResponseMessage,
-                                  let status = removeResp.status else {
-                                self.dialogAlert("IPC Error", "Unable to parse MFA removal response message")
-                                self.toggleMfa(self.identity, .on)
-                                return
-                            }
-                            
-                            if status != Ziti.ZITI_OK {
-                                self.dialogAlert("MFA Removal Error",
-                                                 "Status code: \(status)\nDescription: \(Ziti.zitiErrorString(status: status))")
-                                self.toggleMfa(self.identity, .on)
-                            } else {
-                                zLog.info("MFA removed for \(self.identity.name):\(self.identity.id)")
-                                self.identity.mfaEnabled = false
-                                _ = self.zidMgr.zidStore.store(self.identity)
-                                self.ShowDetails();
-                            }
-                        }
-                    }
-                }
-            }
-    }
-    
-    func doMfaAuth(_ zid:ZitiIdentity) {
-        if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
-            
-        }
     }
     
     @IBAction func onMfaAuthNow(_ sender: Any) {
