@@ -99,9 +99,10 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var SpeedArea: NSStackView!
     @IBOutlet var MainView: NSView!
     @IBOutlet var ParentBox: NSBox!
-    @IBOutlet var IntroView: NSView!
     @IBOutlet var LogoArea: NSStackView!
     @IBOutlet var MainArea: NSStackView!
+    @IBOutlet var DoConnectGesture: NSClickGestureRecognizer!
+    @IBOutlet var TimerSubLabel: NSTextField!
     
     override func viewWillAppear() {
         self.view.shadow = NSShadow();
@@ -110,7 +111,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.view.layer?.shadowOffset = NSMakeSize(0, 0);
         let rect = self.view.layer?.bounds.insetBy(dx: 30, dy: 30);
         self.view.layer?.shadowPath = CGPath(rect: rect!, transform: nil);
-        self.view.layer?.shadowRadius = 13;
+        self.view.layer?.shadowRadius = 12;
         
         self.view.window?.titleVisibility = .hidden;
         self.view.window?.titlebarAppearsTransparent = true;
@@ -129,41 +130,34 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         DashboardBox.wantsLayer = true;
         DashboardBox.layer?.borderWidth = 0;
-        DashboardBox.layer?.cornerRadius = 20;
+        DashboardBox.layer?.cornerRadius = 12;
     }
     
     override func viewDidLoad() {
         super.viewDidLoad();
-        IntroBox.isHidden = false;
-        IntroBox.alphaValue = 1;
-        self.allViews =  [MenuBox,AdvancedBox,AboutBox,LogLevelBox,ConfigBox,RecoveryBox,AuthBox,MFASetupBox,ServiceBox,DetailsBox,IntroBox];
+        self.allViews =  [MenuBox,AdvancedBox,AboutBox,LogLevelBox,ConfigBox,RecoveryBox,AuthBox,MFASetupBox,ServiceBox,DetailsBox];
         
         
         
         Logger.initShared(Logger.APP_TAG);
-        SetLogIcon();
-        
-        SetupConfig();
-        
         zLog.info(Version.verboseStr);
+        
         zidMgr.zidStore.delegate = self;
-        level = ZitiLog.getLogLevel();
-        
-        VersionString.stringValue = "v"+Version.str;
-        
-        self.view.window?.setFrame(NSRect(x:0,y:0,width: 480, height: 520), display: true);
         getMainWindow()?.delegate = self;
+        
+        level = ZitiLog.getLogLevel();
+        SetLogIcon();
+        SetupConfig();
         
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange);
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier);
-        timeLaunched = 1;
-        timer.invalidate();
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
         
-        do {
-            try tunnelMgr.startTunnel();
-        } catch {
-            dialogAlert("Tunnel Error", error.localizedDescription);
+        if (tunnelMgr.status == .disconnected) {
+            do {
+                try tunnelMgr.startTunnel();
+            } catch {
+                dialogAlert("Tunnel Error", error.localizedDescription);
+            }
         }
         
         // Load previous identities
@@ -182,12 +176,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         MFAToggle.layer?.masksToBounds = true;
         MFAToggle.layer?.cornerRadius = 10;
         
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 2;
-            self.IntroView.animator().alphaValue = 0;
-        } completionHandler: {
-            self.HideAll();
-        }
+        self.HideAll();
         
         // listen for Ziti IPC events
         NotificationCenter.default.addObserver(forName: .onZitiPollResponse, object: nil, queue: OperationQueue.main) { notification in
@@ -200,62 +189,92 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 zLog.error("Unsupported IPC message type \(msg.meta.msgType) for id \(msg.meta.zid ?? "nil")")
                 return
             }
+            /*
             DispatchQueue.main.async {
                 self.doMfaAuth(zid)
             }
+            */
         }
+        
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
-        TimerLabel.stringValue = "00:00.00";
         ConnectButton.isHidden = true;
         ConnectedButton.isHidden = false;
         timer.invalidate();
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
+        
+        zLog.info("Tunnel Status: \(status)");
         
         switch status {
         case .connecting:
             ConnectButton.isHidden = true;
             ConnectedButton.isHidden = false;
-            SpeedArea.alphaValue = 1.0;
-            //connectStatus.stringValue = "Connecting..."
-            //connectButton.title = "Turn Ziti Off"
+            SpeedArea.alphaValue = 0.2;
+            TimerLabel.stringValue = "Connecting...";
+            TimerSubLabel.stringValue = "";
+            DoConnectGesture.isEnabled = false;
+            ConnectedButton.alphaValue = 0.2;
+            IdentityList.isHidden = true;
             break
         case .connected:
+            TimerLabel.stringValue = "00:00.00";
+            TimerSubLabel.stringValue = "STOP";
             ConnectButton.isHidden = true;
             ConnectedButton.isHidden = false;
             SpeedArea.alphaValue = 1.0;
-            //connectStatus.stringValue = "Connected"
-            //connectButton.title = "Turn Ziti Off"
+            DoConnectGesture.isEnabled = true;
+            ConnectedButton.alphaValue = 1.0;
+            IdentityList.isHidden = false;
+            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
+            UpdateList();
             break
         case .disconnecting:
-            ConnectButton.isHidden = false;
-            ConnectedButton.isHidden = true;
+            ConnectButton.isHidden = true;
+            ConnectedButton.isHidden = false;
             SpeedArea.alphaValue = 0.2;
-            //connectStatus.stringValue = "Disconnecting..."
+            TimerLabel.stringValue = "Disconnecting...";
+            TimerSubLabel.stringValue = "";
+            DoConnectGesture.isEnabled = false;
+            ConnectedButton.alphaValue = 0.2;
+            IdentityList.isHidden = true;
             break
         case .disconnected:
             ConnectButton.isHidden = false;
             ConnectedButton.isHidden = true;
             SpeedArea.alphaValue = 0.2;
-            //connectStatus.stringValue = "Not Connected"
-            //connectButton.title = "Turn Ziti On"
+            IdentityList.isHidden = true;
+            ClearIdList();
             break
         case .invalid:
-            ConnectButton.isHidden = false;
-            ConnectedButton.isHidden = true;
+            ConnectButton.isHidden = true;
+            ConnectedButton.isHidden = false;
             SpeedArea.alphaValue = 0.2;
-            //connectStatus.stringValue = "Invalid"
+            TimerLabel.stringValue = "Invalid!";
+            TimerSubLabel.stringValue = "";
+            DoConnectGesture.isEnabled = false;
+            ConnectedButton.alphaValue = 0.2;
+            IdentityList.isHidden = true;
             break
         case .reasserting:
-            ConnectButton.isHidden = false;
-            ConnectedButton.isHidden = true;
+            ConnectButton.isHidden = true;
+            ConnectedButton.isHidden = false;
             SpeedArea.alphaValue = 0.2;
-            //connectStatus.stringValue = "Reasserting..."
-            //connectButton.isEnabled = false
+            TimerLabel.stringValue = "Reasserting...";
+            TimerSubLabel.stringValue = "";
+            DoConnectGesture.isEnabled = false;
+            ConnectedButton.alphaValue = 0.2;
+            IdentityList.isHidden = true;
             break
         @unknown default:
-            zLog.warn("Unknown tunnel status")
+            ConnectButton.isHidden = true;
+            ConnectedButton.isHidden = false;
+            SpeedArea.alphaValue = 0.2;
+            TimerLabel.stringValue = "Unknown Tunnel State";
+            TimerSubLabel.stringValue = "";
+            DoConnectGesture.isEnabled = false;
+            ConnectedButton.alphaValue = 0.2;
+            IdentityList.isHidden = true;
+            zLog.warn("Unknown tunnel status");
             break
         }
         self.UpdateList();
@@ -360,6 +379,12 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         timeLaunched += 1;
     }
     
+    func ClearIdList() {
+        IdentityList.documentView?.subviews.forEach { subview in
+            subview.removeFromSuperviewWithoutNeedingDisplay();
+        }
+    }
+    
     func UpdateList() {
         
         IdentityList.horizontalScrollElasticity = .none;
@@ -367,11 +392,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         let idListView = NSStackView(frame: NSRect(x: 0, y: 0, width: 320, height: 500));
         idListView.orientation = .vertical;
         idListView.spacing = 2;
-        //if IdView.subviews != nil {
-        //for view in IdentityList.subviews {
-        //  view.removeFromSuperview();
-        //}
-        //}
+        IdentityList.documentView?.subviews.forEach { subview in
+            subview.removeFromSuperviewWithoutNeedingDisplay();
+        }
         var index = 0;
         for identity in zidMgr.zids {
             
@@ -579,18 +602,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         IdentityList.frame.size.height = CGFloat(index*50);
         let height = 720 + (index*50);
-        self.ParentView.window?.setFrame(NSRect(x:0.0, y: 0.0, width: 420, height: 2014), display: true);
-        self.DashboardBox.window?.setFrame(NSRect(x:0.0, y: 0.0, width: 420, height: 2014), display: true);
-        self.MainView.window?.setFrame(NSRect(x:0.0, y: 0.0, width: 420, height: 2014), display: true);
-        self.MainArea.window?.setFrame(NSRect(x:0.0, y: 0.0, width: 420, height: 2014), display: true);
-        self.view.window?.center()
-        self.view.window?.aspectRatio = NSSize(width: 420, height: 2014)
-        self.view.window?.minSize = NSSize(width: 420, height: 2014)
-        self.view.window?.setFrameAutosaveName("Main Window")
-        self.view.window?.makeKeyAndOrderFront(nil)
-        
-        //IdentityList.contentSize.height = CGFloat(index*72);
-        NSApp.activate(ignoringOtherApps: true);
     }
     
     func AddIdentity() {
@@ -656,6 +667,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Show the details view and fill in the UI elements
      */
     func ShowDetails() {
+        let status = tunnelMgr.status;
         ToggleIdentity.isHidden = false;
         ForgotButton.isHidden = false;
         ServiceList.isHidden = false;
@@ -690,6 +702,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         MFAOn.isHidden = true;
         MFAOff.isHidden = true;
         MFARecovery.isHidden = true;
+        MFAToggle.state = .off;
         
         if (self.identity.isMfaEnabled) {
             MFAToggle.state = .on;
@@ -784,10 +797,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             index = index-2;
             baseHeight = baseHeight+(50*index);
         }
+        /*
         guard var frame = self.view.window?.frame else { return };
         frame.size = NSMakeSize(CGFloat(420), CGFloat(baseHeight));
         self.view.window?.setFrame(frame, display: true);
-        
+        */
         ServiceList.documentView = serviceListView;
         showArea(state: "details");
     }
@@ -797,14 +811,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      */
     @IBAction func Connect(_ sender: NSClickGestureRecognizer) {
         timer.invalidate();
-        TimerLabel.stringValue = "00:00.00";
-        ConnectButton.isHidden = true;
-        ConnectedButton.isHidden = false;
         do {
             try tunnelMgr.startTunnel();
-            timeLaunched = 1;
-            timer.invalidate();
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
         } catch {
             dialogAlert("Tunnel Error", error.localizedDescription);
         }
@@ -822,6 +830,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         DownSpeedSize.stringValue = "bps";
         ConnectButton.isHidden = false;
         ConnectedButton.isHidden = true;
+        ClearIdList();
         tunnelMgr.stopTunnel();
     }
     
@@ -847,7 +856,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 dialogAlert("Unable to remove identity", error!.localizedDescription)
                 return
             }
-            UpdateList();
+            self.UpdateList();
             Close(sender);
         }
     }
@@ -1282,11 +1291,12 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var SaveButton: NSTextField!
     
     func SetupConfig() {
-        self.IPAddress.stringValue = "0.0.0.0"
-        self.SubNet.stringValue = "0.0.0.0"
-        self.MTU.stringValue = "0"
-        self.DNS.stringValue = ""
-        self.Matched.stringValue = ""
+        self.IPAddress.stringValue = "0.0.0.0";
+        self.SubNet.stringValue = "0.0.0.0";
+        self.MTU.stringValue = "0";
+        self.DNS.stringValue = "";
+        self.Matched.stringValue = "";
+        VersionString.stringValue = "v"+Version.str;
         
         guard
             let pp = tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
@@ -1436,14 +1446,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      */
     let context = CIContext();
     let filter = CIFilter.qrCodeGenerator();
-    var url:String = "";
+    var mfaUrl:String = "";
     @IBOutlet var BarCode: NSImageView!
     @IBOutlet var SecretCode: NSTextField!
     @IBOutlet var SecretToggle: NSTextField!
     @IBOutlet var LinkButton: NSTextField!
     @IBOutlet var MFACloseButton: NSImageView!
-    @IBOutlet var AuthButton: NSBox!
     @IBOutlet var SetupAuthCode: NSTextField!
+    @IBOutlet var AuthSetupButton: NSBox!
     
     func ShowMFASetup() {
         SetupCursor();
@@ -1482,6 +1492,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             return
         }
     
+        self.mfaUrl = provisioningUrl;
         let parts = provisioningUrl.components(separatedBy: "/")
         let secret = parts.last;
         SecretCode.stringValue = secret!;
@@ -1499,9 +1510,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         showArea(state: "mfa");
     }
     
-    @IBAction func SetupClicked(_ sender: NSClickGestureRecognizer) {
+    @IBOutlet var SetupAuthCodeText: NSTextFieldCell!
+    
+    @IBAction func VerifySetupMfa(_ sender: NSClickGestureRecognizer) {
         // Need to call the setup MFA service and get a response
-        let code = SetupAuthCode.stringValue;
+        let code = SetupAuthCodeText.stringValue;
         let msg = IpcMfaVerifyRequestMessage(self.identity.id, code)
         tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
             DispatchQueue.main.async {
@@ -1564,8 +1577,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func LinkClicked(_ sender: NSClickGestureRecognizer) {
-        let mfaurl = URL (string: url)!;
-        NSWorkspace.shared.open(mfaurl);
+        let launchUrl = URL (string: self.mfaUrl)!;
+        NSWorkspace.shared.open(launchUrl);
     }
     
     @IBAction func SecretClicked(_ sender: NSClickGestureRecognizer) {
@@ -1737,7 +1750,12 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Show the area defined by the state we are in
      */
     func showArea(state: String) {
+        if (state=="recovery" && self.state=="mfa") {
+            MFASetupBox.isHidden = true;
+            MFASetupBox.alphaValue = 0.0;
+        }
         self.state = state;
+        
         
         let view = GetStateView();
         
@@ -1803,7 +1821,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                      LogCloseButton, ErrorButton, FatalButton, WarnButton, InfoButton, DebugButton, VerboseButton, TraceButton,
                      ConfigBackButton, ConfigCloseButton, SaveButton,
                      RecoveryCloseButton, RegenButton, SaveCodesButton,
-                     SecretToggle, LinkButton, MFACloseButton, AuthButton, AuthCloseButton, CloseServiceButton];
+                     SecretToggle, LinkButton, MFACloseButton, AuthSetupButton, AuthCloseButton, CloseServiceButton];
         
         pointingHand = NSCursor.pointingHand;
         for item in items {
