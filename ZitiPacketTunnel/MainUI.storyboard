@@ -38,29 +38,29 @@
                 <customObject id="rNE-oq-bVd" customClass="NSFontManager"/>
                 <customObject id="cpo-9K-zHN" customClass="AppDelegate" customModule="Ziti_Desktop_Edge" customModuleProvider="target"/>
             </objects>
-            <point key="canvasLocation" x="-212" y="-324"/>
+            <point key="canvasLocation" x="-1369" y="-190"/>
         </scene>
         <!--DashboardScreen-->
         <scene sceneID="Lm0-fL-zGs">
             <objects>
                 <customObject id="8qG-TM-zhi" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="DashboardScreen" showSeguePresentationStyle="single" id="xIs-vq-bpn" userLabel="DashboardScreen" customClass="DashboardScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" misplaced="YES" id="IZP-fV-y05" userLabel="ParentView">
-                        <rect key="frame" x="0.0" y="0.0" width="420" height="850"/>
+                    <view key="view" wantsLayer="YES" id="IZP-fV-y05" userLabel="ParentView">
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="517"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <box misplaced="YES" boxType="custom" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="tbB-Jy-9ZT">
-                                <rect key="frame" x="0.0" y="156" width="420" height="694"/>
+                            <box boxType="custom" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="tbB-Jy-9ZT">
+                                <rect key="frame" x="0.0" y="0.0" width="420" height="517"/>
                                 <view key="contentView" id="57I-j6-hnP">
-                                    <rect key="frame" x="1" y="1" width="418" height="692"/>
+                                    <rect key="frame" x="1" y="1" width="418" height="515"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                                 <color key="fillColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
                             </box>
                             <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="12" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="vVS-ZC-RlN" userLabel="DashboardBox">
-                                <rect key="frame" x="20" y="20" width="380" height="480"/>
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="W3c-1e-2tO" userLabel="MainView">
-                                    <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="380" height="477"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F5c-GZ-U8e" userLabel="Background">
@@ -68,17 +68,17 @@
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="top" imageScaling="proportionallyDown" image="background" id="0Bp-6p-v8v"/>
                                         </imageView>
                                         <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7OL-ln-fVN" userLabel="Globe">
-                                            <rect key="frame" x="0.0" y="180" width="420" height="300"/>
+                                            <rect key="frame" x="0.0" y="177" width="420" height="300"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="300" id="A0J-JW-Sy8"/>
                                             </constraints>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="globe" id="cDp-mO-wX9"/>
                                         </imageView>
                                         <stackView distribution="fillProportionally" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xfP-An-zVj" userLabel="MainArea">
-                                            <rect key="frame" x="0.0" y="-140" width="380" height="620"/>
+                                            <rect key="frame" x="0.0" y="57" width="380" height="420"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qra-fI-o2I" userLabel="HeaderArea">
-                                                    <rect key="frame" x="20" y="540" width="340" height="80"/>
+                                                    <rect key="frame" x="20" y="340" width="340" height="80"/>
                                                     <subviews>
                                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="-1" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A1r-HE-ekJ" userLabel="MenuButton">
                                                             <rect key="frame" x="0.0" y="18" width="50" height="45"/>
@@ -173,7 +173,7 @@
                                                                 </textField>
                                                             </subviews>
                                                             <gestureRecognizers>
-                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="h3k-bk-8Eo">
+                                                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="h3k-bk-8Eo" userLabel="AddIdGesture">
                                                                     <connections>
                                                                         <action selector="AddId:" target="xIs-vq-bpn" id="nI2-FO-Mg8"/>
                                                                     </connections>
@@ -207,7 +207,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UYD-8P-Hgn" userLabel="ConnectButton">
-                                                    <rect key="frame" x="0.0" y="460" width="140" height="160"/>
+                                                    <rect key="frame" x="0.0" y="260" width="140" height="160"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="160" id="9Hz-Ay-Wby"/>
                                                         <constraint firstAttribute="width" constant="140" id="X8h-BU-l8P"/>
@@ -223,7 +223,7 @@
                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="connect" id="Zy7-uQ-3eX"/>
                                                 </imageView>
                                                 <box boxType="custom" borderType="none" cornerRadius="4" title="Box" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k0p-7a-nGQ" userLabel="ConnectedButton">
-                                                    <rect key="frame" x="0.0" y="372" width="380" height="160"/>
+                                                    <rect key="frame" x="0.0" y="172" width="380" height="160"/>
                                                     <view key="contentView" id="3DQ-jl-hbI">
                                                         <rect key="frame" x="0.0" y="0.0" width="380" height="160"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -273,7 +273,7 @@
                                                     </constraints>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Wpj-1q-2La" userLabel="SpeedArea">
-                                                    <rect key="frame" x="70" y="296" width="241" height="68"/>
+                                                    <rect key="frame" x="70" y="96" width="241" height="68"/>
                                                     <subviews>
                                                         <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="-5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sN5-sh-znZ">
                                                             <rect key="frame" x="0.0" y="0.0" width="125" height="68"/>
@@ -406,27 +406,26 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <scrollView autoresizesSubviews="NO" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="waY-FF-3b1" userLabel="IdList">
-                                                    <rect key="frame" x="0.0" y="38" width="380" height="250"/>
+                                                    <rect key="frame" x="0.0" y="38" width="380" height="50"/>
                                                     <clipView key="contentView" id="Edr-Hu-kk4">
-                                                        <rect key="frame" x="0.0" y="0.0" width="380" height="250"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="380" height="50"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <view id="ZGg-PJ-jVA">
-                                                                <rect key="frame" x="0.0" y="0.0" width="0.0" height="150"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             </view>
                                                         </subviews>
                                                         <color key="backgroundColor" red="0.056343473489999997" green="0.061413832010000002" blue="0.13491415979999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     </clipView>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="250" id="e20-ha-kN8"/>
+                                                        <constraint firstAttribute="height" constant="50" id="e20-ha-kN8"/>
                                                     </constraints>
                                                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="axu-Qe-Xte">
                                                         <rect key="frame" x="-100" y="-100" width="380" height="16"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="aMJ-l5-1ef">
-                                                        <rect key="frame" x="364" y="0.0" width="16" height="250"/>
+                                                        <rect key="frame" x="364" y="0.0" width="16" height="50"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                 </scrollView>
@@ -494,16 +493,16 @@
                                 <color key="fillColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </box>
                             <box alphaValue="0.0" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="r1m-PG-WcY" userLabel="DetailBox">
-                                <rect key="frame" x="20" y="20" width="380" height="480"/>
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="HrI-vS-oxy">
-                                    <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="380" height="477"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j5x-vZ-gEb">
-                                            <rect key="frame" x="20" y="20" width="340" height="440"/>
+                                            <rect key="frame" x="20" y="20" width="340" height="437"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ctT-ul-7vS" userLabel="MenuArea">
-                                                    <rect key="frame" x="0.0" y="400" width="340" height="40"/>
+                                                    <rect key="frame" x="0.0" y="397" width="340" height="40"/>
                                                     <subviews>
                                                         <switch horizontalHuggingPriority="750" verticalHuggingPriority="750" baseWritingDirection="leftToRight" alignment="left" state="on" translatesAutoresizingMaskIntoConstraints="NO" id="bxQ-q9-Jcg" userLabel="ToggleIdentity">
                                                             <rect key="frame" x="-2" y="7" width="42" height="25"/>
@@ -554,7 +553,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="HVB-dr-neR">
-                                                    <rect key="frame" x="0.0" y="391" width="340" height="1"/>
+                                                    <rect key="frame" x="0.0" y="388" width="340" height="1"/>
                                                     <view key="contentView" id="KWY-0u-GVT">
                                                         <rect key="frame" x="1" y="1" width="338" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -566,7 +565,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eTN-We-ofe" userLabel="NameArea">
-                                                    <rect key="frame" x="0.0" y="353" width="340" height="30"/>
+                                                    <rect key="frame" x="0.0" y="350" width="340" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Iqt-Po-LmT">
                                                             <rect key="frame" x="-2" y="7" width="288" height="16"/>
@@ -598,7 +597,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="WbL-k7-LEp">
-                                                    <rect key="frame" x="2" y="344" width="338" height="1"/>
+                                                    <rect key="frame" x="2" y="341" width="338" height="1"/>
                                                     <view key="contentView" id="SVp-qQ-Off">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -610,7 +609,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rk3-B3-dbT" userLabel="MFAArea">
-                                                    <rect key="frame" x="0.0" y="306" width="340" height="30"/>
+                                                    <rect key="frame" x="0.0" y="303" width="340" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LaA-3s-XE0">
                                                             <rect key="frame" x="-2" y="7" width="232" height="16"/>
@@ -691,7 +690,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="mmh-fP-Asr">
-                                                    <rect key="frame" x="2" y="297" width="338" height="1"/>
+                                                    <rect key="frame" x="2" y="294" width="338" height="1"/>
                                                     <view key="contentView" id="TJS-JD-xJ8">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -703,7 +702,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TGD-aW-yr8" userLabel="NetworkArea">
-                                                    <rect key="frame" x="0.0" y="259" width="340" height="30"/>
+                                                    <rect key="frame" x="0.0" y="256" width="340" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vir-c4-YLf">
                                                             <rect key="frame" x="-2" y="7" width="226" height="16"/>
@@ -735,7 +734,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Xh9-Q6-95D">
-                                                    <rect key="frame" x="2" y="250" width="338" height="1"/>
+                                                    <rect key="frame" x="2" y="247" width="338" height="1"/>
                                                     <view key="contentView" id="9ob-hP-a0N">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -747,7 +746,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="djg-g3-7cY" userLabel="StatusArea">
-                                                    <rect key="frame" x="0.0" y="212" width="340" height="30"/>
+                                                    <rect key="frame" x="0.0" y="209" width="340" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Crh-RM-gzG">
                                                             <rect key="frame" x="-2" y="7" width="299" height="16"/>
@@ -779,7 +778,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="hmA-u0-nO1">
-                                                    <rect key="frame" x="2" y="203" width="338" height="1"/>
+                                                    <rect key="frame" x="2" y="200" width="338" height="1"/>
                                                     <view key="contentView" id="ymd-Ae-fPO">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -791,7 +790,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fdT-c0-Hnw" userLabel="EnrollButton">
-                                                    <rect key="frame" x="-2" y="179" width="344" height="16"/>
+                                                    <rect key="frame" x="-2" y="176" width="344" height="16"/>
                                                     <gestureRecognizers>
                                                         <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="hDV-b6-cvm" userLabel="EnrollGesture">
                                                             <connections>
@@ -806,7 +805,7 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SCO-Zw-EHg" userLabel="IdServiceCount">
-                                                    <rect key="frame" x="-2" y="152" width="344" height="19"/>
+                                                    <rect key="frame" x="-2" y="149" width="344" height="19"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="0 Services" id="Yer-Da-ROf">
                                                         <font key="font" metaFont="system" size="15"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -814,13 +813,13 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kt8-wn-tGH" userLabel="ServiceList">
-                                                    <rect key="frame" x="0.0" y="24" width="340" height="120"/>
+                                                    <rect key="frame" x="0.0" y="24" width="340" height="117"/>
                                                     <clipView key="contentView" id="pIn-yy-GNl">
-                                                        <rect key="frame" x="0.0" y="0.0" width="340" height="120"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="340" height="117"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <view id="nNx-Nd-M2W">
-                                                                <rect key="frame" x="0.0" y="0.0" width="325" height="105"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="325" height="102"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             </view>
                                                         </subviews>
@@ -831,7 +830,7 @@
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Ker-Yr-oEa">
-                                                        <rect key="frame" x="324" y="0.0" width="16" height="120"/>
+                                                        <rect key="frame" x="324" y="0.0" width="16" height="117"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </scroller>
                                                 </scrollView>
@@ -916,17 +915,17 @@
                                 </view>
                                 <color key="fillColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </box>
-                            <box wantsLayer="YES" boxType="custom" cornerRadius="12" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="JjY-hl-sY5" userLabel="MenuBox">
-                                <rect key="frame" x="20" y="20" width="380" height="480"/>
+                            <box wantsLayer="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="JjY-hl-sY5" userLabel="MenuBox">
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="LfE-dC-7Ak">
-                                    <rect key="frame" x="1" y="1" width="378" height="478"/>
+                                    <rect key="frame" x="1" y="1" width="378" height="475"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fnk-tP-RQB">
-                                            <rect key="frame" x="20" y="20" width="338" height="438"/>
+                                            <rect key="frame" x="20" y="20" width="338" height="435"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rVe-aj-ODd" userLabel="MenuArea">
-                                                    <rect key="frame" x="0.0" y="398" width="338" height="40"/>
+                                                    <rect key="frame" x="0.0" y="395" width="338" height="40"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="czN-YZ-qgx" userLabel="Spacer">
                                                             <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -975,7 +974,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="iXm-aG-BJI">
-                                                    <rect key="frame" x="0.0" y="389" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="386" width="338" height="1"/>
                                                     <view key="contentView" id="5Qk-Gq-wvT">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -987,7 +986,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fnx-DE-lqh" userLabel="AdvancedButton">
-                                                    <rect key="frame" x="0.0" y="351" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="348" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8mS-pM-1ui">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1036,7 +1035,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="XDd-la-bG7">
-                                                    <rect key="frame" x="0.0" y="342" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="339" width="338" height="1"/>
                                                     <view key="contentView" id="i9E-qK-QvI">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1048,7 +1047,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V6I-Xo-rNq" userLabel="AboutButton">
-                                                    <rect key="frame" x="0.0" y="304" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="301" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="qZr-uo-1Pw">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1097,7 +1096,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="HFb-Aa-NQT">
-                                                    <rect key="frame" x="0.0" y="295" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="292" width="338" height="1"/>
                                                     <view key="contentView" id="PdB-qr-2Yz">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1109,7 +1108,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yI4-QY-e6a" userLabel="FeedbackButton">
-                                                    <rect key="frame" x="0.0" y="257" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="254" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ABI-Pv-NFZ">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1158,7 +1157,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bvp-TP-HAb">
-                                                    <rect key="frame" x="0.0" y="248" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="245" width="338" height="1"/>
                                                     <view key="contentView" id="N5J-tS-jvn">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1170,7 +1169,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RXB-p3-8TH" userLabel="SupportButton">
-                                                    <rect key="frame" x="0.0" y="210" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="207" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="JCo-kg-4qy">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1219,7 +1218,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ejx-xA-Dqg">
-                                                    <rect key="frame" x="0.0" y="201" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="198" width="338" height="1"/>
                                                     <view key="contentView" id="6dI-y4-fpM">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1231,7 +1230,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0y4-Sa-RhI" userLabel="DetachButton">
-                                                    <rect key="frame" x="0.0" y="163" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="160" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="e9H-9e-i0E">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1280,7 +1279,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="9W5-u9-9mK">
-                                                    <rect key="frame" x="0.0" y="154" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="151" width="338" height="1"/>
                                                     <view key="contentView" id="j4Y-Wg-CQJ">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1292,7 +1291,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMz-Gu-TDq">
-                                                    <rect key="frame" x="-2" y="130" width="342" height="16"/>
+                                                    <rect key="frame" x="-2" y="127" width="342" height="16"/>
                                                     <gestureRecognizers>
                                                         <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="BRJ-uf-BsE" userLabel="CloseAppGesture">
                                                             <connections>
@@ -1313,9 +1312,9 @@
                                                     </connections>
                                                 </textField>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="SLY-PP-Xld">
-                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="122"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="119"/>
                                                     <view key="contentView" id="FCb-fg-3Yk">
-                                                        <rect key="frame" x="1" y="1" width="336" height="120"/>
+                                                        <rect key="frame" x="1" y="1" width="336" height="117"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </view>
                                                 </box>
@@ -1381,24 +1380,20 @@
                                         <constraint firstAttribute="bottom" secondItem="fnk-tP-RQB" secondAttribute="bottom" constant="20" id="wgE-OK-23W"/>
                                     </constraints>
                                 </view>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="480" id="P4D-Pg-eJX"/>
-                                    <constraint firstAttribute="width" constant="380" id="hTm-Si-ES9"/>
-                                </constraints>
                                 <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </box>
-                            <box wantsLayer="YES" ambiguous="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="FW6-ai-hao" userLabel="AboutBox">
-                                <rect key="frame" x="20" y="350" width="380" height="480"/>
+                            <box wantsLayer="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="FW6-ai-hao" userLabel="AboutBox">
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="vkT-xd-fJz">
-                                    <rect key="frame" x="1" y="1" width="378" height="478"/>
+                                    <rect key="frame" x="1" y="1" width="378" height="475"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d5M-KS-l1D">
-                                            <rect key="frame" x="20" y="20" width="338" height="438"/>
+                                            <rect key="frame" x="20" y="20" width="338" height="435"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IFG-9b-WS5" userLabel="MenuArea">
-                                                    <rect key="frame" x="0.0" y="398" width="338" height="40"/>
+                                                    <rect key="frame" x="0.0" y="395" width="338" height="40"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="CSM-sD-qvW" userLabel="BackButton">
                                                             <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -1457,7 +1452,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="l1J-Hc-ZAO">
-                                                    <rect key="frame" x="0.0" y="389" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="386" width="338" height="1"/>
                                                     <view key="contentView" id="v5d-0c-1Kp">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1469,7 +1464,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HU4-EB-ca4" userLabel="PrivacyButton">
-                                                    <rect key="frame" x="0.0" y="351" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="348" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1SZ-gc-HBS">
                                                             <rect key="frame" x="-2" y="7" width="308" height="16"/>
@@ -1508,7 +1503,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="874-bX-Npf">
-                                                    <rect key="frame" x="0.0" y="342" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="339" width="338" height="1"/>
                                                     <view key="contentView" id="Z9V-uK-aAF">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1520,7 +1515,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d9y-Ny-JY9" userLabel="TermsButton">
-                                                    <rect key="frame" x="0.0" y="304" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="301" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wd1-ua-w8x">
                                                             <rect key="frame" x="-2" y="7" width="308" height="16"/>
@@ -1559,7 +1554,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="31Z-m3-qQ7">
-                                                    <rect key="frame" x="0.0" y="295" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="292" width="338" height="1"/>
                                                     <view key="contentView" id="Fle-nd-lmq">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1571,7 +1566,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vrj-Hc-NQI" userLabel="VersionField">
-                                                    <rect key="frame" x="18" y="271" width="302" height="16"/>
+                                                    <rect key="frame" x="18" y="268" width="302" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="V1.0.0.0" id="PgP-4c-hXi">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1579,9 +1574,9 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="7Sn-T8-mu7">
-                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="263"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="260"/>
                                                     <view key="contentView" id="1RX-8f-tzd">
-                                                        <rect key="frame" x="1" y="1" width="336" height="261"/>
+                                                        <rect key="frame" x="1" y="1" width="336" height="258"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </view>
                                                 </box>
@@ -1627,24 +1622,20 @@
                                         <constraint firstAttribute="trailing" secondItem="d5M-KS-l1D" secondAttribute="trailing" constant="20" id="slk-kX-7vu"/>
                                     </constraints>
                                 </view>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="380" id="a2q-vq-AzY"/>
-                                    <constraint firstAttribute="height" constant="480" id="leK-CV-7eL"/>
-                                </constraints>
                                 <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </box>
-                            <box ambiguous="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0c2-wg-2hS" userLabel="LogLevelBox">
-                                <rect key="frame" x="20" y="350" width="380" height="480"/>
+                            <box alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0c2-wg-2hS" userLabel="LogLevelBox">
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="mq3-u6-5BB">
-                                    <rect key="frame" x="1" y="1" width="378" height="478"/>
+                                    <rect key="frame" x="1" y="1" width="378" height="475"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4sT-3u-tRe" userLabel="MainArea">
-                                            <rect key="frame" x="20" y="20" width="338" height="438"/>
+                                            <rect key="frame" x="20" y="20" width="338" height="435"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F70-am-OhA" userLabel="MenuArea">
-                                                    <rect key="frame" x="0.0" y="398" width="338" height="40"/>
+                                                    <rect key="frame" x="0.0" y="395" width="338" height="40"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="tPd-nY-9bg" userLabel="GoBackButton">
                                                             <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -1700,7 +1691,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="S6V-sT-Esb">
-                                                    <rect key="frame" x="0.0" y="389" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="386" width="338" height="1"/>
                                                     <view key="contentView" id="INB-Nb-e5E">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1712,7 +1703,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="01a-cw-Mx5" userLabel="FatalButton">
-                                                    <rect key="frame" x="0.0" y="351" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="348" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4jQ-JT-KFL">
                                                             <rect key="frame" x="-2" y="7" width="314" height="16"/>
@@ -1751,7 +1742,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bw6-wb-pYC">
-                                                    <rect key="frame" x="0.0" y="342" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="339" width="338" height="1"/>
                                                     <view key="contentView" id="X49-dg-qmj">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1763,7 +1754,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="h39-9Y-CeL" userLabel="ErrorButton">
-                                                    <rect key="frame" x="0.0" y="304" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="301" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9JV-kS-Q9k">
                                                             <rect key="frame" x="-2" y="7" width="314" height="16"/>
@@ -1802,7 +1793,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="dJj-9o-gcI">
-                                                    <rect key="frame" x="0.0" y="295" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="292" width="338" height="1"/>
                                                     <view key="contentView" id="fL6-mH-m5j">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1814,7 +1805,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vs6-N4-W72" userLabel="WarnButton">
-                                                    <rect key="frame" x="0.0" y="257" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="254" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ski-kX-PV7">
                                                             <rect key="frame" x="-2" y="7" width="314" height="16"/>
@@ -1853,7 +1844,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="TfR-if-XSc">
-                                                    <rect key="frame" x="0.0" y="248" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="245" width="338" height="1"/>
                                                     <view key="contentView" id="bA5-CV-URF">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1865,7 +1856,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Djw-iB-BiM" userLabel="InfoButton">
-                                                    <rect key="frame" x="0.0" y="210" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="207" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7TI-w5-QQd">
                                                             <rect key="frame" x="-2" y="7" width="314" height="16"/>
@@ -1904,7 +1895,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Dkd-gs-nt2">
-                                                    <rect key="frame" x="0.0" y="201" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="198" width="338" height="1"/>
                                                     <view key="contentView" id="icj-0U-hhC">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1916,7 +1907,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="00v-aU-VSN" userLabel="DebugButton">
-                                                    <rect key="frame" x="0.0" y="163" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="160" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IGs-iK-72j">
                                                             <rect key="frame" x="-2" y="7" width="314" height="16"/>
@@ -1955,7 +1946,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0BO-R1-LGp">
-                                                    <rect key="frame" x="0.0" y="154" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="151" width="338" height="1"/>
                                                     <view key="contentView" id="uyj-UL-0kI">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1967,7 +1958,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NZ2-mH-gnm" userLabel="VerboseButton">
-                                                    <rect key="frame" x="0.0" y="116" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="113" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ypB-RJ-QY9">
                                                             <rect key="frame" x="-2" y="7" width="314" height="16"/>
@@ -2006,7 +1997,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="68C-Co-ZQP">
-                                                    <rect key="frame" x="0.0" y="107" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="104" width="338" height="1"/>
                                                     <view key="contentView" id="Sef-SQ-hHs">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2018,7 +2009,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HHH-zK-MdF" userLabel="TraceButton">
-                                                    <rect key="frame" x="0.0" y="69" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="66" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d1b-Ey-uOo">
                                                             <rect key="frame" x="-2" y="7" width="314" height="16"/>
@@ -2057,7 +2048,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="cpJ-Cg-ILa">
-                                                    <rect key="frame" x="0.0" y="60" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="57" width="338" height="1"/>
                                                     <view key="contentView" id="J1Q-dJ-6ZD">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2069,9 +2060,9 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="fby-hx-mtP">
-                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="52"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="49"/>
                                                     <view key="contentView" id="xXY-ef-Mjs">
-                                                        <rect key="frame" x="1" y="1" width="336" height="50"/>
+                                                        <rect key="frame" x="1" y="1" width="336" height="47"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </view>
                                                 </box>
@@ -2157,23 +2148,19 @@
                                         <constraint firstAttribute="bottom" secondItem="4sT-3u-tRe" secondAttribute="bottom" constant="20" id="h6R-0f-242"/>
                                     </constraints>
                                 </view>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="480" id="5od-jd-ox1"/>
-                                    <constraint firstAttribute="width" constant="380" id="aXo-8p-l2T"/>
-                                </constraints>
                                 <color key="fillColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </box>
-                            <box ambiguous="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="adH-7J-gif" userLabel="ConfigBox">
-                                <rect key="frame" x="20" y="350" width="380" height="480"/>
+                            <box alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="adH-7J-gif" userLabel="ConfigBox">
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="8AB-WU-B4W">
-                                    <rect key="frame" x="1" y="1" width="378" height="478"/>
+                                    <rect key="frame" x="1" y="1" width="378" height="475"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="olL-Cf-7N9" userLabel="MainArea">
-                                            <rect key="frame" x="20" y="20" width="338" height="438"/>
+                                            <rect key="frame" x="20" y="20" width="338" height="435"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="shi-46-XiZ" userLabel="MenuArea">
-                                                    <rect key="frame" x="0.0" y="398" width="338" height="40"/>
+                                                    <rect key="frame" x="0.0" y="395" width="338" height="40"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hub-Dq-gcn" userLabel="BackButton">
                                                             <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -2229,7 +2216,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="EMO-b5-okm">
-                                                    <rect key="frame" x="0.0" y="389" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="386" width="338" height="1"/>
                                                     <view key="contentView" id="biz-00-dlU">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2241,7 +2228,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="r96-bs-3P1" userLabel="IPArea">
-                                                    <rect key="frame" x="0.0" y="351" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="348" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vG0-I4-cHz">
                                                             <rect key="frame" x="-2" y="7" width="88" height="16"/>
@@ -2273,7 +2260,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="mu8-Md-Hfd">
-                                                    <rect key="frame" x="0.0" y="342" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="339" width="338" height="1"/>
                                                     <view key="contentView" id="jRc-Vc-hMJ">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2285,7 +2272,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tJm-V4-n8C" userLabel="SubnetArea">
-                                                    <rect key="frame" x="0.0" y="304" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="301" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="n6y-ln-03R">
                                                             <rect key="frame" x="-2" y="7" width="87" height="16"/>
@@ -2317,7 +2304,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="3Lx-Ex-ZFP">
-                                                    <rect key="frame" x="0.0" y="295" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="292" width="338" height="1"/>
                                                     <view key="contentView" id="piM-Ne-9wx">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2329,7 +2316,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fRY-Qw-45r" userLabel="MtuArea">
-                                                    <rect key="frame" x="0.0" y="257" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="254" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C8H-Na-Xhd">
                                                             <rect key="frame" x="-2" y="7" width="37" height="16"/>
@@ -2361,7 +2348,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="iPt-Lx-x0B">
-                                                    <rect key="frame" x="0.0" y="248" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="245" width="338" height="1"/>
                                                     <view key="contentView" id="78o-XV-whG">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2373,7 +2360,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="69T-NG-16T" userLabel="DnsArea">
-                                                    <rect key="frame" x="0.0" y="210" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="207" width="338" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aQh-rl-74t">
                                                             <rect key="frame" x="-2" y="7" width="85" height="16"/>
@@ -2405,7 +2392,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0WN-32-HxS">
-                                                    <rect key="frame" x="0.0" y="201" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="198" width="338" height="1"/>
                                                     <view key="contentView" id="avd-wh-blO">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2417,7 +2404,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="edk-6T-mcJ" userLabel="MatchedArea">
-                                                    <rect key="frame" x="8" y="163" width="330" height="30"/>
+                                                    <rect key="frame" x="8" y="160" width="330" height="30"/>
                                                     <subviews>
                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LIh-1A-DGR">
                                                             <rect key="frame" x="-2" y="7" width="118" height="16"/>
@@ -2449,7 +2436,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Ixt-uy-NKw">
-                                                    <rect key="frame" x="0.0" y="154" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="151" width="338" height="1"/>
                                                     <view key="contentView" id="hfI-vP-9Xy">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2461,7 +2448,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yh0-3u-1hV" userLabel="SaveButton">
-                                                    <rect key="frame" x="-2" y="130" width="342" height="16"/>
+                                                    <rect key="frame" x="-2" y="127" width="342" height="16"/>
                                                     <gestureRecognizers>
                                                         <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="Ewl-gf-549" userLabel="SaveGesture">
                                                             <connections>
@@ -2476,9 +2463,9 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="k0K-xq-g8h">
-                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="122"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="119"/>
                                                     <view key="contentView" id="Aku-pz-L3X">
-                                                        <rect key="frame" x="1" y="1" width="336" height="120"/>
+                                                        <rect key="frame" x="1" y="1" width="336" height="117"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </view>
                                                 </box>
@@ -2548,14 +2535,11 @@
                                         <constraint firstItem="olL-Cf-7N9" firstAttribute="leading" secondItem="8AB-WU-B4W" secondAttribute="leading" constant="20" id="fbc-nL-jw7"/>
                                     </constraints>
                                 </view>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="380" id="SOV-14-dIu"/>
-                                    <constraint firstAttribute="height" constant="480" id="yB8-UD-6Ut"/>
-                                </constraints>
                                 <color key="fillColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </box>
-                            <box wantsLayer="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bmo-kS-tdU" userLabel="MFASetupBox">
-                                <rect key="frame" x="20" y="20" width="380" height="480"/>
+                            <box wantsLayer="YES" fixedFrame="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bmo-kS-tdU" userLabel="MFASetupBox">
+                                <rect key="frame" x="20" y="17" width="380" height="480"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="jOU-ba-KXz">
                                     <rect key="frame" x="1" y="1" width="378" height="478"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2853,9 +2837,9 @@
                                 <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </box>
                             <box wantsLayer="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="zpy-kv-rvg" userLabel="RecoveryBox">
-                                <rect key="frame" x="20" y="20" width="380" height="480"/>
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="HZF-Ug-hfT">
-                                    <rect key="frame" x="1" y="1" width="378" height="478"/>
+                                    <rect key="frame" x="1" y="1" width="378" height="475"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="17" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f4c-db-Ipt">
@@ -3322,13 +3306,13 @@
                                 <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </box>
                             <box wantsLayer="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="1n0-Bh-2o5" userLabel="ServiceBox">
-                                <rect key="frame" x="20" y="20" width="380" height="480"/>
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="2EY-1o-FvT">
-                                    <rect key="frame" x="1" y="1" width="378" height="478"/>
+                                    <rect key="frame" x="1" y="1" width="378" height="475"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fillProportionally" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g0j-BW-FMP">
-                                            <rect key="frame" x="20" y="127" width="338" height="331"/>
+                                            <rect key="frame" x="20" y="124" width="338" height="331"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="86w-7N-i6x" userLabel="MenuArea">
                                                     <rect key="frame" x="0.0" y="291" width="338" height="40"/>
@@ -3718,16 +3702,16 @@
                                 <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </box>
                             <box wantsLayer="YES" alphaValue="0.0" boxType="custom" cornerRadius="20" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="YWJ-Us-RT9" userLabel="AdvancedBox">
-                                <rect key="frame" x="20" y="20" width="380" height="480"/>
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
                                 <view key="contentView" id="ztC-6Q-wJJ">
-                                    <rect key="frame" x="1" y="1" width="378" height="478"/>
+                                    <rect key="frame" x="1" y="1" width="378" height="475"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fDU-iw-v9a">
-                                            <rect key="frame" x="20" y="20" width="338" height="438"/>
+                                            <rect key="frame" x="20" y="20" width="338" height="435"/>
                                             <subviews>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WyX-5r-Bqb" userLabel="MenuArea">
-                                                    <rect key="frame" x="0.0" y="398" width="338" height="40"/>
+                                                    <rect key="frame" x="0.0" y="395" width="338" height="40"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="720-do-XBp" userLabel="GoBackButton">
                                                             <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -3783,7 +3767,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Wd3-P2-ghB">
-                                                    <rect key="frame" x="0.0" y="389" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="386" width="338" height="1"/>
                                                     <view key="contentView" id="Ys3-BS-jrS">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3795,7 +3779,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6bk-1S-JRY" userLabel="TunnelButton">
-                                                    <rect key="frame" x="0.0" y="351" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="348" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="DPG-kj-llk">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -3844,7 +3828,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="jam-oD-1bF">
-                                                    <rect key="frame" x="0.0" y="342" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="339" width="338" height="1"/>
                                                     <view key="contentView" id="e7F-d7-QWX">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3856,7 +3840,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WdH-rg-FHH" userLabel="ServiceLogButton">
-                                                    <rect key="frame" x="0.0" y="304" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="301" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xI7-kd-EIn">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -3905,7 +3889,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="GhW-mX-kWe">
-                                                    <rect key="frame" x="0.0" y="295" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="292" width="338" height="1"/>
                                                     <view key="contentView" id="uoS-yB-idO">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3917,7 +3901,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Rt-gY-Lz5" userLabel="ApplicationLogButton">
-                                                    <rect key="frame" x="0.0" y="257" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="254" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="82H-RK-5rt">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -3966,7 +3950,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="9CW-Su-9cY">
-                                                    <rect key="frame" x="0.0" y="248" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="245" width="338" height="1"/>
                                                     <view key="contentView" id="szv-84-IEB">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3978,7 +3962,7 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KtD-5R-sxH" userLabel="LogLevelButton">
-                                                    <rect key="frame" x="0.0" y="210" width="338" height="30"/>
+                                                    <rect key="frame" x="0.0" y="207" width="338" height="30"/>
                                                     <subviews>
                                                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rEk-vr-TH0">
                                                             <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -4027,7 +4011,7 @@
                                                     </customSpacing>
                                                 </stackView>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="4mA-nL-DvT">
-                                                    <rect key="frame" x="0.0" y="201" width="338" height="1"/>
+                                                    <rect key="frame" x="0.0" y="198" width="338" height="1"/>
                                                     <view key="contentView" id="pie-vy-ICG">
                                                         <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -4039,9 +4023,9 @@
                                                     <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </box>
                                                 <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bgm-hJ-Va8">
-                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="193"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="190"/>
                                                     <view key="contentView" id="5D6-jb-Cdc">
-                                                        <rect key="frame" x="1" y="1" width="336" height="191"/>
+                                                        <rect key="frame" x="1" y="1" width="336" height="188"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </view>
                                                 </box>
@@ -4098,14 +4082,15 @@
                                 <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </box>
-                            <box wantsLayer="YES" alphaValue="0.0" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="iE3-ca-yhv" userLabel="AuthBox">
-                                <rect key="frame" x="20" y="20" width="380" height="480"/>
+                            <box wantsLayer="YES" fixedFrame="YES" alphaValue="0.0" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="iE3-ca-yhv" userLabel="AuthBox">
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="RZK-NF-Di3" userLabel="AuthModalView">
-                                    <rect key="frame" x="0.0" y="0.0" width="380" height="480"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="380" height="477"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <stackView distribution="fillProportionally" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iiR-jk-fUo" userLabel="AuthModalStack">
-                                            <rect key="frame" x="30" y="240" width="320" height="180"/>
+                                            <rect key="frame" x="30" y="237" width="320" height="180"/>
                                             <subviews>
                                                 <box boxType="custom" borderType="bezel" cornerRadius="12" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="S3z-bF-J91" userLabel="AuthModalBox">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="180"/>
@@ -4113,11 +4098,11 @@
                                                         <rect key="frame" x="1" y="1" width="318" height="178"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yuY-qJ-ClI" userLabel="AuthStackView">
-                                                                <rect key="frame" x="5" y="173" width="308" height="0.0"/>
+                                                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yuY-qJ-ClI" userLabel="AuthStackView">
+                                                                <rect key="frame" x="5" y="5" width="308" height="168"/>
                                                                 <subviews>
-                                                                    <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bP8-Ix-wCL" userLabel="MenuArea">
-                                                                        <rect key="frame" x="10" y="-40" width="288" height="40"/>
+                                                                    <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bP8-Ix-wCL" userLabel="MenuArea">
+                                                                        <rect key="frame" x="10" y="128" width="288" height="40"/>
                                                                         <subviews>
                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w7T-Fv-FYZ">
                                                                                 <rect key="frame" x="-2" y="12" width="24" height="16"/>
@@ -4278,9 +4263,13 @@
                                                             </stackView>
                                                         </subviews>
                                                         <constraints>
+                                                            <constraint firstItem="yuY-qJ-ClI" firstAttribute="top" secondItem="SFm-5x-qf6" secondAttribute="top" constant="5" id="FmZ-ZB-rJy"/>
+                                                            <constraint firstItem="yuY-qJ-ClI" firstAttribute="leading" secondItem="SFm-5x-qf6" secondAttribute="leading" constant="5" id="Hei-cq-4m0"/>
+                                                            <constraint firstAttribute="trailing" secondItem="yuY-qJ-ClI" secondAttribute="trailing" constant="5" id="YmW-Uy-tBp"/>
                                                             <constraint firstAttribute="trailing" secondItem="yuY-qJ-ClI" secondAttribute="trailing" constant="5" id="dxo-Ou-veE"/>
                                                             <constraint firstItem="yuY-qJ-ClI" firstAttribute="top" secondItem="SFm-5x-qf6" secondAttribute="top" constant="5" id="k4B-RH-j9Z"/>
                                                             <constraint firstItem="yuY-qJ-ClI" firstAttribute="leading" secondItem="SFm-5x-qf6" secondAttribute="leading" constant="5" id="tmG-PI-4AV"/>
+                                                            <constraint firstAttribute="bottom" secondItem="yuY-qJ-ClI" secondAttribute="bottom" constant="5" id="w7w-QA-pkn"/>
                                                         </constraints>
                                                     </view>
                                                     <constraints>
@@ -4311,44 +4300,105 @@
                                 <color key="borderColor" name="ClearColor"/>
                                 <color key="fillColor" name="ClearColor"/>
                             </box>
+                            <box wantsLayer="YES" alphaValue="0.0" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Ayx-FD-cVQ" userLabel="LoadingBox">
+                                <rect key="frame" x="20" y="20" width="380" height="477"/>
+                                <view key="contentView" id="BNF-dO-pcd">
+                                    <rect key="frame" x="0.0" y="0.0" width="380" height="477"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <stackView distribution="fillProportionally" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8aT-WM-qE1" userLabel="LoadingList">
+                                            <rect key="frame" x="20" y="260" width="340" height="80"/>
+                                            <subviews>
+                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0wH-dx-amK">
+                                                    <rect key="frame" x="84" y="53" width="172" height="27"/>
+                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Progress Header" id="NWu-73-DMB">
+                                                        <font key="font" size="20" name="OpenSans-Bold"/>
+                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nAS-QE-wOX">
+                                                    <rect key="frame" x="63" y="26" width="214" height="19"/>
+                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Information about the progress" id="d9R-yZ-5td">
+                                                        <font key="font" size="14" name="OpenSans"/>
+                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <progressIndicator maxValue="100" displayedWhenStopped="NO" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="YtQ-kM-LRz" userLabel="ProgressBar">
+                                                    <rect key="frame" x="120" y="-1" width="100" height="20"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="18" id="BhA-wt-5tg"/>
+                                                        <constraint firstAttribute="width" constant="100" id="CeA-5t-qQT"/>
+                                                    </constraints>
+                                                </progressIndicator>
+                                            </subviews>
+                                            <visibilityPriorities>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                            </visibilityPriorities>
+                                            <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                            </customSpacing>
+                                        </stackView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="8aT-WM-qE1" secondAttribute="trailing" constant="20" id="aAE-Jo-OGU"/>
+                                        <constraint firstItem="8aT-WM-qE1" firstAttribute="leading" secondItem="BNF-dO-pcd" secondAttribute="leading" constant="20" id="b3G-3v-aOw"/>
+                                    </constraints>
+                                </view>
+                                <color key="borderColor" name="ModalColor"/>
+                                <color key="fillColor" name="ModalColor"/>
+                            </box>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="iE3-ca-yhv" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="1BN-LT-bHY"/>
-                            <constraint firstAttribute="bottom" secondItem="YWJ-Us-RT9" secondAttribute="bottom" constant="20" id="2pc-D1-HNk"/>
-                            <constraint firstItem="vVS-ZC-RlN" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="3ep-4k-Sf3"/>
-                            <constraint firstItem="YWJ-Us-RT9" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="7Zi-oB-vqu"/>
-                            <constraint firstAttribute="bottom" secondItem="Bmo-kS-tdU" secondAttribute="bottom" constant="20" id="9wC-gx-FdR"/>
-                            <constraint firstAttribute="bottom" secondItem="1n0-Bh-2o5" secondAttribute="bottom" constant="20" id="GOL-vE-27e"/>
-                            <constraint firstAttribute="trailing" secondItem="1n0-Bh-2o5" secondAttribute="trailing" constant="20" id="JfZ-S0-Vev"/>
-                            <constraint firstAttribute="trailing" secondItem="iE3-ca-yhv" secondAttribute="trailing" constant="20" id="L8w-Va-kNd"/>
-                            <constraint firstAttribute="bottom" secondItem="JjY-hl-sY5" secondAttribute="bottom" constant="20" id="QXs-Sd-Ecc"/>
-                            <constraint firstItem="iE3-ca-yhv" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="c39-xx-bHN"/>
-                            <constraint firstAttribute="bottom" secondItem="zpy-kv-rvg" secondAttribute="bottom" constant="20" id="cCg-rw-isI"/>
-                            <constraint firstAttribute="trailing" secondItem="zpy-kv-rvg" secondAttribute="trailing" constant="20" id="cfg-Ar-UMO"/>
-                            <constraint firstItem="YWJ-Us-RT9" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="dC8-VO-tyP"/>
-                            <constraint firstItem="r1m-PG-WcY" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="dep-1V-cQy"/>
-                            <constraint firstItem="JjY-hl-sY5" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="ehY-fM-rlI"/>
-                            <constraint firstItem="JjY-hl-sY5" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="emN-qm-S0U"/>
-                            <constraint firstItem="tbB-Jy-9ZT" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" id="eob-AT-7ZC"/>
-                            <constraint firstAttribute="trailing" secondItem="Bmo-kS-tdU" secondAttribute="trailing" constant="20" id="ezN-ey-9pg"/>
-                            <constraint firstItem="Bmo-kS-tdU" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="fdR-XJ-8e4"/>
-                            <constraint firstItem="Bmo-kS-tdU" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="gou-72-n8v"/>
-                            <constraint firstAttribute="trailing" secondItem="r1m-PG-WcY" secondAttribute="trailing" constant="20" id="gyK-y4-k0Q"/>
-                            <constraint firstAttribute="bottom" secondItem="tbB-Jy-9ZT" secondAttribute="bottom" id="h8G-q1-atL"/>
-                            <constraint firstItem="zpy-kv-rvg" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="hgf-WM-9ng"/>
-                            <constraint firstAttribute="trailing" secondItem="JjY-hl-sY5" secondAttribute="trailing" constant="20" id="iLC-0o-s1W"/>
-                            <constraint firstAttribute="trailing" secondItem="vVS-ZC-RlN" secondAttribute="trailing" constant="20" id="jK3-jb-Slj"/>
-                            <constraint firstItem="tbB-Jy-9ZT" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" id="jYV-kR-ajZ"/>
-                            <constraint firstAttribute="trailing" secondItem="YWJ-Us-RT9" secondAttribute="trailing" constant="20" id="kMX-Wn-em7"/>
-                            <constraint firstItem="vVS-ZC-RlN" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="shz-9x-SzG"/>
-                            <constraint firstItem="zpy-kv-rvg" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="t2F-c1-gQa"/>
-                            <constraint firstAttribute="bottom" secondItem="vVS-ZC-RlN" secondAttribute="bottom" constant="20" id="vrU-R2-oyM"/>
-                            <constraint firstItem="1n0-Bh-2o5" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="wZq-tY-4Sa"/>
-                            <constraint firstAttribute="bottom" secondItem="iE3-ca-yhv" secondAttribute="bottom" constant="20" id="xOA-5Q-QSd"/>
-                            <constraint firstAttribute="bottom" secondItem="r1m-PG-WcY" secondAttribute="bottom" constant="20" id="xjV-pE-eQo"/>
-                            <constraint firstAttribute="trailing" secondItem="tbB-Jy-9ZT" secondAttribute="trailing" id="yV5-5Y-op3"/>
-                            <constraint firstItem="r1m-PG-WcY" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="zTm-EU-jMF"/>
-                            <constraint firstItem="1n0-Bh-2o5" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="zd1-Hi-GjC"/>
+                            <constraint firstAttribute="trailing" secondItem="JjY-hl-sY5" secondAttribute="trailing" constant="20" id="0oZ-fE-vkh"/>
+                            <constraint firstItem="zpy-kv-rvg" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="21k-9C-xGS"/>
+                            <constraint firstItem="1n0-Bh-2o5" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="2hM-1z-z3M"/>
+                            <constraint firstAttribute="trailing" secondItem="1n0-Bh-2o5" secondAttribute="trailing" constant="20" id="463-ao-CUu"/>
+                            <constraint firstItem="vVS-ZC-RlN" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="5UM-d2-XfC"/>
+                            <constraint firstAttribute="trailing" secondItem="FW6-ai-hao" secondAttribute="trailing" constant="20" id="8Rc-2D-PBd"/>
+                            <constraint firstAttribute="trailing" secondItem="vVS-ZC-RlN" secondAttribute="trailing" constant="20" id="9vK-gp-wJo"/>
+                            <constraint firstItem="r1m-PG-WcY" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="A8R-Fr-Qmc"/>
+                            <constraint firstAttribute="trailing" secondItem="Ayx-FD-cVQ" secondAttribute="trailing" constant="20" id="AFP-zd-eLl"/>
+                            <constraint firstAttribute="bottom" secondItem="1n0-Bh-2o5" secondAttribute="bottom" constant="20" id="EFU-xe-wlD"/>
+                            <constraint firstItem="0c2-wg-2hS" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="Fb8-Ll-4Z3"/>
+                            <constraint firstItem="r1m-PG-WcY" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="H5n-mm-8mi"/>
+                            <constraint firstItem="YWJ-Us-RT9" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="HGZ-P9-kFG"/>
+                            <constraint firstItem="adH-7J-gif" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="I72-iH-02S"/>
+                            <constraint firstItem="FW6-ai-hao" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="KKL-cV-O2T"/>
+                            <constraint firstItem="YWJ-Us-RT9" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="MlK-DH-MLr"/>
+                            <constraint firstAttribute="bottom" secondItem="FW6-ai-hao" secondAttribute="bottom" constant="20" id="N68-an-Ywk"/>
+                            <constraint firstItem="FW6-ai-hao" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="NdN-Ug-hgk"/>
+                            <constraint firstAttribute="bottom" secondItem="adH-7J-gif" secondAttribute="bottom" constant="20" id="Nst-de-qS2"/>
+                            <constraint firstItem="vVS-ZC-RlN" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="Pco-bB-41Z"/>
+                            <constraint firstItem="Ayx-FD-cVQ" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="PfG-Gu-Yak"/>
+                            <constraint firstAttribute="bottom" secondItem="0c2-wg-2hS" secondAttribute="bottom" constant="20" id="Q4Q-zR-shT"/>
+                            <constraint firstAttribute="bottom" secondItem="r1m-PG-WcY" secondAttribute="bottom" constant="20" id="QBT-CO-zlD"/>
+                            <constraint firstItem="tbB-Jy-9ZT" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" id="SZJ-e5-8Xn"/>
+                            <constraint firstItem="adH-7J-gif" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="TO1-13-CSN"/>
+                            <constraint firstItem="zpy-kv-rvg" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="Va1-Of-daG"/>
+                            <constraint firstAttribute="trailing" secondItem="adH-7J-gif" secondAttribute="trailing" constant="20" id="WAm-Xl-y7l"/>
+                            <constraint firstAttribute="bottom" secondItem="Ayx-FD-cVQ" secondAttribute="bottom" constant="20" id="WBx-9P-qgw"/>
+                            <constraint firstItem="1n0-Bh-2o5" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="YiZ-OW-ln0"/>
+                            <constraint firstAttribute="trailing" secondItem="r1m-PG-WcY" secondAttribute="trailing" constant="20" id="aSq-dI-Yep"/>
+                            <constraint firstAttribute="bottom" secondItem="tbB-Jy-9ZT" secondAttribute="bottom" id="c1M-Rw-FzH"/>
+                            <constraint firstAttribute="bottom" secondItem="vVS-ZC-RlN" secondAttribute="bottom" constant="20" id="cUL-H7-7LU"/>
+                            <constraint firstAttribute="bottom" secondItem="zpy-kv-rvg" secondAttribute="bottom" constant="20" id="eYg-U9-E9H"/>
+                            <constraint firstAttribute="trailing" secondItem="zpy-kv-rvg" secondAttribute="trailing" constant="20" id="ej7-g0-sou"/>
+                            <constraint firstItem="tbB-Jy-9ZT" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" id="fuO-BN-aGA"/>
+                            <constraint firstItem="Ayx-FD-cVQ" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="nGl-qM-POF"/>
+                            <constraint firstAttribute="trailing" secondItem="0c2-wg-2hS" secondAttribute="trailing" constant="20" id="ngi-DU-3b3"/>
+                            <constraint firstItem="JjY-hl-sY5" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="oSG-aL-btz"/>
+                            <constraint firstItem="JjY-hl-sY5" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="r51-Sp-UXR"/>
+                            <constraint firstAttribute="bottom" secondItem="JjY-hl-sY5" secondAttribute="bottom" constant="20" id="rg7-SA-8fh"/>
+                            <constraint firstAttribute="trailing" secondItem="YWJ-Us-RT9" secondAttribute="trailing" constant="20" id="u4q-pL-baY"/>
+                            <constraint firstAttribute="trailing" secondItem="tbB-Jy-9ZT" secondAttribute="trailing" id="uxU-gE-eKs"/>
+                            <constraint firstItem="0c2-wg-2hS" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="vzR-Cn-XvN"/>
+                            <constraint firstAttribute="bottom" secondItem="YWJ-Us-RT9" secondAttribute="bottom" constant="20" id="waf-cA-mgs"/>
                         </constraints>
                         <shadow key="shadow">
                             <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -4361,7 +4411,8 @@
                         <outlet property="AboutCloseButton" destination="ghi-ES-ACV" id="Fcn-Pp-PbI"/>
                         <outlet property="AddButton" destination="reF-sf-eQQ" id="ejE-nf-bQy"/>
                         <outlet property="AddIdButton" destination="19w-l6-G7l" id="COi-2e-BMI"/>
-                        <outlet property="AddIdentityGesture" destination="9Qj-s4-LBg" id="Y22-kO-FlB"/>
+                        <outlet property="AddIdGesture" destination="h3k-bk-8Eo" id="gf0-2L-ssX"/>
+                        <outlet property="AddIdentityGesture" destination="9qx-Z7-RXm" id="Pz5-g2-0Mz"/>
                         <outlet property="AddressValue" destination="3Lr-nJ-RNN" id="qby-YU-qIb"/>
                         <outlet property="AdvancedBackButton" destination="720-do-XBp" id="FDt-uM-P2W"/>
                         <outlet property="AdvancedBox" destination="YWJ-Us-RT9" id="V96-s5-px9"/>
@@ -4422,6 +4473,7 @@
                         <outlet property="ForgotButton" destination="4Ik-l7-mzJ" id="90R-X8-eGc"/>
                         <outlet property="IPAddress" destination="d89-i1-quA" id="zyw-tb-5KV"/>
                         <outlet property="IdDetailCloseButton" destination="xXj-YT-QNa" id="Ws7-WF-daE"/>
+                        <outlet property="IdListHeight" destination="e20-ha-kN8" id="OJV-FC-H8e"/>
                         <outlet property="IdName" destination="LaG-Ec-Dab" id="Omt-BM-A2y"/>
                         <outlet property="IdNetwork" destination="tZx-46-LZv" id="pAs-y4-sz0"/>
                         <outlet property="IdServiceCount" destination="SCO-Zw-EHg" id="rgo-qb-K4O"/>
@@ -4453,6 +4505,10 @@
                         <outlet property="PortValue" destination="7st-GY-Zwr" id="Nj9-Vd-Z6j"/>
                         <outlet property="PostureInfo" destination="BAc-Y1-DvX" id="6ig-8t-5CG"/>
                         <outlet property="PrivacyButton" destination="HU4-EB-ca4" id="kFt-zh-ayJ"/>
+                        <outlet property="ProgressBar" destination="YtQ-kM-LRz" id="JMa-3M-ZV8"/>
+                        <outlet property="ProgressModal" destination="Ayx-FD-cVQ" id="c6f-n4-1nf"/>
+                        <outlet property="ProgressSubTitle" destination="nAS-QE-wOX" id="qcq-k6-9V2"/>
+                        <outlet property="ProgressTitle" destination="0wH-dx-amK" id="GgP-25-mP0"/>
                         <outlet property="ProtocolsValue" destination="9PX-nC-Cs7" id="20K-Td-ORb"/>
                         <outlet property="QuitButton" destination="TMz-Gu-TDq" id="VZi-bi-hXO"/>
                         <outlet property="RecoveryBox" destination="zpy-kv-rvg" id="rN0-eE-lFN"/>
@@ -4543,6 +4599,9 @@
         <image name="z" width="330" height="537"/>
         <namedColor name="ClearColor">
             <color red="0.16599999368190765" green="0.18799999356269836" blue="0.22400000691413879" alpha="0.80099999904632568" colorSpace="custom" customColorSpace="displayP3"/>
+        </namedColor>
+        <namedColor name="ModalColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.97999999999999998" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>
         <namedColor name="PrimaryColor">
             <color red="0.0" green="0.40799999237060547" blue="0.97600001096725464" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

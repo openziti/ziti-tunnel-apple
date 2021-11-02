@@ -103,6 +103,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MainArea: NSStackView!
     @IBOutlet var DoConnectGesture: NSClickGestureRecognizer!
     @IBOutlet var TimerSubLabel: NSTextField!
+    @IBOutlet var AddIdentityGesture: NSClickGestureRecognizer!
+    @IBOutlet var AddIdGesture: NSClickGestureRecognizer!
     
     override func viewWillAppear() {
         self.view.shadow = NSShadow();
@@ -152,14 +154,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange);
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier);
         
-        if (tunnelMgr.status == .disconnected) {
-            do {
-                try tunnelMgr.startTunnel();
-            } catch {
-                dialogAlert("Tunnel Error", error.localizedDescription);
-            }
-        }
-        
         // Load previous identities
         if let err = zidMgr.loadZids() {
             zLog.error(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
@@ -168,8 +162,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.bytesDown = 0.0;
         self.bytesUp = 0.0;
         
-        UpdateList();
         SetupCursor();
+        UpdateList();
         
         // Details Setup
         MFAToggle.layer?.backgroundColor = NSColor.red.cgColor;
@@ -177,6 +171,10 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         MFAToggle.layer?.cornerRadius = 10;
         
         self.HideAll();
+        
+        ProgressModal.isHidden = true;
+        ProgressModal.alphaValue = 1;
+        ProgressModal.shadow = .none;
         
         // listen for Ziti IPC events
         NotificationCenter.default.addObserver(forName: .onZitiPollResponse, object: nil, queue: OperationQueue.main) { notification in
@@ -189,18 +187,22 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 zLog.error("Unsupported IPC message type \(msg.meta.msgType) for id \(msg.meta.zid ?? "nil")")
                 return
             }
-            /*
-            DispatchQueue.main.async {
-                self.doMfaAuth(zid)
-            }
-            */
         }
+            //DispatchQueue.main.async {
+            //    self.doMfaAuth(zid)
+            //}
+        
+        //}
         
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
         ConnectButton.isHidden = true;
         ConnectedButton.isHidden = false;
+        //AddButton.alphaValue = 0.2;
+        //AddIdButton.alphaValue = 0.2;
+        //AddIdGesture.isEnabled = false;
+        //AddIdentityGesture.isEnabled = false;
         timer.invalidate();
         
         zLog.info("Tunnel Status: \(status)");
@@ -217,6 +219,10 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             IdentityList.isHidden = true;
             break
         case .connected:
+            AddIdGesture.isEnabled = true;
+            AddIdentityGesture.isEnabled = true;
+            AddButton.alphaValue = 1.0;
+            AddIdButton.alphaValue = 1.0;
             TimerLabel.stringValue = "00:00.00";
             TimerSubLabel.stringValue = "STOP";
             ConnectButton.isHidden = true;
@@ -226,7 +232,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             ConnectedButton.alphaValue = 1.0;
             IdentityList.isHidden = false;
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
-            UpdateList();
             break
         case .disconnecting:
             ConnectButton.isHidden = true;
@@ -281,23 +286,23 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        UpdateList();
+        self.UpdateList();
     }
     
     func onRemovedId(_ idString: String) {
-        UpdateList();
+        self.UpdateList();
     }
     
     @IBAction func AddId(_ sender: Any) {
-        AddIdentity();
+        self.AddIdentity();
     }
     
     @IBAction func AddIdentity(_ sender: NSClickGestureRecognizer) {
-        AddIdentity();
+        self.AddIdentity();
     }
     
     @IBAction func ShowMenu(_ sender: NSClickGestureRecognizer) {
-        showArea(state: "menu");
+        self.showArea(state: "menu");
     }
     
     func getMainWindow() -> NSWindow? {
@@ -384,6 +389,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             subview.removeFromSuperviewWithoutNeedingDisplay();
         }
     }
+    @IBOutlet var IdListHeight: NSLayoutConstraint!
     
     func UpdateList() {
         
@@ -461,17 +467,18 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             idName.isSelectable = false;
             idName.backgroundColor = NSColor(calibratedRed: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
-            let idServer = NSText();
+            let idServer = NSTextField();
             idServer.font = NSFont(name: "Open Sans", size: 10);
             idServer.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
-            idServer.frame.size.height = 20;
+            idServer.frame.size.height = 6;
             idServer.isEditable = false;
             idServer.isSelectable = false;
-            idServer.string = identity.czid?.ztAPI ?? "no network";
+            idServer.usesSingleLineMode = true;
+            idServer.stringValue = identity.czid?.ztAPI ?? "no network";
             idServer.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
             
             let col2 = NSStackView(views: [idName, idServer]);
-            col2.frame = CGRect(x: 0, y: 0, width: 200, height: 50);
+            col2.frame = CGRect(x: 0, y: 0, width: 260, height: 40);
             col2.distribution = .fill;
             col2.alignment = .leading;
             col2.spacing = 0;
@@ -600,8 +607,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         idListView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: CGFloat(((50*index)+(2*index))+2));
         IdentityList.documentView = idListView;
         
-        IdentityList.frame.size.height = CGFloat(index*50);
+        
+        IdListHeight.constant = CGFloat(index*50);
         let height = 720 + (index*50);
+        
+        ParentView.frame.size.height = CGFloat(1000);
     }
     
     func AddIdentity() {
@@ -1014,7 +1024,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func ShowFeedback(_ sender: NSClickGestureRecognizer) {
-        
+        ShowProgress("Test", "Testing");
     }
     
     @IBAction func ShowSupport(_ sender: NSClickGestureRecognizer) {
@@ -1069,6 +1079,32 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     
     
+    
+    
+    
+    
+    
+    /**
+     Progress Modal
+     */
+    @IBOutlet var ProgressModal: NSBox!
+    @IBOutlet var ProgressTitle: NSTextField!
+    @IBOutlet var ProgressSubTitle: NSTextField!
+    @IBOutlet var ProgressBar: NSProgressIndicator!
+    
+    func ShowProgress(_ title:String, _ subTitle:String) {
+        ProgressTitle.stringValue = title;
+        ProgressSubTitle.stringValue = subTitle;
+        ProgressBar.startAnimation(nil);
+        ProgressModal.isHidden = false;
+        ProgressModal.alphaValue = 1;
+    }
+    
+    func HideProgress() {
+        ProgressBar.stopAnimation(nil);
+        ProgressModal.isHidden = true;
+        ProgressModal.alphaValue = 0;
+    }
     
     
     
