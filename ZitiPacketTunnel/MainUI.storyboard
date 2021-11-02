@@ -40,6 +40,31 @@
             </objects>
             <point key="canvasLocation" x="-5184" y="-220"/>
         </scene>
+        <!--Window Controller-->
+        <scene sceneID="T6P-pA-krx">
+            <objects>
+                <windowController showSeguePresentationStyle="single" id="uM6-pn-Kfg" sceneMemberID="viewController">
+                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="u5r-Pc-yhy">
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="245" y="301" width="420" height="517"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
+                        <value key="minSize" type="size" width="420" height="800"/>
+                        <view key="contentView" id="g8F-tN-hFq">
+                            <rect key="frame" x="0.0" y="0.0" width="420" height="517"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="uM6-pn-Kfg" id="yv7-Kp-1yA"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="xIs-vq-bpn" kind="relationship" relationship="window.shadowedContentViewController" id="pPt-QG-ky1"/>
+                    </connections>
+                </windowController>
+                <customObject id="kzh-rj-2Yu" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-4486" y="-451"/>
+        </scene>
         <!--DashboardScreen-->
         <scene sceneID="Lm0-fL-zGs">
             <objects>
