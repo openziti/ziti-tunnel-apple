@@ -143,6 +143,7 @@
 		82B6EFD526DCF42A009C5BED /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFD326DCF42A009C5BED /* DragView.swift */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
+		D7DF1A9127315E5D000C6548 /* IdentityOperationGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DF1A9027315E5D000C6548 /* IdentityOperationGesture.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -358,6 +359,7 @@
 		B2055ED46BB4712E8ACCBE15 /* Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-ios_targets-ZitiMobilePacketTunnel/Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
 		B9942F531B1AE05E9C8AA335 /* Pods_macos_targets_ZitiPosture.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_macos_targets_ZitiPosture.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD089AE0E096B75A46595B3D /* Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-ZitiPacketTunnel/Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
+		D7DF1A9027315E5D000C6548 /* IdentityOperationGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityOperationGesture.swift; sourceTree = "<group>"; };
 		D8AA43E427149108FA6F7ECF /* Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobilePacketTunnelProvider/Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig"; sourceTree = "<group>"; };
 		E274C11E7D7B959B31918E18 /* Pods-macos_targets-ZitiPosture.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-ZitiPosture.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-ZitiPosture/Pods-macos_targets-ZitiPosture.release.xcconfig"; sourceTree = "<group>"; };
 		E2D4420EFA2906A21C91CD96 /* Pods-ZitiPacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiPacketTunnel.release.xcconfig"; path = "Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
@@ -690,6 +692,7 @@
 			isa = PBXGroup;
 			children = (
 				82B6EFCF26DCF422009C5BED /* GoToDetailGesture.swift */,
+				D7DF1A9027315E5D000C6548 /* IdentityOperationGesture.swift */,
 			);
 			path = Gestures;
 			sourceTree = "<group>";
@@ -1178,6 +1181,7 @@
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
 				5A78DEE325631E1000316CE9 /* AppGroup.swift in Sources */,
 				5A0D1D2C222B093F00D01F30 /* ZitiError.swift in Sources */,
+				D7DF1A9127315E5D000C6548 /* IdentityOperationGesture.swift in Sources */,
 				5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */,
 				5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */,
 				5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */,

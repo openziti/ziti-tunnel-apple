@@ -38,16 +38,16 @@
                 <customObject id="rNE-oq-bVd" customClass="NSFontManager"/>
                 <customObject id="cpo-9K-zHN" customClass="AppDelegate" customModule="Ziti_Desktop_Edge" customModuleProvider="target"/>
             </objects>
-            <point key="canvasLocation" x="-1369" y="-190"/>
+            <point key="canvasLocation" x="-5184" y="-220"/>
         </scene>
         <!--DashboardScreen-->
         <scene sceneID="Lm0-fL-zGs">
             <objects>
                 <customObject id="8qG-TM-zhi" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="DashboardScreen" showSeguePresentationStyle="single" id="xIs-vq-bpn" userLabel="DashboardScreen" customClass="DashboardScreen" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" id="IZP-fV-y05" userLabel="ParentView">
-                        <rect key="frame" x="0.0" y="0.0" width="420" height="517"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                    <view key="view" wantsLayer="YES" misplaced="YES" id="IZP-fV-y05" userLabel="ParentView">
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="800"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <box boxType="custom" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="tbB-Jy-9ZT">
                                 <rect key="frame" x="0.0" y="0.0" width="420" height="517"/>
@@ -2538,7 +2538,7 @@
                                 <color key="fillColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </box>
                             <box wantsLayer="YES" fixedFrame="YES" alphaValue="0.0" boxType="custom" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bmo-kS-tdU" userLabel="MFASetupBox">
-                                <rect key="frame" x="20" y="17" width="380" height="480"/>
+                                <rect key="frame" x="20" y="-983" width="380" height="480"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="jOU-ba-KXz">
                                     <rect key="frame" x="1" y="1" width="378" height="478"/>
@@ -4083,7 +4083,7 @@
                                 <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </box>
                             <box wantsLayer="YES" fixedFrame="YES" alphaValue="0.0" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="iE3-ca-yhv" userLabel="AuthBox">
-                                <rect key="frame" x="20" y="20" width="380" height="477"/>
+                                <rect key="frame" x="20" y="-980" width="380" height="477"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="RZK-NF-Di3" userLabel="AuthModalView">
                                     <rect key="frame" x="0.0" y="0.0" width="380" height="477"/>
@@ -4385,7 +4385,6 @@
                             <constraint firstAttribute="bottom" secondItem="Ayx-FD-cVQ" secondAttribute="bottom" constant="20" id="WBx-9P-qgw"/>
                             <constraint firstItem="1n0-Bh-2o5" firstAttribute="top" secondItem="IZP-fV-y05" secondAttribute="top" constant="20" id="YiZ-OW-ln0"/>
                             <constraint firstAttribute="trailing" secondItem="r1m-PG-WcY" secondAttribute="trailing" constant="20" id="aSq-dI-Yep"/>
-                            <constraint firstAttribute="bottom" secondItem="tbB-Jy-9ZT" secondAttribute="bottom" id="c1M-Rw-FzH"/>
                             <constraint firstAttribute="bottom" secondItem="vVS-ZC-RlN" secondAttribute="bottom" constant="20" id="cUL-H7-7LU"/>
                             <constraint firstAttribute="bottom" secondItem="zpy-kv-rvg" secondAttribute="bottom" constant="20" id="eYg-U9-E9H"/>
                             <constraint firstAttribute="trailing" secondItem="zpy-kv-rvg" secondAttribute="trailing" constant="20" id="ej7-g0-sou"/>
@@ -4397,6 +4396,7 @@
                             <constraint firstAttribute="bottom" secondItem="JjY-hl-sY5" secondAttribute="bottom" constant="20" id="rg7-SA-8fh"/>
                             <constraint firstAttribute="trailing" secondItem="YWJ-Us-RT9" secondAttribute="trailing" constant="20" id="u4q-pL-baY"/>
                             <constraint firstAttribute="trailing" secondItem="tbB-Jy-9ZT" secondAttribute="trailing" id="uxU-gE-eKs"/>
+                            <constraint firstAttribute="bottom" secondItem="tbB-Jy-9ZT" secondAttribute="bottom" id="v4S-8a-aBi"/>
                             <constraint firstItem="0c2-wg-2hS" firstAttribute="leading" secondItem="IZP-fV-y05" secondAttribute="leading" constant="20" id="vzR-Cn-XvN"/>
                             <constraint firstAttribute="bottom" secondItem="YWJ-Us-RT9" secondAttribute="bottom" constant="20" id="waf-cA-mgs"/>
                         </constraints>
@@ -4568,9 +4568,12 @@
                         <constraint firstAttribute="trailing" secondItem="3og-CW-P5w" secondAttribute="trailing" id="SKm-iI-bnx"/>
                         <constraint firstItem="3og-CW-P5w" firstAttribute="leading" secondItem="8W1-sg-uII" secondAttribute="leading" id="l72-zq-YXi"/>
                     </constraints>
+                    <connections>
+                        <outlet property="DashboardScreen" destination="xIs-vq-bpn" id="a7R-LC-RCb"/>
+                    </connections>
                 </view>
             </objects>
-            <point key="canvasLocation" x="-1218" y="148"/>
+            <point key="canvasLocation" x="-5184" y="246"/>
         </scene>
     </scenes>
     <resources>

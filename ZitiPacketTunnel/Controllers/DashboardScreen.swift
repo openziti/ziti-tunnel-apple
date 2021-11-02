@@ -162,8 +162,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.bytesDown = 0.0;
         self.bytesUp = 0.0;
         
-        SetupCursor();
-        UpdateList();
+        // SetupCursor();
         
         // Details Setup
         MFAToggle.layer?.backgroundColor = NSColor.red.cgColor;
@@ -199,6 +198,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
         ConnectButton.isHidden = true;
         ConnectedButton.isHidden = false;
+        SpeedArea.alphaValue = 0.2;
+        TimerSubLabel.stringValue = "";
+        DoConnectGesture.isEnabled = false;
+        ConnectedButton.alphaValue = 0.2;
+        self.ClearList();
         //AddButton.alphaValue = 0.2;
         //AddIdButton.alphaValue = 0.2;
         //AddIdGesture.isEnabled = false;
@@ -209,14 +213,20 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         switch status {
         case .connecting:
-            ConnectButton.isHidden = true;
-            ConnectedButton.isHidden = false;
-            SpeedArea.alphaValue = 0.2;
             TimerLabel.stringValue = "Connecting...";
-            TimerSubLabel.stringValue = "";
-            DoConnectGesture.isEnabled = false;
-            ConnectedButton.alphaValue = 0.2;
-            IdentityList.isHidden = true;
+            break
+        case .disconnecting:
+            TimerLabel.stringValue = "Disconnecting...";
+            break
+        case .disconnected:
+            ConnectButton.isHidden = false;
+            ConnectedButton.isHidden = true;
+            break
+        case .invalid:
+            TimerLabel.stringValue = "Invalid!";
+            break
+        case .reasserting:
+            TimerLabel.stringValue = "Reasserting...";
             break
         case .connected:
             AddIdGesture.isEnabled = true;
@@ -231,62 +241,19 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             DoConnectGesture.isEnabled = true;
             ConnectedButton.alphaValue = 1.0;
             IdentityList.isHidden = false;
+            IdListHeight.constant = 300;
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
-            break
-        case .disconnecting:
-            ConnectButton.isHidden = true;
-            ConnectedButton.isHidden = false;
-            SpeedArea.alphaValue = 0.2;
-            TimerLabel.stringValue = "Disconnecting...";
-            TimerSubLabel.stringValue = "";
-            DoConnectGesture.isEnabled = false;
-            ConnectedButton.alphaValue = 0.2;
-            IdentityList.isHidden = true;
-            break
-        case .disconnected:
-            ConnectButton.isHidden = false;
-            ConnectedButton.isHidden = true;
-            SpeedArea.alphaValue = 0.2;
-            IdentityList.isHidden = true;
-            ClearIdList();
-            break
-        case .invalid:
-            ConnectButton.isHidden = true;
-            ConnectedButton.isHidden = false;
-            SpeedArea.alphaValue = 0.2;
-            TimerLabel.stringValue = "Invalid!";
-            TimerSubLabel.stringValue = "";
-            DoConnectGesture.isEnabled = false;
-            ConnectedButton.alphaValue = 0.2;
-            IdentityList.isHidden = true;
-            break
-        case .reasserting:
-            ConnectButton.isHidden = true;
-            ConnectedButton.isHidden = false;
-            SpeedArea.alphaValue = 0.2;
-            TimerLabel.stringValue = "Reasserting...";
-            TimerSubLabel.stringValue = "";
-            DoConnectGesture.isEnabled = false;
-            ConnectedButton.alphaValue = 0.2;
-            IdentityList.isHidden = true;
+            self.UpdateList();
             break
         @unknown default:
-            ConnectButton.isHidden = true;
-            ConnectedButton.isHidden = false;
-            SpeedArea.alphaValue = 0.2;
             TimerLabel.stringValue = "Unknown Tunnel State";
-            TimerSubLabel.stringValue = "";
-            DoConnectGesture.isEnabled = false;
-            ConnectedButton.alphaValue = 0.2;
-            IdentityList.isHidden = true;
             zLog.warn("Unknown tunnel status");
             break
         }
-        self.UpdateList();
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        self.UpdateList();
+        // self.UpdateList();
     }
     
     func onRemovedId(_ idString: String) {
@@ -384,34 +351,37 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         timeLaunched += 1;
     }
     
-    func ClearIdList() {
+    @IBOutlet var IdListHeight: NSLayoutConstraint!
+    
+    func ClearList() {
         IdentityList.documentView?.subviews.forEach { subview in
             subview.removeFromSuperviewWithoutNeedingDisplay();
         }
+        IdListHeight.constant = 20;
+        // IdentityList.isHidden = true;
     }
-    @IBOutlet var IdListHeight: NSLayoutConstraint!
     
     func UpdateList() {
         
         IdentityList.horizontalScrollElasticity = .none;
         IdentityList.horizontalScroller = .none;
-        let idListView = NSStackView(frame: NSRect(x: 0, y: 0, width: 320, height: 500));
+        let idListView = NSStackView(frame: NSRect(x: 0, y: 0, width: 280, height: 500));
         idListView.orientation = .vertical;
         idListView.spacing = 2;
-        IdentityList.documentView?.subviews.forEach { subview in
-            subview.removeFromSuperviewWithoutNeedingDisplay();
-        }
+        ClearList();
         var index = 0;
         for identity in zidMgr.zids {
             
-            let clickGesture = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
-            clickGesture.indexValue = index;
-            
+            let clickGesture1 = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
             let clickGesture2 = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
-            clickGesture2.indexValue = index;
-            
             let clickGesture3 = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
+            clickGesture1.indexValue = index;
+            clickGesture2.indexValue = index;
             clickGesture3.indexValue = index;
+            
+            let toggleGesture = IdentityOperationGesture(target: self, action: #selector(self.ToggleInline(gesture:)));
+            toggleGesture.indexValue = index;
+            toggleGesture.isOn = !identity.isEnabled;
             
             // First Column of Identity Item Renderer
             let toggler = NSSwitch(frame: CGRect(x: 0, y: 0, width: 75, height: 22));
@@ -433,7 +403,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 toggler.state = .off;
             }
             toggler.tag = index;
-            toggler.addGestureRecognizer(clickGesture);
+            toggler.addGestureRecognizer(toggleGesture);
             
             if (identity.isEnrolled) {
                 if (identity.isEnabled) {
@@ -487,7 +457,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             col2.edgeInsets.top = 8;
             col2.heightAnchor.constraint(equalToConstant: 50).isActive = true;
             col2.widthAnchor.constraint(equalToConstant: 200).isActive = true;
-            col2.addGestureRecognizer(clickGesture2);
+            col2.addGestureRecognizer(clickGesture1);
             
             
             // Count column for the item renderer
@@ -517,7 +487,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             serviceLabel.frame.size.height = 20;
             serviceLabel.isEditable = false;
             serviceLabel.isSelectable = false;
-            serviceLabel.addGestureRecognizer(clickGesture);
             serviceLabel.font = NSFont(name: "Open Sans", size: 10);
             serviceLabel.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.00);
             idServiceCount.heightAnchor.constraint(equalToConstant: 20).isActive = true;
@@ -533,7 +502,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             col3.orientation = .vertical;
             col3.edgeInsets.top = 8;
             col3.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col3.addGestureRecognizer(clickGesture3);
+            col3.addGestureRecognizer(clickGesture2);
             col3.widthAnchor.constraint(equalToConstant: 50).isActive = true;
             
             // Arrow image for Item Renderer
@@ -552,12 +521,13 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             col4.alignment = .centerX;
             col4.spacing = 0;
             col4.orientation = .vertical;
-            col4.addGestureRecognizer(clickGesture);
+            col4.addGestureRecognizer(clickGesture3);
             idServiceCount.heightAnchor.constraint(equalToConstant: 50).isActive = true;
             col4.widthAnchor.constraint(equalToConstant: 30).isActive = true;
             
             let items = [col2, col3, col4];
             
+            /* This is dumb, Mac needs a Hover State
             pointingHand = NSCursor.pointingHand;
             for item in items {
                 item.addCursorRect(item.bounds, cursor: pointingHand!);
@@ -577,7 +547,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             for item in items {
                 item.addTrackingRect(item.bounds, owner: arrow!, userData: nil, assumeInside: true);
             }
-            
+            */
 
             // Put all the columns into the parent frames
             
@@ -594,8 +564,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             idListView.addSubview(renderer);
             index = index + 1;
         }
+
+        idListView.frame = CGRect(x: 0, y: 0, width: IdentityList.frame.size.width, height: CGFloat(((50*index)+(2*index))+2));
+        IdentityList.documentView = idListView
+        
+        /*
         let clipView = FlippedClipView();
         clipView.drawsBackground = false;
+        IdentityList.horizontalScrollElasticity = .none;
         IdentityList.contentView = clipView
         clipView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -604,14 +580,15 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
           clipView.topAnchor.constraint(equalTo: IdentityList.topAnchor),
           clipView.bottomAnchor.constraint(equalTo: IdentityList.bottomAnchor)
         ]);
-        idListView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: CGFloat(((50*index)+(2*index))+2));
-        IdentityList.documentView = idListView;
+         */
         
         
         IdListHeight.constant = CGFloat(index*50);
         let height = 720 + (index*50);
         
-        ParentView.frame.size.height = CGFloat(1000);
+    
+        
+        self.view.layoutSubtreeIfNeeded();
     }
     
     func AddIdentity() {
@@ -820,7 +797,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Connect the client and restart the timer
      */
     @IBAction func Connect(_ sender: NSClickGestureRecognizer) {
-        timer.invalidate();
         do {
             try tunnelMgr.startTunnel();
         } catch {
@@ -832,15 +808,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Disconnct the client and stop the tunnel
      */
     @IBAction func Disconnect(_ sender: NSClickGestureRecognizer) {
-        timer.invalidate();
-        TimerLabel.stringValue = "00:00.00";
-        UpSpeed.stringValue = "0.0";
-        UpSpeedSize.stringValue = "bps";
-        DownSpeed.stringValue = "0.0";
-        DownSpeedSize.stringValue = "bps";
-        ConnectButton.isHidden = false;
-        ConnectedButton.isHidden = true;
-        ClearIdList();
         tunnelMgr.stopTunnel();
     }
     
@@ -852,7 +819,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         _ = zidMgr.zidStore.store(identity);
         ShowDetails();
         tunnelMgr.restartTunnel();
-        self.UpdateList();
     }
     
     /**
@@ -878,6 +844,17 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         let index = gesture.indexValue;
         self.identity = zidMgr.zids[index ?? 0];
         ShowDetails();
+    }
+    
+    /**
+     Toggle Inline Identity
+     */
+    @objc func ToggleInline(gesture : IdentityOperationGesture) {
+        let index = gesture.indexValue;
+        let identity = zidMgr.zids[index ?? 0];
+        identity.enabled = gesture.isOn;
+        _ = zidMgr.zidStore.store(identity);
+        tunnelMgr.restartTunnel();
     }
     
     /**
@@ -1492,9 +1469,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var AuthSetupButton: NSBox!
     
     func ShowMFASetup() {
-        SetupCursor();
-        
-        
         let msg = IpcMfaEnrollRequestMessage(self.identity.id)
         tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
             DispatchQueue.main.async {
