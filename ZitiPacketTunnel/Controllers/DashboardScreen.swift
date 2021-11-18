@@ -67,7 +67,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFASetupBox: NSBox!
     @IBOutlet var ServiceBox: NSBox!
     @IBOutlet var DetailsBox: NSBox!
-    @IBOutlet var IntroBox: NSBox!
     var allViews:[NSBox] = [];
     
     
@@ -88,7 +87,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var ConnectButton: NSImageView!
     @IBOutlet var ConnectedButton: NSBox!
     @IBOutlet weak var MenuButton: NSStackView!
-    @IBOutlet weak var ParentView: NSView!
     @IBOutlet var Background: NSImageView!
     @IBOutlet var IdentityList: NSScrollView!
     @IBOutlet var TimerLabel: NSTextField!
@@ -97,24 +95,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var DownSpeed: NSTextField!
     @IBOutlet var DownSpeedSize: NSTextField!
     @IBOutlet var SpeedArea: NSStackView!
-    @IBOutlet var MainView: NSView!
-    @IBOutlet var ParentBox: NSBox!
     @IBOutlet var LogoArea: NSStackView!
-    @IBOutlet var MainArea: NSStackView!
     @IBOutlet var DoConnectGesture: NSClickGestureRecognizer!
     @IBOutlet var TimerSubLabel: NSTextField!
     @IBOutlet var AddIdentityGesture: NSClickGestureRecognizer!
     @IBOutlet var AddIdGesture: NSClickGestureRecognizer!
+    @IBOutlet var IdListHeight: NSLayoutConstraint!
     
     override func viewWillAppear() {
-        self.view.shadow = NSShadow();
-        self.view.layer?.shadowOpacity = 0.6;
-        self.view.layer?.shadowColor = NSColor.black.cgColor;
-        self.view.layer?.shadowOffset = NSMakeSize(0, 0);
-        let rect = self.view.layer?.bounds.insetBy(dx: 30, dy: 30);
-        self.view.layer?.shadowPath = CGPath(rect: rect!, transform: nil);
-        self.view.layer?.shadowRadius = 12;
-        
         self.view.window?.titleVisibility = .hidden;
         self.view.window?.titlebarAppearsTransparent = true;
         self.view.window?.styleMask.insert(.fullSizeContentView);
@@ -129,7 +117,13 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.view.window?.isMovable = true;
         self.view.window?.isMovableByWindowBackground = true;
         self.view.window?.makeKeyAndOrderFront(self);
-        
+        self.view.shadow = NSShadow();
+        self.view.layer?.shadowOpacity = 0.6;
+        self.view.layer?.shadowColor = NSColor.black.cgColor;
+        self.view.layer?.shadowOffset = NSMakeSize(0, 0);
+        let rect = self.view.layer?.bounds.insetBy(dx: 30, dy: 30);
+        self.view.layer?.shadowPath = CGPath(rect: rect!, transform: nil);
+        self.view.layer?.shadowRadius = 12;
         DashboardBox.wantsLayer = true;
         DashboardBox.layer?.borderWidth = 0;
         DashboardBox.layer?.cornerRadius = 12;
@@ -145,7 +139,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         zLog.info(Version.verboseStr);
         
         zidMgr.zidStore.delegate = self;
-        getMainWindow()?.delegate = self;
+        // getMainWindow()?.delegate = self;
         
         level = ZitiLog.getLogLevel();
         SetLogIcon();
@@ -172,10 +166,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.HideAll();
         
         ProgressModal.isHidden = true;
-        ProgressModal.alphaValue = 1;
+        ProgressModal.alphaValue = 0;
         ProgressModal.shadow = .none;
         
         // listen for Ziti IPC events
+        /*
         NotificationCenter.default.addObserver(forName: .onZitiPollResponse, object: nil, queue: OperationQueue.main) { notification in
             guard let msg = notification.userInfo?["ipcMessage"] as? IpcMessage else {
                 zLog.error("Unable to retrieve IPC message from event notification")
@@ -193,6 +188,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         //}
         
+         */
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
@@ -221,6 +217,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         case .disconnected:
             ConnectButton.isHidden = false;
             ConnectedButton.isHidden = true;
+            DoConnectGesture.isEnabled = true;
             break
         case .invalid:
             TimerLabel.stringValue = "Invalid!";
@@ -264,11 +261,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.AddIdentity();
     }
     
-    @IBAction func AddIdentity(_ sender: NSClickGestureRecognizer) {
+    @IBAction func AddIdentity(_ sender: Any) {
         self.AddIdentity();
     }
     
-    @IBAction func ShowMenu(_ sender: NSClickGestureRecognizer) {
+    @IBAction func ShowMenuAction(_ sender: Any) {
         self.showArea(state: "menu");
     }
     
@@ -350,8 +347,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         TimerLabel.stringValue = formatter.string(from: TimeInterval(timeLaunched))!;
         timeLaunched += 1;
     }
-    
-    @IBOutlet var IdListHeight: NSLayoutConstraint!
     
     func ClearList() {
         IdentityList.documentView?.subviews.forEach { subview in
@@ -635,10 +630,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Detail Screen Functionality
      */
     @IBOutlet var IdDetailCloseButton: NSImageView!
-    @IBOutlet var ToggleIdentity: NSSwitch!
     @IBOutlet var IdName: NSTextField!
     @IBOutlet var IdNetwork: NSTextField!
-    @IBOutlet var IdStatus: NSTextField!
     @IBOutlet var IdServiceCount: NSTextField!
     @IBOutlet var EnrollButton: NSTextField!
     @IBOutlet var ServiceList: NSScrollView!
@@ -649,33 +642,28 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFAToggle: NSSwitch!
     @IBOutlet var MFAArea: NSStackView!
     @IBOutlet var MFALine: NSBox!
+    @IBOutlet var IsOfflineButton: NSImageView!
+    @IBOutlet var IsOnlineButton: NSImageView!
     
     /**
      Show the details view and fill in the UI elements
      */
     func ShowDetails() {
         let status = tunnelMgr.status;
-        ToggleIdentity.isHidden = false;
         ForgotButton.isHidden = false;
         ServiceList.isHidden = false;
         IdServiceCount.isHidden = false;
         MFAArea.isHidden = false;
         MFALine.isHidden = false;
-        if (self.identity.isEnabled) {
-            ToggleIdentity.state = .on;
-        } else {
-            ToggleIdentity.state = .off;
-        }
-        if (self.identity.isEnabled) {
-            IdStatus.stringValue = "active";
-        } else {
-            IdStatus.stringValue = "inactive";
-        }
+        IsOnlineButton.isHidden = true;
+        IsOfflineButton.isHidden = true;
         if (self.identity.isEnrolled) {
-            IdStatus.stringValue += "/enrolled";
+            if (self.identity.isEnabled) {
+                IsOnlineButton.isHidden = false;
+            } else {
+                IsOfflineButton.isHidden = false;
+            }
         } else {
-            IdStatus.stringValue += "/not enrolled";
-            ToggleIdentity.isHidden = true;
             ForgotButton.isHidden = true;
             ServiceList.isHidden = true;
             IdServiceCount.isHidden = true;
@@ -720,14 +708,17 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 serviceUrl.string = service.protocols ?? "None";
                 serviceUrl.string = service.portRanges ?? "None";
                 
+                let color = NSColor(red: 255, green: 255, blue: 255, alpha: 1);
+                let subColor = NSColor(red: 255, green: 255, blue: 255, alpha: 0.6);
+                
                 serviceName.font = NSFont(name: "Open Sans", size: 12);
-                serviceName.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 1.00);
+                serviceName.textColor = color;
                 serviceUrl.font = NSFont(name: "Open Sans", size: 11);
-                serviceUrl.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.60);
+                serviceUrl.textColor = subColor;
                 serviceProtocol.font = NSFont(name: "Open Sans", size: 11);
-                serviceProtocol.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.60);
+                serviceProtocol.textColor = subColor;
                 servicePorts.font = NSFont(name: "Open Sans", size: 11);
-                servicePorts.textColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.60);
+                servicePorts.textColor = subColor;
                 
                 serviceName.isEditable = false;
                 serviceUrl.isEditable = false;
@@ -809,16 +800,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      */
     @IBAction func Disconnect(_ sender: NSClickGestureRecognizer) {
         tunnelMgr.stopTunnel();
-    }
-    
-    /**
-     Toggle the state of the identity
-     */
-    @IBAction func Toggled(_ sender: NSClickGestureRecognizer) {
-        identity.enabled = ToggleIdentity.state != .on;
-        _ = zidMgr.zidStore.store(identity);
-        ShowDetails();
-        tunnelMgr.restartTunnel();
     }
     
     /**
@@ -1467,6 +1448,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFACloseButton: NSImageView!
     @IBOutlet var SetupAuthCode: NSTextField!
     @IBOutlet var AuthSetupButton: NSBox!
+    @IBOutlet var SetupAuthCodeText: NSTextField!
     
     func ShowMFASetup() {
         let msg = IpcMfaEnrollRequestMessage(self.identity.id)
@@ -1520,7 +1502,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         showArea(state: "mfa");
     }
     
-    @IBOutlet var SetupAuthCodeText: NSTextFieldCell!
     
     @IBAction func VerifySetupMfa(_ sender: NSClickGestureRecognizer) {
         // Need to call the setup MFA service and get a response
@@ -1824,7 +1805,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      */
     func SetupCursor() {
         let items = [AddButton, AddIdButton, ConnectButton, ConnectedButton, MenuButton,
-                     IdDetailCloseButton, EnrollButton, ForgotButton, ToggleIdentity, MFAToggle, MFAOff, MFARecovery, QuitButton, AdvancedButton, AboutButton,
+                     IdDetailCloseButton, EnrollButton, ForgotButton, IsOfflineButton, IsOnlineButton, MFAToggle, MFAOff, MFARecovery, QuitButton, AdvancedButton, AboutButton,
                      FeedbackButton, SupportButton, DetachButton,
                      AboutBackButton, AboutCloseButton, PrivacyButton, TermsButton,
                      AdvancedBackButton, AdvancedCloseButton, TunnelButton, ServiceLogButton, AppLogButton, LogLevelButton,

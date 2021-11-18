@@ -236,7 +236,7 @@
                                                 </connections>
                                             </switch>
                                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G3N-3W-MF7">
-                                                <rect key="frame" x="74" y="-7" width="93" height="32"/>
+                                                <rect key="frame" x="74" y="-7" width="94" height="32"/>
                                                 <buttonCell key="cell" type="push" title="Auth Now" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NNy-JJ-gHS">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -246,7 +246,7 @@
                                                 </connections>
                                             </button>
                                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eXL-hW-ma0">
-                                                <rect key="frame" x="161" y="-7" width="73" height="32"/>
+                                                <rect key="frame" x="162" y="-7" width="72" height="32"/>
                                                 <buttonCell key="cell" type="push" title="Codes" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="R8O-4S-wNu">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
