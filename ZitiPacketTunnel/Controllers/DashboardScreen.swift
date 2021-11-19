@@ -199,10 +199,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         DoConnectGesture.isEnabled = false;
         ConnectedButton.alphaValue = 0.2;
         self.ClearList();
-        //AddButton.alphaValue = 0.2;
-        //AddIdButton.alphaValue = 0.2;
-        //AddIdGesture.isEnabled = false;
-        //AddIdentityGesture.isEnabled = false;
         timer.invalidate();
         
         zLog.info("Tunnel Status: \(status)");
@@ -226,8 +222,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             TimerLabel.stringValue = "Reasserting...";
             break
         case .connected:
-            AddIdGesture.isEnabled = true;
-            AddIdentityGesture.isEnabled = true;
             AddButton.alphaValue = 1.0;
             AddIdButton.alphaValue = 1.0;
             TimerLabel.stringValue = "00:00.00";
