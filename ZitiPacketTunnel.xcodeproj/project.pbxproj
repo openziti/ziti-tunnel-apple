@@ -137,13 +137,15 @@
 		82B6EFC626DCF11F009C5BED /* IdentityItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFC526DCF11F009C5BED /* IdentityItemCell.swift */; };
 		82B6EFC826DCF12D009C5BED /* MainUI.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 82B6EFC726DCF12D009C5BED /* MainUI.storyboard */; };
 		82B6EFCC26DCF416009C5BED /* DashboardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFCA26DCF416009C5BED /* DashboardScreen.swift */; };
-		82B6EFCD26DCF416009C5BED /* ServiceDetailsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFCB26DCF416009C5BED /* ServiceDetailsScreen.swift */; };
 		82B6EFD026DCF422009C5BED /* GoToDetailGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFCF26DCF422009C5BED /* GoToDetailGesture.swift */; };
 		82B6EFD426DCF42A009C5BED /* FlippedClipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFD226DCF42A009C5BED /* FlippedClipView.swift */; };
 		82B6EFD526DCF42A009C5BED /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFD326DCF42A009C5BED /* DragView.swift */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
+		D751518C2748109D008CFBF2 /* DashboardWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D751518B2748109D008CFBF2 /* DashboardWindowController.swift */; };
 		D7DF1A9127315E5D000C6548 /* IdentityOperationGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DF1A9027315E5D000C6548 /* IdentityOperationGesture.swift */; };
+		D7EF44BA2749D60800EC130F /* IdentityListItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7EF44B92749D60800EC130F /* IdentityListItem.xib */; };
+		D7EF44BC2749E46F00EC130F /* IdentityListitem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EF44BB2749E46F00EC130F /* IdentityListitem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -346,7 +348,6 @@
 		82B6EFC526DCF11F009C5BED /* IdentityItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentityItemCell.swift; sourceTree = "<group>"; };
 		82B6EFC726DCF12D009C5BED /* MainUI.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainUI.storyboard; sourceTree = "<group>"; };
 		82B6EFCA26DCF416009C5BED /* DashboardScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardScreen.swift; sourceTree = "<group>"; };
-		82B6EFCB26DCF416009C5BED /* ServiceDetailsScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceDetailsScreen.swift; sourceTree = "<group>"; };
 		82B6EFCF26DCF422009C5BED /* GoToDetailGesture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoToDetailGesture.swift; sourceTree = "<group>"; };
 		82B6EFD226DCF42A009C5BED /* FlippedClipView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlippedClipView.swift; sourceTree = "<group>"; };
 		82B6EFD326DCF42A009C5BED /* DragView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DragView.swift; sourceTree = "<group>"; };
@@ -359,7 +360,10 @@
 		B2055ED46BB4712E8ACCBE15 /* Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-ios_targets-ZitiMobilePacketTunnel/Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
 		B9942F531B1AE05E9C8AA335 /* Pods_macos_targets_ZitiPosture.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_macos_targets_ZitiPosture.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD089AE0E096B75A46595B3D /* Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-ZitiPacketTunnel/Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
+		D751518B2748109D008CFBF2 /* DashboardWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWindowController.swift; sourceTree = "<group>"; };
 		D7DF1A9027315E5D000C6548 /* IdentityOperationGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityOperationGesture.swift; sourceTree = "<group>"; };
+		D7EF44B92749D60800EC130F /* IdentityListItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IdentityListItem.xib; sourceTree = "<group>"; };
+		D7EF44BB2749E46F00EC130F /* IdentityListitem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityListitem.swift; sourceTree = "<group>"; };
 		D8AA43E427149108FA6F7ECF /* Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig"; path = "Target Support Files/Pods-ios_targets-MobilePacketTunnelProvider/Pods-ios_targets-MobilePacketTunnelProvider.debug.xcconfig"; sourceTree = "<group>"; };
 		E274C11E7D7B959B31918E18 /* Pods-macos_targets-ZitiPosture.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-ZitiPosture.release.xcconfig"; path = "Target Support Files/Pods-macos_targets-ZitiPosture/Pods-macos_targets-ZitiPosture.release.xcconfig"; sourceTree = "<group>"; };
 		E2D4420EFA2906A21C91CD96 /* Pods-ZitiPacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiPacketTunnel.release.xcconfig"; path = "Target Support Files/Pods-ZitiPacketTunnel/Pods-ZitiPacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
@@ -683,7 +687,7 @@
 			isa = PBXGroup;
 			children = (
 				82B6EFCA26DCF416009C5BED /* DashboardScreen.swift */,
-				82B6EFCB26DCF416009C5BED /* ServiceDetailsScreen.swift */,
+				D751518B2748109D008CFBF2 /* DashboardWindowController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -702,6 +706,8 @@
 			children = (
 				82B6EFD226DCF42A009C5BED /* FlippedClipView.swift */,
 				82B6EFD326DCF42A009C5BED /* DragView.swift */,
+				D7EF44B92749D60800EC130F /* IdentityListItem.xib */,
+				D7EF44BB2749E46F00EC130F /* IdentityListitem.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -963,6 +969,7 @@
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
 				5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */,
+				D7EF44BA2749D60800EC130F /* IdentityListItem.xib in Resources */,
 				826F65B326D64E4000D830DC /* MainUI.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1166,9 +1173,11 @@
 			files = (
 				5AB5F9F926ED46D700F198F2 /* IpcAppClient.swift in Sources */,
 				5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */,
+				D751518C2748109D008CFBF2 /* DashboardWindowController.swift in Sources */,
 				5A051F612264183500B11CB2 /* ZidMgr.swift in Sources */,
 				82B6EFD526DCF42A009C5BED /* DragView.swift in Sources */,
 				5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */,
+				D7EF44BC2749E46F00EC130F /* IdentityListitem.swift in Sources */,
 				5ABA5EDA2274D2EB00B2221D /* Logger.swift in Sources */,
 				82B6EFCC26DCF416009C5BED /* DashboardScreen.swift in Sources */,
 				82B6EFD026DCF422009C5BED /* GoToDetailGesture.swift in Sources */,
@@ -1186,7 +1195,6 @@
 				5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */,
 				5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */,
 				5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */,
-				82B6EFCD26DCF416009C5BED /* ServiceDetailsScreen.swift in Sources */,
 				5A8702D922372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5ABF9863260C13EF00AA982F /* SnapshotViewController.swift in Sources */,
 				5A6BA265226F6AB400224F09 /* MainMenuBar.swift in Sources */,

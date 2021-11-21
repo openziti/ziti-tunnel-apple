@@ -145,6 +145,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         SetLogIcon();
         SetupConfig();
         
+        
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange);
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier);
         
@@ -170,7 +171,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         ProgressModal.shadow = .none;
         
         // listen for Ziti IPC events
-        /*
         NotificationCenter.default.addObserver(forName: .onZitiPollResponse, object: nil, queue: OperationQueue.main) { notification in
             guard let msg = notification.userInfo?["ipcMessage"] as? IpcMessage else {
                 zLog.error("Unable to retrieve IPC message from event notification")
@@ -188,7 +188,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         //}
         
-         */
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {

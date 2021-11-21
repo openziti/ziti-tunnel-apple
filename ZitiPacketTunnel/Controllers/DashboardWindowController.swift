@@ -15,9 +15,8 @@
 //
 
 import Foundation
-import Cocoa
+import AppKit
 
-class ServiceDetailsScreen: NSViewController {
-    
+class DashboardWindowController:NSWindowController {
     
 }
