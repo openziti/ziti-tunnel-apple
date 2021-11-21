@@ -88,7 +88,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var ConnectedButton: NSBox!
     @IBOutlet weak var MenuButton: NSStackView!
     @IBOutlet var Background: NSImageView!
-    @IBOutlet var IdentityList: NSScrollView!
     @IBOutlet var TimerLabel: NSTextField!
     @IBOutlet var UpSpeed: NSTextField!
     @IBOutlet var UpSpeedSize: NSTextField!
@@ -98,9 +97,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var LogoArea: NSStackView!
     @IBOutlet var DoConnectGesture: NSClickGestureRecognizer!
     @IBOutlet var TimerSubLabel: NSTextField!
-    @IBOutlet var AddIdentityGesture: NSClickGestureRecognizer!
     @IBOutlet var AddIdGesture: NSClickGestureRecognizer!
-    @IBOutlet var IdListHeight: NSLayoutConstraint!
+    @IBOutlet var IdList: NSStackView!
+    @IBOutlet var IdListScroll: NSScrollView!
     
     override func viewWillAppear() {
         self.view.window?.titleVisibility = .hidden;
@@ -230,8 +229,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             SpeedArea.alphaValue = 1.0;
             DoConnectGesture.isEnabled = true;
             ConnectedButton.alphaValue = 1.0;
-            IdentityList.isHidden = false;
-            IdListHeight.constant = 300;
+            IdListScroll.isHidden = false;
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
             self.UpdateList();
             break
@@ -342,241 +340,24 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     func ClearList() {
-        IdentityList.documentView?.subviews.forEach { subview in
+        IdList.subviews.forEach { subview in
             subview.removeFromSuperviewWithoutNeedingDisplay();
         }
-        IdListHeight.constant = 20;
+        // IdList.constant = 20;
         // IdentityList.isHidden = true;
     }
     
     func UpdateList() {
-        
-        IdentityList.horizontalScrollElasticity = .none;
-        IdentityList.horizontalScroller = .none;
-        let idListView = NSStackView(frame: NSRect(x: 0, y: 0, width: 280, height: 500));
-        idListView.orientation = .vertical;
-        idListView.spacing = 2;
+        IdListScroll.horizontalScrollElasticity = .none;
+        IdListScroll.horizontalScroller = .none;
         ClearList();
         var index = 0;
         for identity in zidMgr.zids {
-            
-            let clickGesture1 = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
-            let clickGesture2 = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
-            let clickGesture3 = GoToDetailGesture(target: self, action: #selector(self.GoToDetails(gesture:)));
-            clickGesture1.indexValue = index;
-            clickGesture2.indexValue = index;
-            clickGesture3.indexValue = index;
-            
-            let toggleGesture = IdentityOperationGesture(target: self, action: #selector(self.ToggleInline(gesture:)));
-            toggleGesture.indexValue = index;
-            toggleGesture.isOn = !identity.isEnabled;
-            
-            // First Column of Identity Item Renderer
-            let toggler = NSSwitch(frame: CGRect(x: 0, y: 0, width: 75, height: 22));
-            toggler.heightAnchor.constraint(equalToConstant: 22).isActive = true;
-            let connectLabel = NSText();
-            
-            connectLabel.isEditable = false;
-            connectLabel.isSelectable = false;
-            connectLabel.alignment = .center;
-            connectLabel.frame.size.height = 20;
-            connectLabel.font = NSFont(name: "Open Sans", size: 10);
-            connectLabel.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
-            connectLabel.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
-            
-            toggler.isEnabled = identity.isEnrolled;
-            if (identity.isEnabled) {
-                toggler.state = .on;
-            } else {
-                toggler.state = .off;
-            }
-            toggler.tag = index;
-            toggler.addGestureRecognizer(toggleGesture);
-            
-            if (identity.isEnrolled) {
-                if (identity.isEnabled) {
-                    connectLabel.string = "connected";
-                } else {
-                    connectLabel.string = "disconnected";
-                }
-            } else {
-                connectLabel.string = "not enrolled";
-            }
-            
-            let col1 = NSStackView(views: [toggler,connectLabel]);
-            col1.frame = CGRect(x: 0, y: 0, width: 75, height: 50);
-            
-            col1.distribution = .fillProportionally;
-            col1.alignment = .centerX;
-            col1.spacing = 0;
-            col1.orientation = .vertical;
-            col1.edgeInsets.top = 8;
-            col1.widthAnchor.constraint(equalToConstant: 75).isActive = true;
-            col1.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            
-            // Label Column of Identity Item Renderer
-            let idName = NSText();
-            
-            idName.font = NSFont(name: "Open Sans", size: 16);
-            idName.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
-            idName.heightAnchor.constraint(equalToConstant: 22).isActive = true;
-            idName.string = String(String(identity.name).prefix(10));
-            idName.isEditable = false;
-            idName.isSelectable = false;
-            idName.backgroundColor = NSColor(calibratedRed: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
-            
-            let idServer = NSTextField();
-            idServer.font = NSFont(name: "Open Sans", size: 10);
-            idServer.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
-            idServer.frame.size.height = 6;
-            idServer.isEditable = false;
-            idServer.isSelectable = false;
-            idServer.usesSingleLineMode = true;
-            idServer.stringValue = identity.czid?.ztAPI ?? "no network";
-            idServer.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
-            
-            let col2 = NSStackView(views: [idName, idServer]);
-            col2.frame = CGRect(x: 0, y: 0, width: 260, height: 40);
-            col2.distribution = .fill;
-            col2.alignment = .leading;
-            col2.spacing = 0;
-            col2.frame.size.width = 120;
-            col2.orientation = .vertical;
-            col2.edgeInsets.top = 8;
-            col2.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col2.widthAnchor.constraint(equalToConstant: 200).isActive = true;
-            col2.addGestureRecognizer(clickGesture1);
-            
-            
-            // Count column for the item renderer
-            
-            //let circleView = NSView();
-            //circleView.wantsLayer = true;
-            //circleView.layer?.cornerRadius = 7;
-            //circleView.layer?.backgroundColor = NSColor(named: "PrimaryColor")?.cgColor;
-            
-            //let serviceCountFrame = NSView();
-            //serviceCountFrame.frame = CGRect(x: 0, y: 0, width: 50, height: 30);
-            //serviceCountFrame.addSubview(circleView);
-            
-            let idServiceCount = NSText();
-            idServiceCount.alignment = .center;
-            idServiceCount.font = NSFont(name: "Open Sans", size: 16);
-            idServiceCount.textColor = NSColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
-            idServiceCount.heightAnchor.constraint(equalToConstant: 22).isActive = true;
-            idServiceCount.string = String(identity.services.count);
-            idServiceCount.isEditable = false;
-            idServiceCount.isSelectable = false;
-            idServiceCount.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
-            
-            let serviceLabel = NSText();
-            serviceLabel.alignment = .center;
-            serviceLabel.string = "services";
-            serviceLabel.frame.size.height = 20;
-            serviceLabel.isEditable = false;
-            serviceLabel.isSelectable = false;
-            serviceLabel.font = NSFont(name: "Open Sans", size: 10);
-            serviceLabel.textColor = NSColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.00);
-            idServiceCount.heightAnchor.constraint(equalToConstant: 20).isActive = true;
-            serviceLabel.backgroundColor = NSColor(red: 0.00, green: 0.00, blue: 0.00, alpha: 0.00);
-            
-            //serviceCountFrame.addSubview(idServiceCount);
-            
-            let col3 = NSStackView(views: [idServiceCount, serviceLabel]);
-            col3.frame = CGRect(x: 0, y: 0, width: 50, height: 50);
-            col3.distribution = .gravityAreas;
-            col3.alignment = .centerX;
-            col3.spacing = 0;
-            col3.orientation = .vertical;
-            col3.edgeInsets.top = 8;
-            col3.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col3.addGestureRecognizer(clickGesture2);
-            col3.widthAnchor.constraint(equalToConstant: 50).isActive = true;
-            
-            // Arrow image for Item Renderer
-            
-            let arrowImage = NSImage(named: "next");
-            let arrowView = NSImageView();
-            arrowView.frame = CGRect(x: 10, y: 10, width: 10, height: 10);
-            arrowView.imageScaling = .scaleProportionallyUpOrDown;
-            arrowView.image = arrowImage;
-            arrowView.widthAnchor.constraint(equalToConstant: 16).isActive = true;
-            arrowView.heightAnchor.constraint(equalToConstant: 16).isActive = true;
-            
-            let col4 = NSStackView(views: [arrowView]);
-            col4.frame = CGRect(x: 0, y: 0, width: 30, height: 50);
-            col4.distribution = .fillProportionally;
-            col4.alignment = .centerX;
-            col4.spacing = 0;
-            col4.orientation = .vertical;
-            col4.addGestureRecognizer(clickGesture3);
-            idServiceCount.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col4.widthAnchor.constraint(equalToConstant: 30).isActive = true;
-            
-            let items = [col2, col3, col4];
-            
-            /* This is dumb, Mac needs a Hover State
-            pointingHand = NSCursor.pointingHand;
-            for item in items {
-                item.addCursorRect(item.bounds, cursor: pointingHand!);
-            }
-            
-            pointingHand!.setOnMouseEntered(true);
-            for item in items {
-                item.addTrackingRect(item.bounds, owner: pointingHand!, userData: nil, assumeInside: true);
-            }
-
-            arrow = NSCursor.arrow
-            for item in items {
-                item.addCursorRect(item.bounds, cursor: arrow!);
-            }
-            
-            arrow!.setOnMouseExited(true)
-            for item in items {
-                item.addTrackingRect(item.bounds, owner: arrow!, userData: nil, assumeInside: true);
-            }
-            */
-
-            // Put all the columns into the parent frames
-            
-            let renderer = NSStackView(views: [col1,col2,col3,col4]);
-            renderer.orientation = .horizontal;
-            renderer.distribution = .fillProportionally;
-            //renderer.backgroundColor = NSColor(red: 0.05, green: 0.06, blue: 0.13, alpha: 1.00);
-            renderer.alignment = .centerY;
-            //renderer.translatesAutoresizingMaskIntoConstraints = true;
-            renderer.spacing = 0;
-            renderer.frame = CGRect(x: 0, y: CGFloat((index*50)+(index*2)), width: view.frame.size.width, height: 50);
-
-            //IdentityList.addSubview(renderer);
-            idListView.addSubview(renderer);
+            let identityItem = IdentityListitem();
+            identityItem.setIdentity(identity: identity);
+            IdList.addSubview(identityItem);
             index = index + 1;
         }
-
-        idListView.frame = CGRect(x: 0, y: 0, width: IdentityList.frame.size.width, height: CGFloat(((50*index)+(2*index))+2));
-        IdentityList.documentView = idListView
-        
-        /*
-        let clipView = FlippedClipView();
-        clipView.drawsBackground = false;
-        IdentityList.horizontalScrollElasticity = .none;
-        IdentityList.contentView = clipView
-        clipView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-          clipView.leftAnchor.constraint(equalTo: IdentityList.leftAnchor),
-          clipView.rightAnchor.constraint(equalTo: IdentityList.rightAnchor),
-          clipView.topAnchor.constraint(equalTo: IdentityList.topAnchor),
-          clipView.bottomAnchor.constraint(equalTo: IdentityList.bottomAnchor)
-        ]);
-         */
-        
-        
-        IdListHeight.constant = CGFloat(index*50);
-        let height = 720 + (index*50);
-        
-    
-        
-        self.view.layoutSubtreeIfNeeded();
     }
     
     func AddIdentity() {

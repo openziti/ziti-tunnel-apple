@@ -35,28 +35,28 @@ class IdentityListitem: NSView {
     public func setIdentity(identity:ZitiIdentity) {
         zid = identity;
         if (zid.isEnabled) {
-            ToggleLabel.stringValue = "enabled";
-            ToggleButton.image = NSImage(named: "on");
+            ToggleLabel?.stringValue = "enabled";
+            ToggleButton?.image = NSImage(named: "on");
         } else {
-            ToggleLabel.stringValue = "disabled";
-            ToggleButton.image = NSImage(named: "off");
+            ToggleLabel?.stringValue = "disabled";
+            ToggleButton?.image = NSImage(named: "off");
         }
-        IdentityLabel.stringValue = zid.name;
-        ServerUrl.stringValue = zid.czid?.ztAPI ?? "no network";
-        ServiceCount.stringValue = String(zid.services.count);
+        IdentityLabel?.stringValue = zid.name;
+        ServerUrl?.stringValue = zid.czid?.ztAPI ?? "no network";
+        ServiceCount?.stringValue = String(zid.services.count);
     }
     
     @IBAction func ToggleClicked(_ sender: NSClickGestureRecognizer) {
         let newState = !zid.isEnabled;
         if (newState) {
-            ToggleLabel.stringValue = "enabled";
-            ToggleButton.image = NSImage(named: "on");
+            ToggleLabel?.stringValue = "enabled";
+            ToggleButton?.image = NSImage(named: "on");
         } else {
-            ToggleLabel.stringValue = "disabled";
-            ToggleButton.image = NSImage(named: "off");
+            ToggleLabel?.stringValue = "disabled";
+            ToggleButton?.image = NSImage(named: "off");
         }
         zid.enabled = newState;
-        ZidMgr.restartTunnel();
+        TunnelMgr.shared.restartTunnel();
         
     }
 }
