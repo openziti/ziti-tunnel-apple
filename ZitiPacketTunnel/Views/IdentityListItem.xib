@@ -7,15 +7,25 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="IdentityListitem" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
+            <connections>
+                <outlet property="IdentityLabel" destination="bfY-l0-ZEr" id="G2q-nV-kvZ"/>
+                <outlet property="ServerUrl" destination="GbF-cd-icf" id="4I3-Ad-fI1"/>
+                <outlet property="ServiceCount" destination="ETc-Gs-WrZ" id="d3W-Gp-VI6"/>
+                <outlet property="ServicesLabel" destination="AcE-0v-A1c" id="2tC-Hy-Nlh"/>
+                <outlet property="ToggleButton" destination="jQ9-1n-Isc" id="q9m-gB-pYd"/>
+                <outlet property="ToggleLabel" destination="7Bf-mY-n9o" id="7XZ-SH-CvM"/>
+                <outlet property="view" destination="fBa-AI-I1d" id="UTb-Zc-d5i"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView misplaced="YES" id="c22-O7-iKe" customClass="IdentityListitem" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
+        <customView id="c22-O7-iKe">
             <rect key="frame" x="0.0" y="0.0" width="400" height="60"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fBa-AI-I1d" userLabel="IdentityItem">
-                    <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
+                    <rect key="frame" x="0.0" y="0.0" width="400" height="60"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zPd-6j-q8k" userLabel="ToggleColumn">
                             <rect key="frame" x="0.0" y="0.0" width="75" height="60"/>
@@ -31,7 +41,7 @@
                                                 <gestureRecognizers>
                                                     <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="Oba-S3-8mJ" userLabel="ToggleGesture">
                                                         <connections>
-                                                            <action selector="ToggleClicked:" target="c22-O7-iKe" id="Scu-Kn-rBG"/>
+                                                            <action selector="ToggleClicked:" target="-2" id="YdS-uc-kmp"/>
                                                         </connections>
                                                     </clickGestureRecognizer>
                                                 </gestureRecognizers>
@@ -96,16 +106,16 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ihm-1a-me4" userLabel="IdentityColumn">
-                            <rect key="frame" x="83" y="0.0" width="200" height="60"/>
+                            <rect key="frame" x="83" y="0.0" width="180" height="60"/>
                             <subviews>
                                 <box boxType="custom" borderType="none" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="qrc-J1-PVg" userLabel="IdentityNameBox">
-                                    <rect key="frame" x="0.0" y="25" width="200" height="35"/>
+                                    <rect key="frame" x="0.0" y="25" width="180" height="35"/>
                                     <view key="contentView" id="jeH-Jq-VjD">
-                                        <rect key="frame" x="0.0" y="0.0" width="200" height="35"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="180" height="35"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bfY-l0-ZEr" userLabel="IdentityLabel">
-                                                <rect key="frame" x="-2" y="0.0" width="204" height="23"/>
+                                                <rect key="frame" x="-2" y="0.0" width="184" height="23"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Identity Name" id="iPv-pO-Xgl">
                                                     <font key="font" size="18" name="OpenSans"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -125,13 +135,13 @@
                                     </constraints>
                                 </box>
                                 <box boxType="custom" borderType="none" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="e2F-3g-A1Q" userLabel="ServerBox">
-                                    <rect key="frame" x="0.0" y="0.0" width="200" height="25"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="180" height="25"/>
                                     <view key="contentView" id="0pF-Wg-xmB">
-                                        <rect key="frame" x="0.0" y="0.0" width="200" height="25"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="180" height="25"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GbF-cd-icf" userLabel="ServerUrl">
-                                                <rect key="frame" x="-2" y="0.0" width="204" height="25"/>
+                                                <rect key="frame" x="-2" y="0.0" width="184" height="25"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="serverurl.com" id="pOc-BB-km8">
                                                     <font key="font" size="11" name="OpenSans"/>
                                                     <color key="textColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
@@ -155,7 +165,7 @@
                                 <constraint firstAttribute="trailing" secondItem="qrc-J1-PVg" secondAttribute="trailing" id="nGb-zr-dhy"/>
                                 <constraint firstAttribute="trailing" secondItem="e2F-3g-A1Q" secondAttribute="trailing" id="nPB-g7-wST"/>
                                 <constraint firstItem="e2F-3g-A1Q" firstAttribute="leading" secondItem="ihm-1a-me4" secondAttribute="leading" id="qbh-XH-7cg"/>
-                                <constraint firstAttribute="width" constant="200" id="wXm-pp-lcr"/>
+                                <constraint firstAttribute="width" constant="180" id="wXm-pp-lcr"/>
                                 <constraint firstItem="qrc-J1-PVg" firstAttribute="leading" secondItem="ihm-1a-me4" secondAttribute="leading" id="xkc-4A-umM"/>
                             </constraints>
                             <visibilityPriorities>
@@ -168,7 +178,7 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uoM-qe-RdT" userLabel="ServiceColumn">
-                            <rect key="frame" x="291" y="0.0" width="50" height="60"/>
+                            <rect key="frame" x="271" y="0.0" width="50" height="60"/>
                             <subviews>
                                 <box boxType="custom" borderType="none" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Idz-V3-9Vf" userLabel="ServiceCountBox">
                                     <rect key="frame" x="0.0" y="25" width="50" height="35"/>
@@ -238,8 +248,12 @@
                                 </box>
                             </subviews>
                             <constraints>
+                                <constraint firstItem="Idz-V3-9Vf" firstAttribute="leading" secondItem="uoM-qe-RdT" secondAttribute="leading" id="2tw-qv-nkH"/>
                                 <constraint firstItem="8Jd-KX-kWm" firstAttribute="top" secondItem="Idz-V3-9Vf" secondAttribute="bottom" id="4eJ-IN-7SW"/>
+                                <constraint firstAttribute="trailing" secondItem="Idz-V3-9Vf" secondAttribute="trailing" id="5fR-pT-9wF"/>
+                                <constraint firstAttribute="trailing" secondItem="8Jd-KX-kWm" secondAttribute="trailing" id="EhH-mu-MXf"/>
                                 <constraint firstAttribute="width" constant="50" id="IM9-mJ-O2B"/>
+                                <constraint firstItem="8Jd-KX-kWm" firstAttribute="leading" secondItem="uoM-qe-RdT" secondAttribute="leading" id="WU7-1u-U1b"/>
                                 <constraint firstAttribute="bottom" secondItem="8Jd-KX-kWm" secondAttribute="bottom" id="h2l-Us-xSn"/>
                             </constraints>
                             <visibilityPriorities>
@@ -252,13 +266,13 @@
                             </customSpacing>
                         </stackView>
                         <box boxType="custom" borderType="none" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ip3-J0-n2g" userLabel="ArrowBox">
-                            <rect key="frame" x="349" y="0.0" width="65" height="60"/>
+                            <rect key="frame" x="329" y="0.0" width="71" height="60"/>
                             <view key="contentView" id="egO-2M-Ood">
-                                <rect key="frame" x="0.0" y="0.0" width="65" height="60"/>
+                                <rect key="frame" x="0.0" y="0.0" width="71" height="60"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="seX-Pj-fZK" userLabel="Arrow">
-                                        <rect key="frame" x="14" y="14" width="37" height="32"/>
+                                        <rect key="frame" x="14" y="14" width="43" height="32"/>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="next" id="07D-p9-J1y"/>
                                     </imageView>
                                 </subviews>

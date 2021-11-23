@@ -347,6 +347,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         // IdentityList.isHidden = true;
     }
     
+    @IBOutlet var IdListHeight: NSLayoutConstraint!
+    
     func UpdateList() {
         IdListScroll.horizontalScrollElasticity = .none;
         IdListScroll.horizontalScroller = .none;
@@ -355,9 +357,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         for identity in zidMgr.zids {
             let identityItem = IdentityListitem();
             identityItem.setIdentity(identity: identity);
-            IdList.addSubview(identityItem);
+            identityItem.frame = CGRect(x: 0, y: CGFloat(index*62), width: 340, height: 60);
+            IdList.addArrangedSubview(identityItem);
             index = index + 1;
         }
+        IdListHeight.constant = CGFloat(index*62);
     }
     
     func AddIdentity() {

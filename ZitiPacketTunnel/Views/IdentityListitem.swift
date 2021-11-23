@@ -16,8 +16,13 @@
 
 import Cocoa
 import CZiti
+import AppKit
+import SwiftUI
 
+@IBDesignable
 class IdentityListitem: NSView {
+    
+    @IBOutlet weak var view: NSView!
     
     @IBOutlet var ToggleLabel: NSTextField!
     @IBOutlet var ToggleButton: NSButton!
@@ -27,6 +32,30 @@ class IdentityListitem: NSView {
     @IBOutlet var ServiceCount: NSTextField!
     var zid:ZitiIdentity!;
     var tunnelMgr = TunnelMgr.shared;
+    let XIB = "IdentityListItem";
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.setup()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.setup()
+    }
+    
+    private func setup() {
+        let nib = NSNib(nibNamed: XIB, bundle: Bundle(for: type(of: self)));
+        nib?.instantiate(withOwner: self, topLevelObjects: nil);
+        addSubview(view);
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: topAnchor, constant: 0.0),
+            view.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0.0),
+            view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0.0),
+            view.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0.0),
+
+        ])
+    }
     
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
