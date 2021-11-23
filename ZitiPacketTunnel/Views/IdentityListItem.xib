@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="IdentityListitem" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
             <connections>
+                <outlet property="BlueBox" destination="0JG-KG-BWK" id="0xQ-nd-SZX"/>
                 <outlet property="IdentityLabel" destination="bfY-l0-ZEr" id="G2q-nV-kvZ"/>
+                <outlet property="LockoutImage" destination="Z9m-dJ-hQ8" id="8bP-wu-QNL"/>
+                <outlet property="MfaImage" destination="ASG-VO-Rvh" id="7Zd-4P-JSs"/>
                 <outlet property="ServerUrl" destination="GbF-cd-icf" id="4I3-Ad-fI1"/>
                 <outlet property="ServiceCount" destination="ETc-Gs-WrZ" id="d3W-Gp-VI6"/>
                 <outlet property="ServicesLabel" destination="AcE-0v-A1c" id="2tC-Hy-Nlh"/>
+                <outlet property="TimeoutImage" destination="QR4-dH-xbO" id="DCO-y8-Z8q"/>
                 <outlet property="ToggleButton" destination="jQ9-1n-Isc" id="q9m-gB-pYd"/>
                 <outlet property="ToggleLabel" destination="7Bf-mY-n9o" id="7XZ-SH-CvM"/>
                 <outlet property="view" destination="fBa-AI-I1d" id="UTb-Zc-d5i"/>
@@ -71,7 +75,7 @@
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Bf-mY-n9o" userLabel="ToggleLabel">
                                                 <rect key="frame" x="-2" y="0.0" width="79" height="25"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="enabled" id="nSZ-eD-nNW">
-                                                    <font key="font" size="11" name="OpenSans"/>
+                                                    <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -117,7 +121,7 @@
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bfY-l0-ZEr" userLabel="IdentityLabel">
                                                 <rect key="frame" x="-2" y="0.0" width="184" height="23"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Identity Name" id="iPv-pO-Xgl">
-                                                    <font key="font" size="18" name="OpenSans"/>
+                                                    <font key="font" metaFont="system" size="18"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -143,7 +147,7 @@
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GbF-cd-icf" userLabel="ServerUrl">
                                                 <rect key="frame" x="-2" y="0.0" width="184" height="25"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" title="serverurl.com" id="pOc-BB-km8">
-                                                    <font key="font" size="11" name="OpenSans"/>
+                                                    <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -206,12 +210,44 @@
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
+                                            <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ASG-VO-Rvh" userLabel="MfaImage">
+                                                <rect key="frame" x="12" y="0.0" width="26" height="26"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="26" id="egN-D6-oIQ"/>
+                                                    <constraint firstAttribute="width" constant="26" id="lrp-QO-WP9"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="mfaoff" id="2Kw-D3-ntF"/>
+                                            </imageView>
+                                            <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="QR4-dH-xbO" userLabel="TimeoutImage">
+                                                <rect key="frame" x="12" y="0.0" width="26" height="26"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="26" id="8lN-7g-vun"/>
+                                                    <constraint firstAttribute="width" constant="26" id="9af-Mg-OKi"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="timer" id="Rax-0D-smU"/>
+                                            </imageView>
+                                            <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Z9m-dJ-hQ8" userLabel="LockoutImage">
+                                                <rect key="frame" x="12" y="0.0" width="26" height="26"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="26" id="8gp-9v-uCH"/>
+                                                    <constraint firstAttribute="width" constant="26" id="BRq-6a-SyL"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lockout" id="Pfq-nI-vcq"/>
+                                            </imageView>
                                         </subviews>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="ETc-Gs-WrZ" secondAttribute="trailing" id="1fv-6P-mOf"/>
+                                            <constraint firstAttribute="trailing" secondItem="Z9m-dJ-hQ8" secondAttribute="trailing" constant="12" id="A99-KW-0VU"/>
+                                            <constraint firstAttribute="bottom" secondItem="ASG-VO-Rvh" secondAttribute="bottom" id="BXf-eo-kdj"/>
                                             <constraint firstAttribute="bottom" secondItem="ETc-Gs-WrZ" secondAttribute="bottom" id="MW0-30-CLF"/>
+                                            <constraint firstAttribute="trailing" secondItem="Z9m-dJ-hQ8" secondAttribute="trailing" constant="12" id="P0k-x5-aov"/>
                                             <constraint firstAttribute="trailing" secondItem="0JG-KG-BWK" secondAttribute="trailing" constant="12" id="U7r-MN-TI8"/>
+                                            <constraint firstAttribute="bottom" secondItem="Z9m-dJ-hQ8" secondAttribute="bottom" id="VJV-3W-4BX"/>
                                             <constraint firstAttribute="bottom" secondItem="0JG-KG-BWK" secondAttribute="bottom" id="Zq2-4e-ZXN"/>
+                                            <constraint firstAttribute="trailing" secondItem="QR4-dH-xbO" secondAttribute="trailing" constant="12" id="aBW-2f-7jW"/>
+                                            <constraint firstAttribute="bottom" secondItem="QR4-dH-xbO" secondAttribute="bottom" id="dOP-bw-Whj"/>
+                                            <constraint firstAttribute="trailing" secondItem="ASG-VO-Rvh" secondAttribute="trailing" constant="12" id="hxW-BT-WOI"/>
+                                            <constraint firstAttribute="bottom" secondItem="Z9m-dJ-hQ8" secondAttribute="bottom" id="kT9-Ud-UIl"/>
                                             <constraint firstItem="ETc-Gs-WrZ" firstAttribute="leading" secondItem="4u5-VC-AKn" secondAttribute="leading" id="qf4-uI-gO8"/>
                                             <constraint firstItem="ETc-Gs-WrZ" firstAttribute="top" secondItem="4u5-VC-AKn" secondAttribute="top" constant="12" id="w1j-fS-h06"/>
                                         </constraints>
@@ -229,7 +265,7 @@
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AcE-0v-A1c" userLabel="ServicesLabel">
                                                 <rect key="frame" x="-2" y="0.0" width="54" height="25"/>
                                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="services" id="NOF-sM-Erj">
-                                                    <font key="font" size="11" name="OpenSans"/>
+                                                    <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -329,8 +365,11 @@
         </customView>
     </objects>
     <resources>
+        <image name="lockout" width="298" height="298"/>
+        <image name="mfaoff" width="75" height="96"/>
         <image name="next" width="37" height="63"/>
         <image name="off" width="129" height="51"/>
+        <image name="timer" width="512" height="512"/>
         <namedColor name="PrimaryColor">
             <color red="0.0" green="0.40799999237060547" blue="0.97600001096725464" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

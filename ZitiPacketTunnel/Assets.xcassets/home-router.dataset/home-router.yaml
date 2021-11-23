@@ -1,0 +1,66 @@
+v: 3
+
+identity:
+  cert:                 "C:\\Applications\\Ziti\\actieve\\pki\\ziti.actieve.com-intermediate\\certs\\ziti.actieve.com-edge-router-client.cert"
+  server_cert:          "C:\\Applications\\Ziti\\actieve\\pki\\ziti.actieve.com-intermediate\\certs\\ziti.actieve.com-edge-router-server.cert"
+  key:                  "C:\\Applications\\Ziti\\actieve\\pki\\ziti.actieve.com-intermediate\\keys\\ziti.actieve.com-edge-router-server.key"
+  ca:                   "C:\\Applications\\Ziti\\actieve\\pki\\ziti.actieve.com-intermediate\\certs\\ziti.actieve.com-intermediate.cert"
+
+ctrl:
+  endpoint:             tls:ziti.actieve.com:6262
+
+link:
+#   listeners:
+#     - binding:          transport
+#       bind:             tls:0.0.0.0:10080
+#       advertise:        tls:localhost:10080
+#       options:
+#         outQueueSize:   16
+  dialers:
+    - binding: transport
+
+listeners:
+  - binding: tunnel
+    options:
+      mode: host #tproxy|tun|host
+  - binding: edge
+    address: tls:0.0.0.0:8442
+    options:
+      advertise: Tellier-Plex:8442
+      connectTimeoutMs: 5000
+      getSessionTimeout: 60s
+
+edge:
+  csr:
+    country: US
+    province: NC
+    locality: Charlotte
+    organization: NetFoundry
+    organizationalUnit: Ziti
+    sans:
+      dns:
+        - Tellier-Plex
+        - localhost
+      ip:
+        - "192.168.50.223"
+
+#transport:
+#  ws:
+#    writeTimeout:      10
+#    readTimeout:       5
+#    idleTimeout:       5
+#    pongTimeout:       60
+#    pingInterval:      54
+#    handshakeTimeout:  10
+#    readBufferSize:    4096
+#    writeBufferSize:   4096
+#    enableCompression: true
+#    server_cert:       /home/jtellier/.ziti/quickstart/ziti.actieve.com/pki/ziti.actieve.com-intermediate/certs/-router-server.cert
+#    key:               /home/jtellier/.ziti/quickstart/ziti.actieve.com/pki/ziti.actieve.com-intermediate/keys/-router-server.key
+
+forwarder:
+  latencyProbeInterval: 1000
+  xgressDialQueueLength: 1000
+  xgressDialWorkerCount: 128
+  linkDialQueueLength: 1000
+  linkDialWorkerCount: 10

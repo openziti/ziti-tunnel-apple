@@ -76,6 +76,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     
     
+    @IBOutlet var ParentView: NSView!
     
     
     
@@ -162,6 +163,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         MFAToggle.layer?.backgroundColor = NSColor.red.cgColor;
         MFAToggle.layer?.masksToBounds = true;
         MFAToggle.layer?.cornerRadius = 10;
+    
         
         self.HideAll();
         

@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "home-router.yaml",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
