@@ -37,6 +37,7 @@ class IdentityListitem: NSView {
     var zid:ZitiIdentity!;
     var tunnelMgr = TunnelMgr.shared;
     var timer = Timer();
+    var vc:DashboardScreen!;
     let XIB = "IdentityListItem";
     
     override init(frame: CGRect) {
@@ -47,6 +48,14 @@ class IdentityListitem: NSView {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.setup()
+    }
+    
+    @IBAction func ClickArrow(_ sender: NSClickGestureRecognizer) {
+        self.vc.ShowIdentity(zid: self.zid);
+    }
+    
+    @IBAction func IdClicked(_ sender: NSClickGestureRecognizer) {
+        self.vc.ShowIdentity(zid: self.zid);
     }
     
     private func setup() {
@@ -66,7 +75,8 @@ class IdentityListitem: NSView {
         super.draw(dirtyRect)
     }
     
-    public func setIdentity(identity:ZitiIdentity) {
+    public func setIdentity(identity:ZitiIdentity, vc:DashboardScreen) {
+        self.vc = vc;
         zid = identity;
         if (zid.isEnabled) {
             ToggleLabel?.stringValue = "enabled";

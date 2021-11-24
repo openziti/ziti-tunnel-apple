@@ -367,14 +367,29 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         var index = 0;
         for identity in zidMgr.zids {
             let identityItem = IdentityListitem();
-            identityItem.setIdentity(identity: identity);
+            identityItem.setIdentity(identity: identity, vc: self)
             identityItem.frame = CGRect(x: 0, y: CGFloat(index*62), width: 340, height: 60);
             IdList.addArrangedSubview(identityItem);
             index = index + 1;
         }
-        let listHeight = CGFloat(index*62);
+        let minSize = CGFloat(400);
+        var listHeight = CGFloat(index*62);
+        var innerListHeight = CGFloat(index*62);
+        var dashHeight = CGFloat(listHeight+minSize);
+        
+        guard let mainScreen = NSScreen.main else {
+            assertionFailure();
+            return;
+        }
+        let mainScreenFrame = mainScreen.frame;
+        let mainScreenVisibleFrame = mainScreen.visibleFrame;
+        let maxSize = CGFloat(mainScreenVisibleFrame.height * 0.75);
+        if (dashHeight>maxSize) {
+            listHeight = maxSize-minSize;
+        }
+        
         IdentityListHeight.constant = listHeight;
-        IdListHeight.constant = listHeight;
+        IdListHeight.constant = innerListHeight;
         SetWindowHeight(size: CGFloat(400+listHeight));
     }
     
@@ -453,6 +468,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFALine: NSBox!
     @IBOutlet var IsOfflineButton: NSImageView!
     @IBOutlet var IsOnlineButton: NSImageView!
+    
+    public func ShowIdentity(zid:ZitiIdentity) {
+        self.identity = zid;
+        self.ShowDetails();
+    }
     
     /**
      Show the details view and fill in the UI elements

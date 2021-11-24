@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -163,6 +163,13 @@
                                     <constraints>
                                         <constraint firstAttribute="height" constant="25" id="ipT-p5-kVm"/>
                                     </constraints>
+                                    <gestureRecognizers>
+                                        <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="mcF-z8-ruL">
+                                            <connections>
+                                                <action selector="IdClicked:" target="-2" id="44R-Du-mhN"/>
+                                            </connections>
+                                        </clickGestureRecognizer>
+                                    </gestureRecognizers>
                                 </box>
                             </subviews>
                             <constraints>
@@ -309,6 +316,13 @@
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="seX-Pj-fZK" userLabel="Arrow">
                                         <rect key="frame" x="14" y="14" width="43" height="32"/>
+                                        <gestureRecognizers>
+                                            <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="zyO-IT-etz">
+                                                <connections>
+                                                    <action selector="ClickArrow:" target="-2" id="Yrq-Sa-PnT"/>
+                                                </connections>
+                                            </clickGestureRecognizer>
+                                        </gestureRecognizers>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="next" id="07D-p9-J1y"/>
                                     </imageView>
                                 </subviews>
@@ -365,7 +379,7 @@
         </customView>
     </objects>
     <resources>
-        <image name="lockout" width="298" height="298"/>
+        <image name="lockout" width="149" height="149"/>
         <image name="mfaoff" width="75" height="96"/>
         <image name="next" width="37" height="63"/>
         <image name="off" width="129" height="51"/>
