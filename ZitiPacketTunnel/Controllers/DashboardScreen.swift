@@ -221,7 +221,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             DoConnectGesture.isEnabled = true;
             IdentityListHeight.constant = CGFloat(0);
             IdListHeight.constant = CGFloat(0);
-            SetWindowHeight(size: CGFloat(410));
+            SetWindowHeight(size: CGFloat(400));
             break
         case .invalid:
             TimerLabel.stringValue = "Invalid!";
@@ -375,7 +375,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         let listHeight = CGFloat(index*62);
         IdentityListHeight.constant = listHeight;
         IdListHeight.constant = listHeight;
-        SetWindowHeight(size: CGFloat(300+listHeight));
+        SetWindowHeight(size: CGFloat(400+listHeight));
     }
     
     @IBOutlet var DashHeight: NSLayoutConstraint!
