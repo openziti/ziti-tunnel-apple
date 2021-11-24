@@ -117,6 +117,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.view.window?.isMovable = true;
         self.view.window?.isMovableByWindowBackground = true;
         self.view.window?.makeKeyAndOrderFront(self);
+        /*
         self.view.shadow = NSShadow();
         self.view.layer?.shadowOpacity = 0.6;
         self.view.layer?.shadowColor = NSColor.black.cgColor;
@@ -124,6 +125,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         let rect = self.view.layer?.bounds.insetBy(dx: 30, dy: 30);
         self.view.layer?.shadowPath = CGPath(rect: rect!, transform: nil);
         self.view.layer?.shadowRadius = 12;
+         */
         DashboardBox.wantsLayer = true;
         DashboardBox.layer?.borderWidth = 0;
         DashboardBox.layer?.cornerRadius = 12;
@@ -200,20 +202,26 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         ConnectedButton.alphaValue = 0.2;
         self.ClearList();
         timer.invalidate();
+        HideProgress();
         
         zLog.info("Tunnel Status: \(status)");
         
         switch status {
         case .connecting:
             TimerLabel.stringValue = "Connecting...";
+            ShowProgress("Please Wait", "Connecting...");
             break
         case .disconnecting:
             TimerLabel.stringValue = "Disconnecting...";
+            ShowProgress("Please Wait", "Disconnecting...");
             break
         case .disconnected:
             ConnectButton.isHidden = false;
             ConnectedButton.isHidden = true;
             DoConnectGesture.isEnabled = true;
+            IdentityListHeight.constant = CGFloat(0);
+            IdListHeight.constant = CGFloat(0);
+            SetWindowHeight(size: CGFloat(410));
             break
         case .invalid:
             TimerLabel.stringValue = "Invalid!";
@@ -350,6 +358,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBOutlet var IdListHeight: NSLayoutConstraint!
+    @IBOutlet var IdentityListHeight: NSLayoutConstraint!
     
     func UpdateList() {
         IdListScroll.horizontalScrollElasticity = .none;
@@ -363,7 +372,27 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             IdList.addArrangedSubview(identityItem);
             index = index + 1;
         }
-        IdListHeight.constant = CGFloat(index*62);
+        let listHeight = CGFloat(index*62);
+        IdentityListHeight.constant = listHeight;
+        IdListHeight.constant = listHeight;
+        SetWindowHeight(size: CGFloat(300+listHeight));
+    }
+    
+    @IBOutlet var DashHeight: NSLayoutConstraint!
+    
+    public func SetWindowHeight(size: CGFloat) {
+        /*
+        guard let window = NSApplication.shared.windows.first(where: { $0.isKeyWindow }) else {
+            dialogAlert("No", "No Windows");
+            return;
+        }
+        var windowFrame = window.frame;
+        let oldWidth = windowFrame.size.width;
+        windowFrame.size = NSMakeSize(oldWidth, CGFloat(150));
+        window.setFrame(windowFrame, display: true);
+         */
+        //ParentView.setFrameSize(NSSize(width: 380, height: 399))
+        DashHeight.constant = size;
     }
     
     func AddIdentity() {
