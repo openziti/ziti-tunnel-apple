@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="ServiceListItem" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
+            <connections>
+                <outlet property="DetailsArea" destination="Z3x-ow-Goj" id="2io-zO-aWk"/>
+                <outlet property="MfaImage" destination="rmB-wG-5fh" id="0r9-ac-qcU"/>
+                <outlet property="ServiceLabel" destination="Na2-gH-nuD" id="1AT-Mj-aJJ"/>
+                <outlet property="ServicePorts" destination="XDJ-W8-8ZG" id="88J-bI-5BH"/>
+                <outlet property="ServiceProtocols" destination="2FX-V9-BSP" id="fkf-Xk-mlc"/>
+                <outlet property="ServiceUrl" destination="17D-P4-loJ" id="bP5-ZD-rbg"/>
+                <outlet property="TimeoutImage" destination="Laz-6c-al3" id="fTY-xQ-mdB"/>
+                <outlet property="WarningImage" destination="yqH-n0-S29" id="0YI-As-CIa"/>
+                <outlet property="view" destination="ygR-Xw-ynw" id="wcJ-m7-QAU"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="c22-O7-iKe">
+            <rect key="frame" x="0.0" y="0.0" width="300" height="40"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ygR-Xw-ynw" userLabel="ServiceItemView">
+                    <rect key="frame" x="0.0" y="0.0" width="300" height="40"/>
+                    <subviews>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bd4-Y8-wj6" userLabel="ServiceNameColumn">
+                            <rect key="frame" x="0.0" y="0.0" width="120" height="40"/>
+                            <subviews>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Na2-gH-nuD" userLabel="ServiceLabel">
+                                    <rect key="frame" x="3" y="20" width="119" height="14"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="14" id="ig2-Uh-3AE"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Service Name" id="1wh-fu-tQC">
+                                        <font key="font" size="11" name="OpenSans-Bold"/>
+                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="17D-P4-loJ" userLabel="ServiceUrl">
+                                    <rect key="frame" x="3" y="0.0" width="119" height="20"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="20" id="wa9-WE-eCo"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" lineBreakMode="clipping" title="service.url" id="ShM-4H-y7t">
+                                        <font key="font" size="9" name="OpenSans"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="120" id="0O1-9E-Jn0"/>
+                                <constraint firstItem="17D-P4-loJ" firstAttribute="leading" secondItem="Bd4-Y8-wj6" secondAttribute="leading" constant="5" id="0aq-e5-u4X"/>
+                                <constraint firstAttribute="height" constant="40" id="7Ju-7M-4o7"/>
+                                <constraint firstItem="Na2-gH-nuD" firstAttribute="leading" secondItem="Bd4-Y8-wj6" secondAttribute="leading" constant="5" id="H4O-Uy-h8P"/>
+                                <constraint firstItem="Na2-gH-nuD" firstAttribute="top" secondItem="Bd4-Y8-wj6" secondAttribute="top" constant="6" id="ggf-AS-RYc"/>
+                                <constraint firstItem="17D-P4-loJ" firstAttribute="top" secondItem="Na2-gH-nuD" secondAttribute="bottom" id="h5r-tS-PAH"/>
+                                <constraint firstAttribute="trailing" secondItem="Na2-gH-nuD" secondAttribute="trailing" id="vk3-2J-JX5"/>
+                                <constraint firstAttribute="trailing" secondItem="17D-P4-loJ" secondAttribute="trailing" id="wig-q3-XMf"/>
+                            </constraints>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                            </customSpacing>
+                        </stackView>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KQe-Qu-Q6l" userLabel="ProtocolColumn">
+                            <rect key="frame" x="120" y="0.0" width="100" height="40"/>
+                            <subviews>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2FX-V9-BSP" userLabel="ServiceProtocols">
+                                    <rect key="frame" x="-2" y="20" width="104" height="14"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="14" id="DQj-5C-sos"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="TCP,UDP" id="ayF-KL-05b">
+                                        <font key="font" size="11" name="OpenSans-Bold"/>
+                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XDJ-W8-8ZG" userLabel="ServicePorts">
+                                    <rect key="frame" x="-2" y="0.0" width="104" height="20"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="20" id="SxS-am-iCf"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="80-8001" id="IIF-Di-tat">
+                                        <font key="font" size="10" name="OpenSans"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="XDJ-W8-8ZG" firstAttribute="leading" secondItem="KQe-Qu-Q6l" secondAttribute="leading" id="38Q-tm-5TA"/>
+                                <constraint firstAttribute="trailing" secondItem="XDJ-W8-8ZG" secondAttribute="trailing" id="8FG-O9-vEv"/>
+                                <constraint firstItem="2FX-V9-BSP" firstAttribute="leading" secondItem="KQe-Qu-Q6l" secondAttribute="leading" id="Kls-u5-2Ud"/>
+                                <constraint firstItem="XDJ-W8-8ZG" firstAttribute="top" secondItem="2FX-V9-BSP" secondAttribute="bottom" id="d6p-J7-NUZ"/>
+                                <constraint firstAttribute="width" constant="100" id="deH-yi-U8A"/>
+                                <constraint firstItem="2FX-V9-BSP" firstAttribute="top" secondItem="KQe-Qu-Q6l" secondAttribute="top" constant="6" id="f7q-zu-y9R"/>
+                                <constraint firstAttribute="trailing" secondItem="2FX-V9-BSP" secondAttribute="trailing" id="ujk-cr-eUk"/>
+                                <constraint firstAttribute="height" constant="40" id="zWe-y8-8Hf"/>
+                            </constraints>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                            </customSpacing>
+                        </stackView>
+                        <box boxType="custom" borderWidth="0.0" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="PNe-PF-f7Y" userLabel="StatusColumn">
+                            <rect key="frame" x="220" y="0.0" width="40" height="40"/>
+                            <view key="contentView" id="sb3-Gj-Aye">
+                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="yqH-n0-S29" userLabel="WarningImage">
+                                        <rect key="frame" x="10" y="10" width="20" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="20" id="Kqv-kW-GTu"/>
+                                            <constraint firstAttribute="height" constant="20" id="j3M-yp-smI"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Warning" id="0BQ-LP-SU3"/>
+                                    </imageView>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Laz-6c-al3" userLabel="TimeoutImage">
+                                        <rect key="frame" x="10" y="10" width="20" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="20" id="WYP-Ya-xOj"/>
+                                            <constraint firstAttribute="width" constant="20" id="emd-iM-N68"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="timer" id="JTp-pq-Tug"/>
+                                    </imageView>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rmB-wG-5fh" userLabel="MfaImage">
+                                        <rect key="frame" x="10" y="10" width="20" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="20" id="1Np-5z-bcz"/>
+                                            <constraint firstAttribute="height" constant="20" id="aZi-Uk-Wsz"/>
+                                        </constraints>
+                                        <gestureRecognizers>
+                                            <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="pW3-CG-M00" userLabel="DoMfa">
+                                                <connections>
+                                                    <action selector="DoMfa:" target="c22-O7-iKe" id="eVU-zj-MPn"/>
+                                                </connections>
+                                            </clickGestureRecognizer>
+                                        </gestureRecognizers>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="mfaoff" id="h8a-nC-KvX"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="rmB-wG-5fh" firstAttribute="leading" secondItem="sb3-Gj-Aye" secondAttribute="leading" constant="10" id="Ggo-Ox-VIz"/>
+                                    <constraint firstItem="Laz-6c-al3" firstAttribute="top" secondItem="sb3-Gj-Aye" secondAttribute="top" constant="10" id="Zyz-S1-hxV"/>
+                                    <constraint firstItem="Laz-6c-al3" firstAttribute="leading" secondItem="sb3-Gj-Aye" secondAttribute="leading" constant="10" id="c4Q-Vs-YcB"/>
+                                    <constraint firstItem="rmB-wG-5fh" firstAttribute="top" secondItem="sb3-Gj-Aye" secondAttribute="top" constant="10" id="ori-ar-zmw"/>
+                                    <constraint firstItem="yqH-n0-S29" firstAttribute="top" secondItem="sb3-Gj-Aye" secondAttribute="top" constant="10" id="v1k-dW-51l"/>
+                                    <constraint firstItem="yqH-n0-S29" firstAttribute="leading" secondItem="sb3-Gj-Aye" secondAttribute="leading" constant="10" id="wdb-nW-aHh"/>
+                                </constraints>
+                            </view>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="40" id="7OW-Ul-JnJ"/>
+                                <constraint firstAttribute="height" constant="40" id="ajb-fd-rWs"/>
+                            </constraints>
+                        </box>
+                        <box boxType="custom" borderWidth="0.0" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Z3x-ow-Goj" userLabel="DetailsColumn">
+                            <rect key="frame" x="260" y="0.0" width="40" height="40"/>
+                            <view key="contentView" id="iZl-En-bvY" userLabel="DetailsArea">
+                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="3IE-Bg-9kW" userLabel="DetailsImage">
+                                        <rect key="frame" x="10" y="10" width="20" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="20" id="ZJB-wL-IoS"/>
+                                            <constraint firstAttribute="height" constant="20" id="hQZ-Ex-o7g"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="detail" id="BpC-Jv-Pv1"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="3IE-Bg-9kW" firstAttribute="top" secondItem="iZl-En-bvY" secondAttribute="top" constant="10" id="VgL-Xa-VFI"/>
+                                    <constraint firstAttribute="trailing" secondItem="3IE-Bg-9kW" secondAttribute="trailing" constant="10" id="s7n-pw-5m4"/>
+                                </constraints>
+                                <gestureRecognizers>
+                                    <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="k65-ae-fYT" userLabel="ShowDetails">
+                                        <connections>
+                                            <action selector="ShowDetails:" target="c22-O7-iKe" id="tAf-nP-LBO"/>
+                                        </connections>
+                                    </clickGestureRecognizer>
+                                </gestureRecognizers>
+                            </view>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="BNI-KG-MCi"/>
+                                <constraint firstAttribute="width" constant="40" id="dLg-dx-7aB"/>
+                            </constraints>
+                        </box>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="Bd4-Y8-wj6" firstAttribute="top" secondItem="ygR-Xw-ynw" secondAttribute="top" id="5YW-oY-qIr"/>
+                        <constraint firstAttribute="width" constant="300" id="94F-gB-Isb"/>
+                        <constraint firstAttribute="height" constant="40" id="NUq-Ri-TXT"/>
+                        <constraint firstItem="Bd4-Y8-wj6" firstAttribute="leading" secondItem="ygR-Xw-ynw" secondAttribute="leading" id="TfU-NB-Q2B"/>
+                    </constraints>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="ygR-Xw-ynw" secondAttribute="bottom" id="S7t-gr-9a2"/>
+                <constraint firstAttribute="trailing" secondItem="ygR-Xw-ynw" secondAttribute="trailing" id="dN4-KJ-12t"/>
+                <constraint firstItem="ygR-Xw-ynw" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="u7L-0s-rht"/>
+                <constraint firstItem="ygR-Xw-ynw" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="xpw-x1-pfk"/>
+            </constraints>
+            <connections>
+                <outlet property="DetailsArea" destination="iZl-En-bvY" id="cua-a4-i1C"/>
+                <outlet property="MfaImage" destination="rmB-wG-5fh" id="Xtn-6H-yRU"/>
+                <outlet property="ServiceLabel" destination="Na2-gH-nuD" id="D8Q-kh-EzA"/>
+                <outlet property="ServicePorts" destination="XDJ-W8-8ZG" id="U5e-3e-tbk"/>
+                <outlet property="ServiceProtocols" destination="2FX-V9-BSP" id="DwM-AQ-4Vt"/>
+                <outlet property="ServiceUrl" destination="17D-P4-loJ" id="qWT-Ls-NWa"/>
+                <outlet property="TimeoutImage" destination="Laz-6c-al3" id="krD-JP-TrI"/>
+                <outlet property="WarningImage" destination="yqH-n0-S29" id="bEg-sn-fUd"/>
+            </connections>
+            <point key="canvasLocation" x="139" y="151"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="Warning" width="132" height="133"/>
+        <image name="detail" width="512" height="512"/>
+        <image name="mfaoff" width="75" height="96"/>
+        <image name="timer" width="512" height="512"/>
+    </resources>
+</document>

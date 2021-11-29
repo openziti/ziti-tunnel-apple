@@ -142,6 +142,8 @@
 		82B6EFD526DCF42A009C5BED /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFD326DCF42A009C5BED /* DragView.swift */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
+		D76148CD275458CF009BCB36 /* ServiceListItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = D76148CC275458CF009BCB36 /* ServiceListItem.xib */; };
+		D76148CF27545ED3009BCB36 /* ServiceListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76148CE27545ED3009BCB36 /* ServiceListItem.swift */; };
 		D7DF1A9127315E5D000C6548 /* IdentityOperationGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DF1A9027315E5D000C6548 /* IdentityOperationGesture.swift */; };
 		D7EF44BA2749D60800EC130F /* IdentityListItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7EF44B92749D60800EC130F /* IdentityListItem.xib */; };
 		D7EF44BC2749E46F00EC130F /* IdentityListitem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EF44BB2749E46F00EC130F /* IdentityListitem.swift */; };
@@ -359,6 +361,8 @@
 		B2055ED46BB4712E8ACCBE15 /* Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-ios_targets-ZitiMobilePacketTunnel/Pods-ios_targets-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
 		B9942F531B1AE05E9C8AA335 /* Pods_macos_targets_ZitiPosture.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_macos_targets_ZitiPosture.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD089AE0E096B75A46595B3D /* Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-macos_targets-ZitiPacketTunnel/Pods-macos_targets-ZitiPacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
+		D76148CC275458CF009BCB36 /* ServiceListItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ServiceListItem.xib; sourceTree = "<group>"; };
+		D76148CE27545ED3009BCB36 /* ServiceListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceListItem.swift; sourceTree = "<group>"; };
 		D7DF1A9027315E5D000C6548 /* IdentityOperationGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityOperationGesture.swift; sourceTree = "<group>"; };
 		D7EF44B92749D60800EC130F /* IdentityListItem.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IdentityListItem.xib; sourceTree = "<group>"; };
 		D7EF44BB2749E46F00EC130F /* IdentityListitem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityListitem.swift; sourceTree = "<group>"; };
@@ -705,6 +709,8 @@
 				82B6EFD326DCF42A009C5BED /* DragView.swift */,
 				D7EF44B92749D60800EC130F /* IdentityListItem.xib */,
 				D7EF44BB2749E46F00EC130F /* IdentityListitem.swift */,
+				D76148CC275458CF009BCB36 /* ServiceListItem.xib */,
+				D76148CE27545ED3009BCB36 /* ServiceListItem.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -965,6 +971,7 @@
 			files = (
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
+				D76148CD275458CF009BCB36 /* ServiceListItem.xib in Resources */,
 				5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */,
 				D7EF44BA2749D60800EC130F /* IdentityListItem.xib in Resources */,
 				826F65B326D64E4000D830DC /* MainUI.storyboard in Resources */,
@@ -1169,6 +1176,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AB5F9F926ED46D700F198F2 /* IpcAppClient.swift in Sources */,
+				D76148CF27545ED3009BCB36 /* ServiceListItem.swift in Sources */,
 				5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */,
 				5A051F612264183500B11CB2 /* ZidMgr.swift in Sources */,
 				82B6EFD526DCF42A009C5BED /* DragView.swift in Sources */,

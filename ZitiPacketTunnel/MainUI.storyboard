@@ -1212,7 +1212,7 @@
                                             <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </box>
-                                        <box alphaValue="0.0" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="r1m-PG-WcY" userLabel="DetailBox">
+                                        <box boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="r1m-PG-WcY" userLabel="DetailBox">
                                             <rect key="frame" x="0.0" y="0.0" width="380" height="600"/>
                                             <view key="contentView" id="HrI-vS-oxy">
                                                 <rect key="frame" x="0.0" y="0.0" width="380" height="600"/>
@@ -1458,7 +1458,7 @@
                                                                 <rect key="frame" x="0.0" y="327" width="340" height="35"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sxg-lZ-sM8">
-                                                                        <rect key="frame" x="-2" y="10" width="101" height="15"/>
+                                                                        <rect key="frame" x="-2" y="10" width="56" height="15"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Filter For" id="jfv-V7-CMp">
                                                                             <font key="font" size="13" name="HelveticaNeue"/>
                                                                             <color key="textColor" name="ModalColor"/>
@@ -1466,7 +1466,7 @@
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yBt-zI-Z24" userLabel="FilterText">
-                                                                        <rect key="frame" x="102" y="8" width="50" height="20"/>
+                                                                        <rect key="frame" x="57" y="8" width="50" height="20"/>
                                                                         <constraints>
                                                                             <constraint firstAttribute="width" constant="50" id="khZ-Aq-hf3"/>
                                                                         </constraints>
@@ -1477,7 +1477,7 @@
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="t61-QI-Te6">
-                                                                        <rect key="frame" x="155" y="10" width="77" height="16"/>
+                                                                        <rect key="frame" x="110" y="10" width="122" height="16"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="and sort by" id="7K1-X0-4Ux">
                                                                             <font key="font" metaFont="system"/>
                                                                             <color key="textColor" name="ModalColor"/>
@@ -1564,6 +1564,19 @@
                                                                                     <view id="nNx-Nd-M2W">
                                                                                         <rect key="frame" x="0.0" y="0.0" width="305" height="190"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                                        <subviews>
+                                                                                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xZz-pR-Soj" userLabel="ServiceListView">
+                                                                                                <rect key="frame" x="0.0" y="150" width="305" height="40"/>
+                                                                                                <constraints>
+                                                                                                    <constraint firstAttribute="height" constant="40" id="j3L-Mu-6br"/>
+                                                                                                </constraints>
+                                                                                            </stackView>
+                                                                                        </subviews>
+                                                                                        <constraints>
+                                                                                            <constraint firstItem="xZz-pR-Soj" firstAttribute="leading" secondItem="nNx-Nd-M2W" secondAttribute="leading" id="5DG-pi-mVR"/>
+                                                                                            <constraint firstItem="xZz-pR-Soj" firstAttribute="top" secondItem="nNx-Nd-M2W" secondAttribute="top" id="bc6-on-bgS"/>
+                                                                                            <constraint firstAttribute="trailing" secondItem="xZz-pR-Soj" secondAttribute="trailing" id="zrZ-ib-ucb"/>
+                                                                                        </constraints>
                                                                                     </view>
                                                                                 </subviews>
                                                                                 <color key="backgroundColor" red="0.16599999368190765" green="0.18799999356269836" blue="0.22400000691413879" alpha="0.0" colorSpace="custom" customColorSpace="displayP3"/>
@@ -4578,6 +4591,7 @@
                         <outlet property="SecretToggle" destination="f54-XA-ab9" id="9Uj-2C-zw5"/>
                         <outlet property="ServiceBox" destination="1n0-Bh-2o5" id="KTv-gD-6Q9"/>
                         <outlet property="ServiceList" destination="kt8-wn-tGH" id="BZd-1R-Y1W"/>
+                        <outlet property="ServiceListHeight" destination="j3L-Mu-6br" id="S0V-a9-iPh"/>
                         <outlet property="ServiceLogButton" destination="WdH-rg-FHH" id="bqN-Mv-LWT"/>
                         <outlet property="ServiceName" destination="4Bg-iB-3lA" id="xXr-QH-mPb"/>
                         <outlet property="SetupAuthCode" destination="n5W-qd-xAt" id="QSJ-rP-wwA"/>

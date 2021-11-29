@@ -474,6 +474,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.ShowDetails();
     }
     
+    @IBOutlet var ServiceListHeight: NSLayoutConstraint!
     /**
      Show the details view and fill in the UI elements
      */
@@ -520,66 +521,23 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             
         let serviceListView = NSStackView(frame: NSRect(x: 0, y: 0, width: self.view.frame.width-50, height: 70));
         serviceListView.orientation = .vertical;
-        serviceListView.spacing = 2;
+        serviceListView.spacing = 0;
         var baseHeight = 480;
         var index = 0;
         
         if (self.identity.isEnrolled) {
-            let rowHeight = 50;
+            let rowHeight = 40;
+            var index = 0;
             for service in self.identity.services {
-                let serviceName = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 14));
-                let serviceUrl = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 12));
-                let serviceProtocol = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 12));
-                let servicePorts = NSText(frame: CGRect(x: 0, y: 0, width: self.view.frame.width-50, height: 12));
-                
-                serviceName.string = service.name ?? "";
-                serviceUrl.string = service.addresses ?? "None";
-                serviceUrl.string = service.protocols ?? "None";
-                serviceUrl.string = service.portRanges ?? "None";
-                
-                let color = NSColor(red: 255, green: 255, blue: 255, alpha: 1);
-                let subColor = NSColor(red: 255, green: 255, blue: 255, alpha: 0.6);
-                
-                serviceName.font = NSFont(name: "Open Sans", size: 12);
-                serviceName.textColor = color;
-                serviceUrl.font = NSFont(name: "Open Sans", size: 11);
-                serviceUrl.textColor = subColor;
-                serviceProtocol.font = NSFont(name: "Open Sans", size: 11);
-                serviceProtocol.textColor = subColor;
-                servicePorts.font = NSFont(name: "Open Sans", size: 11);
-                servicePorts.textColor = subColor;
-                
-                serviceName.isEditable = false;
-                serviceUrl.isEditable = false;
-                serviceProtocol.isEditable = false;
-                servicePorts.isEditable = false;
-                
-                serviceName.backgroundColor = NSColor.clear;
-                serviceUrl.backgroundColor = NSColor.clear;
-                serviceProtocol.backgroundColor = NSColor.clear;
-                servicePorts.backgroundColor = NSColor.clear;
-                
-                serviceName.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
-                serviceName.heightAnchor.constraint(equalToConstant: CGFloat(14)).isActive = true
-                serviceUrl.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
-                serviceUrl.heightAnchor.constraint(equalToConstant: CGFloat(12)).isActive = true
-                serviceProtocol.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
-                serviceProtocol.heightAnchor.constraint(equalToConstant: CGFloat(12)).isActive = true
-                servicePorts.widthAnchor.constraint(equalToConstant: self.view.frame.width-50).isActive = true
-                servicePorts.heightAnchor.constraint(equalToConstant: CGFloat(12)).isActive = true
-                
-                let stack = NSStackView(views: [serviceName, serviceUrl, serviceProtocol, servicePorts]);
-                
-                stack.edgeInsets.top = 14;
-                stack.distribution = .fillProportionally;
-                stack.alignment = .leading;
-                stack.spacing = 0;
-                stack.orientation = .vertical;
-                stack.frame = CGRect(x: 0, y: CGFloat(index*rowHeight), width: view.frame.size.width-90, height: CGFloat(rowHeight));
-
-                serviceListView.addSubview(stack);
+                let serviceItem = ServiceListItem();
+                serviceItem.SetService(service: service, vc: self);
+                serviceItem.frame = CGRect(x: 0, y: CGFloat(index*40), width: 300, height: 40);
+                serviceListView.addArrangedSubview(serviceItem);
                 index = index + 1;
             }
+            let innerListHeight = CGFloat(index*40);
+            ServiceListHeight.constant = innerListHeight;
+                
             
             let clipView = FlippedClipView();
             clipView.drawsBackground = false;

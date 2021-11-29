@@ -19,7 +19,7 @@
                 <outlet property="TimeoutImage" destination="QR4-dH-xbO" id="DCO-y8-Z8q"/>
                 <outlet property="ToggleButton" destination="jQ9-1n-Isc" id="q9m-gB-pYd"/>
                 <outlet property="ToggleLabel" destination="7Bf-mY-n9o" id="7XZ-SH-CvM"/>
-                <outlet property="view" destination="fBa-AI-I1d" id="UTb-Zc-d5i"/>
+                <outlet property="view" destination="fBa-AI-I1d" id="TmO-6D-Yye"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
