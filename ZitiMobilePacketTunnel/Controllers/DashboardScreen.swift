@@ -437,7 +437,6 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         }
     }
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         

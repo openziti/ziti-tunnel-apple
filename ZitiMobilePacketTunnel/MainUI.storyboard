@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Be6-zG-vnf">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Be6-zG-vnf">
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -25,7 +25,7 @@
         <!--Dashboard Screen-->
         <scene sceneID="4Ld-VB-yse">
             <objects>
-                <viewController storyboardIdentifier="Dashboard" id="Be6-zG-vnf" customClass="DashboardScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="Dashboard" extendedLayoutIncludesOpaqueBars="YES" interfaceStyle="light" id="Be6-zG-vnf" customClass="DashboardScreen" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="ge4-rq-x5v"/>
                         <viewControllerLayoutGuide type="bottom" id="APS-cf-JwN"/>
@@ -2611,7 +2611,7 @@
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ndy-R5-lnM" userLabel="QrButton">
-                                                                <rect key="frame" x="37" y="253.33333333333331" width="280" height="40"/>
+                                                                <rect key="frame" x="121.66666666666666" y="253.33333333333331" width="111" height="40"/>
                                                                 <color key="backgroundColor" name="PrimaryColor"/>
                                                                 <gestureRecognizers/>
                                                                 <constraints>
@@ -4444,7 +4444,7 @@
         <image name="down" width="52" height="53"/>
         <image name="export" width="20" height="28"/>
         <image name="feedback" width="61" height="62"/>
-        <image name="globe" width="1310" height="661"/>
+        <image name="globe" width="436.66665649414062" height="220.33332824707031"/>
         <image name="hamburger" width="84" height="69"/>
         <image name="identity" width="92" height="93"/>
         <image name="jwt" width="284" height="353"/>

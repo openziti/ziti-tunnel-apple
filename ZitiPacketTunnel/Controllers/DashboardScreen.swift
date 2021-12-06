@@ -143,7 +143,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         zidMgr.zidStore.delegate = self;
         // getMainWindow()?.delegate = self;
         
-        level = ZitiLog.getLogLevel();
         SetLogIcon();
         SetupConfig();
         
@@ -769,7 +768,19 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func ShowFeedback(_ sender: NSClickGestureRecognizer) {
-        ShowProgress("Test", "Testing");
+        let logger = Logger.shared;
+        let tunLog = (logger?.currLog(forTag: Logger.TUN_TAG)?.absoluteString)!;
+        let appLog = (logger?.currLog(forTag: Logger.APP_TAG)?.absoluteString)!;
+        let service = NSSharingService(named: NSSharingService.Name.composeEmail)!;
+        
+        service.recipients = ["help@openziti.org"];
+        service.subject = "Ziti Support";
+        
+        let tunUrl = NSURL.fileURL(withPath: tunLog);
+        let appUrl = NSURL.fileURL(withPath: appLog);
+        let items: [Any] = ["see attachment", tunUrl, appUrl];
+        
+        service.perform(withItems: items);
     }
     
     @IBAction func ShowSupport(_ sender: NSClickGestureRecognizer) {
@@ -871,6 +882,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Go to the config screen
      */
     @IBAction func GoToConfig(_ sender: NSClickGestureRecognizer) {
+        SetupConfig();
         showArea(state: "config");
     }
     
@@ -892,6 +904,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Open the log level screen
      */
     @IBAction func GoToLogLevel(_ sender: NSClickGestureRecognizer) {
+        SetLogIcon();
         showArea(state: "loglevel");
     }
     
@@ -921,15 +934,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         }
     }
     
-    /**
-     Close three screens deep to dismiss all
-     */
-    @IBAction func DoTripleClose(_ sender: NSClickGestureRecognizer) {
-        Close(sender);
-        Close(sender);
-        Close(sender);
-    }
-    
     
     
     
@@ -941,7 +945,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     /**
      Tunnel Configuration Functionality
      */
-    var level = ZitiLog.LogLevel.ERROR;
     @IBOutlet var FatalImage: NSImageView!
     @IBOutlet var ErrorImage: NSImageView!
     @IBOutlet var WarnImage: NSImageView!
@@ -970,19 +973,20 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         WarnImage.isHidden = true;
         ErrorImage.isHidden = true;
         FatalImage.isHidden = true;
-        if (level==ZitiLog.LogLevel.TRACE) {
+        let thisLevel = ZitiLog.getLogLevel();
+        if (thisLevel==ZitiLog.LogLevel.TRACE) {
             TraceImage.isHidden = false;
-        } else if (level==ZitiLog.LogLevel.VERBOSE) {
+        } else if (thisLevel==ZitiLog.LogLevel.VERBOSE) {
             VerboseImage.isHidden = false;
-        } else if (level==ZitiLog.LogLevel.DEBUG) {
+        } else if (thisLevel==ZitiLog.LogLevel.DEBUG) {
             DebugImage.isHidden = false;
-        } else if (level==ZitiLog.LogLevel.INFO) {
+        } else if (thisLevel==ZitiLog.LogLevel.INFO) {
             InfoImage.isHidden = false;
-        } else if (level==ZitiLog.LogLevel.WARN) {
+        } else if (thisLevel==ZitiLog.LogLevel.WARN) {
             WarnImage.isHidden = false;
-        } else if (level==ZitiLog.LogLevel.ERROR) {
+        } else if (thisLevel==ZitiLog.LogLevel.ERROR) {
             ErrorImage.isHidden = false;
-        } else if (level==ZitiLog.LogLevel.WTF) {
+        } else if (thisLevel==ZitiLog.LogLevel.WTF) {
             FatalImage.isHidden = false;
         }
     }
@@ -991,8 +995,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Set the log level to fatal
      */
     @IBAction func SetFatal(_ sender: NSClickGestureRecognizer) {
-        level = ZitiLog.LogLevel.WTF;
-        TunnelMgr.shared.updateLogLevel(level);
+        TunnelMgr.shared.updateLogLevel(ZitiLog.LogLevel.WTF);
         SetLogIcon();
     }
     
@@ -1000,8 +1003,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Set the log level to error
      */
     @IBAction func SetError(_ sender: NSClickGestureRecognizer) {
-        level = ZitiLog.LogLevel.ERROR;
-        TunnelMgr.shared.updateLogLevel(level);
+        TunnelMgr.shared.updateLogLevel(ZitiLog.LogLevel.ERROR);
         SetLogIcon();
     }
     
@@ -1009,8 +1011,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Set the log level to warning
      */
     @IBAction func SetWarn(_ sender: NSClickGestureRecognizer) {
-        level = ZitiLog.LogLevel.WARN;
-        TunnelMgr.shared.updateLogLevel(level);
+        TunnelMgr.shared.updateLogLevel(ZitiLog.LogLevel.WARN);
         SetLogIcon();
     }
     
@@ -1018,8 +1019,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Set the log level to info
      */
     @IBAction func SetInfo(_ sender: NSClickGestureRecognizer) {
-        level = ZitiLog.LogLevel.INFO;
-        TunnelMgr.shared.updateLogLevel(level);
+        TunnelMgr.shared.updateLogLevel(ZitiLog.LogLevel.INFO);
         SetLogIcon();
     }
     
@@ -1027,8 +1027,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Set the log level to debug
      */
     @IBAction func SetDebug(_ sender: NSClickGestureRecognizer) {
-        level = ZitiLog.LogLevel.DEBUG;
-        TunnelMgr.shared.updateLogLevel(level);
+        TunnelMgr.shared.updateLogLevel(ZitiLog.LogLevel.DEBUG);
         SetLogIcon();
     }
     
@@ -1036,8 +1035,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Set the log level to verbose
      */
     @IBAction func SetVerbose(_ sender: NSClickGestureRecognizer) {
-        level = ZitiLog.LogLevel.VERBOSE;
-        TunnelMgr.shared.updateLogLevel(level);
+        TunnelMgr.shared.updateLogLevel(ZitiLog.LogLevel.VERBOSE);
         SetLogIcon();
     }
     
@@ -1045,8 +1043,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Set the log level to trace
      */
     @IBAction func SetTrace(_ sender: NSClickGestureRecognizer) {
-        level = ZitiLog.LogLevel.TRACE;
-        TunnelMgr.shared.updateLogLevel(level);
+        TunnelMgr.shared.updateLogLevel(ZitiLog.LogLevel.TRACE);
         SetLogIcon();
     }
     
@@ -1554,6 +1551,15 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Do a close that requires rolling back the last two states
      */
     @IBAction func DoDoubleClose(_ sender: NSClickGestureRecognizer) {
+        Close(sender);
+        Close(sender);
+    }
+    
+    /**
+     Close three screens deep to dismiss all
+     */
+    @IBAction func DoTripleClose(_ sender: NSClickGestureRecognizer) {
+        Close(sender);
         Close(sender);
         Close(sender);
     }
