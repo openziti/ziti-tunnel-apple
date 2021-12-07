@@ -58,6 +58,19 @@ class IdentityListitem: NSView {
         self.vc.ShowIdentity(zid: self.zid);
     }
     
+    @IBAction func ServiceClicked(_ sender: NSClickGestureRecognizer) {
+        if (self.zid.isMfaEnabled) {
+            if (self.zid.isMfaVerified) {
+                // Check if timing out
+                self.vc.ShowIdentity(zid: self.zid);
+            } else {
+                self.vc.ShowIdentity(zid: self.zid);
+            }
+        } else {
+            self.vc.ShowIdentity(zid: self.zid);
+        }
+    }
+    
     private func setup() {
         let nib = NSNib(nibNamed: XIB, bundle: Bundle(for: type(of: self)));
         nib?.instantiate(withOwner: self, topLevelObjects: nil);

@@ -27,7 +27,7 @@ extension NSTextField {
     }
 }
 
-class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDelegate {
+class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDelegate, NSComboBoxDelegate {
     
     /**
      Ziti SDK Variables
@@ -164,6 +164,17 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         MFAToggle.layer?.backgroundColor = NSColor.red.cgColor;
         MFAToggle.layer?.masksToBounds = true;
         MFAToggle.layer?.cornerRadius = 10;
+        
+        SortBy.delegate = self;
+        SortHow.delegate = self;
+        
+        SortBy?.addItem(withObjectValue: "Name");
+        SortBy?.addItem(withObjectValue: "Address");
+        SortBy?.addItem(withObjectValue: "Protocol");
+        SortBy?.addItem(withObjectValue: "Port");
+        
+        SortHow?.addItem(withObjectValue: "Asc");
+        SortHow?.addItem(withObjectValue: "Desc");
     
         
         self.HideAll();
@@ -467,6 +478,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFALine: NSBox!
     @IBOutlet var IsOfflineButton: NSImageView!
     @IBOutlet var IsOnlineButton: NSImageView!
+    @IBOutlet var SortHow: NSComboBox!
+    @IBOutlet var SortBy: NSComboBox!
     
     public func ShowIdentity(zid:ZitiIdentity) {
         self.identity = zid;
@@ -478,6 +491,10 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Show the details view and fill in the UI elements
      */
     func ShowDetails() {
+        
+        SortBy?.selectItem(at: 0);
+        SortHow?.selectItem(at: 0);
+        
         let status = tunnelMgr.status;
         ForgotButton.isHidden = false;
         ServiceList.isHidden = false;
@@ -517,7 +534,20 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 MFAOff.isHidden = false;
             }
         }
-            
+        
+        SetupServices();
+        showArea(state: "details");
+    }
+    
+    func comboBoxSelectionDidChange(notification: NSNotification) {
+        print("Woohoo, it changed")
+    }
+    
+    func SetupServices() {
+        
+        let sortBy = SortBy.objectValueOfSelectedItem;
+        let sortHow = SortHow.objectValueOfSelectedItem;
+        
         let serviceListView = NSStackView(frame: NSRect(x: 0, y: 0, width: self.view.frame.width-50, height: 70));
         serviceListView.orientation = .vertical;
         serviceListView.spacing = 0;
@@ -561,13 +591,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             index = index-2;
             baseHeight = baseHeight+(50*index);
         }
-        /*
-        guard var frame = self.view.window?.frame else { return };
-        frame.size = NSMakeSize(CGFloat(420), CGFloat(baseHeight));
-        self.view.window?.setFrame(frame, display: true);
-        */
         ServiceList.documentView = serviceListView;
-        showArea(state: "details");
+        
     }
     
     /**

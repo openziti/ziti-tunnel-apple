@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="UHm-9v-ehL">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="UHm-9v-ehL">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -62,7 +62,7 @@
                 </windowController>
                 <customObject id="EK0-kM-KSC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-6023.5" y="340"/>
+            <point key="canvasLocation" x="-5908" y="566"/>
         </scene>
         <!--Dashboard Screen-->
         <scene sceneID="ffK-nd-vMp">
@@ -2265,30 +2265,21 @@
                                                                         <constraints>
                                                                             <constraint firstAttribute="width" constant="50" id="v5m-9l-Ljx"/>
                                                                         </constraints>
-                                                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="3" id="Hb7-uJ-s4C">
+                                                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="4" id="Hb7-uJ-s4C">
                                                                             <font key="font" metaFont="system"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                            <objectValues>
-                                                                                <string>Item</string>
-                                                                                <string>Item</string>
-                                                                                <string>Item</string>
-                                                                            </objectValues>
                                                                         </comboBoxCell>
                                                                     </comboBox>
-                                                                    <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="c9M-N2-TFx">
+                                                                    <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="c9M-N2-TFx" userLabel="SortHow">
                                                                         <rect key="frame" x="290" y="4" width="53" height="25"/>
                                                                         <constraints>
                                                                             <constraint firstAttribute="width" constant="50" id="sfh-Y9-pcD"/>
                                                                         </constraints>
-                                                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="PCl-Ur-uxZ">
+                                                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="2" id="PCl-Ur-uxZ">
                                                                             <font key="font" metaFont="system"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                            <objectValues>
-                                                                                <string>Item 3</string>
-                                                                                <string>Item</string>
-                                                                            </objectValues>
                                                                         </comboBoxCell>
                                                                     </comboBox>
                                                                 </subviews>
@@ -4378,7 +4369,7 @@
                                             <color key="borderColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" wantsLayer="YES" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Ayx-FD-cVQ" userLabel="LoadingBox">
+                                        <box autoresizesSubviews="NO" wantsLayer="YES" alphaValue="0.0" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Ayx-FD-cVQ" userLabel="LoadingBox">
                                             <rect key="frame" x="0.0" y="0.0" width="380" height="600"/>
                                             <view key="contentView" id="BNF-dO-pcd">
                                                 <rect key="frame" x="0.0" y="0.0" width="380" height="600"/>
@@ -4388,7 +4379,7 @@
                                                         <rect key="frame" x="20" y="372" width="340" height="78"/>
                                                         <subviews>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0wH-dx-amK">
-                                                                <rect key="frame" x="84" y="51" width="172" height="27"/>
+                                                                <rect key="frame" x="84" y="51" width="173" height="27"/>
                                                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Progress Header" id="NWu-73-DMB">
                                                                     <font key="font" size="20" name="OpenSans-Bold"/>
                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -4624,6 +4615,9 @@
                         <outlet property="ServiceName" destination="4Bg-iB-3lA" id="xXr-QH-mPb"/>
                         <outlet property="SetupAuthCode" destination="n5W-qd-xAt" id="QSJ-rP-wwA"/>
                         <outlet property="SetupAuthCodeText" destination="ZSa-yW-ZzQ" id="oYN-VK-N9G"/>
+                        <outlet property="SortBy" destination="89j-Xm-2a5" id="NdK-P7-o7d"/>
+                        <outlet property="SortHow" destination="c9M-N2-TFx" id="brP-j4-dKm"/>
+                        <outlet property="SoryBy" destination="89j-Xm-2a5" id="eYK-x3-Ytm"/>
                         <outlet property="SpeedArea" destination="Wpj-1q-2La" id="RcG-Lw-s1X"/>
                         <outlet property="SubNet" destination="AVF-M0-4w4" id="BUC-cM-aNv"/>
                         <outlet property="SupportButton" destination="RXB-p3-8TH" id="qoR-0t-UIE"/>
@@ -4644,7 +4638,7 @@
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="-5418" y="340"/>
+            <point key="canvasLocation" x="-5419" y="590"/>
         </scene>
     </scenes>
     <resources>
@@ -4657,7 +4651,7 @@
         <image name="detach" width="189" height="189"/>
         <image name="down" width="52" height="53"/>
         <image name="feedbackIcon" width="61" height="62"/>
-        <image name="globe" width="655" height="330.5"/>
+        <image name="globe" width="1310" height="661"/>
         <image name="hamburger" width="84" height="69"/>
         <image name="identity" width="92" height="93"/>
         <image name="lastArrow" width="37" height="63"/>

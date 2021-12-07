@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -163,15 +163,15 @@
                                     <constraints>
                                         <constraint firstAttribute="height" constant="25" id="ipT-p5-kVm"/>
                                     </constraints>
-                                    <gestureRecognizers>
-                                        <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="mcF-z8-ruL">
-                                            <connections>
-                                                <action selector="IdClicked:" target="-2" id="44R-Du-mhN"/>
-                                            </connections>
-                                        </clickGestureRecognizer>
-                                    </gestureRecognizers>
                                 </box>
                             </subviews>
+                            <gestureRecognizers>
+                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="mcF-z8-ruL">
+                                    <connections>
+                                        <action selector="IdClicked:" target="-2" id="OV9-aO-1l0"/>
+                                    </connections>
+                                </clickGestureRecognizer>
+                            </gestureRecognizers>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="qrc-J1-PVg" secondAttribute="trailing" id="nGb-zr-dhy"/>
                                 <constraint firstAttribute="trailing" secondItem="e2F-3g-A1Q" secondAttribute="trailing" id="nPB-g7-wST"/>
@@ -290,6 +290,13 @@
                                     </constraints>
                                 </box>
                             </subviews>
+                            <gestureRecognizers>
+                                <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="wvV-1c-Uk2" userLabel="ServiceClicked">
+                                    <connections>
+                                        <action selector="ServiceClicked:" target="-2" id="npT-5v-2tx"/>
+                                    </connections>
+                                </clickGestureRecognizer>
+                            </gestureRecognizers>
                             <constraints>
                                 <constraint firstItem="Idz-V3-9Vf" firstAttribute="leading" secondItem="uoM-qe-RdT" secondAttribute="leading" id="2tw-qv-nkH"/>
                                 <constraint firstItem="8Jd-KX-kWm" firstAttribute="top" secondItem="Idz-V3-9Vf" secondAttribute="bottom" id="4eJ-IN-7SW"/>
@@ -379,7 +386,7 @@
         </customView>
     </objects>
     <resources>
-        <image name="lockout" width="149" height="149"/>
+        <image name="lockout" width="298" height="298"/>
         <image name="mfaoff" width="75" height="96"/>
         <image name="next" width="37" height="63"/>
         <image name="off" width="129" height="51"/>
