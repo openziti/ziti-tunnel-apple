@@ -27,6 +27,12 @@ extension NSTextField {
     }
 }
 
+extension String {
+    func indexOf(string: String) -> String.Index? {
+        return range(of: string, options: .literal, range: nil, locale: nil)?.lowerBound;
+    }
+}
+
 class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDelegate, NSComboBoxDelegate {
     
     /**
@@ -164,18 +170,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         MFAToggle.layer?.backgroundColor = NSColor.red.cgColor;
         MFAToggle.layer?.masksToBounds = true;
         MFAToggle.layer?.cornerRadius = 10;
-        
-        SortBy.delegate = self;
-        SortHow.delegate = self;
-        
-        SortBy?.addItem(withObjectValue: "Name");
-        SortBy?.addItem(withObjectValue: "Address");
-        SortBy?.addItem(withObjectValue: "Protocol");
-        SortBy?.addItem(withObjectValue: "Port");
-        
-        SortHow?.addItem(withObjectValue: "Asc");
-        SortHow?.addItem(withObjectValue: "Desc");
-    
         
         self.HideAll();
         
@@ -478,31 +472,54 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFALine: NSBox!
     @IBOutlet var IsOfflineButton: NSImageView!
     @IBOutlet var IsOnlineButton: NSImageView!
-    @IBOutlet var SortHow: NSComboBox!
-    @IBOutlet var SortBy: NSComboBox!
+    @IBOutlet var SortHow: NSPopUpButton!
+    @IBOutlet var SortBy: NSPopUpButton!
+    @IBOutlet var ServiceListHeight: NSLayoutConstraint!
+    @IBOutlet var SearchFor: NSTextField!
+    @IBOutlet var FilterArea: NSStackView!
+    @IBOutlet var ForgotButtonArea: NSBox!
     
     public func ShowIdentity(zid:ZitiIdentity) {
         self.identity = zid;
         self.ShowDetails();
     }
     
-    @IBOutlet var ServiceListHeight: NSLayoutConstraint!
+    @IBAction func FilterChanged(_ sender: NSTextField) {
+        SetupServices();
+    }
+    
+    @IBAction func SortHow(_ sender: NSPopUpButton) {
+        SetupServices();
+    }
+    
+    
+    @IBAction func SortBy(_ sender: NSPopUpButton) {
+        SetupServices();
+    }
+    
+    @IBAction func DoFilter(_ sender: NSClickGestureRecognizer) {
+        SetupServices();
+    }
     /**
      Show the details view and fill in the UI elements
      */
     func ShowDetails() {
         
-        SortBy?.selectItem(at: 0);
+        SortBy.selectItem(at: 0);
         SortHow?.selectItem(at: 0);
+        SearchFor?.stringValue = "";
         
         let status = tunnelMgr.status;
-        ForgotButton.isHidden = false;
+        ForgotButtonArea.isHidden = false;
         ServiceList.isHidden = false;
         IdServiceCount.isHidden = false;
         MFAArea.isHidden = false;
         MFALine.isHidden = false;
         IsOnlineButton.isHidden = true;
         IsOfflineButton.isHidden = true;
+        ForgotButtonArea.alphaValue = 1;
+        FilterArea.alphaValue = 1;
+        FilterArea.isHidden = false;
         if (self.identity.isEnrolled) {
             if (self.identity.isEnabled) {
                 IsOnlineButton.isHidden = false;
@@ -510,11 +527,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 IsOfflineButton.isHidden = false;
             }
         } else {
-            ForgotButton.isHidden = true;
+            ForgotButtonArea.alphaValue = 0;
+            ForgotButtonArea.isHidden = true;
             ServiceList.isHidden = true;
             IdServiceCount.isHidden = true;
             MFAArea.isHidden = true;
             MFALine.isHidden = true;
+            FilterArea.alphaValue = 0;
+            FilterArea.isHidden = true;
         }
         IdName.stringValue = self.identity.name;
         IdNetwork.stringValue = self.identity.czid?.ztAPI ?? "no network";
@@ -539,14 +559,16 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         showArea(state: "details");
     }
     
-    func comboBoxSelectionDidChange(notification: NSNotification) {
-        print("Woohoo, it changed")
+    func comboBoxSelectionDidChange(_ notification: NSNotification) {
+        print("It changed");
     }
     
     func SetupServices() {
         
-        let sortBy = SortBy.objectValueOfSelectedItem;
-        let sortHow = SortHow.objectValueOfSelectedItem;
+        let sortBy = SortBy.selectedItem?.title;
+        let sortHow = SortHow.selectedItem?.title;
+        var filterFor = SearchFor.stringValue;
+        filterFor = filterFor.trimmingCharacters(in: .whitespacesAndNewlines);
         
         let serviceListView = NSStackView(frame: NSRect(x: 0, y: 0, width: self.view.frame.width-50, height: 70));
         serviceListView.orientation = .vertical;
@@ -557,12 +579,44 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         if (self.identity.isEnrolled) {
             let rowHeight = 40;
             var index = 0;
-            for service in self.identity.services {
-                let serviceItem = ServiceListItem();
-                serviceItem.SetService(service: service, vc: self);
-                serviceItem.frame = CGRect(x: 0, y: CGFloat(index*40), width: 300, height: 40);
-                serviceListView.addArrangedSubview(serviceItem);
-                index = index + 1;
+            var services = self.identity.services;
+            
+            if (sortBy=="Name") {
+                if (sortHow=="Desc") {
+                    services = services.sorted(by: { ($0.name ?? "") > ($1.name ?? "") })
+                } else {
+                    services = services.sorted(by: { ($0.name ?? "") < ($1.name ?? "") })
+                }
+            } else if (sortBy=="Address") {
+                if (sortHow=="Desc") {
+                    services = services.sorted(by: { ($0.addresses ?? "") > ($1.addresses ?? "") })
+                } else {
+                    services = services.sorted(by: { ($0.addresses ?? "") < ($1.addresses ?? "" ) })
+                }
+            } else if (sortBy=="Port") {
+                if (sortHow=="Desc") {
+                    services = services.sorted(by: { ($0.portRanges ?? "") > ($1.portRanges ?? "") })
+                } else {
+                    services = services.sorted(by: { ($0.portRanges ?? "") < ($1.portRanges ?? "") })
+                }
+            } else if (sortBy=="Protocol") {
+                if (sortHow=="Desc") {
+                    services = services.sorted(by: { ($0.protocols ?? "") > ($1.protocols ?? "") })
+                } else {
+                    services = services.sorted(by: { ($0.protocols ?? "") < ($1.protocols ?? "") })
+                }
+            }
+            
+            for service in services {
+                var name = service.name ?? "";
+                let valIndex = name.indexOf(string: filterFor)?.utf16Offset(in: name) ?? -1;
+                if (filterFor == "" || valIndex > -1) {
+                    let serviceItem = ServiceListItem();
+                    serviceItem.SetService(service: service, vc: self);
+                    serviceItem.frame = CGRect(x: 0, y: CGFloat(index*40), width: 300, height: 40);
+                    serviceListView.addArrangedSubview(serviceItem);
+                    index = index + 1;
+                }
             }
             let innerListHeight = CGFloat(index*40);
             ServiceListHeight.constant = innerListHeight;
@@ -1468,10 +1522,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     func ShowServiceDetails(service: ZitiService) {
         ServiceName.stringValue = service.name!;
-        UrlValue.stringValue = "\(service.protocols):\(service.addresses):\(service.portRanges)";
+        UrlValue.stringValue = "\(service.protocols!):\(service.addresses!):\(service.portRanges!)";
         AddressValue.stringValue = service.addresses!;
         PortValue.stringValue = service.portRanges!;
         ProtocolsValue.stringValue = service.protocols!;
+        showArea(state: "service");
     }
     
     
@@ -1539,6 +1594,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             view = AuthBox;
         case "recovery":
             view = RecoveryBox;
+        case "service":
+            view = ServiceBox;
         default:
             view = MenuBox;
         }
@@ -1608,7 +1665,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             state = "menu";
         } else if (state=="config"||state=="loglevel") {
             state = "advanced";
-        } else if (state=="mfa"||state=="recovery"||state=="auth") {
+        } else if (state=="mfa"||state=="recovery"||state=="auth"||state=="service") {
             state = "details";
         } else {
             state = "dashboard";

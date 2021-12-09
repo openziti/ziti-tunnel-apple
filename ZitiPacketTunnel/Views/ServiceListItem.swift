@@ -79,6 +79,7 @@ class ServiceListItem: NSView {
     }
     
     @IBAction func ShowDetails(_ sender: NSClickGestureRecognizer) {
+        self.vc.ShowServiceDetails(service: self.service);
     }
     
     @IBAction func DoMfa(_ sender: NSClickGestureRecognizer) {

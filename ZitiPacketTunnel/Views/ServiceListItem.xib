@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -138,6 +138,13 @@
                                             <constraint firstAttribute="height" constant="20" id="WYP-Ya-xOj"/>
                                             <constraint firstAttribute="width" constant="20" id="emd-iM-N68"/>
                                         </constraints>
+                                        <gestureRecognizers>
+                                            <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="64f-Il-brJ" userLabel="HandleMfa">
+                                                <connections>
+                                                    <action selector="DoMfa:" target="-2" id="lix-5b-LwZ"/>
+                                                </connections>
+                                            </clickGestureRecognizer>
+                                        </gestureRecognizers>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="timer" id="JTp-pq-Tug"/>
                                     </imageView>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rmB-wG-5fh" userLabel="MfaImage">
@@ -149,7 +156,7 @@
                                         <gestureRecognizers>
                                             <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="pW3-CG-M00" userLabel="DoMfa">
                                                 <connections>
-                                                    <action selector="DoMfa:" target="c22-O7-iKe" id="eVU-zj-MPn"/>
+                                                    <action selector="DoMfa:" target="-2" id="0gD-cz-hpl"/>
                                                 </connections>
                                             </clickGestureRecognizer>
                                         </gestureRecognizers>
@@ -192,7 +199,7 @@
                                 <gestureRecognizers>
                                     <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="k65-ae-fYT" userLabel="ShowDetails">
                                         <connections>
-                                            <action selector="ShowDetails:" target="c22-O7-iKe" id="tAf-nP-LBO"/>
+                                            <action selector="ShowDetails:" target="-2" id="u54-Ml-9pV"/>
                                         </connections>
                                     </clickGestureRecognizer>
                                 </gestureRecognizers>
