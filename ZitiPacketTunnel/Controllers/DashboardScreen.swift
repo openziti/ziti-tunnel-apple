@@ -1288,7 +1288,33 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func SaveClicked(_ sender: NSClickGestureRecognizer) {
-        // Prompt to save to file
+        let dialog = NSSavePanel();
+
+        dialog.title = "Choose Directory To Save Codes";
+        dialog.showsResizeIndicator = true;
+        dialog.showsHiddenFiles = false;
+        dialog.nameFieldStringValue = self.identity.name+"-Recovery.txt";
+
+        if (dialog.runModal() ==  NSApplication.ModalResponse.OK) {
+            let result = dialog.url
+
+            if (result != nil) {
+                let path: String = result!.path;
+                var codeString = "";
+                for code in self.codes {
+                    codeString += code+"\n";
+                }
+                let filename = result!.standardizedFileURL
+                do {
+                    try codeString.write(to: filename, atomically: false, encoding: String.Encoding.utf8)
+                } catch {
+                    let errors = error;
+                    print("Unexpected error: \(errors).")
+                }
+            }
+        } else {
+            return
+        }
     }
     
     
@@ -1306,14 +1332,17 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     var mfaUrl:String = "";
     @IBOutlet var BarCode: NSImageView!
     @IBOutlet var SecretCode: NSTextField!
+    @IBOutlet var SecretCodeArea: NSStackView!
     @IBOutlet var SecretToggle: NSTextField!
     @IBOutlet var LinkButton: NSTextField!
     @IBOutlet var MFACloseButton: NSImageView!
     @IBOutlet var SetupAuthCode: NSTextField!
     @IBOutlet var AuthSetupButton: NSBox!
     @IBOutlet var SetupAuthCodeText: NSTextField!
+    @IBOutlet var MfaSubTitle: NSTextField!
     
     func ShowMFASetup() {
+        MfaSubTitle.stringValue = self.identity.name;
         let msg = IpcMfaEnrollRequestMessage(self.identity.id)
         tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
             DispatchQueue.main.async {
@@ -1328,15 +1357,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                     return
                 }
                 
-                self.identity.mfaEnabled = true
-                self.identity.mfaVerified = mfaEnrollment.isVerified
-                _ = self.zidMgr.zidStore.store(self.identity);
-                
-                if !self.identity.isMfaVerified {
-                    self.VerifyMfa(self.identity, mfaEnrollment)
-                } else {
-                    self.ShowDetails();
-                }
+                self.VerifyMfa(self.identity, mfaEnrollment);
             }
         }
     }
@@ -1350,7 +1371,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.mfaUrl = provisioningUrl;
         let parts = provisioningUrl.components(separatedBy: "/")
         let secret = parts.last;
-        SecretCode.stringValue = secret!;
+        let secretParts = secret?.components(separatedBy: "=");
+        SecretCode.stringValue = (secretParts?.last!)!;
         
         self.codes = mfaEnrollment.recoveryCodes!;
         
@@ -1389,10 +1411,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 }
                 
                 // Success!
-                self.identity.mfaVerified = true
-                self.identity.lastMfaAuth = Date()
+                self.identity.mfaEnabled = true;
+                self.identity.mfaVerified = true;
+                self.identity.lastMfaAuth = Date();
                 _ = self.zidMgr.zidStore.store(self.identity);
-                self.ShowDetails();
+                self.Close(sender);
                 
                 self.ShowRecovery();
             }
@@ -1438,11 +1461,11 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBAction func SecretClicked(_ sender: NSClickGestureRecognizer) {
         if (BarCode.isHidden) {
             BarCode.isHidden = false;
-            SecretCode.isHidden = true;
+            SecretCodeArea.isHidden = true;
             SecretToggle.stringValue = "Show Secret";
         } else {
             BarCode.isHidden = true;
-            SecretCode.isHidden = false;
+            SecretCodeArea.isHidden = false;
             SecretToggle.stringValue = "Show QR Code";
         }
     }
@@ -1526,6 +1549,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         AddressValue.stringValue = service.addresses!;
         PortValue.stringValue = service.portRanges!;
         ProtocolsValue.stringValue = service.protocols!;
+        var checks = "N/A";
+        for checkSet in service.postureQuerySets ?? [] {
+            for posture in checkSet.postureQueries ?? [] {
+                checks += posture.description;
+                
+            }
+        }
+        PostureInfo.stringValue = checks;
         showArea(state: "service");
     }
     
