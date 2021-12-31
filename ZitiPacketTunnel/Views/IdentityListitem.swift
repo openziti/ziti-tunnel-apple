@@ -18,6 +18,7 @@ import Cocoa
 import CZiti
 import AppKit
 import SwiftUI
+import CryptoKit
 
 @IBDesignable
 class IdentityListitem: NSView {
@@ -39,6 +40,7 @@ class IdentityListitem: NSView {
     var timer = Timer();
     var vc:DashboardScreen!;
     let XIB = "IdentityListItem";
+    var isMfaRequired = false;
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -67,7 +69,11 @@ class IdentityListitem: NSView {
                 self.vc.ShowIdentity(zid: self.zid);
             }
         } else {
-            self.vc.ShowIdentity(zid: self.zid);
+            if (self.isMfaRequired) {
+                self.vc.identity = self.zid;
+            } else {
+                self.vc.ShowIdentity(zid: self.zid);
+            }
         }
     }
     
@@ -145,6 +151,7 @@ class IdentityListitem: NSView {
             }
         }
         if (needsMfa > 0) {
+            self.isMfaRequired = true;
             if (hasMfa == 0) {
                 // Nothin is authorized, show authorize
                 self.ShowImage(name: "authorize");

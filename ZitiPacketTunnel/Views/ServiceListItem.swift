@@ -36,7 +36,10 @@ class ServiceListItem: NSView {
     var service:ZitiService!;
     var vc:DashboardScreen!;
     var tunnelMgr = TunnelMgr.shared;
+    var timer = Timer();
     let XIB = "ServiceListItem";
+    var timeLeft = -1;
+    var timeTotal = -1;
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -75,7 +78,71 @@ class ServiceListItem: NSView {
         WarningImage.isHidden = true;
         MfaImage.isHidden = true;
         TimeoutImage.isHidden = true;
-        // Add Mfa posture check for showing which image
+        
+        for checkSet in service.postureQuerySets ?? [] {
+            for posture in checkSet.postureQueries ?? [] {
+                let type = posture.queryType ?? "";
+                
+                if (type == "MFA") {
+                    if (!(posture.isPassing ?? true)) {
+                        MfaImage.isHidden = false;
+                        MfaImage.toolTip =  " \(type) Failing";
+                        break;
+                    } else {
+                        if (posture.timeout! > 0) {
+                            if (posture.timeoutRemaining! > 0) {
+                                timeLeft = Int(posture.timeoutRemaining ?? 0);
+                                timeTotal = Int(posture.timeout ?? 0);
+                                timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
+                            } else {
+                                WarningImage.isHidden = true;
+                                MfaImage.isHidden = true;
+                                TimeoutImage.isHidden = true;
+                                
+                                MfaImage.isHidden = false;
+                                MfaImage.toolTip =  " \(type) Failing";
+                            }
+                        }
+                    }
+                } else {
+                    if (!(posture.isPassing ?? true)) {
+                        WarningImage.isHidden = false;
+                        WarningImage.toolTip =  " \(type) Failing";
+                    }
+                }
+            }
+        }
+    }
+    
+    func secondsToHoursMinutesSeconds(_ seconds: Int) -> (Int, Int, Int) {
+        return (seconds / 3600, (seconds % 3600) / 60, (seconds % 3600) % 60)
+    }
+    
+    public func SetTimedOut() {
+        MfaImage.isHidden = false;
+        MfaImage.toolTip =  "MFA Timed Out";
+    }
+    
+    @objc public func UpdateTimer() {
+        if (self.timeLeft <= 2800) {
+            WarningImage.isHidden = true;
+            MfaImage.isHidden = true;
+            TimeoutImage.isHidden = true;
+            
+            if (self.timeLeft > 0) {
+                self.timeLeft -= 1;
+                let (h, m, s) = secondsToHoursMinutesSeconds(self.timeLeft);
+                TimeoutImage.toolTip = ("\(h) Hours, \(m) Minutes, \(s) Seconds");
+            } else {
+                SetTimedOut();
+            }
+        } else {
+            if (self.timeLeft > 0) {
+                self.timeLeft -= 1;
+            } else {
+                SetTimedOut();
+            }
+        }
     }
     
     @IBAction func ShowDetails(_ sender: NSClickGestureRecognizer) {

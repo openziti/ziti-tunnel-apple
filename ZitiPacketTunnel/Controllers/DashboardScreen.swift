@@ -183,11 +183,20 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 zLog.error("Unable to retrieve IPC message from event notification")
                 return
             }
-            guard msg.meta.msgType == .MfaAuthQuery, let zidStr = msg.meta.zid,
-                  let zid = self.zidMgr.zids.first(where: { $0.id == zidStr }) else {
-                zLog.error("Unsupported IPC message type \(msg.meta.msgType) for id \(msg.meta.zid ?? "nil")")
-                return
+            
+            let zidStr = msg.meta.zid;
+            guard let zid = self.zidMgr.zids.first(where: { $0.id == zidStr }) else {
+                return;
             }
+            
+            if (msg.meta.msgType == .MfaAuthQuery) {
+                zid.mfaEnabled = true;
+            }
+            
+            self.zidMgr.zidStore.store(zid);
+            self.UpdateList();
+            
+            //zid.mfaEnabled = msg.meta.m
         }
             //DispatchQueue.main.async {
             //    self.doMfaAuth(zid)
@@ -255,7 +264,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        // self.UpdateList();
+        self.UpdateList();
     }
     
     func onRemovedId(_ idString: String) {
@@ -430,7 +439,12 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                     do {
                         try self.zidMgr.insertFromJWT(panel.urls[0], at: 0)
                         DispatchQueue.main.async {
-                            self.UpdateList();
+                            for zid in self.zidMgr.zids {
+                                if (!zid.enrolled!) {
+                                    self.identity = zid;
+                                    self.DoEnroll();
+                                }
+                            }
                         }
                     } catch {
                         DispatchQueue.main.async {
@@ -673,11 +687,13 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBAction func Forget(_ sender: NSClickGestureRecognizer) {
         let text = "Deleting identity \(identity.name) (\(identity.id)) can't be undone"
         if dialogOKCancel(question: "Are you sure?", text: text) == true {
-            let error = zidMgr.zidStore.remove(identity)
+            let error = zidMgr.zidStore.remove(self.identity)
             guard error == nil else {
                 dialogAlert("Unable to remove identity", error!.localizedDescription)
                 return
             }
+            _ = self.zidMgr.loadZids();
+            self.tunnelMgr.restartTunnel();
             self.UpdateList();
             Close(sender);
         }
@@ -703,10 +719,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         tunnelMgr.restartTunnel();
     }
     
-    /**
-     Enroll the currnt identity
-     */
-    @IBAction func Enroll(_ sender: Any) {
+    func DoEnroll() {
         EnrollButton.isHidden = true;
         enrollingIds.append(identity);
         
@@ -740,10 +753,17 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                     identity.enrolled = true;
                     _ = zidMgr.zidStore.store(identity);
                     self.tunnelMgr.restartTunnel();
-                    self.ShowDetails();
                 }
             }
         }
+        
+    }
+    
+    /**
+     Enroll the currnt identity
+     */
+    @IBAction func Enroll(_ sender: Any) {
+        DoEnroll();
     }
     
     
@@ -1549,12 +1569,19 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         AddressValue.stringValue = service.addresses!;
         PortValue.stringValue = service.portRanges!;
         ProtocolsValue.stringValue = service.protocols!;
-        var checks = "N/A";
+        var checks = "";
         for checkSet in service.postureQuerySets ?? [] {
             for posture in checkSet.postureQueries ?? [] {
-                checks += posture.description;
-                
+                checks += posture.queryType!;
+                if (posture.isPassing!) {
+                    checks += ": Passing";
+                } else {
+                    checks += ": Failing";
+                }
             }
+        }
+        if (checks.count==0) {
+            checks = "N/A";
         }
         PostureInfo.stringValue = checks;
         showArea(state: "service");

@@ -119,9 +119,9 @@
                             </customSpacing>
                         </stackView>
                         <box boxType="custom" borderWidth="0.0" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="PNe-PF-f7Y" userLabel="StatusColumn">
-                            <rect key="frame" x="220" y="0.0" width="40" height="40"/>
+                            <rect key="frame" x="220" y="0.0" width="30" height="40"/>
                             <view key="contentView" id="sb3-Gj-Aye">
-                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="40"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="yqH-n0-S29" userLabel="WarningImage">
@@ -173,18 +173,18 @@
                                 </constraints>
                             </view>
                             <constraints>
-                                <constraint firstAttribute="width" constant="40" id="7OW-Ul-JnJ"/>
+                                <constraint firstAttribute="width" constant="30" id="7OW-Ul-JnJ"/>
                                 <constraint firstAttribute="height" constant="40" id="ajb-fd-rWs"/>
                             </constraints>
                         </box>
                         <box boxType="custom" borderWidth="0.0" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Z3x-ow-Goj" userLabel="DetailsColumn">
-                            <rect key="frame" x="260" y="0.0" width="40" height="40"/>
+                            <rect key="frame" x="250" y="0.0" width="30" height="40"/>
                             <view key="contentView" id="iZl-En-bvY" userLabel="DetailsArea">
-                                <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="40"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="3IE-Bg-9kW" userLabel="DetailsImage">
-                                        <rect key="frame" x="10" y="10" width="20" height="20"/>
+                                        <rect key="frame" x="0.0" y="10" width="20" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="20" id="ZJB-wL-IoS"/>
                                             <constraint firstAttribute="height" constant="20" id="hQZ-Ex-o7g"/>
@@ -206,7 +206,7 @@
                             </view>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="BNI-KG-MCi"/>
-                                <constraint firstAttribute="width" constant="40" id="dLg-dx-7aB"/>
+                                <constraint firstAttribute="width" constant="30" id="dLg-dx-7aB"/>
                             </constraints>
                         </box>
                     </subviews>
