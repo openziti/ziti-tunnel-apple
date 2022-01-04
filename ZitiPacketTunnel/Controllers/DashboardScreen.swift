@@ -62,6 +62,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      The Screens of the application controlled by the state
      */
     var state = "dashboard";
+    var prevState = "dashboard";
     @IBOutlet var DashboardBox: NSBox!
     @IBOutlet var MenuBox: NSBox!
     @IBOutlet var AdvancedBox: NSBox!
@@ -766,14 +767,36 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         DoEnroll();
     }
     
-    
     @IBAction func AuthClicked(_ sender: NSClickGestureRecognizer) {
-        ShowAuthentication();
+        ShowAuthentication(identity: self.identity);
     }
     
     
     @IBAction func ShowRecoveryScreen(_ sender: NSClickGestureRecognizer) {
-        showArea(state: "recovery");
+        if let code = self.dialogForString(question: "Authorize MFA\n\(self.identity.name):\(self.identity.id)", text: "Enter your authentication code") {
+            let msg = IpcMfaGetRecoveryCodesRequestMessage(self.identity.id, code)
+            self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                DispatchQueue.main.async {
+                    guard zErr == nil else {
+                        self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                        return
+                    }
+                    guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                          let status = codesMsg.status else {
+                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
+                        return
+                    }
+                    guard status == Ziti.ZITI_OK else {
+                        self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
+                        return
+                    }
+                    
+                    // Success!
+                    self.codes = codesMsg.codes ?? [String]();
+                    self.ShowRecovery();
+                }
+            }
+        }
     }
     
     @IBAction func ToggleMFA(_ sender: NSClickGestureRecognizer) {
@@ -1304,7 +1327,30 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func RegenClicked(_ sender: NSClickGestureRecognizer) {
-        // Call recovery code regen service
+        if let code = self.dialogForString(question: "Authorize MFA\n\(self.identity.name):\(self.identity.id)", text: "Enter your authentication code") {
+            let msg = IpcMfaNewRecoveryCodesRequestMessage(self.identity.id, code)
+            self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                DispatchQueue.main.async {
+                    guard zErr == nil else {
+                        self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                        return
+                    }
+                    guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                          let status = codesMsg.status else {
+                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
+                        return
+                    }
+                    guard status == Ziti.ZITI_OK else {
+                        self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status));
+                        return
+                    }
+                    
+                    // Success!
+                    self.codes = codesMsg.codes ?? [String]();
+                    self.ShowRecovery();
+                }
+            }
+        }
     }
     
     @IBAction func SaveClicked(_ sender: NSClickGestureRecognizer) {
@@ -1510,7 +1556,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var AuthCloseButton: NSImageView!
     @IBOutlet var AuthCodeText: NSTextField!
     
-    func ShowAuthentication() {
+    func ShowAuthentication(identity:ZitiIdentity) {
+        self.identity = identity;
         AuthCodeText.stringValue = "";
         showArea(state: "auth");
     }
@@ -1538,8 +1585,10 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                     
                     // Success!
                     self.identity.lastMfaAuth = Date();
+                    self.identity.mfaEnabled = true;
+                    self.identity.mfaVerified = true;
                     _ = self.zidMgr.zidStore.store(self.identity);
-                    self.ShowDetails();
+                    self.Close(sender);
                 }
             }
         } else {
@@ -1723,8 +1772,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             state = "menu";
         } else if (state=="config"||state=="loglevel") {
             state = "advanced";
-        } else if (state=="mfa"||state=="recovery"||state=="auth"||state=="service") {
+        } else if (state=="mfa"||state=="recovery"||state=="service") {
             state = "details";
+        } else if (state=="auth") {
+            if (DetailsBox.isHidden) {
+                state = "dashboard";
+            } else {
+                state = "details";
+            }
         } else {
             state = "dashboard";
         }
@@ -1808,7 +1863,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                     }
                     guard status == Ziti.ZITI_OK else {
                         self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
-                        self.onMfaCodes(sender)
                         return
                     }
                     

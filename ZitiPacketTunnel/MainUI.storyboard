@@ -2638,7 +2638,11 @@
                                                                             <constraint firstAttribute="width" constant="25" id="iIk-g0-3Ob"/>
                                                                         </constraints>
                                                                         <gestureRecognizers>
-                                                                            <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="szO-OU-dFY" userLabel="AuthClick"/>
+                                                                            <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="szO-OU-dFY" userLabel="AuthClick">
+                                                                                <connections>
+                                                                                    <action selector="AuthClicked:" target="UHm-9v-ehL" id="bE1-qo-8gv"/>
+                                                                                </connections>
+                                                                            </clickGestureRecognizer>
                                                                         </gestureRecognizers>
                                                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="mfaoff" id="CRq-e2-sgY"/>
                                                                     </imageView>
@@ -3716,10 +3720,10 @@
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yuY-qJ-ClI" userLabel="AuthStackView">
-                                                                            <rect key="frame" x="5" y="5" width="308" height="168"/>
+                                                                            <rect key="frame" x="5" y="5" width="308" height="144"/>
                                                                             <subviews>
                                                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bP8-Ix-wCL" userLabel="MenuArea">
-                                                                                    <rect key="frame" x="10" y="128" width="288" height="40"/>
+                                                                                    <rect key="frame" x="10" y="104" width="288" height="40"/>
                                                                                     <subviews>
                                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w7T-Fv-FYZ">
                                                                                             <rect key="frame" x="-2" y="12" width="24" height="16"/>
@@ -3752,7 +3756,7 @@
                                                                                             <gestureRecognizers>
                                                                                                 <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="Q9A-M8-qT9" userLabel="CloseGesture">
                                                                                                     <connections>
-                                                                                                        <action selector="Close:" target="UHm-9v-ehL" id="eGE-FL-eVz"/>
+                                                                                                        <action selector="Close:" target="UHm-9v-ehL" id="7j0-VI-U4r"/>
                                                                                                     </connections>
                                                                                                 </clickGestureRecognizer>
                                                                                             </gestureRecognizers>
@@ -3775,7 +3779,7 @@
                                                                                     </customSpacing>
                                                                                 </stackView>
                                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QPO-3B-i7q" userLabel="AuthSubTitle">
-                                                                                    <rect key="frame" x="-2" y="118" width="312" height="20"/>
+                                                                                    <rect key="frame" x="-2" y="94" width="312" height="20"/>
                                                                                     <constraints>
                                                                                         <constraint firstAttribute="height" constant="20" id="Ejy-C8-gfE"/>
                                                                                     </constraints>
@@ -3786,13 +3790,13 @@
                                                                                     </textFieldCell>
                                                                                 </textField>
                                                                                 <box boxType="custom" cornerRadius="7" translatesAutoresizingMaskIntoConstraints="NO" id="wLV-sv-RED" userLabel="AuthBox">
-                                                                                    <rect key="frame" x="10" y="43" width="288" height="67"/>
+                                                                                    <rect key="frame" x="10" y="-1" width="288" height="87"/>
                                                                                     <view key="contentView" id="W1c-3s-wcr">
-                                                                                        <rect key="frame" x="1" y="1" width="286" height="65"/>
+                                                                                        <rect key="frame" x="1" y="1" width="286" height="85"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                         <subviews>
                                                                                             <textField verticalHuggingPriority="750" contentType="oneTimeCode" translatesAutoresizingMaskIntoConstraints="NO" id="1sz-MD-lGW" userLabel="AuthCode">
-                                                                                                <rect key="frame" x="3" y="5" width="280" height="55"/>
+                                                                                                <rect key="frame" x="3" y="5" width="280" height="75"/>
                                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" alignment="center" placeholderString="code" usesSingleLineMode="YES" id="gpS-Ci-3WD">
                                                                                                     <font key="font" size="40" name="OpenSans-Regular"/>
                                                                                                     <color key="textColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -3815,9 +3819,39 @@
                                                                                             <constraint firstItem="1sz-MD-lGW" firstAttribute="top" secondItem="W1c-3s-wcr" secondAttribute="top" constant="5" id="tRt-uL-g65"/>
                                                                                         </constraints>
                                                                                     </view>
+                                                                                    <constraints>
+                                                                                        <constraint firstAttribute="height" constant="87" id="XPp-ul-tF5"/>
+                                                                                    </constraints>
                                                                                     <color key="borderColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                                     <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 </box>
+                                                                                <view id="cfk-ua-yzR">
+                                                                                    <rect key="frame" x="40" y="43" width="228" height="35"/>
+                                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                                    <subviews>
+                                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="B2G-uZ-WQg">
+                                                                                            <rect key="frame" x="-2" y="9" width="232" height="17"/>
+                                                                                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Authenticate" id="WYH-O6-ES1">
+                                                                                                <font key="font" usesAppearanceFont="YES"/>
+                                                                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                            </textFieldCell>
+                                                                                        </textField>
+                                                                                    </subviews>
+                                                                                    <constraints>
+                                                                                        <constraint firstItem="B2G-uZ-WQg" firstAttribute="leading" secondItem="cfk-ua-yzR" secondAttribute="leading" id="3jd-hl-ww6"/>
+                                                                                        <constraint firstItem="B2G-uZ-WQg" firstAttribute="centerY" secondItem="cfk-ua-yzR" secondAttribute="centerY" id="Bed-ki-0cT"/>
+                                                                                        <constraint firstItem="B2G-uZ-WQg" firstAttribute="top" secondItem="cfk-ua-yzR" secondAttribute="top" constant="9" id="Tvn-vL-f9J"/>
+                                                                                        <constraint firstAttribute="trailing" secondItem="B2G-uZ-WQg" secondAttribute="trailing" id="oiV-dz-Vfv"/>
+                                                                                    </constraints>
+                                                                                    <gestureRecognizers>
+                                                                                        <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="4RC-Vc-4lr" userLabel="AuthClick">
+                                                                                            <connections>
+                                                                                                <action selector="AuthorizeClicked:" target="UHm-9v-ehL" id="dFW-Ut-ndN"/>
+                                                                                            </connections>
+                                                                                        </clickGestureRecognizer>
+                                                                                    </gestureRecognizers>
+                                                                                </view>
                                                                                 <box boxType="custom" borderType="none" cornerRadius="7" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="Vhg-pI-hnO" userLabel="AuthButton">
                                                                                     <rect key="frame" x="40" y="0.0" width="228" height="35"/>
                                                                                     <view key="contentView" id="R5z-At-Aah">
@@ -3869,8 +3903,10 @@
                                                                                 <integer value="1000"/>
                                                                                 <integer value="1000"/>
                                                                                 <integer value="1000"/>
+                                                                                <integer value="1000"/>
                                                                             </visibilityPriorities>
                                                                             <customSpacing>
+                                                                                <real value="3.4028234663852886e+38"/>
                                                                                 <real value="3.4028234663852886e+38"/>
                                                                                 <real value="3.4028234663852886e+38"/>
                                                                                 <real value="3.4028234663852886e+38"/>
@@ -3891,6 +3927,9 @@
                                                                 <constraints>
                                                                     <constraint firstAttribute="height" constant="180" id="pg1-eW-xIm"/>
                                                                 </constraints>
+                                                                <shadow key="shadow" blurRadius="5">
+                                                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                </shadow>
                                                                 <color key="borderColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="fillColor" red="0.054901960780000002" green="0.062745098040000002" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             </box>
