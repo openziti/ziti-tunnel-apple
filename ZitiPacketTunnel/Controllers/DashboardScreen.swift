@@ -33,7 +33,7 @@ extension String {
     }
 }
 
-class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDelegate, NSComboBoxDelegate {
+class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDelegate, NSComboBoxDelegate, NSTextFieldDelegate {
     
     /**
      Ziti SDK Variables
@@ -173,6 +173,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         MFAToggle.layer?.cornerRadius = 10;
         
         self.HideAll();
+        self.AuthCodeText.delegate = self;
         
         ProgressModal.isHidden = true;
         ProgressModal.alphaValue = 0;
@@ -236,6 +237,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             IdentityListHeight.constant = CGFloat(0);
             IdListHeight.constant = CGFloat(0);
             SetWindowHeight(size: CGFloat(400));
+            self.HideAll();
             break
         case .invalid:
             TimerLabel.stringValue = "Invalid!";
@@ -262,6 +264,30 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             zLog.warn("Unknown tunnel status");
             break
         }
+    }
+    
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        if (commandSelector == #selector(NSResponder.insertNewline(_:))) {
+            // Do something against ENTER key
+            print("enter");
+            self.DoAuthorize()
+            return true
+        } else if (commandSelector == #selector(NSResponder.deleteForward(_:))) {
+            // Do something against DELETE key
+            return true
+        } else if (commandSelector == #selector(NSResponder.deleteBackward(_:))) {
+            // Do something against BACKSPACE key
+            return true
+        } else if (commandSelector == #selector(NSResponder.insertTab(_:))) {
+            // Do something against TAB key
+            return true
+        } else if (commandSelector == #selector(NSResponder.cancelOperation(_:))) {
+            // Do something against ESCAPE key
+            return true
+        }
+        
+        // return true if the action was handled; otherwise false
+        return false
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
@@ -768,35 +794,12 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func AuthClicked(_ sender: NSClickGestureRecognizer) {
-        ShowAuthentication(identity: self.identity);
+        self.ShowAuthentication(identity: self.identity, type: "auth");
     }
     
     
     @IBAction func ShowRecoveryScreen(_ sender: NSClickGestureRecognizer) {
-        if let code = self.dialogForString(question: "Authorize MFA\n\(self.identity.name):\(self.identity.id)", text: "Enter your authentication code") {
-            let msg = IpcMfaGetRecoveryCodesRequestMessage(self.identity.id, code)
-            self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-                DispatchQueue.main.async {
-                    guard zErr == nil else {
-                        self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
-                        return
-                    }
-                    guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
-                          let status = codesMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
-                        return
-                    }
-                    guard status == Ziti.ZITI_OK else {
-                        self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
-                        return
-                    }
-                    
-                    // Success!
-                    self.codes = codesMsg.codes ?? [String]();
-                    self.ShowRecovery();
-                }
-            }
-        }
+        self.ShowAuthentication(identity: self.identity, type: "recovery");
     }
     
     @IBAction func ToggleMFA(_ sender: NSClickGestureRecognizer) {
@@ -1327,30 +1330,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     @IBAction func RegenClicked(_ sender: NSClickGestureRecognizer) {
-        if let code = self.dialogForString(question: "Authorize MFA\n\(self.identity.name):\(self.identity.id)", text: "Enter your authentication code") {
-            let msg = IpcMfaNewRecoveryCodesRequestMessage(self.identity.id, code)
-            self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-                DispatchQueue.main.async {
-                    guard zErr == nil else {
-                        self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
-                        return
-                    }
-                    guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
-                          let status = codesMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
-                        return
-                    }
-                    guard status == Ziti.ZITI_OK else {
-                        self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status));
-                        return
-                    }
-                    
-                    // Success!
-                    self.codes = codesMsg.codes ?? [String]();
-                    self.ShowRecovery();
-                }
-            }
-        }
+        self.ShowAuthentication(identity: self.identity, type: "regen")
     }
     
     @IBAction func SaveClicked(_ sender: NSClickGestureRecognizer) {
@@ -1555,45 +1535,100 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var AuthCode: NSTextField!
     @IBOutlet var AuthCloseButton: NSImageView!
     @IBOutlet var AuthCodeText: NSTextField!
+    private var authType: String = "";
     
-    func ShowAuthentication(identity:ZitiIdentity) {
+    func ShowAuthentication(identity:ZitiIdentity, type:String) {
+        self.authType = type;
         self.identity = identity;
         AuthCodeText.stringValue = "";
         showArea(state: "auth");
     }
     
-    @IBAction func AuthorizeClicked(_ sender: NSClickGestureRecognizer) {
+    func DoAuthorize() {
         let code = AuthCodeText.stringValue;
         let authCode = code.trimmingCharacters(in: CharacterSet(charactersIn: "0123456789.").inverted)
         AuthCodeText.stringValue = authCode;
         if (authCode.count == 6 || authCode.count == 8) {
-            let msg = IpcMfaAuthQueryResponseMessage(self.identity.id, code)
-            self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-                DispatchQueue.main.async {
-                    guard zErr == nil else {
-                        self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
-                        return
+            if (self.authType=="recovery") {
+                let msg = IpcMfaGetRecoveryCodesRequestMessage(self.identity.id, authCode);
+                self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                    DispatchQueue.main.async {
+                        guard zErr == nil else {
+                            self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                            return
+                        }
+                        guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                              let status = codesMsg.status else {
+                            self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
+                            return
+                        }
+                        guard status == Ziti.ZITI_OK else {
+                            self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
+                            return
+                        }
+                        
+                        self.codes = codesMsg.codes ?? [String]();
+                        self.ShowRecovery();
+                        
                     }
-                    guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage, let status = statusMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse auth response message")
-                        return
+                }
+            } else if (self.authType=="regen") {
+                let msg = IpcMfaNewRecoveryCodesRequestMessage(self.identity.id, authCode);
+                self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                    DispatchQueue.main.async {
+                        guard zErr == nil else {
+                            self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                            return
+                        }
+                        guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                              let status = codesMsg.status else {
+                                  self.dialogAlert("IPC Error", "Unable to parse recovery codees response message");
+                                  self.DoClose();
+                                  self.DoClose();
+                            return
+                        }
+                        guard status == Ziti.ZITI_OK else {
+                            self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
+                            return
+                        }
+                            
+                        self.codes = codesMsg.codes ?? [String]();
+                        self.ShowRecovery();
                     }
-                    guard status == Ziti.ZITI_OK else {
-                        self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
-                        return
+                }
+            } else {
+                let msg = IpcMfaAuthQueryResponseMessage(self.identity.id, code);
+                self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                    DispatchQueue.main.async {
+                        guard zErr == nil else {
+                            self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                            return
+                        }
+                        guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage, let status = statusMsg.status else {
+                            self.dialogAlert("IPC Error", "Unable to parse auth response message")
+                            return
+                        }
+                        guard status == Ziti.ZITI_OK else {
+                            self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
+                            return
+                        }
+                        
+                        self.identity.lastMfaAuth = Date();
+                        self.identity.mfaEnabled = true;
+                        self.identity.mfaVerified = true;
+                        _ = self.zidMgr.zidStore.store(self.identity);
+                        self.DoClose();
                     }
-                    
-                    // Success!
-                    self.identity.lastMfaAuth = Date();
-                    self.identity.mfaEnabled = true;
-                    self.identity.mfaVerified = true;
-                    _ = self.zidMgr.zidStore.store(self.identity);
-                    self.Close(sender);
                 }
             }
         } else {
             self.dialogAlert("Invalid", "Invalid Authorization Code")
         }
+        
+    }
+    
+    @IBAction func AuthorizeClicked(_ sender: NSClickGestureRecognizer) {
+        DoAuthorize();
     }
     
     
@@ -1640,16 +1675,35 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     
     
+    @IBOutlet var AlertMessage: NSTextField!;
+    @IBOutlet var Blurb: NSBox!;
+    var blurbTimer = Timer();
+    
+    @IBAction func CloseAlert(_ sender: Any) {
+        CloseAlerts();
+    }
+    
+    @objc func CloseAlerts() {
+        Blurb.isHidden = true;
+        Blurb.alphaValue = 0;
+    }
     
     /**
      Pop a dialog message
      */
     func dialogAlert(_ msg:String, _ text:String? = nil) {
+        /*
         let alert = NSAlert()
         alert.messageText = msg
         alert.informativeText =  text ?? ""
         alert.alertStyle = NSAlert.Style.critical
         alert.runModal()
+         */
+        AlertMessage.stringValue = text ?? "";
+        AlertMessage.toolTip = msg+" "+text!;
+        Blurb.isHidden = false;
+        Blurb.alphaValue = 1;
+        self.blurbTimer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: (#selector(self.CloseAlerts)), userInfo: nil, repeats: true);
     }
     
     /**
@@ -1767,6 +1821,10 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Close the current view
      */
     @IBAction func Close(_ sender: NSClickGestureRecognizer) {
+        self.DoClose();
+    }
+    
+    func DoClose() {
         let view = GetStateView();
         if (state=="about"||state=="advanced") {
             state = "menu";

@@ -66,7 +66,7 @@ class IdentityListitem: NSView {
                 // Check if timing out
                 self.vc.ShowIdentity(zid: self.zid);
             } else {
-                self.vc.ShowAuthentication(identity: self.zid);
+                self.vc.ShowAuthentication(identity: self.zid, type: "auth");
             }
         } else {
             if (self.isMfaRequired) {

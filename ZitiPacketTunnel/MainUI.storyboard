@@ -3790,7 +3790,7 @@
                                                                                     </textFieldCell>
                                                                                 </textField>
                                                                                 <box boxType="custom" cornerRadius="7" translatesAutoresizingMaskIntoConstraints="NO" id="wLV-sv-RED" userLabel="AuthBox">
-                                                                                    <rect key="frame" x="10" y="-1" width="288" height="87"/>
+                                                                                    <rect key="frame" x="10" y="86" width="288" height="87"/>
                                                                                     <view key="contentView" id="W1c-3s-wcr">
                                                                                         <rect key="frame" x="1" y="1" width="286" height="85"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -4478,10 +4478,86 @@
                                             <color key="borderColor" name="ModalColor"/>
                                             <color key="fillColor" name="ModalColor"/>
                                         </box>
+                                        <box alphaValue="0.0" boxType="custom" cornerRadius="7" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Iox-U3-Dl8" userLabel="Blurb">
+                                            <rect key="frame" x="20" y="20" width="340" height="60"/>
+                                            <view key="contentView" id="uuq-n1-RHL">
+                                                <rect key="frame" x="1" y="1" width="338" height="58"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wZw-Fg-cbX" userLabel="BlurbStack">
+                                                        <rect key="frame" x="7" y="7" width="324" height="44"/>
+                                                        <subviews>
+                                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="kvF-dp-e9n" userLabel="AlertImage">
+                                                                <rect key="frame" x="5" y="5" width="34" height="34"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="height" constant="34" id="F8H-EH-bIZ"/>
+                                                                    <constraint firstAttribute="width" constant="34" id="MNe-c5-wL6"/>
+                                                                </constraints>
+                                                                <imageCell key="cell" alignment="left" imageScaling="proportionallyDown" image="Warning" id="PUk-It-YZY"/>
+                                                            </imageView>
+                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yVQ-6S-dcH">
+                                                                <rect key="frame" x="45" y="16" width="243" height="15"/>
+                                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="center" title="Message Text" usesSingleLineMode="YES" id="4Ux-0J-D4s">
+                                                                    <font key="font" size="11" name="OpenSans"/>
+                                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
+                                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="X67-Wo-SVh" userLabel="CloseAlertButton">
+                                                                <rect key="frame" x="294" y="12" width="20" height="20"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="width" constant="20" id="JNg-rS-0qZ"/>
+                                                                    <constraint firstAttribute="height" constant="20" id="i6q-wd-9Gy"/>
+                                                                </constraints>
+                                                                <gestureRecognizers>
+                                                                    <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="y4F-zP-ira" userLabel="CloseAlertAction">
+                                                                        <connections>
+                                                                            <action selector="CloseAlert:" target="UHm-9v-ehL" id="mbt-Nt-bp2"/>
+                                                                        </connections>
+                                                                    </clickGestureRecognizer>
+                                                                </gestureRecognizers>
+                                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="x" id="9ED-Oq-Vmv"/>
+                                                            </imageView>
+                                                        </subviews>
+                                                        <constraints>
+                                                            <constraint firstItem="kvF-dp-e9n" firstAttribute="top" secondItem="wZw-Fg-cbX" secondAttribute="top" constant="5" id="3NZ-HQ-yIX"/>
+                                                            <constraint firstItem="X67-Wo-SVh" firstAttribute="top" secondItem="wZw-Fg-cbX" secondAttribute="top" constant="12" id="GmT-Xv-mpk"/>
+                                                            <constraint firstItem="yVQ-6S-dcH" firstAttribute="top" secondItem="wZw-Fg-cbX" secondAttribute="top" constant="13" id="O1R-8J-ClW"/>
+                                                            <constraint firstAttribute="trailing" secondItem="X67-Wo-SVh" secondAttribute="trailing" constant="10" id="npJ-dA-HOR"/>
+                                                            <constraint firstItem="kvF-dp-e9n" firstAttribute="leading" secondItem="wZw-Fg-cbX" secondAttribute="leading" constant="5" id="t5k-V6-2dl"/>
+                                                        </constraints>
+                                                        <visibilityPriorities>
+                                                            <integer value="1000"/>
+                                                            <integer value="1000"/>
+                                                            <integer value="1000"/>
+                                                        </visibilityPriorities>
+                                                        <customSpacing>
+                                                            <real value="3.4028234663852886e+38"/>
+                                                            <real value="3.4028234663852886e+38"/>
+                                                            <real value="3.4028234663852886e+38"/>
+                                                        </customSpacing>
+                                                    </stackView>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="trailing" secondItem="wZw-Fg-cbX" secondAttribute="trailing" constant="7" id="7tx-xZ-AWr"/>
+                                                    <constraint firstItem="wZw-Fg-cbX" firstAttribute="top" secondItem="uuq-n1-RHL" secondAttribute="top" constant="7" id="Ucx-3n-dGY"/>
+                                                    <constraint firstItem="wZw-Fg-cbX" firstAttribute="leading" secondItem="uuq-n1-RHL" secondAttribute="leading" constant="7" id="qGH-Iu-qJA"/>
+                                                    <constraint firstAttribute="bottom" secondItem="wZw-Fg-cbX" secondAttribute="bottom" constant="7" id="wei-Uz-d96"/>
+                                                </constraints>
+                                            </view>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="60" id="8yw-Yg-VZB"/>
+                                            </constraints>
+                                            <shadow key="shadow" blurRadius="4">
+                                                <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            </shadow>
+                                            <color key="fillColor" name="WhiteColor"/>
+                                        </box>
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="0c2-wg-2hS" secondAttribute="trailing" id="2At-ih-Acn"/>
                                         <constraint firstItem="r1m-PG-WcY" firstAttribute="leading" secondItem="W3c-1e-2tO" secondAttribute="leading" id="2Fk-sC-rsE"/>
+                                        <constraint firstItem="Iox-U3-Dl8" firstAttribute="leading" secondItem="W3c-1e-2tO" secondAttribute="leading" constant="20" id="4oZ-d2-7Mq"/>
                                         <constraint firstAttribute="bottom" secondItem="Ayx-FD-cVQ" secondAttribute="bottom" id="5n8-qN-5mZ"/>
                                         <constraint firstAttribute="trailing" secondItem="JjY-hl-sY5" secondAttribute="trailing" id="627-qK-cdS"/>
                                         <constraint firstItem="Bmo-kS-tdU" firstAttribute="top" secondItem="W3c-1e-2tO" secondAttribute="top" id="6GR-cX-CPR"/>
@@ -4493,6 +4569,7 @@
                                         <constraint firstItem="JjY-hl-sY5" firstAttribute="leading" secondItem="W3c-1e-2tO" secondAttribute="leading" id="HXm-3g-YPI"/>
                                         <constraint firstAttribute="bottom" secondItem="r1m-PG-WcY" secondAttribute="bottom" id="IYk-1H-MwP"/>
                                         <constraint firstAttribute="trailing" secondItem="7OL-ln-fVN" secondAttribute="trailing" constant="-20" id="Ik5-Vt-cMw"/>
+                                        <constraint firstAttribute="bottom" secondItem="Iox-U3-Dl8" secondAttribute="bottom" constant="20" id="KyR-6V-q0Q"/>
                                         <constraint firstAttribute="trailing" secondItem="zpy-kv-rvg" secondAttribute="trailing" id="MWM-Rq-PX4"/>
                                         <constraint firstItem="F5c-GZ-U8e" firstAttribute="top" secondItem="W3c-1e-2tO" secondAttribute="top" id="NT8-Wh-W7w"/>
                                         <constraint firstAttribute="trailing" secondItem="Ayx-FD-cVQ" secondAttribute="trailing" id="ONf-Zj-QfV"/>
@@ -4501,6 +4578,7 @@
                                         <constraint firstItem="7OL-ln-fVN" firstAttribute="leading" secondItem="W3c-1e-2tO" secondAttribute="leading" constant="-20" id="Pgl-2L-i8m"/>
                                         <constraint firstItem="xfP-An-zVj" firstAttribute="top" secondItem="W3c-1e-2tO" secondAttribute="top" id="Pvx-dd-nmw"/>
                                         <constraint firstAttribute="bottom" secondItem="JjY-hl-sY5" secondAttribute="bottom" id="Rnq-dE-s1b"/>
+                                        <constraint firstAttribute="trailing" secondItem="Iox-U3-Dl8" secondAttribute="trailing" constant="20" id="TDp-mY-mLZ"/>
                                         <constraint firstItem="FW6-ai-hao" firstAttribute="leading" secondItem="W3c-1e-2tO" secondAttribute="leading" id="VWE-aa-u8c"/>
                                         <constraint firstAttribute="bottom" secondItem="Bmo-kS-tdU" secondAttribute="bottom" id="Vce-nP-KzJ"/>
                                         <constraint firstAttribute="bottom" secondItem="1n0-Bh-2o5" secondAttribute="bottom" id="XSt-xW-yFB"/>
@@ -4562,6 +4640,7 @@
                         <outlet property="AdvancedBox" destination="YWJ-Us-RT9" id="1jN-Iw-6ON"/>
                         <outlet property="AdvancedButton" destination="Fnx-DE-lqh" id="8NC-em-6Kx"/>
                         <outlet property="AdvancedCloseButton" destination="6ig-GX-aBW" id="IBp-ch-keg"/>
+                        <outlet property="AlertMessage" destination="yVQ-6S-dcH" id="MAh-7Y-lnC"/>
                         <outlet property="AppLogButton" destination="6Rt-gY-Lz5" id="kyP-i4-ecv"/>
                         <outlet property="AuthBox" destination="iE3-ca-yhv" id="YZL-ew-fEG"/>
                         <outlet property="AuthCloseButton" destination="IVh-de-NTn" id="LHw-np-OQA"/>
@@ -4571,6 +4650,7 @@
                         <outlet property="AuthSetupButton" destination="ASv-hf-O3g" id="kOT-vF-Epx"/>
                         <outlet property="Background" destination="F5c-GZ-U8e" id="jEU-Tt-pYU"/>
                         <outlet property="BarCode" destination="pOd-HL-t7g" id="fUE-vD-uOA"/>
+                        <outlet property="Blurb" destination="Iox-U3-Dl8" id="Vl1-jx-r8c"/>
                         <outlet property="CloseServiceButton" destination="af8-1c-jwU" id="kUw-94-aWU"/>
                         <outlet property="Code1" destination="IUV-sS-LbR" id="COt-lx-enD"/>
                         <outlet property="Code10" destination="8dQ-fy-gcO" id="6JZ-hH-Ev3"/>
@@ -4701,6 +4781,7 @@
     </scenes>
     <resources>
         <image name="Success" width="53" height="53"/>
+        <image name="Warning" width="132" height="133"/>
         <image name="about" width="61" height="62"/>
         <image name="advanced" width="61" height="62"/>
         <image name="background" width="417" height="894"/>
@@ -4738,6 +4819,9 @@
         </namedColor>
         <namedColor name="SecondaryColor">
             <color red="0.9570000171661377" green="0.016000000759959221" blue="0.30199998617172241" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="WhiteColor">
+            <color red="0.95999997854232788" green="0.95999997854232788" blue="0.95999997854232788" alpha="0.98000001907348633" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
