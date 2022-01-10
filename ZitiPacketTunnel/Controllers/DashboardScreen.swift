@@ -108,6 +108,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var AddIdGesture: NSClickGestureRecognizer!
     @IBOutlet var IdList: NSStackView!
     @IBOutlet var IdListScroll: NSScrollView!
+    var isConnecting = false;
     
     override func viewWillAppear() {
         self.view.window?.titleVisibility = .hidden;
@@ -223,6 +224,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         
         switch status {
         case .connecting:
+            self.isConnecting = true;
             TimerLabel.stringValue = "Connecting...";
             ShowProgress("Please Wait", "Connecting...");
             break
@@ -231,6 +233,13 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             ShowProgress("Please Wait", "Disconnecting...");
             break
         case .disconnected:
+            if (self.isConnecting) {
+                self.isConnecting = false;
+                for zid in zidMgr.zids {
+                    zid.mfaVerified = false;
+                    zidMgr.zidStore.store(zid);
+                }
+            }
             ConnectButton.isHidden = false;
             ConnectedButton.isHidden = true;
             DoConnectGesture.isEnabled = true;
@@ -1723,6 +1732,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
      Hide and kill the clickability of all fields
      */
     func HideAll() {
+        Blurb.isHidden = true;
         for view in allViews {
             view.isHidden = true;
             view.alphaValue = 1;
