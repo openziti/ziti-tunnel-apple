@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="UHm-9v-ehL">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="UHm-9v-ehL">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -519,10 +519,10 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fnk-tP-RQB">
-                                                        <rect key="frame" x="20" y="20" width="338" height="562"/>
+                                                        <rect key="frame" x="20" y="20" width="338" height="771"/>
                                                         <subviews>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rVe-aj-ODd" userLabel="MenuArea">
-                                                                <rect key="frame" x="0.0" y="522" width="338" height="40"/>
+                                                                <rect key="frame" x="0.0" y="731" width="338" height="40"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="czN-YZ-qgx" userLabel="Spacer">
                                                                         <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -571,7 +571,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="iXm-aG-BJI">
-                                                                <rect key="frame" x="0.0" y="513" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="722" width="338" height="1"/>
                                                                 <view key="contentView" id="5Qk-Gq-wvT">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -583,7 +583,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fnx-DE-lqh" userLabel="AdvancedButton">
-                                                                <rect key="frame" x="0.0" y="475" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="684" width="338" height="30"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8mS-pM-1ui">
                                                                         <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -632,7 +632,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="XDd-la-bG7">
-                                                                <rect key="frame" x="0.0" y="466" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="675" width="338" height="1"/>
                                                                 <view key="contentView" id="i9E-qK-QvI">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -644,7 +644,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V6I-Xo-rNq" userLabel="AboutButton">
-                                                                <rect key="frame" x="0.0" y="428" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="637" width="338" height="30"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="qZr-uo-1Pw">
                                                                         <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -693,7 +693,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="HFb-Aa-NQT">
-                                                                <rect key="frame" x="0.0" y="419" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="628" width="338" height="1"/>
                                                                 <view key="contentView" id="PdB-qr-2Yz">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -705,7 +705,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yI4-QY-e6a" userLabel="FeedbackButton">
-                                                                <rect key="frame" x="0.0" y="381" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="590" width="338" height="30"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ABI-Pv-NFZ">
                                                                         <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -754,7 +754,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bvp-TP-HAb">
-                                                                <rect key="frame" x="0.0" y="372" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="581" width="338" height="1"/>
                                                                 <view key="contentView" id="N5J-tS-jvn">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -766,7 +766,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RXB-p3-8TH" userLabel="SupportButton">
-                                                                <rect key="frame" x="0.0" y="334" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="543" width="338" height="30"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="JCo-kg-4qy">
                                                                         <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -815,7 +815,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ejx-xA-Dqg">
-                                                                <rect key="frame" x="0.0" y="325" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="534" width="338" height="1"/>
                                                                 <view key="contentView" id="6dI-y4-fpM">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -827,7 +827,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMz-Gu-TDq">
-                                                                <rect key="frame" x="-2" y="301" width="342" height="16"/>
+                                                                <rect key="frame" x="-2" y="510" width="342" height="16"/>
                                                                 <gestureRecognizers>
                                                                     <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="BRJ-uf-BsE" userLabel="CloseAppGesture">
                                                                         <connections>
@@ -845,9 +845,9 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="SLY-PP-Xld">
-                                                                <rect key="frame" x="0.0" y="0.0" width="338" height="293"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="338" height="502"/>
                                                                 <view key="contentView" id="FCb-fg-3Yk">
-                                                                    <rect key="frame" x="1" y="1" width="336" height="291"/>
+                                                                    <rect key="frame" x="1" y="1" width="336" height="500"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 </view>
                                                             </box>
@@ -917,10 +917,10 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d5M-KS-l1D">
-                                                        <rect key="frame" x="20" y="16" width="338" height="562"/>
+                                                        <rect key="frame" x="20" y="-193" width="338" height="771"/>
                                                         <subviews>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IFG-9b-WS5" userLabel="MenuArea">
-                                                                <rect key="frame" x="0.0" y="522" width="338" height="40"/>
+                                                                <rect key="frame" x="0.0" y="731" width="338" height="40"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="CSM-sD-qvW" userLabel="BackButton">
                                                                         <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -976,7 +976,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="l1J-Hc-ZAO">
-                                                                <rect key="frame" x="0.0" y="513" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="722" width="338" height="1"/>
                                                                 <view key="contentView" id="v5d-0c-1Kp">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -988,7 +988,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HU4-EB-ca4" userLabel="PrivacyButton">
-                                                                <rect key="frame" x="0.0" y="475" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="684" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1SZ-gc-HBS">
                                                                         <rect key="frame" x="-2" y="7" width="308" height="16"/>
@@ -1027,7 +1027,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="874-bX-Npf">
-                                                                <rect key="frame" x="0.0" y="466" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="675" width="338" height="1"/>
                                                                 <view key="contentView" id="Z9V-uK-aAF">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1039,7 +1039,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d9y-Ny-JY9" userLabel="TermsButton">
-                                                                <rect key="frame" x="0.0" y="428" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="637" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wd1-ua-w8x">
                                                                         <rect key="frame" x="-2" y="7" width="308" height="16"/>
@@ -1078,7 +1078,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="31Z-m3-qQ7">
-                                                                <rect key="frame" x="0.0" y="419" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="628" width="338" height="1"/>
                                                                 <view key="contentView" id="Fle-nd-lmq">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1090,7 +1090,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Vrj-Hc-NQI" userLabel="VersionField">
-                                                                <rect key="frame" x="18" y="395" width="302" height="16"/>
+                                                                <rect key="frame" x="18" y="604" width="302" height="16"/>
                                                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="V1.0.0.0" id="PgP-4c-hXi">
                                                                     <font key="font" usesAppearanceFont="YES"/>
                                                                     <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1098,9 +1098,9 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="7Sn-T8-mu7">
-                                                                <rect key="frame" x="0.0" y="0.0" width="338" height="387"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="338" height="596"/>
                                                                 <view key="contentView" ambiguous="YES" id="1RX-8f-tzd">
-                                                                    <rect key="frame" x="1" y="1" width="336" height="385"/>
+                                                                    <rect key="frame" x="1" y="1" width="336" height="594"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 </view>
                                                             </box>
@@ -1156,10 +1156,10 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fDU-iw-v9a">
-                                                        <rect key="frame" x="20" y="16" width="338" height="562"/>
+                                                        <rect key="frame" x="20" y="-193" width="338" height="771"/>
                                                         <subviews>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WyX-5r-Bqb" userLabel="MenuArea">
-                                                                <rect key="frame" x="0.0" y="522" width="338" height="40"/>
+                                                                <rect key="frame" x="0.0" y="731" width="338" height="40"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="720-do-XBp" userLabel="GoBackButton">
                                                                         <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -1215,7 +1215,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Wd3-P2-ghB">
-                                                                <rect key="frame" x="0.0" y="513" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="722" width="338" height="1"/>
                                                                 <view key="contentView" id="Ys3-BS-jrS">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1227,7 +1227,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6bk-1S-JRY" userLabel="TunnelButton">
-                                                                <rect key="frame" x="0.0" y="475" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="684" width="338" height="30"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="DPG-kj-llk">
                                                                         <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1276,7 +1276,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="jam-oD-1bF">
-                                                                <rect key="frame" x="0.0" y="466" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="675" width="338" height="1"/>
                                                                 <view key="contentView" id="e7F-d7-QWX">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1288,7 +1288,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WdH-rg-FHH" userLabel="ServiceLogButton">
-                                                                <rect key="frame" x="0.0" y="428" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="637" width="338" height="30"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xI7-kd-EIn">
                                                                         <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1337,7 +1337,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="GhW-mX-kWe">
-                                                                <rect key="frame" x="0.0" y="419" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="628" width="338" height="1"/>
                                                                 <view key="contentView" id="uoS-yB-idO">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1349,7 +1349,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Rt-gY-Lz5" userLabel="ApplicationLogButton">
-                                                                <rect key="frame" x="0.0" y="381" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="590" width="338" height="30"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="82H-RK-5rt">
                                                                         <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1398,7 +1398,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="9CW-Su-9cY">
-                                                                <rect key="frame" x="0.0" y="372" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="581" width="338" height="1"/>
                                                                 <view key="contentView" id="szv-84-IEB">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1410,7 +1410,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KtD-5R-sxH" userLabel="LogLevelButton">
-                                                                <rect key="frame" x="0.0" y="334" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="543" width="338" height="30"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rEk-vr-TH0">
                                                                         <rect key="frame" x="0.0" y="2" width="26" height="26"/>
@@ -1459,7 +1459,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="4mA-nL-DvT">
-                                                                <rect key="frame" x="0.0" y="325" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="534" width="338" height="1"/>
                                                                 <view key="contentView" id="pie-vy-ICG">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1471,9 +1471,9 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Bgm-hJ-Va8">
-                                                                <rect key="frame" x="0.0" y="0.0" width="338" height="317"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="338" height="526"/>
                                                                 <view key="contentView" ambiguous="YES" id="5D6-jb-Cdc">
-                                                                    <rect key="frame" x="1" y="1" width="336" height="315"/>
+                                                                    <rect key="frame" x="1" y="1" width="336" height="524"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 </view>
                                                             </box>
@@ -1537,10 +1537,10 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="olL-Cf-7N9" userLabel="MainArea">
-                                                        <rect key="frame" x="20" y="16" width="338" height="562"/>
+                                                        <rect key="frame" x="20" y="-193" width="338" height="771"/>
                                                         <subviews>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="shi-46-XiZ" userLabel="MenuArea">
-                                                                <rect key="frame" x="0.0" y="522" width="338" height="40"/>
+                                                                <rect key="frame" x="0.0" y="731" width="338" height="40"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hub-Dq-gcn" userLabel="BackButton">
                                                                         <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -1596,7 +1596,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="EMO-b5-okm">
-                                                                <rect key="frame" x="0.0" y="513" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="722" width="338" height="1"/>
                                                                 <view key="contentView" id="biz-00-dlU">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1608,7 +1608,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="r96-bs-3P1" userLabel="IPArea">
-                                                                <rect key="frame" x="0.0" y="475" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="684" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vG0-I4-cHz">
                                                                         <rect key="frame" x="-2" y="7" width="88" height="16"/>
@@ -1640,7 +1640,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="mu8-Md-Hfd">
-                                                                <rect key="frame" x="0.0" y="466" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="675" width="338" height="1"/>
                                                                 <view key="contentView" id="jRc-Vc-hMJ">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1652,7 +1652,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tJm-V4-n8C" userLabel="SubnetArea">
-                                                                <rect key="frame" x="0.0" y="428" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="637" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="n6y-ln-03R">
                                                                         <rect key="frame" x="-2" y="7" width="87" height="16"/>
@@ -1684,7 +1684,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="3Lx-Ex-ZFP">
-                                                                <rect key="frame" x="0.0" y="419" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="628" width="338" height="1"/>
                                                                 <view key="contentView" id="piM-Ne-9wx">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1696,7 +1696,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fRY-Qw-45r" userLabel="MtuArea">
-                                                                <rect key="frame" x="0.0" y="381" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="590" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C8H-Na-Xhd">
                                                                         <rect key="frame" x="-2" y="7" width="37" height="16"/>
@@ -1728,7 +1728,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="iPt-Lx-x0B">
-                                                                <rect key="frame" x="0.0" y="372" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="581" width="338" height="1"/>
                                                                 <view key="contentView" id="78o-XV-whG">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1740,7 +1740,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="69T-NG-16T" userLabel="DnsArea">
-                                                                <rect key="frame" x="0.0" y="334" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="543" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aQh-rl-74t">
                                                                         <rect key="frame" x="-2" y="7" width="85" height="16"/>
@@ -1772,7 +1772,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0WN-32-HxS">
-                                                                <rect key="frame" x="0.0" y="325" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="534" width="338" height="1"/>
                                                                 <view key="contentView" id="avd-wh-blO">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1784,7 +1784,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="edk-6T-mcJ" userLabel="MatchedArea">
-                                                                <rect key="frame" x="8" y="287" width="330" height="30"/>
+                                                                <rect key="frame" x="8" y="496" width="330" height="30"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LIh-1A-DGR">
                                                                         <rect key="frame" x="-2" y="7" width="118" height="16"/>
@@ -1816,7 +1816,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Ixt-uy-NKw">
-                                                                <rect key="frame" x="0.0" y="278" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="487" width="338" height="1"/>
                                                                 <view key="contentView" id="hfI-vP-9Xy">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1828,7 +1828,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yh0-3u-1hV" userLabel="SaveButton">
-                                                                <rect key="frame" x="-2" y="254" width="342" height="16"/>
+                                                                <rect key="frame" x="-2" y="463" width="342" height="16"/>
                                                                 <gestureRecognizers>
                                                                     <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="Ewl-gf-549" userLabel="SaveGesture">
                                                                         <connections>
@@ -1843,9 +1843,9 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="k0K-xq-g8h">
-                                                                <rect key="frame" x="0.0" y="0.0" width="338" height="246"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="338" height="455"/>
                                                                 <view key="contentView" ambiguous="YES" id="Aku-pz-L3X">
-                                                                    <rect key="frame" x="1" y="1" width="336" height="244"/>
+                                                                    <rect key="frame" x="1" y="1" width="336" height="453"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 </view>
                                                             </box>
@@ -1925,13 +1925,13 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4sT-3u-tRe" userLabel="MainArea">
-                                                        <rect key="frame" x="20" y="16" width="338" height="562"/>
+                                                        <rect key="frame" x="20" y="-193" width="338" height="771"/>
                                                         <subviews>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F70-am-OhA" userLabel="MenuArea">
-                                                                <rect key="frame" x="0.0" y="518" width="338" height="44"/>
+                                                                <rect key="frame" x="0.0" y="518" width="338" height="253"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="tPd-nY-9bg" userLabel="GoBackButton">
-                                                                        <rect key="frame" x="0.0" y="12" width="20" height="20"/>
+                                                                        <rect key="frame" x="0.0" y="117" width="20" height="20"/>
                                                                         <constraints>
                                                                             <constraint firstAttribute="width" constant="20" id="40I-o5-Vup"/>
                                                                             <constraint firstAttribute="height" constant="20" id="lgE-uv-kvl"/>
@@ -1946,7 +1946,7 @@
                                                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lastArrow" id="OYp-yT-T9d"/>
                                                                     </imageView>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="f5S-U5-UZB">
-                                                                        <rect key="frame" x="26" y="13" width="286" height="19"/>
+                                                                        <rect key="frame" x="26" y="117" width="286" height="19"/>
                                                                         <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Set Log Level" id="ssy-oz-vcv">
                                                                             <font key="font" metaFont="system" size="15"/>
                                                                             <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1954,7 +1954,7 @@
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="2Qw-c9-2dE" userLabel="CloseButton">
-                                                                        <rect key="frame" x="318" y="12" width="20" height="20"/>
+                                                                        <rect key="frame" x="318" y="117" width="20" height="20"/>
                                                                         <constraints>
                                                                             <constraint firstAttribute="width" constant="20" id="Gsv-SU-LYP"/>
                                                                             <constraint firstAttribute="height" constant="20" id="ux7-it-IcT"/>
@@ -2451,10 +2451,10 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="trailing" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j5x-vZ-gEb">
-                                                        <rect key="frame" x="20" y="16" width="338" height="562"/>
+                                                        <rect key="frame" x="20" y="-193" width="338" height="771"/>
                                                         <subviews>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ctT-ul-7vS" userLabel="MenuArea">
-                                                                <rect key="frame" x="0.0" y="522" width="338" height="40"/>
+                                                                <rect key="frame" x="0.0" y="731" width="338" height="40"/>
                                                                 <subviews>
                                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Q9r-6c-00t" userLabel="IsOnline">
                                                                         <rect key="frame" x="0.0" y="10" width="20" height="20"/>
@@ -2513,7 +2513,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="HVB-dr-neR">
-                                                                <rect key="frame" x="0.0" y="513" width="338" height="1"/>
+                                                                <rect key="frame" x="0.0" y="722" width="338" height="1"/>
                                                                 <view key="contentView" id="KWY-0u-GVT">
                                                                     <rect key="frame" x="1" y="1" width="336" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2525,7 +2525,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eTN-We-ofe" userLabel="NameArea">
-                                                                <rect key="frame" x="0.0" y="475" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="684" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Iqt-Po-LmT">
                                                                         <rect key="frame" x="-2" y="7" width="286" height="16"/>
@@ -2557,7 +2557,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="WbL-k7-LEp">
-                                                                <rect key="frame" x="2" y="466" width="336" height="1"/>
+                                                                <rect key="frame" x="2" y="675" width="336" height="1"/>
                                                                 <view key="contentView" id="SVp-qQ-Off">
                                                                     <rect key="frame" x="1" y="1" width="334" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2569,7 +2569,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TGD-aW-yr8" userLabel="NetworkArea">
-                                                                <rect key="frame" x="0.0" y="428" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="637" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vir-c4-YLf">
                                                                         <rect key="frame" x="-2" y="7" width="224" height="16"/>
@@ -2601,7 +2601,7 @@
                                                                 </customSpacing>
                                                             </stackView>
                                                             <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="Xh9-Q6-95D">
-                                                                <rect key="frame" x="2" y="419" width="336" height="1"/>
+                                                                <rect key="frame" x="2" y="628" width="336" height="1"/>
                                                                 <view key="contentView" id="9ob-hP-a0N">
                                                                     <rect key="frame" x="1" y="1" width="334" height="0.0"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2613,7 +2613,7 @@
                                                                 <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </box>
                                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rk3-B3-dbT" userLabel="MFAArea">
-                                                                <rect key="frame" x="0.0" y="381" width="338" height="30"/>
+                                                                <rect key="frame" x="0.0" y="590" width="338" height="30"/>
                                                                 <subviews>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LaA-3s-XE0">
                                                                         <rect key="frame" x="-2" y="7" width="230" height="16"/>
@@ -2690,117 +2690,121 @@
                                                                     <real value="3.4028234663852886e+38"/>
                                                                 </customSpacing>
                                                             </stackView>
-                                                            <box ambiguous="YES" boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="mmh-fP-Asr">
-                                                                <rect key="frame" x="2" y="372" width="336" height="1"/>
-                                                                <view key="contentView" id="TJS-JD-xJ8">
-                                                                    <rect key="frame" x="1" y="1" width="334" height="0.0"/>
+                                                            <box ambiguous="YES" boxType="custom" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="U4e-Gl-qat" userLabel="FilterBox">
+                                                                <rect key="frame" x="0.0" y="547" width="338" height="35"/>
+                                                                <view key="contentView" id="HcW-UC-Ibe">
+                                                                    <rect key="frame" x="1" y="1" width="336" height="33"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                    <subviews>
+                                                                        <stackView distribution="fillProportionally" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mdC-vP-li8" userLabel="FilterArea">
+                                                                            <rect key="frame" x="0.0" y="0.0" width="336" height="33"/>
+                                                                            <subviews>
+                                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sxg-lZ-sM8">
+                                                                                    <rect key="frame" x="-2" y="10" width="53" height="13"/>
+                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Filter For" id="jfv-V7-CMp">
+                                                                                        <font key="font" metaFont="system" size="10"/>
+                                                                                        <color key="textColor" name="WhiteColor"/>
+                                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                    </textFieldCell>
+                                                                                </textField>
+                                                                                <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yBt-zI-Z24" userLabel="FilterText">
+                                                                                    <rect key="frame" x="54" y="6" width="60" height="22"/>
+                                                                                    <constraints>
+                                                                                        <constraint firstAttribute="width" constant="60" id="khZ-Aq-hf3"/>
+                                                                                    </constraints>
+                                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" placeholderString="filter text" usesSingleLineMode="YES" bezelStyle="round" id="YEC-Oh-ihX">
+                                                                                        <font key="font" metaFont="system" size="10"/>
+                                                                                        <color key="textColor" name="WhiteColor"/>
+                                                                                        <color key="backgroundColor" red="0.61708886331921586" green="0.64245779164490757" blue="0.66096511994949503" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                                                        <allowedInputSourceLocales>
+                                                                                            <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                                                                                        </allowedInputSourceLocales>
+                                                                                    </textFieldCell>
+                                                                                    <connections>
+                                                                                        <action selector="FilterChanged:" target="UHm-9v-ehL" id="CuH-G1-mDw"/>
+                                                                                    </connections>
+                                                                                </textField>
+                                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="t61-QI-Te6">
+                                                                                    <rect key="frame" x="117" y="10" width="70" height="13"/>
+                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="and sort by" id="7K1-X0-4Ux">
+                                                                                        <font key="font" metaFont="system" size="10"/>
+                                                                                        <color key="textColor" name="WhiteColor"/>
+                                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                    </textFieldCell>
+                                                                                </textField>
+                                                                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tEE-cu-tnx" userLabel="SortBy">
+                                                                                    <rect key="frame" x="187" y="3" width="87" height="25"/>
+                                                                                    <popUpButtonCell key="cell" type="push" title="Name" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="rhE-fe-M9G" id="7J4-Uf-d1I">
+                                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                                        <font key="font" size="10" name="OpenSans"/>
+                                                                                        <menu key="menu" id="J5f-MW-BjN">
+                                                                                            <items>
+                                                                                                <menuItem title="Name" state="on" id="rhE-fe-M9G">
+                                                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                                </menuItem>
+                                                                                                <menuItem title="Address" id="zPa-2y-teP">
+                                                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                                </menuItem>
+                                                                                                <menuItem title="Port" id="Lo2-aK-Nrf">
+                                                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                                </menuItem>
+                                                                                                <menuItem title="Protocol" id="Sb6-UA-3za">
+                                                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                                </menuItem>
+                                                                                            </items>
+                                                                                        </menu>
+                                                                                    </popUpButtonCell>
+                                                                                    <connections>
+                                                                                        <action selector="SortBy:" target="UHm-9v-ehL" id="7PR-KQ-2c4"/>
+                                                                                    </connections>
+                                                                                </popUpButton>
+                                                                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cQL-Rz-9yd" userLabel="SortHow">
+                                                                                    <rect key="frame" x="272" y="3" width="68" height="25"/>
+                                                                                    <popUpButtonCell key="cell" type="push" title="Asc" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="t14-AO-q2E" id="9A3-ND-WeH">
+                                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                                        <font key="font" size="10" name="OpenSans"/>
+                                                                                        <menu key="menu" id="WZ1-Nh-v0x">
+                                                                                            <items>
+                                                                                                <menuItem title="Asc" state="on" id="t14-AO-q2E"/>
+                                                                                                <menuItem title="Desc" id="Sms-Vy-EpB"/>
+                                                                                            </items>
+                                                                                        </menu>
+                                                                                    </popUpButtonCell>
+                                                                                    <connections>
+                                                                                        <action selector="SortHow:" target="UHm-9v-ehL" id="ixh-Rx-7bv"/>
+                                                                                    </connections>
+                                                                                </popUpButton>
+                                                                            </subviews>
+                                                                            <visibilityPriorities>
+                                                                                <integer value="1000"/>
+                                                                                <integer value="1000"/>
+                                                                                <integer value="1000"/>
+                                                                                <integer value="1000"/>
+                                                                                <integer value="1000"/>
+                                                                            </visibilityPriorities>
+                                                                            <customSpacing>
+                                                                                <real value="3.4028234663852886e+38"/>
+                                                                                <real value="3.4028234663852886e+38"/>
+                                                                                <real value="3.4028234663852886e+38"/>
+                                                                                <real value="3.4028234663852886e+38"/>
+                                                                                <real value="3.4028234663852886e+38"/>
+                                                                            </customSpacing>
+                                                                        </stackView>
+                                                                    </subviews>
+                                                                    <constraints>
+                                                                        <constraint firstItem="mdC-vP-li8" firstAttribute="top" secondItem="HcW-UC-Ibe" secondAttribute="top" id="AN2-At-rEp"/>
+                                                                        <constraint firstAttribute="bottom" secondItem="mdC-vP-li8" secondAttribute="bottom" id="YTI-qC-6eM"/>
+                                                                        <constraint firstAttribute="trailing" secondItem="mdC-vP-li8" secondAttribute="trailing" id="etH-Pn-fvg"/>
+                                                                        <constraint firstItem="mdC-vP-li8" firstAttribute="leading" secondItem="HcW-UC-Ibe" secondAttribute="leading" id="meP-sf-CNK"/>
+                                                                    </constraints>
                                                                 </view>
                                                                 <constraints>
-                                                                    <constraint firstAttribute="height" constant="1" id="bgz-HS-RJJ"/>
+                                                                    <constraint firstAttribute="height" constant="35" id="PCI-KK-RXb"/>
                                                                 </constraints>
-                                                                <color key="borderColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                                <color key="fillColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                                             </box>
-                                                            <stackView distribution="fillProportionally" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mdC-vP-li8" userLabel="FilterArea">
-                                                                <rect key="frame" x="0.0" y="329" width="338" height="35"/>
-                                                                <subviews>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sxg-lZ-sM8">
-                                                                        <rect key="frame" x="-2" y="11" width="53" height="13"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Filter For" id="jfv-V7-CMp">
-                                                                            <font key="font" metaFont="system" size="10"/>
-                                                                            <color key="textColor" name="ModalColor"/>
-                                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                        </textFieldCell>
-                                                                    </textField>
-                                                                    <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yBt-zI-Z24" userLabel="FilterText">
-                                                                        <rect key="frame" x="54" y="7" width="60" height="22"/>
-                                                                        <constraints>
-                                                                            <constraint firstAttribute="width" constant="60" id="khZ-Aq-hf3"/>
-                                                                        </constraints>
-                                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" placeholderString="filter text" usesSingleLineMode="YES" bezelStyle="round" id="YEC-Oh-ihX">
-                                                                            <font key="font" metaFont="system" size="10"/>
-                                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                                                            <color key="backgroundColor" red="0.61708886331921586" green="0.64245779164490757" blue="0.66096511994949503" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                                                            <allowedInputSourceLocales>
-                                                                                <string>NSAllRomanInputSourcesLocaleIdentifier</string>
-                                                                            </allowedInputSourceLocales>
-                                                                        </textFieldCell>
-                                                                        <connections>
-                                                                            <action selector="FilterChanged:" target="UHm-9v-ehL" id="CuH-G1-mDw"/>
-                                                                        </connections>
-                                                                    </textField>
-                                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="t61-QI-Te6">
-                                                                        <rect key="frame" x="117" y="11" width="69" height="13"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="and sort by" id="7K1-X0-4Ux">
-                                                                            <font key="font" metaFont="system" size="10"/>
-                                                                            <color key="textColor" name="ModalColor"/>
-                                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                        </textFieldCell>
-                                                                    </textField>
-                                                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tEE-cu-tnx" userLabel="SortBy">
-                                                                        <rect key="frame" x="186" y="4" width="88" height="25"/>
-                                                                        <popUpButtonCell key="cell" type="push" title="Name" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="rhE-fe-M9G" id="7J4-Uf-d1I">
-                                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                            <font key="font" metaFont="system" size="10"/>
-                                                                            <menu key="menu" id="J5f-MW-BjN">
-                                                                                <items>
-                                                                                    <menuItem title="Name" state="on" id="rhE-fe-M9G">
-                                                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                                                    </menuItem>
-                                                                                    <menuItem title="Address" id="zPa-2y-teP">
-                                                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                                                    </menuItem>
-                                                                                    <menuItem title="Port" id="Lo2-aK-Nrf">
-                                                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                                                    </menuItem>
-                                                                                    <menuItem title="Protocol" id="Sb6-UA-3za">
-                                                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                                                    </menuItem>
-                                                                                </items>
-                                                                            </menu>
-                                                                        </popUpButtonCell>
-                                                                        <connections>
-                                                                            <action selector="SortBy:" target="UHm-9v-ehL" id="7PR-KQ-2c4"/>
-                                                                        </connections>
-                                                                    </popUpButton>
-                                                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cQL-Rz-9yd" userLabel="SortHow">
-                                                                        <rect key="frame" x="272" y="4" width="70" height="25"/>
-                                                                        <popUpButtonCell key="cell" type="push" title="Asc" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="t14-AO-q2E" id="9A3-ND-WeH">
-                                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                            <font key="font" metaFont="system" size="10"/>
-                                                                            <menu key="menu" id="WZ1-Nh-v0x">
-                                                                                <items>
-                                                                                    <menuItem title="Asc" state="on" id="t14-AO-q2E"/>
-                                                                                    <menuItem title="Desc" id="Sms-Vy-EpB"/>
-                                                                                </items>
-                                                                            </menu>
-                                                                        </popUpButtonCell>
-                                                                        <connections>
-                                                                            <action selector="SortHow:" target="UHm-9v-ehL" id="ixh-Rx-7bv"/>
-                                                                        </connections>
-                                                                    </popUpButton>
-                                                                </subviews>
-                                                                <constraints>
-                                                                    <constraint firstAttribute="height" constant="35" id="4Qj-0y-lnI"/>
-                                                                </constraints>
-                                                                <visibilityPriorities>
-                                                                    <integer value="1000"/>
-                                                                    <integer value="1000"/>
-                                                                    <integer value="1000"/>
-                                                                    <integer value="1000"/>
-                                                                    <integer value="1000"/>
-                                                                </visibilityPriorities>
-                                                                <customSpacing>
-                                                                    <real value="3.4028234663852886e+38"/>
-                                                                    <real value="3.4028234663852886e+38"/>
-                                                                    <real value="3.4028234663852886e+38"/>
-                                                                    <real value="3.4028234663852886e+38"/>
-                                                                    <real value="3.4028234663852886e+38"/>
-                                                                </customSpacing>
-                                                            </stackView>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fdT-c0-Hnw" userLabel="EnrollButton">
-                                                                <rect key="frame" x="-2" y="305" width="342" height="16"/>
+                                                                <rect key="frame" x="-2" y="523" width="342" height="16"/>
                                                                 <gestureRecognizers>
                                                                     <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="hDV-b6-cvm" userLabel="EnrollGesture">
                                                                         <connections>
@@ -2815,13 +2819,13 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <box ambiguous="YES" boxType="custom" borderWidth="0.0" cornerRadius="12" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="poP-YT-xdb" userLabel="ServiceListArea">
-                                                                <rect key="frame" x="0.0" y="70" width="338" height="227"/>
+                                                                <rect key="frame" x="0.0" y="70" width="338" height="445"/>
                                                                 <view key="contentView" ambiguous="YES" id="sR8-Pz-w7o">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="227"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="338" height="445"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <scrollView ambiguous="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kt8-wn-tGH" userLabel="ServiceList">
-                                                                            <rect key="frame" x="0.0" y="12" width="338" height="205"/>
+                                                                            <rect key="frame" x="0.0" y="230" width="338" height="205"/>
                                                                             <clipView key="contentView" ambiguous="YES" id="pIn-yy-GNl">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="338" height="205"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2923,9 +2927,9 @@
                                                             <constraint firstItem="poP-YT-xdb" firstAttribute="leading" secondItem="j5x-vZ-gEb" secondAttribute="leading" id="bEw-yg-phF"/>
                                                             <constraint firstAttribute="trailing" secondItem="ctT-ul-7vS" secondAttribute="trailing" id="bTs-OV-KDV"/>
                                                             <constraint firstAttribute="trailing" secondItem="fdT-c0-Hnw" secondAttribute="trailing" id="dU9-5e-eNP"/>
-                                                            <constraint firstItem="mdC-vP-li8" firstAttribute="leading" secondItem="j5x-vZ-gEb" secondAttribute="leading" id="dZq-7T-TOv"/>
+                                                            <constraint firstAttribute="trailing" secondItem="U4e-Gl-qat" secondAttribute="trailing" id="ewF-OS-vhS"/>
+                                                            <constraint firstItem="U4e-Gl-qat" firstAttribute="leading" secondItem="j5x-vZ-gEb" secondAttribute="leading" id="jLT-dY-XfC"/>
                                                             <constraint firstItem="HVB-dr-neR" firstAttribute="leading" secondItem="j5x-vZ-gEb" secondAttribute="leading" id="s2p-eP-32t"/>
-                                                            <constraint firstAttribute="trailing" secondItem="mdC-vP-li8" secondAttribute="trailing" id="sAa-Bq-lkG"/>
                                                             <constraint firstItem="ohW-s5-Fwo" firstAttribute="leading" secondItem="j5x-vZ-gEb" secondAttribute="leading" constant="20" id="tDp-KO-3vZ"/>
                                                             <constraint firstItem="TGD-aW-yr8" firstAttribute="leading" secondItem="j5x-vZ-gEb" secondAttribute="leading" id="zZ4-3W-weY"/>
                                                         </constraints>
@@ -2942,10 +2946,8 @@
                                                             <integer value="1000"/>
                                                             <integer value="1000"/>
                                                             <integer value="1000"/>
-                                                            <integer value="1000"/>
                                                         </visibilityPriorities>
                                                         <customSpacing>
-                                                            <real value="3.4028234663852886e+38"/>
                                                             <real value="3.4028234663852886e+38"/>
                                                             <real value="3.4028234663852886e+38"/>
                                                             <real value="3.4028234663852886e+38"/>
@@ -3790,7 +3792,7 @@
                                                                                     </textFieldCell>
                                                                                 </textField>
                                                                                 <box boxType="custom" cornerRadius="7" translatesAutoresizingMaskIntoConstraints="NO" id="wLV-sv-RED" userLabel="AuthBox">
-                                                                                    <rect key="frame" x="10" y="86" width="288" height="87"/>
+                                                                                    <rect key="frame" x="10" y="-1" width="288" height="87"/>
                                                                                     <view key="contentView" id="W1c-3s-wcr">
                                                                                         <rect key="frame" x="1" y="1" width="286" height="85"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -4431,10 +4433,10 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stackView distribution="fillProportionally" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8aT-WM-qE1" userLabel="LoadingList">
-                                                        <rect key="frame" x="20" y="376" width="340" height="78"/>
+                                                        <rect key="frame" x="20" y="585" width="340" height="78"/>
                                                         <subviews>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0wH-dx-amK">
-                                                                <rect key="frame" x="84" y="51" width="173" height="27"/>
+                                                                <rect key="frame" x="84" y="51" width="172" height="27"/>
                                                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Progress Header" id="NWu-73-DMB">
                                                                     <font key="font" size="20" name="OpenSans-Bold"/>
                                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -4648,6 +4650,7 @@
                         <outlet property="AuthCodeText" destination="1sz-MD-lGW" id="njI-rq-0uQ"/>
                         <outlet property="AuthMFAButton" destination="Vhg-pI-hnO" id="XIp-d9-UeY"/>
                         <outlet property="AuthSetupButton" destination="ASv-hf-O3g" id="kOT-vF-Epx"/>
+                        <outlet property="AuthSubTitle" destination="QPO-3B-i7q" id="cqJ-02-QOS"/>
                         <outlet property="Background" destination="F5c-GZ-U8e" id="jEU-Tt-pYU"/>
                         <outlet property="BarCode" destination="pOd-HL-t7g" id="fUE-vD-uOA"/>
                         <outlet property="Blurb" destination="Iox-U3-Dl8" id="Vl1-jx-r8c"/>
@@ -4717,7 +4720,6 @@
                         <outlet property="LogoArea" destination="bzt-SS-gSP" id="xaG-lX-AI2"/>
                         <outlet property="MFAArea" destination="rk3-B3-dbT" id="ycV-kf-xvG"/>
                         <outlet property="MFACloseButton" destination="J4h-fd-znj" id="Jm2-Ht-VZ8"/>
-                        <outlet property="MFALine" destination="mmh-fP-Asr" id="bti-oL-FrV"/>
                         <outlet property="MFAOff" destination="BcO-3O-jGD" id="6kd-7G-hxv"/>
                         <outlet property="MFAOn" destination="XO2-9w-Xds" id="Zhh-ZS-45Q"/>
                         <outlet property="MFARecovery" destination="Y3E-Dk-dBC" id="7oX-4k-wHn"/>
@@ -4789,7 +4791,7 @@
         <image name="connected" width="635" height="635"/>
         <image name="down" width="52" height="53"/>
         <image name="feedbackIcon" width="61" height="62"/>
-        <image name="globe" width="1310" height="661"/>
+        <image name="globe" width="655" height="330.5"/>
         <image name="hamburger" width="84" height="69"/>
         <image name="identity" width="92" height="93"/>
         <image name="lastArrow" width="37" height="63"/>

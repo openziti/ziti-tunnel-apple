@@ -109,6 +109,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var IdList: NSStackView!
     @IBOutlet var IdListScroll: NSScrollView!
     var isConnecting = false;
+    var isConnected = false;
     
     override func viewWillAppear() {
         self.view.window?.titleVisibility = .hidden;
@@ -194,6 +195,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             
             if (msg.meta.msgType == .MfaAuthQuery) {
                 zid.mfaEnabled = true;
+                zid.mfaVerified = false;
             }
             
             self.zidMgr.zidStore.store(zid);
@@ -206,6 +208,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             //}
         
         //}
+        getMainWindow()?.orderFrontRegardless();
         
     }
     
@@ -219,6 +222,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         self.ClearList();
         timer.invalidate();
         HideProgress();
+        self.isConnected = false;
         
         zLog.info("Tunnel Status: \(status)");
         
@@ -255,6 +259,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             TimerLabel.stringValue = "Reasserting...";
             break
         case .connected:
+            self.isConnected = true;
             AddButton.alphaValue = 1.0;
             AddIdButton.alphaValue = 1.0;
             TimerLabel.stringValue = "00:00.00";
@@ -267,6 +272,13 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             IdListScroll.isHidden = false;
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
             self.UpdateList();
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                DispatchQueue.main.async {
+                    if self.zidMgr.zids.count > 0 {
+                        self.UpdateList();
+                    }
+                }
+            }
             break
         @unknown default:
             TimerLabel.stringValue = "Unknown Tunnel State";
@@ -281,12 +293,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             print("enter");
             self.DoAuthorize()
             return true
-        } else if (commandSelector == #selector(NSResponder.deleteForward(_:))) {
-            // Do something against DELETE key
-            return true
-        } else if (commandSelector == #selector(NSResponder.deleteBackward(_:))) {
-            // Do something against BACKSPACE key
-            return true
         } else if (commandSelector == #selector(NSResponder.insertTab(_:))) {
             // Do something against TAB key
             return true
@@ -300,7 +306,40 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        self.UpdateList();
+        DispatchQueue.main.async {
+            if let match = self.zidMgr.zids.first(where: { $0.id == zid.id }) {
+                zLog.info("\(zid.name):\(zid.id) CHANGED")
+                
+                // TUN will disable if unable to start for zid
+                match.edgeStatus = zid.edgeStatus
+                match.enabled = zid.enabled
+                
+                // always take new service from tunneler...
+                match.services = zid.services
+                match.controllerVersion = zid.controllerVersion
+                match.czid?.name = zid.name
+            } else {
+                // new one.  generally zids are only added by this app (so will be matched above).
+                // But possible somebody could load one manually or some day via MDM or somesuch
+                zLog.info("\(zid.name):\(zid.id) NEW")
+                self.zidMgr.zids.append(zid)
+            }
+            self.UpdateList();
+            
+            /*
+            if zid.isEnabled && zid.isEnrolled {
+                let needsRestart = zid.services.filter {
+                    if let status = $0.status, let needsRestart = status.needsRestart {
+                        return needsRestart
+                    }
+                    return false
+                }
+                if needsRestart.count > 0 {
+                    self.tunnelMgr.restartTunnel()
+                }
+            }
+             */
+        }
     }
     
     func onRemovedId(_ idString: String) {
@@ -321,9 +360,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     func getMainWindow() -> NSWindow? {
         for window in NSApplication.shared.windows {
-            if window.className == "NSWindow" && window.title == appName {
+            //if window.className == "NSWindow" && window.title == appName {
                 return window
-            }
+            //}
         }
         return nil
     }
@@ -414,12 +453,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         IdListScroll.horizontalScroller = .none;
         ClearList();
         var index = 0;
-        for identity in zidMgr.zids {
-            let identityItem = IdentityListitem();
-            identityItem.setIdentity(identity: identity, vc: self)
-            identityItem.frame = CGRect(x: 0, y: CGFloat(index*62), width: 340, height: 60);
-            IdList.addArrangedSubview(identityItem);
-            index = index + 1;
+        if (self.isConnected) {
+            for identity in zidMgr.zids {
+                let identityItem = IdentityListitem();
+                identityItem.setIdentity(identity: identity, vc: self)
+                identityItem.frame = CGRect(x: 0, y: CGFloat(index*62), width: 340, height: 60);
+                IdList.addArrangedSubview(identityItem);
+                index = index + 1;
+            }
         }
         let minSize = CGFloat(400);
         var listHeight = CGFloat(index*62);
@@ -519,7 +560,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFARecovery: NSImageView!
     @IBOutlet var MFAToggle: NSSwitch!
     @IBOutlet var MFAArea: NSStackView!
-    @IBOutlet var MFALine: NSBox!
     @IBOutlet var IsOfflineButton: NSImageView!
     @IBOutlet var IsOnlineButton: NSImageView!
     @IBOutlet var SortHow: NSPopUpButton!
@@ -564,7 +604,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         ServiceList.isHidden = false;
         IdServiceCount.isHidden = false;
         MFAArea.isHidden = false;
-        MFALine.isHidden = false;
         IsOnlineButton.isHidden = true;
         IsOfflineButton.isHidden = true;
         ForgotButtonArea.alphaValue = 1;
@@ -582,7 +621,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             ServiceList.isHidden = true;
             IdServiceCount.isHidden = true;
             MFAArea.isHidden = true;
-            MFALine.isHidden = true;
             FilterArea.alphaValue = 0;
             FilterArea.isHidden = true;
         }
@@ -845,7 +883,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                             self.toggleMfa(self.identity, .on)
                         } else {
                             zLog.info("MFA removed for \(self.identity.name):\(self.identity.id)")
-                            self.identity.mfaEnabled = false
+                            self.identity.mfaEnabled = false;
+                            self.identity.mfaVerified = false;
                             _ = self.zidMgr.zidStore.store(self.identity)
                             self.ShowDetails();
                         }
@@ -1352,7 +1391,6 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
 
         if (dialog.runModal() ==  NSApplication.ModalResponse.OK) {
             let result = dialog.url
-
             if (result != nil) {
                 let path: String = result!.path;
                 var codeString = "";
@@ -1470,6 +1508,9 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                 self.identity.mfaVerified = true;
                 self.identity.lastMfaAuth = Date();
                 _ = self.zidMgr.zidStore.store(self.identity);
+                _ = self.zidMgr.loadZids();
+                self.UpdateList();
+                self.ShowDetails();
                 self.Close(sender);
                 
                 self.ShowRecovery();
@@ -1544,11 +1585,13 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var AuthCode: NSTextField!
     @IBOutlet var AuthCloseButton: NSImageView!
     @IBOutlet var AuthCodeText: NSTextField!
+    @IBOutlet var AuthSubTitle: NSTextField!;
     private var authType: String = "";
     
     func ShowAuthentication(identity:ZitiIdentity, type:String) {
         self.authType = type;
         self.identity = identity;
+        AuthSubTitle.stringValue = "Enter code for "+identity.name;
         AuthCodeText.stringValue = "";
         showArea(state: "auth");
     }
@@ -1626,6 +1669,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                         self.identity.mfaEnabled = true;
                         self.identity.mfaVerified = true;
                         _ = self.zidMgr.zidStore.store(self.identity);
+                        self.UpdateList();
+                        
                         self.DoClose();
                     }
                 }

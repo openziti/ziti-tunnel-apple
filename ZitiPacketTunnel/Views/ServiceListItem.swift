@@ -60,8 +60,7 @@ class ServiceListItem: NSView {
             view.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0.0),
             view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0.0),
             view.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0.0),
-
-        ])
+        ]);
     }
     
     override func draw(_ dirtyRect: NSRect) {

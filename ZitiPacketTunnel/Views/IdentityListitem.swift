@@ -63,7 +63,6 @@ class IdentityListitem: NSView {
     @IBAction func ServiceClicked(_ sender: NSClickGestureRecognizer) {
         if (self.zid.isMfaEnabled) {
             if (self.zid.isMfaVerified) {
-                // Check if timing out
                 self.vc.ShowIdentity(zid: self.zid);
             } else {
                 self.vc.ShowAuthentication(identity: self.zid, type: "auth");
