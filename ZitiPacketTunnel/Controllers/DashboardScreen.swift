@@ -326,7 +326,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             }
             self.UpdateList();
             
-            /*
+            
             if zid.isEnabled && zid.isEnrolled {
                 let needsRestart = zid.services.filter {
                     if let status = $0.status, let needsRestart = status.needsRestart {
@@ -335,10 +335,10 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                     return false
                 }
                 if needsRestart.count > 0 {
-                    self.tunnelMgr.restartTunnel()
+                    //self.tunnelMgr.restartTunnel()
                 }
             }
-             */
+            
         }
     }
     
