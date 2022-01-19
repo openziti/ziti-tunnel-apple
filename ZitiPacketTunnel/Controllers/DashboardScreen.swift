@@ -74,6 +74,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFASetupBox: NSBox!
     @IBOutlet var ServiceBox: NSBox!
     @IBOutlet var DetailsBox: NSBox!
+    @IBOutlet var MultiAuthBox: NSBox!
     var allViews:[NSBox] = [];
     
     
@@ -142,7 +143,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     override func viewDidLoad() {
         super.viewDidLoad();
-        self.allViews =  [MenuBox,AdvancedBox,AboutBox,LogLevelBox,ConfigBox,RecoveryBox,AuthBox,MFASetupBox,ServiceBox,DetailsBox];
+        self.allViews =  [MenuBox,AdvancedBox,AboutBox,LogLevelBox,ConfigBox,RecoveryBox,AuthBox,MFASetupBox,MultiAuthBox,ServiceBox,DetailsBox];
         
         
         
@@ -335,7 +336,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                     return false
                 }
                 if needsRestart.count > 0 {
-                    //self.tunnelMgr.restartTunnel()
+                    self.tunnelMgr.restartTunnel()
                 }
             }
             
