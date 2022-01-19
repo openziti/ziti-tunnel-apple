@@ -3713,19 +3713,19 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stackView distribution="fillProportionally" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VJD-VH-W85" userLabel="AuthModalStack">
-                                                        <rect key="frame" x="30" y="360" width="320" height="180"/>
+                                                        <rect key="frame" x="30" y="280" width="320" height="260"/>
                                                         <subviews>
                                                             <box boxType="custom" borderType="bezel" cornerRadius="12" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="BYm-kP-Kgc" userLabel="AuthModalBox">
-                                                                <rect key="frame" x="0.0" y="0.0" width="320" height="180"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="320" height="260"/>
                                                                 <view key="contentView" id="5ou-Ta-Ytf">
-                                                                    <rect key="frame" x="1" y="1" width="318" height="178"/>
+                                                                    <rect key="frame" x="1" y="1" width="318" height="258"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q6V-QD-gwU" userLabel="AuthStackView">
-                                                                            <rect key="frame" x="5" y="5" width="308" height="236"/>
+                                                                            <rect key="frame" x="5" y="5" width="308" height="270"/>
                                                                             <subviews>
                                                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3I3-o9-oHu" userLabel="MenuArea">
-                                                                                    <rect key="frame" x="10" y="196" width="288" height="40"/>
+                                                                                    <rect key="frame" x="10" y="230" width="288" height="40"/>
                                                                                     <subviews>
                                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jai-gu-I7t">
                                                                                             <rect key="frame" x="-2" y="12" width="24" height="16"/>
@@ -3758,7 +3758,7 @@
                                                                                             <gestureRecognizers>
                                                                                                 <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="mgD-b4-UAt" userLabel="CloseGesture">
                                                                                                     <connections>
-                                                                                                        <action selector="Close:" target="UHm-9v-ehL" id="NHt-OZ-WLl"/>
+                                                                                                        <action selector="CloseAuth:" target="UHm-9v-ehL" id="tId-Ns-Ro6"/>
                                                                                                     </connections>
                                                                                                 </clickGestureRecognizer>
                                                                                             </gestureRecognizers>
@@ -3781,7 +3781,7 @@
                                                                                     </customSpacing>
                                                                                 </stackView>
                                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kfk-Wb-e91" userLabel="AuthSubTitle">
-                                                                                    <rect key="frame" x="-2" y="186" width="312" height="20"/>
+                                                                                    <rect key="frame" x="-2" y="220" width="312" height="20"/>
                                                                                     <constraints>
                                                                                         <constraint firstAttribute="height" constant="20" id="jGw-8q-3GW"/>
                                                                                     </constraints>
@@ -3792,7 +3792,7 @@
                                                                                     </textFieldCell>
                                                                                 </textField>
                                                                                 <box boxType="custom" cornerRadius="7" translatesAutoresizingMaskIntoConstraints="NO" id="dM5-xC-dw9" userLabel="AuthBox">
-                                                                                    <rect key="frame" x="10" y="91" width="288" height="87"/>
+                                                                                    <rect key="frame" x="10" y="125" width="288" height="87"/>
                                                                                     <view key="contentView" id="UgU-87-3Yf">
                                                                                         <rect key="frame" x="1" y="1" width="286" height="85"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3828,7 +3828,7 @@
                                                                                     <color key="fillColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 </box>
                                                                                 <box boxType="custom" borderType="none" cornerRadius="7" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="Dwp-Mt-iek" userLabel="AuthButton">
-                                                                                    <rect key="frame" x="40" y="48" width="228" height="35"/>
+                                                                                    <rect key="frame" x="40" y="82" width="228" height="35"/>
                                                                                     <view key="contentView" id="m8h-V0-enR">
                                                                                         <rect key="frame" x="0.0" y="0.0" width="228" height="35"/>
                                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -3859,10 +3859,17 @@
                                                                                     <constraints>
                                                                                         <constraint firstAttribute="height" constant="35" id="xig-Vb-Kay"/>
                                                                                     </constraints>
+                                                                                    <gestureRecognizers>
+                                                                                        <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="Hsv-aQ-TGp" userLabel="MultiAuthClck">
+                                                                                            <connections>
+                                                                                                <action selector="MultiAuthClick:" target="UHm-9v-ehL" id="DIm-sy-GGj"/>
+                                                                                            </connections>
+                                                                                        </clickGestureRecognizer>
+                                                                                    </gestureRecognizers>
                                                                                     <color key="fillColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                                 </box>
                                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Mu-wX-CYG" userLabel="AuthTotal">
-                                                                                    <rect key="frame" x="18" y="0.0" width="272" height="40"/>
+                                                                                    <rect key="frame" x="18" y="34" width="272" height="40"/>
                                                                                     <constraints>
                                                                                         <constraint firstAttribute="height" constant="40" id="FLS-Oc-pUd"/>
                                                                                     </constraints>
@@ -3872,8 +3879,28 @@
                                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                                     </textFieldCell>
                                                                                 </textField>
+                                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ggb-FW-rEd">
+                                                                                    <rect key="frame" x="18" y="0.0" width="272" height="26"/>
+                                                                                    <constraints>
+                                                                                        <constraint firstAttribute="height" constant="26" id="OP5-Hg-By8"/>
+                                                                                    </constraints>
+                                                                                    <gestureRecognizers>
+                                                                                        <clickGestureRecognizer delaysPrimaryMouseButtonEvents="YES" numberOfClicksRequired="1" id="AZJ-A5-tw5" userLabel="DoSkip">
+                                                                                            <connections>
+                                                                                                <action selector="SkipMfa:" target="UHm-9v-ehL" id="HC8-0u-f7H"/>
+                                                                                            </connections>
+                                                                                        </clickGestureRecognizer>
+                                                                                    </gestureRecognizers>
+                                                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Skip" id="cI2-MR-lp6">
+                                                                                        <font key="font" metaFont="system"/>
+                                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                                    </textFieldCell>
+                                                                                </textField>
                                                                             </subviews>
                                                                             <constraints>
+                                                                                <constraint firstAttribute="trailing" secondItem="ggb-FW-rEd" secondAttribute="trailing" constant="20" id="29r-lS-ZPa"/>
+                                                                                <constraint firstItem="ggb-FW-rEd" firstAttribute="leading" secondItem="q6V-QD-gwU" secondAttribute="leading" constant="20" id="9Sq-NL-C4M"/>
                                                                                 <constraint firstItem="dM5-xC-dw9" firstAttribute="leading" secondItem="q6V-QD-gwU" secondAttribute="leading" constant="10" id="PeT-CL-b56"/>
                                                                                 <constraint firstItem="Kfk-Wb-e91" firstAttribute="top" secondItem="3I3-o9-oHu" secondAttribute="bottom" constant="-10" id="X6X-4k-MhF"/>
                                                                                 <constraint firstItem="3I3-o9-oHu" firstAttribute="leading" secondItem="q6V-QD-gwU" secondAttribute="leading" constant="10" id="aIY-NI-Rsb"/>
@@ -3892,8 +3919,10 @@
                                                                                 <integer value="1000"/>
                                                                                 <integer value="1000"/>
                                                                                 <integer value="1000"/>
+                                                                                <integer value="1000"/>
                                                                             </visibilityPriorities>
                                                                             <customSpacing>
+                                                                                <real value="3.4028234663852886e+38"/>
                                                                                 <real value="3.4028234663852886e+38"/>
                                                                                 <real value="3.4028234663852886e+38"/>
                                                                                 <real value="3.4028234663852886e+38"/>
@@ -3913,7 +3942,7 @@
                                                                     </constraints>
                                                                 </view>
                                                                 <constraints>
-                                                                    <constraint firstAttribute="height" constant="180" id="TsU-yR-4DO"/>
+                                                                    <constraint firstAttribute="height" constant="260" id="TsU-yR-4DO"/>
                                                                 </constraints>
                                                                 <shadow key="shadow" blurRadius="5">
                                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -3962,7 +3991,7 @@
                                                                             <rect key="frame" x="5" y="5" width="308" height="144"/>
                                                                             <subviews>
                                                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bP8-Ix-wCL" userLabel="MenuArea">
-                                                                                    <rect key="frame" x="10" y="104" width="288" height="40"/>
+                                                                                    <rect key="frame" x="10" y="191" width="288" height="40"/>
                                                                                     <subviews>
                                                                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="w7T-Fv-FYZ">
                                                                                             <rect key="frame" x="-2" y="12" width="24" height="16"/>
@@ -4018,7 +4047,7 @@
                                                                                     </customSpacing>
                                                                                 </stackView>
                                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QPO-3B-i7q" userLabel="AuthSubTitle">
-                                                                                    <rect key="frame" x="-2" y="94" width="312" height="20"/>
+                                                                                    <rect key="frame" x="-2" y="181" width="312" height="20"/>
                                                                                     <constraints>
                                                                                         <constraint firstAttribute="height" constant="20" id="Ejy-C8-gfE"/>
                                                                                     </constraints>
@@ -4852,6 +4881,7 @@
                                         <constraint firstItem="zpy-kv-rvg" firstAttribute="top" secondItem="W3c-1e-2tO" secondAttribute="top" id="uxi-b9-3HL"/>
                                         <constraint firstItem="Ayx-FD-cVQ" firstAttribute="top" secondItem="W3c-1e-2tO" secondAttribute="top" id="vOx-8m-vJa"/>
                                         <constraint firstAttribute="bottom" secondItem="YWJ-Us-RT9" secondAttribute="bottom" id="vRK-BG-UHv"/>
+                                        <constraint firstAttribute="bottom" secondItem="dBl-bZ-y8B" secondAttribute="bottom" id="y2t-tz-9M8"/>
                                         <constraint firstAttribute="bottom" secondItem="0c2-wg-2hS" secondAttribute="bottom" id="ySv-b7-oWL"/>
                                         <constraint firstAttribute="trailing" secondItem="FW6-ai-hao" secondAttribute="trailing" id="zQi-Im-odb"/>
                                     </constraints>
@@ -4971,6 +5001,10 @@
                         <outlet property="MenuButton" destination="A1r-HE-ekJ" id="r6b-kg-n8z"/>
                         <outlet property="MfaSubTitle" destination="9UF-hj-uxB" id="qqa-H7-jFI"/>
                         <outlet property="MultiAuthBox" destination="dBl-bZ-y8B" id="fcP-tp-7B2"/>
+                        <outlet property="MultiAuthButton" destination="Dwp-Mt-iek" id="1UP-mP-Q6o"/>
+                        <outlet property="MultiAuthCode" destination="UjT-LZ-a5L" id="iBy-ZL-K8v"/>
+                        <outlet property="MultiAuthDescription" destination="1Mu-wX-CYG" id="hZL-CR-MpR"/>
+                        <outlet property="MultiAuthTitle" destination="AfN-cF-Qt5" id="exU-6G-oah"/>
                         <outlet property="ParentView" destination="fPk-3A-94o" id="QSN-wW-lrC"/>
                         <outlet property="PortValue" destination="7st-GY-Zwr" id="NxG-R3-rYa"/>
                         <outlet property="PostureInfo" destination="BAc-Y1-DvX" id="yrC-b8-XN1"/>
@@ -4997,6 +5031,7 @@
                         <outlet property="ServiceName" destination="4Bg-iB-3lA" id="xXr-QH-mPb"/>
                         <outlet property="SetupAuthCode" destination="n5W-qd-xAt" id="QSJ-rP-wwA"/>
                         <outlet property="SetupAuthCodeText" destination="ZSa-yW-ZzQ" id="oYN-VK-N9G"/>
+                        <outlet property="SkipButton" destination="ggb-FW-rEd" id="09u-b1-Acn"/>
                         <outlet property="SortBy" destination="tEE-cu-tnx" id="qjl-uJ-nEt"/>
                         <outlet property="SortHow" destination="cQL-Rz-9yd" id="txe-ep-7ag"/>
                         <outlet property="SpeedArea" destination="Wpj-1q-2La" id="RcG-Lw-s1X"/>

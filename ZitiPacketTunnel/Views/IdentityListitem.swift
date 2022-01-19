@@ -41,6 +41,12 @@ class IdentityListitem: NSView {
     var vc:DashboardScreen!;
     let XIB = "IdentityListItem";
     var isMfaRequired = false;
+    var wasNotified = false;
+    var needsMfa = 0;
+    var hasMfa = 0;
+    var totalServices = 0;
+    var maxTimeout = Int32(-1);
+    var minTimeout = Int32(-1);
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -116,10 +122,6 @@ class IdentityListitem: NSView {
     }
     
     public func CheckMfaRequiredByChecks() {
-        var needsMfa = 0;
-        var hasMfa = 0;
-        var totalServices = 0;
-        var timeout = Int32(-1);
         for service in self.zid.services {
             totalServices += 1;
             guard let checks = service.postureQuerySets else {
@@ -141,8 +143,15 @@ class IdentityListitem: NSView {
                                 continue
                             }
                             
-                            if (remaining>timeout) {
-                                timeout = remaining;
+                            if (remaining > self.maxTimeout) {
+                                self.maxTimeout = remaining;
+                            }
+                            if (remaining < self.minTimeout) {
+                                self.minTimeout = remaining;
+                            } else {
+                                if (remaining >= 0 && self.minTimeout == -1) {
+                                    self.minTimeout = remaining;
+                                }
                             }
                         }
                     }
@@ -155,20 +164,36 @@ class IdentityListitem: NSView {
                 // Nothin is authorized, show authorize
                 self.ShowImage(name: "authorize");
             } else {
-                if (timeout > -1) {
-                    if (timeout > 0) {
-                        if (timeout <= 1200) {
-                            // Within 20 minutes, show timing out
-                            self.ShowImage(name: "timeout");
-                            let available = totalServices - needsMfa;
-                            ServicesLabel.stringValue = "\(available)/\(totalServices)";
-                        }
+                if (self.minTimeout > -1) {
+                    if (self.maxTimeout > 0) {
+                        
+                        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(self.UpdateTimer)), userInfo: nil, repeats: true);
                     } else {
                         // All tiemd out, show authorize icon
                         self.ShowImage(name: "authorize");
                     }
                 }
             }
+        }
+    }
+    
+    func CheckTimers() {
+        if (self.minTimeout <= 1200) {
+            // Within 20 minutes, show timing out
+            if (!self.wasNotified) {
+                self.wasNotified = true;
+                let notification = NSUserNotification();
+                notification.identifier = "zid-notify-"+self.zid.id;
+                notification.title = "Service Access Warning";
+                notification.subtitle = "You must authenticate";
+                notification.informativeText = "The services for \(self.zid.name) identity will be timing out shortly, please reauthenticate to maintain acces.";
+                notification.soundName = NSUserNotificationDefaultSoundName;
+                let notificationCenter = NSUserNotificationCenter.default;
+                notificationCenter.deliver(notification);
+            }
+            self.ShowImage(name: "timeout");
+            let available = totalServices - needsMfa;
+            ServicesLabel.stringValue = "\(available)/\(totalServices)";
         }
     }
     
@@ -194,8 +219,14 @@ class IdentityListitem: NSView {
         }
     }
     
-    public func UpdateTimerValues() {
-        
+    @objc public func UpdateTimer() {
+        if (self.minTimeout > 0) {
+            self.minTimeout -= 1;
+        }
+        if (self.maxTimeout > 0) {
+            self.maxTimeout -= 1;
+        }
+        CheckTimers();
     }
     
     @IBAction func ToggleClicked(_ sender: NSClickGestureRecognizer) {
