@@ -251,6 +251,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             ShowProgress("Please Wait", "Disconnecting...");
             break
         case .disconnected:
+            self.totalMfa = 0;
+            self.mfaIndex = 0;
             if (self.isConnecting) {
                 self.isConnecting = false;
                 for zid in zidMgr.zids {

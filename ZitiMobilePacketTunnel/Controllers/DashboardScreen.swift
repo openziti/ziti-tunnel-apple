@@ -50,7 +50,7 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         timeLaunched += 1;
     }
     
-    @IBAction func DoConnect(_ sender: UITapGestureRecognizer) {
+    func Connect() {
         TimerLabel.text = "00:00.00";
         ConnectButton.isHidden = true;
         ConnectedButton.isHidden = false;
@@ -69,12 +69,16 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         }
     }
     
+    @IBAction func DoConnect(_ sender: UITapGestureRecognizer) {
+        self.Connect();
+    }
+    
     @IBAction func DoDisconnect(_ sender: UITapGestureRecognizer) {
         TimerLabel.text = "00:00.00";
         timer.invalidate();
         ConnectButton.isHidden = false;
         ConnectedButton.isHidden = true;
-        tunnelMgr.stopTunnel()
+        tunnelMgr.stopTunnel();
     }
     
     @IBAction func CloseMenuGesture(_ sender: UITapGestureRecognizer) {
@@ -137,6 +141,15 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         }
     }
     
+    @IBAction func ShowAddIdentity(_ sender: UITapGestureRecognizer) {
+        let storyBoard : UIStoryboard = UIStoryboard(name: "MainUI", bundle:nil);
+        let screen = storyBoard.instantiateViewController(withIdentifier: "AddIdentity") as! AddIdentityScreen;
+        screen.zidMgr = zidMgr;
+        screen.dash = self;
+        screen.modalPresentationStyle = .fullScreen;
+        self.present(screen, animated:true, completion:nil);
+    }
+    
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
         return "";
     }
@@ -182,174 +195,12 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             }
         //}
         var index = 0;
+        
         for identity in zidMgr.zids {
-            
-            
-            // First Column of Identity Item Renderer
-            let toggler = UISwitch(frame: CGRect(x: 0, y: 0, width: 75, height: 30));
-            toggler.heightAnchor.constraint(equalToConstant: 30).isActive = true;
-            let connectLabel = UILabel();
-            
-            connectLabel.frame.size.height = 20;
-            connectLabel.font = UIFont(name: "Open Sans", size: 10);
-            connectLabel.textColor = UIColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
-            
-            toggler.isEnabled = identity.isEnrolled;
-            toggler.isOn = identity.isEnabled;
-            toggler.isUserInteractionEnabled = true;
-            toggler.tag = index;
-            toggler.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
-            toggler.addTarget(self, action: #selector(switchValueDidChange), for: .valueChanged)
-            
-            if (identity.isEnrolled) {
-                if (identity.isEnabled) {
-                    connectLabel.text = "connected";
-                } else {
-                    connectLabel.text = "disconnected";
-                }
-            } else {
-                connectLabel.text = "not enrolled";
-            }
-            
-            
-            let leadLabel1 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 5));
-            leadLabel1.text = " ";
-            
-            let col1 = UIStackView(arrangedSubviews: [leadLabel1,toggler,connectLabel]);
-            
-            col1.frame.size.width = 75;
-            col1.distribution = .fill;
-            col1.alignment = .center;
-            col1.spacing = 0;
-            col1.axis = .vertical;
-            col1.widthAnchor.constraint(equalToConstant: 75).isActive = true;
-            col1.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            
-            
-            // Label Column of Identity Item Renderer
-            let idName = UILabel();
-            
-            idName.font = UIFont(name: "Open Sans", size: 22);
-            idName.textColor = UIColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00);
-            idName.heightAnchor.constraint(equalToConstant: 30).isActive = true;
-            
-            idName.text = String(String(identity.name).prefix(10));
-            
-            
-            let idServer = UILabel();
-            idServer.font = UIFont(name: "Open Sans", size: 10);
-            idServer.textColor = UIColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.0);
-            idServer.frame.size.height = 20;
-            idServer.text = identity.czid?.ztAPI;
-            
-            let leadLabel2 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 5));
-            leadLabel2.text = " ";
-            
-            let col2 = UIStackView(arrangedSubviews: [leadLabel2, idName, idServer]);
-            col2.distribution = .fill;
-            col2.alignment = .leading;
-            col2.spacing = 0;
-            col2.frame.size.width = 100;
-            col2.axis = .vertical;
-            col2.isUserInteractionEnabled = true;
-            col2.tag = index;
-            col2.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col2.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
-            
-            
-            // Count column for the item renderer
-            
-            let serviceCountFrame = UIView();
-            let circlePath = UIBezierPath(arcCenter: CGPoint(x: 0, y: 15), radius: CGFloat(15), startAngle: CGFloat(0), endAngle: CGFloat(Double.pi * 2), clockwise: true);
-            let shapeLayer = CAShapeLayer();
-            serviceCountFrame.frame = CGRect(x: 0, y: 0, width: 50, height: 40)
-            shapeLayer.path = circlePath.cgPath;
-            shapeLayer.fillColor = UIColor(named: "PrimaryColor")?.cgColor;
-            
-            let idServiceCount = UILabel();
-            idServiceCount.textAlignment = .center;
-            idServiceCount.font = UIFont(name: "Open Sans", size: 22);
-            idServiceCount.textColor = UIColor(red: 1.00, green: 1.00, blue: 1.00, alpha: 1.00)
-            idServiceCount.text = String(identity.services.count);
-            idServiceCount.heightAnchor.constraint(equalToConstant: 30).isActive = true;
-            
-            let serviceLabel = UILabel();
-            serviceLabel.textAlignment = .center;
-            serviceLabel.text = "services";
-            serviceLabel.frame.size.height = 20;
-            serviceLabel.font = UIFont(name: "Open Sans", size: 10);
-            serviceLabel.textColor = UIColor(red: 0.80, green: 0.80, blue: 0.80, alpha: 1.00)
-            
-            //serviceCountFrame.layer.addSublayer(shapeLayer);
-            serviceCountFrame.addSubview(idServiceCount);
-            
-            
-            let leadLabel3 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 5));
-            leadLabel3.text = " ";
-            
-            let col3 = UIStackView(arrangedSubviews: [leadLabel3, idServiceCount, serviceLabel]);
-            col3.frame.size.width = 50;
-            col3.distribution = .fill;
-            col3.alignment = .center;
-            col3.spacing = 0;
-            col3.axis = .vertical;
-            col3.isUserInteractionEnabled = true;
-            col3.tag = index;
-            col3.heightAnchor.constraint(equalToConstant: 50).isActive = true;
-            col3.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
-            col3.widthAnchor.constraint(equalToConstant: 50).isActive = true;
-            
-            
-            
-            
-            // Arrow image for Item Renderer
-            
-            let arrowImage = UIImage(named: "next");
-            let arrowView = UIImageView();
-            arrowView.frame = CGRect(x: 10, y: 10, width: 10, height: 10);
-            arrowView.contentMode = .scaleAspectFit;
-            arrowView.image = arrowImage;
-            arrowView.widthAnchor.constraint(equalToConstant: 20).isActive = true;
-            arrowView.heightAnchor.constraint(equalToConstant: 20).isActive = true;
-            
-            // These are simple margins because iOS keeps ignoring margin settings
-            let leadLabel4 = UILabel(frame: CGRect(x: 0, y: 0, width: 30, height: 10));
-            leadLabel4.text = " ";
-            
-            
-            let col4 = UIStackView(arrangedSubviews: [leadLabel4,arrowView]);
-            col4.distribution = .fillProportionally;
-            col4.alignment = .center;
-            col4.spacing = 0;
-            col4.axis = .vertical;
-            col4.isUserInteractionEnabled = true;
-            col4.tag = index;
-            col4.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.GoToDetails(gesture:))));
-            col4.widthAnchor.constraint(equalToConstant: 75).isActive = true;
-            
-
-
-      
-            // Put all the columns into the parent frames
-            
-            let renderer = UIStackView(arrangedSubviews: [col1,col2,col3,col4]);
-            renderer.axis = .horizontal;
-            renderer.distribution = .fill;
-            renderer.backgroundColor = UIColor(red: 0.05, green: 0.06, blue: 0.13, alpha: 1.00);
-            renderer.alignment = .center;
-            renderer.translatesAutoresizingMaskIntoConstraints = true;
-            renderer.spacing = 4;
-            renderer.frame = CGRect(x: 0, y: CGFloat((index*70)+(index*2)), width: view.frame.size.width, height: 70);
-            // renderer.frame = CGRect(x: 0, y: CGFloat(index*60), width: view.frame.size.width, height: 60)
-            // view.frame.size.width
-            /*
-            let lineView = UIView();
-            
-            lineView.addSubview(renderer);
-            lineView.frame.size.height = 60;
-            lineView.isUserInteractionEnabled = true;
-            */
-            IdentityList.addSubview(renderer);
+            let identityItem = IdentityListitem();
+            identityItem.setIdentity(identity: identity, vc: self)
+            identityItem.frame = CGRect(x: 0, y: CGFloat(index*62), width: 340, height: 60);
+            IdList.addArrangedSubview(identityItem);
             index = index + 1;
         }
         IdentityList.contentSize.height = CGFloat(index*72);
@@ -368,33 +219,6 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
             self.reloadList();
             self.tunnelMgr.restartTunnel();
            // }
-        }
-    }
-    
-    func onNewUrl(_ url:URL) {
-        DispatchQueue(label: "JwtLoader").async {
-            do {
-                try self.zidMgr.insertFromJWT(url, at: 0)
-                DispatchQueue.main.async {
-                    // Send to details
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    let alert = UIAlertController(
-                        title:"Unable to add identity",
-                        message: error.localizedDescription,
-                        preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
-                    self.present(alert, animated: true, completion: nil)
-                    NSLog("Unable to add identity: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
-    
-    @objc func onNewUrlNotification(_ notification: NSNotification) {
-        if let dict = notification.userInfo as NSDictionary?, let url = dict["url"] as? URL {
-            onNewUrl(url)
         }
     }
     
@@ -450,15 +274,17 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
         // init the manager
         tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
             DispatchQueue.main.async {
-                self.reloadList();
+                // Load previous identities
+                if let err = self.zidMgr.loadZids() {
+                    NSLog(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
+                }
+                if (self.tunnelMgr.status == .disconnected) {
+                    self.Connect();
+                } else {
+                    self.reloadList();
+                }
             }
         }
-        
-        // Load previous identities
-        if let err = zidMgr.loadZids() {
-            NSLog(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
-        }
-        self.reloadList();
     }
     
     func deviceName() -> String {
@@ -508,6 +334,33 @@ class DashboardScreen: UIViewController, UIActivityItemSource, MFMailComposeView
     @IBAction func ShowSupport(_ sender: UITapGestureRecognizer) {
         let url = URL (string: "https://openziti.discourse.group")!
         UIApplication.shared.open (url)
+    }
+    
+    func onNewUrl(_ url:URL) {
+        DispatchQueue(label: "JwtLoader").async {
+            do {
+                try self.zidMgr.insertFromJWT(url, at: 0)
+                DispatchQueue.main.async {
+                    // Send to details
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(
+                        title:"Unable to add identity",
+                        message: error.localizedDescription,
+                        preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+                    self.present(alert, animated: true, completion: nil)
+                    NSLog("Unable to add identity: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    @objc func onNewUrlNotification(_ notification: NSNotification) {
+        if let dict = notification.userInfo as NSDictionary?, let url = dict["url"] as? URL {
+            onNewUrl(url)
+        }
     }
     
     
