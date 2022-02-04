@@ -231,6 +231,17 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         _ = zidStore.store(zid)
     }
     
+    private func handleApiEvent(_ ziti:Ziti, _ zid:ZitiIdentity, _ zidStore:ZitiIdentityStore, _ zEvent:ZitiEvent) {
+        guard let event = zEvent.apiEvent else {
+            zLog.wtf("invalid event")
+            return
+        }
+        
+        zLog.info("\(zid.name):(\(zid.id)) \(zEvent.debugDescription)")
+        zLog.info("Saving zid file, newControllerAddress=\(event.newControllerAddress).")
+        _ = zidStore.store(zid)
+    }
+    
     private func registerEventHandler(_ ziti:Ziti, _ zid:ZitiIdentity, _ zidStore:ZitiIdentityStore, _ gotServices: @escaping () ->Void) {
         ziti.registerEventCallback { zEvent in
             guard let zEvent = zEvent else {
@@ -246,6 +257,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                 self.handleServiceEvent(ziti, zid, zidStore, zEvent)
             case .MfaAuth:
                 self.ipcServer?.queueMsg(IpcMfaAuthQueryMessage(zid.id, zEvent.mfaAuthEvent?.mfaAuthQuery))
+            case .ApiEvent: self.handleApiEvent(ziti, zid, zidStore, zEvent)
             case .Invalid: zLog.error("Invalid event")
             @unknown default: zLog.error("unrecognized event type \(zEvent.type.debug)")
             }
@@ -421,7 +433,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
         
-        #if true // intercept_by_match_domains
+        #if false // intercept_by_match_domains
             // Add in all the hostnames we want to intercept as 'matchDomains'. We'll get some extras, but that's ok, we'll proxy 'em...
             var matchDomains = self.dnsResolver?.hostnames
             
@@ -510,10 +522,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     override func sleep(completionHandler: @escaping () -> Void) {
+        zLog.info("---Sleep---")
         completionHandler()
     }
     
     override func wake() {
-        // Add code here to wake up.
+        zLog.info("---Wake---")
     }
 }
