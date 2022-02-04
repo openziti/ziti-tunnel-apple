@@ -82,7 +82,7 @@ class AdvancedViewController: UITableViewController {
                     return
                 }
                 guard let dumpResp = respMsg as? IpcDumpResponseMessage,
-                      let str = dumpResp.dump else {
+                      var str = dumpResp.dump else {
                     zLog.error("Unable to parse snapshot (dump) string from response message")
                     return
                 }
