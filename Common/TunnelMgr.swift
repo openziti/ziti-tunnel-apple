@@ -128,7 +128,9 @@ class TunnelMgr: NSObject {
                     
                     completionHandler?(tpm, nil)
                     tmgr.tsChangedCallbacks.forEach { cb in cb(tmgr.status) }
-                    if tmgr.status != .disconnected { tmgr.ipcClient.startPolling() }
+                    #if os(macOS)
+                        if tmgr.status != .disconnected { tmgr.ipcClient.startPolling() }
+                    #endif
                 } else {
                     completionHandler?(nil, ZitiError("Tunnel preferencecs load fail due to retain scope"))
                 }
