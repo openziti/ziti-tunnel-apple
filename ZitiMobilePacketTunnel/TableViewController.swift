@@ -130,8 +130,10 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 
                 // always take new service from tunneler...
                 match.services = zid.services
-                match.czid?.name = zid.name
                 match.controllerVersion = zid.controllerVersion
+                match.mfaEnabled = zid.mfaEnabled
+                match.czid?.name = zid.name
+                match.czid?.ztAPI = zid.czid?.ztAPI ?? ""
             } else {
                 // new one.  generally zids are only added by this app (so will be matched above).
                 // But possible somebody could load one manually or some day via MDM or somesuch
