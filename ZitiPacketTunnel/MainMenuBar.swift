@@ -255,7 +255,11 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     @objc func connect(_ sender: Any?) {
         if tunConnectItem.title == "Connect" {
-            try? TunnelMgr.shared.startTunnel()
+            do {
+                try TunnelMgr.shared.startTunnel()
+            } catch {
+                zLog.error("Exception staring tunnel: \(error.localizedDescription)")
+            }
         } else {
             TunnelMgr.shared.stopTunnel()
         }
