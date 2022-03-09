@@ -142,7 +142,12 @@ class TunnelMgr: NSObject {
         if tunnelRestarting == true {
             if status == .disconnected {
                 tunnelRestarting = false
-                try? startTunnel()
+                do {
+                    try startTunnel()
+                } catch {
+                    zLog.error("Failed (re-)starting tunnel \(error.localizedDescription)")
+                }
+                
             }
             tsChangedCallbacks.forEach { cb in cb(.reasserting) }
         } else {
@@ -157,9 +162,18 @@ class TunnelMgr: NSObject {
     }
     
     func startTunnel() throws {
-        guard let tpm = self.tpm else { return }
+        guard let tpm = self.tpm else {
+            zLog.error("Unable to access TPM")
+            return
+        }
+        
         if tpm.isEnabled {
-            try (tpm.connection as? NETunnelProviderSession)?.startTunnel()
+            guard let tps = (tpm.connection as? NETunnelProviderSession) else {
+                zLog.error("Unable to access connection as NETunnelProviderSession")
+                return
+            }
+            zLog.info("starting tunnel")
+            try tps.startTunnel()
         } else {
             zLog.warn("startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
             tpm.isEnabled = true
@@ -172,6 +186,7 @@ class TunnelMgr: NSObject {
                     tpm.loadFromPreferences { [weak tpm] error in
                         zLog.error("Re-loaded preferences, error=\(error != nil). Attempting to start")
                         do {
+                            zLog.info("Attempting to start tunnel after load from preferences")
                             try (tpm?.connection as? NETunnelProviderSession)?.startTunnel()
                         } catch {
                             zLog.error("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
