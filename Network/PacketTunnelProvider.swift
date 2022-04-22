@@ -25,7 +25,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     var interceptedRoutes:[NEIPv4Route] = []
     let netMon = NWPathMonitor()
     var allZitis:[Ziti] = [] // for ziti.dump...
-    var zitiTunnel:ZitiTunnel!
+    var zitiTunnel:ZitiTunnel?
     var writeLock = NSLock()
     var ipcServer:IpcAppexServer?
     let zidStore = ZitiIdentityStore()
@@ -109,7 +109,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         }
         
         // start 'er up
-        zitiTunnel.startZiti(zids, ZitiPostureChecks()) { zErr in
+        zitiTunnel?.startZiti(zids, ZitiPostureChecks()) { zErr in
             guard zErr == nil else {
                 zLog.error("Unable to load identites: \(zErr!.localizedDescription)")
                 completionHandler(zErr)
@@ -178,14 +178,21 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         //let dumpStr = dumpZitis()
         //zLog.info(dumpStr)
-        completionHandler()
-        // Just exit - there are bugs in Apple macOS, plus makes sure we're 'clean' on restart
-        zLog.info("")
-        exit(EXIT_SUCCESS)
+        
+        guard let zitiTunnel = zitiTunnel else {
+            zLog.error("No valid zitiTunnel context found. Exiting.")
+            exit(EXIT_SUCCESS)
+        }
+        
+        zitiTunnel.shutdownZiti {
+            completionHandler()
+            zLog.info("Exiting")
+            exit(EXIT_SUCCESS)
+        }
     }
     
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?) {
-        zLog.info("")
+        zLog.debug("")
         guard let ipcServer = self.ipcServer else {
             zLog.wtf("Invalid/unitialized ipcServer")
             return
@@ -206,7 +213,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         packetFlow.readPacketObjects { (packets:[NEPacket]) in
             for packet in packets {
                 if packet.data.count > 0 {
-                        self.zitiTunnel.queuePacket(packet.data)
+                    self.zitiTunnel?.queuePacket(packet.data)
                 }
             }
             self.readPacketFlow()
@@ -225,7 +232,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         
         let parts = dest.components(separatedBy: "/")
         guard (parts.count == 1 || parts.count == 2) && IPUtils.isValidIpV4Address(parts[0]) else {
-            // TODO: log
+            zLog.error("Invalid destinationAddress: \(destinationAddress)")
             return -1
         }
         if parts.count == 2, let prefixPart = UInt32(parts[1]) {
@@ -292,13 +299,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         if let contextEvent = event as? ZitiTunnelContextEvent {
             handleContextEvent(ziti, tzid, contextEvent)
         } else if let apiEvent = event as? ZitiTunnelApiEvent {
-            zLog.warn("TODO: apiEvent \(apiEvent.newControllerAddress)")
             handleApiEvent(ziti, tzid, apiEvent)
         } else if let serviceEvent = event as? ZitiTunnelServiceEvent {
             handleServiceEvent(ziti, tzid, serviceEvent)
         } else if let mfaEvent = event as? ZitiTunnelMfaEvent {
             zLog.warn("TODO: mfaEvent \(mfaEvent.operation) not implemented")
-            /* Code when handling event directly from C-SDK (the only MFA event I expect - not sure what's going on with TunnelEvent for MFA...
+            /* Code when handling event directly from C-SDK...
              case .MfaAuth:
                  self.ipcServer?.queueMsg(IpcMfaAuthQueryMessage(zid.id, zEvent.mfaAuthEvent?.mfaAuthQuery))
              */
@@ -344,8 +350,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                     }
                 }
                 if identitiesLoaded {
-                    // TODO: Consider changing this to an IpcMessage indicating restart required?  Of, just have the appReact that way
-                    // based on detecting needsRestart...
                     zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
                 }
                 tzid.services.append(zSvc)
