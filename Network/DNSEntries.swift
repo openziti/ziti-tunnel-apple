@@ -17,7 +17,7 @@
 import Foundation
 import NetworkExtension
 
-class DNSResolver : NSObject {
+class DNSEntries : NSObject {
     class DnsEntry : NSObject {
         let hostname:String
         let ip:String
@@ -30,18 +30,14 @@ class DNSResolver : NSObject {
         }
     }
     var dnsEntries:[DnsEntry] = []
-    var dnsLock = NSLock()
     
     var hostnames:[String] {
         var nms:[String] = []
-        dnsLock.lock()
         dnsEntries.forEach { nms.append($0.hostname) }
-        dnsLock.unlock()
         return nms
     }
     
     func addDnsEntry(_ hostname:String, _ ip:String, _ serviceId: String) {
-        dnsLock.lock()
         let matches = dnsEntries.filter{ return $0.hostname.caseInsensitiveCompare(hostname) == .orderedSame }
         if matches.count > 0 {
             matches.forEach { m in
@@ -51,12 +47,9 @@ class DNSResolver : NSObject {
             let newEntry = DnsEntry(hostname, ip, serviceId)
             dnsEntries.append(newEntry)
         }
-        dnsLock.unlock()
     }
     
     func removeDnsEntry(_ serviceId:String) {
-        dnsLock.lock()
-        
         // drop this serviceId from all entries
         dnsEntries.forEach { e in
             e.serviceIds = e.serviceIds.filter { $0 != serviceId }
@@ -64,15 +57,12 @@ class DNSResolver : NSObject {
         
         // drop all entries with no service Id
         dnsEntries = dnsEntries.filter { $0.serviceIds.count > 0 }
-        dnsLock.unlock()
     }
     
     func dumpDns() {
-        dnsLock.lock()
         dnsEntries.forEach { e in
             zLog.debug("hostname: \(e.hostname), ip: \(e.ip), serviceIds: \(e.serviceIds)")
         }
-        dnsLock.unlock()
     }
     
     // To resolve IP addresses we are not intercepting

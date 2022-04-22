@@ -337,7 +337,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
             do {
                 try tunnelMgr.startTunnel()
             } catch {
-                dialogAlert("Tunnel Error", error.localizedDescription)
+                dialogAlert("Error starting tunnel", error.localizedDescription)
             }
         } else {
             tunnelMgr.stopTunnel()

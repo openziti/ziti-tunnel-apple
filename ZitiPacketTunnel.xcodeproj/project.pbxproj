@@ -44,7 +44,7 @@
 		5A2EA2EE209B758800437608 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A2EA2EC209B756400437608 /* NetworkExtension.framework */; };
 		5A2EA2F0209B75B700437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
 		5A2EA2F1209B75B800437608 /* ProviderConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2EA2A52097890400437608 /* ProviderConfig.swift */; };
-		5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSResolver.swift */; };
+		5A2EA2F9209B75E100437608 /* DNSEntries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSEntries.swift */; };
 		5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */; };
 		5A34E95E2278F49100E221DD /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E95D2278F49100E221DD /* Version.swift */; };
@@ -100,6 +100,11 @@
 		5ABA5EDD2274D2EC00B2221D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABA5ED92274D2EB00B2221D /* Logger.swift */; };
 		5ABF9863260C13EF00AA982F /* SnapshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABF9862260C13EF00AA982F /* SnapshotViewController.swift */; };
 		5ABF986B260C2DED00AA982F /* SnapshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABF986A260C2DED00AA982F /* SnapshotViewController.swift */; };
+		5ADAE97C280F7F66007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFE864527E3C6AA00D47A47 /* libresolv.9.tbd */; };
+		5ADAE97D280F7F6F007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFE864527E3C6AA00D47A47 /* libresolv.9.tbd */; };
+		5ADAE97F280F7F7F007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */; };
+		5ADAE980280F7F86007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */; };
+		5ADAE981280F7F8E007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */; };
 		5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF3DCAB24B52642005047BC /* ShareViewController.swift */; };
@@ -112,7 +117,7 @@
 		5AF5113E25842EDE0092DC47 /* MMjge6vGg.zid in Resources */ = {isa = PBXBuildFile; fileRef = 5AF5113925842EDE0092DC47 /* MMjge6vGg.zid */; };
 		5AF5113F25842EDE0092DC47 /* sPxn6MJGR.zid in Resources */ = {isa = PBXBuildFile; fileRef = 5AF5113A25842EDE0092DC47 /* sPxn6MJGR.zid */; };
 		5AF7868B208A91650093498C /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
-		5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSResolver.swift */; };
+		5AF786992090FFCA0093498C /* DNSEntries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSEntries.swift */; };
 		5AF9C24A2268F84A009CFD71 /* IdentityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9C2492268F84A009CFD71 /* IdentityViewController.swift */; };
 		5AF9C24C226B6FAC009CFD71 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AF9C24B226B6FAC009CFD71 /* Default-568h@2x.png */; };
 		5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76C225D644A0048B2F6 /* TableViewController.swift */; };
@@ -269,6 +274,8 @@
 		5ABA5ED92274D2EB00B2221D /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		5ABF9862260C13EF00AA982F /* SnapshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotViewController.swift; sourceTree = "<group>"; };
 		5ABF986A260C2DED00AA982F /* SnapshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotViewController.swift; sourceTree = "<group>"; };
+		5ADAE974280F7837007D1DF4 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.9.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/usr/lib/libresolv.9.tbd; sourceTree = DEVELOPER_DIR; };
 		5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PacketTunnelProvider-Bridging-Header.h"; sourceTree = "<group>"; };
 		5AF0C41C24951A9F00CD4DAE /* libziti_tunneler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler.a"; sourceTree = "<group>"; };
 		5AF0C41D24951A9F00CD4DAE /* libziti_tunneler_cbs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler_cbs.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler_cbs.a"; sourceTree = "<group>"; };
@@ -296,9 +303,10 @@
 		5AF5113925842EDE0092DC47 /* MMjge6vGg.zid */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MMjge6vGg.zid; sourceTree = "<group>"; };
 		5AF5113A25842EDE0092DC47 /* sPxn6MJGR.zid */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sPxn6MJGR.zid; sourceTree = "<group>"; };
 		5AF78688208A8D050093498C /* IPUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPUtils.swift; sourceTree = "<group>"; };
-		5AF786982090FFCA0093498C /* DNSResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResolver.swift; sourceTree = "<group>"; };
+		5AF786982090FFCA0093498C /* DNSEntries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSEntries.swift; sourceTree = "<group>"; };
 		5AF9C2492268F84A009CFD71 /* IdentityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityViewController.swift; sourceTree = "<group>"; };
 		5AF9C24B226B6FAC009CFD71 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		5AFE864527E3C6AA00D47A47 /* libresolv.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.9.tbd; path = usr/lib/libresolv.9.tbd; sourceTree = SDKROOT; };
 		5AFEB76C225D644A0048B2F6 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewController.swift; sourceTree = "<group>"; };
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
@@ -326,6 +334,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ADAE97D280F7F6F007D1DF4 /* libresolv.9.tbd in Frameworks */,
 				5A02AAE420703167006261C6 /* NetworkExtension.framework in Frameworks */,
 				CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */,
 			);
@@ -335,6 +344,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ADAE97C280F7F66007D1DF4 /* libresolv.9.tbd in Frameworks */,
 				5A02AADC206EBE85006261C6 /* NetworkExtension.framework in Frameworks */,
 				AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */,
 			);
@@ -344,6 +354,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ADAE97F280F7F7F007D1DF4 /* libresolv.9.tbd in Frameworks */,
 				5A2EA2EE209B758800437608 /* NetworkExtension.framework in Frameworks */,
 				55A0E70B6BBA0162D541670B /* Pods_ios_targets_Ziti_Mobile_Edge.framework in Frameworks */,
 			);
@@ -353,6 +364,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ADAE980280F7F86007D1DF4 /* libresolv.9.tbd in Frameworks */,
 				5A2EA2ED209B756400437608 /* NetworkExtension.framework in Frameworks */,
 				17D8A0F17887892FEC22834E /* Pods_ios_targets_MobilePacketTunnelProvider.framework in Frameworks */,
 			);
@@ -362,6 +374,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ADAE981280F7F8E007D1DF4 /* libresolv.9.tbd in Frameworks */,
 				29F81AE5DB22FF0C9F866325 /* Pods_ios_targets_MobileShare.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -429,6 +442,9 @@
 		5A02AAD8206EBE3C006261C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */,
+				5ADAE974280F7837007D1DF4 /* libresolv.tbd */,
+				5AFE864527E3C6AA00D47A47 /* libresolv.9.tbd */,
 				5A411E422520E036005EE351 /* libziti-tunnel-cbs-c.a */,
 				5A411E412520E036005EE351 /* libziti-tunnel-sdk-c.a */,
 				5A411E452520E06D005EE351 /* libziti-tunnel-cbs-c.a */,
@@ -462,7 +478,7 @@
 		5A2EA2C4209B317200437608 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				5AF786982090FFCA0093498C /* DNSResolver.swift */,
+				5AF786982090FFCA0093498C /* DNSEntries.swift */,
 				5AF78688208A8D050093498C /* IPUtils.swift */,
 				5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */,
 				5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */,
@@ -1074,7 +1090,7 @@
 				5A0D1D2D222B093F00D01F30 /* ZitiError.swift in Sources */,
 				5A8702CF2230B24B00314199 /* ZitiService.swift in Sources */,
 				5A5539102558425900C02F03 /* ZitiPostureChecks.swift in Sources */,
-				5AF786992090FFCA0093498C /* DNSResolver.swift in Sources */,
+				5AF786992090FFCA0093498C /* DNSEntries.swift in Sources */,
 				5AB0FDD7265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
 				5A78DEE425631E1000316CE9 /* AppGroup.swift in Sources */,
@@ -1133,7 +1149,7 @@
 				5A91B4CA2222E156006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5AB0FDD9265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
-				5A2EA2F9209B75E100437608 /* DNSResolver.swift in Sources */,
+				5A2EA2F9209B75E100437608 /* DNSEntries.swift in Sources */,
 				5A2EA2FB209B75E900437608 /* IPUtils.swift in Sources */,
 				5A6C80BB26F63DC000F283AE /* IpcAppexServer.swift in Sources */,
 				5A78DEE625631E1000316CE9 /* AppGroup.swift in Sources */,
@@ -1444,7 +1460,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 447;
+				CURRENT_PROJECT_VERSION = 448;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1469,7 +1485,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 447;
+				CURRENT_PROJECT_VERSION = 448;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1494,7 +1510,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 447;
+				CURRENT_PROJECT_VERSION = 448;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
@@ -1523,7 +1539,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 447;
+				CURRENT_PROJECT_VERSION = 448;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
