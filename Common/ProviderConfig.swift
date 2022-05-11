@@ -23,7 +23,7 @@ enum ProviderConfigError : Error {
     case invalidSubnetMask
     case invalidMtu
     case invalidDnsAddresses
-    case invalidMatchDomains
+    case invalidFallbackDns
 
     var description: String {
         switch self {
@@ -31,7 +31,7 @@ enum ProviderConfigError : Error {
         case .invalidSubnetMask: return "Invalid Subnet Mask (axpect valid IPv4 subnet mask)"
         case .invalidMtu: return "Invalid MTU"
         case .invalidDnsAddresses: return "Invalid DNS Addresses (expect comma-delimited list of IPv4 addresses)"
-        case .invalidMatchDomains: return "Invalid DNS Match Domains (expect comma-delimited list of domains)"
+        case .invalidFallbackDns: return "Invalid Fallback DNS (expect valid IPv4 address"
         }
     }
 }
@@ -44,7 +44,10 @@ class ProviderConfig : NSObject {
     static var SUBNET_KEY = "subnet"
     static var MTU_KEY = "mtu"
     static var DNS_KEY = "dns"
-    static var MATCH_DOMAINS_KEY = "matchDomains"
+    static var FALLBACK_DNS_ENABLED_KEY = "fallbackDnsEnabled"
+    static var FALLBACK_DNS_KEY = "fallbackDns"
+    static var INTERCEPT_MATCHED_DNS_KEY = "interceptMatchedDns"
+    static var ENABLE_MFA_KEY = "enableMfa"
     static var LOG_LEVEL = "logLevel"
     
     // some defaults in case .mobileconfig not used
@@ -56,7 +59,8 @@ class ProviderConfig : NSObject {
     var mtu:Int = 4000
     #endif
     var dnsAddresses:[String] = ["100.64.0.2"]
-    var dnsMatchDomains:[String] = [""]
+    var fallbackDnsEnabled = false
+    var fallbackDns:String = "1.1.1.1"
     var username = "Ziti"
 #if os(macOS)
     var localizedDescription = "Ziti Desktop Edge"
@@ -64,14 +68,19 @@ class ProviderConfig : NSObject {
     var localizedDescription = "Ziti Mobile Edge"
 #endif
     var logLevel:Int = Int(ZitiLog.LogLevel.INFO.rawValue)
+    var interceptMatchedDns:Bool = true
+    var enableMfa:Bool = false
     
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,
-            ProviderConfig.SUBNET_KEY: self.subnetMask,
-            ProviderConfig.MTU_KEY: String(self.mtu),
-            ProviderConfig.LOG_LEVEL: String(self.logLevel),
-            ProviderConfig.DNS_KEY: self.dnsAddresses.joined(separator: ","),
-            ProviderConfig.MATCH_DOMAINS_KEY: self.dnsMatchDomains.joined(separator: ",")]
+                ProviderConfig.SUBNET_KEY: self.subnetMask,
+                ProviderConfig.MTU_KEY: String(self.mtu),
+                ProviderConfig.LOG_LEVEL: String(self.logLevel),
+                ProviderConfig.DNS_KEY: self.dnsAddresses.joined(separator: ","),
+                ProviderConfig.FALLBACK_DNS_ENABLED_KEY: self.fallbackDnsEnabled,
+                ProviderConfig.FALLBACK_DNS_KEY: self.fallbackDns,
+                ProviderConfig.ENABLE_MFA_KEY: self.enableMfa,
+                ProviderConfig.INTERCEPT_MATCHED_DNS_KEY: self.interceptMatchedDns]
     }
     
     private func isValidIpAddress(_ obj:Any?) -> Bool {
@@ -94,6 +103,11 @@ class ProviderConfig : NSObject {
         } else {
             return ProviderConfigError.invalidDnsAddresses
         }
+        
+        let fallbackEnabled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool ?? false
+        if fallbackEnabled && !isValidIpAddress(conf[ProviderConfig.FALLBACK_DNS_KEY]) {
+            return ProviderConfigError.invalidFallbackDns
+        }
         if (Int(conf[ProviderConfig.MTU_KEY] as! String) == nil) {
             return ProviderConfigError.invalidMtu
         }
@@ -102,18 +116,25 @@ class ProviderConfig : NSObject {
     
     func parseDictionary(_ conf:ProviderConfigDict) -> ProviderConfigError? {
         if let error = validateDictionaty(conf) { return error }
-        self.ipAddress = (conf[ProviderConfig.IP_KEY] as! String).trimmingCharacters(in: .whitespaces)
-        self.subnetMask = (conf[ProviderConfig.SUBNET_KEY] as! String).trimmingCharacters(in: .whitespaces)
-        self.mtu = Int(conf[ProviderConfig.MTU_KEY] as! String)!
-        self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL] as? String ?? "3") ?? 3
-        self.dnsAddresses = (conf[ProviderConfig.DNS_KEY] as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
-        self.dnsMatchDomains = [""] // all routes by default
-        if let mds = conf[ProviderConfig.MATCH_DOMAINS_KEY] {
-            let mdsArray = (mds as! String).trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
-            if mdsArray.count > 0 {
-                self.dnsMatchDomains = mdsArray
-            }
+        if let ipAddress = conf[ProviderConfig.IP_KEY] as? String {
+            self.ipAddress = ipAddress.trimmingCharacters(in: .whitespaces)
         }
+        if let subnetMask = conf[ProviderConfig.SUBNET_KEY] as? String {
+            self.subnetMask = subnetMask.trimmingCharacters(in: .whitespaces)
+        }
+        if let mtu = conf[ProviderConfig.MTU_KEY] as? String, let mtuInt = Int(mtu) {
+            self.mtu = mtuInt
+        }
+        if let dnsAddresses = conf[ProviderConfig.DNS_KEY] as? String {
+            self.dnsAddresses = dnsAddresses.trimmingCharacters(in: .whitespaces).components(separatedBy: ",")
+        }
+        if let fallbackDns = conf[ProviderConfig.FALLBACK_DNS_KEY] as? String {
+            self.fallbackDns = fallbackDns.trimmingCharacters(in: .whitespaces)
+        }
+        self.fallbackDnsEnabled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool ?? false
+        self.interceptMatchedDns = conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] as? Bool ?? true
+        self.enableMfa = conf[ProviderConfig.ENABLE_MFA_KEY] as? Bool ?? false
+        self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL] as? String ?? "3") ?? 3
         return nil
     }
     
@@ -123,7 +144,10 @@ class ProviderConfig : NSObject {
             "subnetMask: \(self.subnetMask)\n" +
             "mtu: \(self.mtu)\n" +
             "dns: \(self.dnsAddresses.joined(separator:","))\n" +
-            "dnsMatchDomains: \(self.dnsMatchDomains.joined(separator:","))\n" +
+            "fallbackDnsEnabled: \(self.fallbackDnsEnabled)\n" +
+            "fallbackDns: \(self.fallbackDns)\n" +
+            "interceptMatchedDns: \(self.interceptMatchedDns)\n" +
+            "enableMfa: \(self.enableMfa)\n" +
             "logLevel: \(self.logLevel)"
     }
 }
