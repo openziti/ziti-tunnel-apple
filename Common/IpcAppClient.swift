@@ -19,11 +19,34 @@ import CZiti
 
 typealias IpcResponseCallback = (_ msg:IpcMessage?, _ error:ZitiError?) -> Void
 
-class IpcAppClient : NSObject {
+class IpcAppClient : NSObject, ZitiIdentityStoreDelegate {
+    
     let encoder = JSONEncoder()
     let decoder = JSONDecoder()
-    var pollInterval = TimeInterval(5.0)
-    var pollTimer:Timer?
+    let zidStore = ZitiIdentityStore()
+    
+    override init() {
+        super.init()
+        zidStore.delegate = self
+        _ = zidStore.loadAll()
+    }
+    
+    func onNewOrChangedId(_ zid: ZitiIdentity) {
+        NotificationCenter.default.post(name: .onNewOrChangedId, object: self, userInfo: ["zid":zid])
+        
+        // appexNotifications
+        zid.appexNotifications?.forEach { polyMsg in
+            NotificationCenter.default.post(name: .onAppexNotification, object: self, userInfo: ["ipcMessage":polyMsg.msg])
+        }
+        if zid.appexNotifications != nil {
+            zid.appexNotifications = nil
+            _ = zidStore.store(zid)
+        }
+    }
+    
+    func onRemovedId(_ idString: String) {
+        NotificationCenter.default.post(name: .onRemovedId, object: self, userInfo: ["id":idString])
+    }
     
     func sendToAppex(_ msg:IpcMessage, _ cb:IpcResponseCallback?) {
         guard let conn = (TunnelMgr.shared.tpm?.connection as? NETunnelProviderSession) else {
@@ -75,40 +98,10 @@ class IpcAppClient : NSObject {
             cb?(nil, ZitiError(errStr))
         }
     }
-    
-    func sendPollMsg() {
-        sendToAppex(IpcPollMessage()) { respMsg, zErr in
-            guard zErr == nil else {
-                zLog.error(zErr!.localizedDescription)
-                return
-            }
-            guard let respMsg = respMsg else { // perfectly legit
-                return
-            }
-            
-            zLog.info("IpcMessage received of type \(respMsg.meta.msgType)")
-            NotificationCenter.default.post(name: .onZitiPollResponse, object: self, userInfo: ["ipcMessage":respMsg])
-        }
-    }
-    func startPolling() {
-        DispatchQueue.main.async { [weak self] in
-            self?.sendPollMsg()
-            if self?.pollTimer == nil {
-                self?.pollTimer = Timer.scheduledTimer(withTimeInterval: self?.pollInterval ?? 0.0, repeats: true) { _ in
-                    self?.sendPollMsg()
-                }
-            }
-        }
-    }
-    
-    func stopPolling() {
-        DispatchQueue.main.async { [weak self] in
-            self?.pollTimer?.invalidate()
-            self?.pollTimer = nil
-        }
-    }
 }
 
 extension Notification.Name {
-    static let onZitiPollResponse = Notification.Name("on-ziti-poll-response")
+    static let onAppexNotification = Notification.Name("on-appex-notification")
+    static let onNewOrChangedId = Notification.Name("on-new-or-changed-id")
+    static let onRemovedId = Notification.Name("on-removed-id")
 }
