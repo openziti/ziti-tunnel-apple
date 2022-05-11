@@ -17,6 +17,7 @@
 import Cocoa
 import NetworkExtension
 import CZiti
+import UniformTypeIdentifiers
 
 class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var connectButton: NSButton!
@@ -344,7 +345,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = false
-        panel.allowedFileTypes = ["jwt"]
+        if let jwtType = UTType(filenameExtension:"jwt") {
+            panel.allowedContentTypes = [jwtType]
+        }
         panel.title = "Select Enrollment JWT file"
         
         panel.beginSheetModal(for: window) { (result) in
