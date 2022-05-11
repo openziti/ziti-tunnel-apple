@@ -167,6 +167,10 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
                     self.vc?.tunnelMgr.restartTunnel()
                     self.saveButton.isEnabled = false
                     self.dismiss(self)
+                    
+                    DispatchQueue.main.async {
+                        self.vc?.updateServiceUI(zId: self.vc?.zidMgr.zids[self.vc?.representedObject as! Int])
+                    }
                 }
             }
         }

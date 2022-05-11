@@ -104,7 +104,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             dateStyle: .long, timeStyle: .long)
     }
     
-    private func updateServiceUI(zId:ZitiIdentity?=nil) {
+    func updateServiceUI(zId:ZitiIdentity?=nil) {
         var mfaEnabled = false
         if let pp = tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol, let conf = pp.providerConfiguration, let mfaEnabledCfg = conf[ProviderConfig.ENABLE_MFA_KEY] as? Bool {
             mfaEnabled = mfaEnabledCfg
