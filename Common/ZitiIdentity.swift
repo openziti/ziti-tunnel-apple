@@ -87,6 +87,22 @@ class ZitiIdentity : NSObject, Codable {
         return .Pending
     }
     
+    var appexNotifications:[IpcPolyMessage]?
+    func getAppexNotifications() -> [IpcMessage] {
+        var msgs:[IpcMessage] = []
+        appexNotifications?.forEach {
+            msgs.append($0.msg)
+        }
+        return msgs
+    }
+    
+    func addAppexNotification(_ msg:IpcMessage) {
+        if appexNotifications == nil {
+            appexNotifications = []
+        }
+        appexNotifications?.append(IpcPolyMessage(msg))
+    }
+    
     func getEnrollmentMethod() -> EnrollmentMethod {
         if let m = claims?.em { return EnrollmentMethod(m) }
         return EnrollmentMethod.ott
