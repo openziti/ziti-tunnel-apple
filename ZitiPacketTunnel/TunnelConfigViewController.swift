@@ -35,7 +35,6 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        box.borderType = NSBorderType.lineBorder
         self.ipAddressText.delegate = self
         self.subnetMaskText.delegate = self
         self.mtuText.delegate = self
