@@ -77,7 +77,7 @@ class StatusCell: UITableViewCell {
     }
 }
 
-class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate, ScannerDelegate, ZitiIdentityStoreDelegate {
+class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate, ScannerDelegate {
     
     static var providerBundleIdentifier:String {
         guard let bid = Bundle.main.object(forInfoDictionaryKey: "IOS_EXT_IDENTIFIER") else {
@@ -98,8 +98,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         
         sc.delegate = self
         
-        // watch for changes to the zids
-        zidMgr.zidStore.delegate = self
         
         // watch for new URLs
         NotificationCenter.default.addObserver(self, selector: #selector(self.onNewUrlNotification(_:)), name: NSNotification.Name(rawValue: "NewURL"), object: nil)
@@ -117,63 +115,50 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             zLog.error(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
         tableView.reloadData()
-    }
-    
-    func onNewOrChangedId(_ zid: ZitiIdentity) {
-        DispatchQueue.main.async {
-            if let match = self.zidMgr.zids.first(where: { $0.id == zid.id }) {
-                zLog.info("\(zid.name):\(zid.id) CHANGED")
-                
-                // TUN will disable if unable to start for zid
-                match.edgeStatus = zid.edgeStatus
-                match.enabled = zid.enabled
-                
-                // always take new service from tunneler...
-                match.services = zid.services
-                match.controllerVersion = zid.controllerVersion
-                match.mfaEnabled = zid.mfaEnabled
-                match.czid?.name = zid.name
-                match.czid?.ztAPI = zid.czid?.ztAPI ?? ""
-            } else {
-                // new one.  generally zids are only added by this app (so will be matched above).
-                // But possible somebody could load one manually or some day via MDM or somesuch
-                zLog.info("\(zid.name):\(zid.id) NEW")
-                self.zidMgr.zids.insert(zid, at:0)
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
-                    self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
-                }
-                self.tunnelMgr.restartTunnel()
+        
+        // listen for newOrChanged
+        NotificationCenter.default.addObserver(forName: .onNewOrChangedId, object: nil, queue: OperationQueue.main) { [self] notification in
+            guard let zid = notification.userInfo?["zid"] as? ZitiIdentity else {
+                zLog.error("Unable to retrieve identity from event notification")
+                return
             }
-            self.tableView.reloadData()
-            self.ivc?.tableView.reloadData()
             
-            if zid.isEnabled && zid.isEnrolled {
-                let needsRestart = zid.services.filter {
-                    if let status = $0.status, let needsRestart = status.needsRestart {
-                        return needsRestart
+            DispatchQueue.main.async { [self] in
+                var count = self.zidMgr.zids.count
+                self.zidMgr.updateIdentity(zid)
+                
+                if count != self.zidMgr.zids.count { // inserted at 0
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                        self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
+                        self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
                     }
-                    return false
+                    self.tunnelMgr.restartTunnel()
                 }
-                if needsRestart.count > 0 {
+                
+                self.tableView.reloadData()
+                self.ivc?.tableView.reloadData()
+                
+                if self.zidMgr.needsRestart(zid) {
                     self.tunnelMgr.restartTunnel()
                 }
             }
         }
-    }
-    
-    func onRemovedId(_ idString: String) {
-        DispatchQueue.main.async {
-            //if let match = self.zidMgr.zids.first(where: { $0.id == idString }) {
-                // shouldn't happend unless somebody deletes the file.
-                zLog.info("\(idString) REMOVED")
+        
+        // listen for removedId
+        NotificationCenter.default.addObserver(forName: .onRemovedId, object: nil, queue: OperationQueue.main) { [self] notification in
+            guard let id = notification.userInfo?["id"] as? Int else {
+                zLog.error("Unable to retrieve identityfrom event notification")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                zLog.info("\(id) REMOVED")
                 _ = self.zidMgr.loadZids()
                 self.tableView.reloadData()
                 self.ivc?.tableView.reloadData()
                 self.tunnelMgr.restartTunnel()
-           // }
+            }
         }
     }
     

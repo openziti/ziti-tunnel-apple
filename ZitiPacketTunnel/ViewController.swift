@@ -18,7 +18,7 @@ import Cocoa
 import NetworkExtension
 import CZiti
 
-class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDelegate {
+class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var connectButton: NSButton!
     @IBOutlet weak var connectStatus: NSTextField!
     @IBOutlet weak var tableView: NSTableView!
@@ -33,6 +33,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     @IBOutlet weak var idExpiresAtLabel: NSTextField!
     @IBOutlet weak var idEnrollBtn: NSButton!
     @IBOutlet weak var idSpinner: NSProgressIndicator!
+    @IBOutlet weak var mfaControls: NSStackView!
     @IBOutlet weak var mfaSwitch: NSSwitch!
     @IBOutlet weak var mfaAuthNowBtn: NSButton!
     @IBOutlet weak var mfaCodesBtn: NSButton!
@@ -104,6 +105,12 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     }
     
     private func updateServiceUI(zId:ZitiIdentity?=nil) {
+        var mfaEnabled = false
+        if let pp = tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol, let conf = pp.providerConfiguration, let mfaEnabledCfg = conf[ProviderConfig.ENABLE_MFA_KEY] as? Bool {
+            mfaEnabled = mfaEnabledCfg
+        }
+        mfaControls.isHidden = !mfaEnabled
+                
         if let zId = zId {
             let cs = zId.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
             var csStr = ""
@@ -172,10 +179,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Logger.initShared(Logger.APP_TAG)
-        zLog.info(Version.verboseStr)
-        
-        zidMgr.zidStore.delegate = self
         tableView.delegate = self
         tableView.dataSource = self
 
@@ -183,7 +186,11 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         
         // init the manager
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange)
-        tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier)
+        tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier) {_,_ in 
+            DispatchQueue.main.async {
+                self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+            }
+        }
         
         // Load previous identities
         if let err = zidMgr.loadZids() {
@@ -194,17 +201,40 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         representedObject = 0
         tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
         
-        // for the case of leaving screen on a non-connected controller so the "as of" time periodically updates...
-        Timer.scheduledTimer(withTimeInterval: 300.0, repeats: true) { _ in
+        // listen for newOrChanged
+        NotificationCenter.default.addObserver(forName: .onNewOrChangedId, object: nil, queue: OperationQueue.main) { [self] notification in
+            guard let zid = notification.userInfo?["zid"] as? ZitiIdentity else {
+                zLog.error("Unable to retrieve identity from event notification")
+                return
+            }
+            
             DispatchQueue.main.async {
-                if self.zidMgr.zids.count > 0 {
-                    self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+                self.zidMgr.updateIdentity(zid)
+                self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+                
+                if self.zidMgr.needsRestart(zid) {
+                    self.tunnelMgr.restartTunnel()
                 }
             }
         }
         
+        // listen for removedId
+        NotificationCenter.default.addObserver(forName: .onRemovedId, object: nil, queue: OperationQueue.main) { [self] notification in
+            guard let id = notification.userInfo?["id"] as? Int else {
+                zLog.error("Unable to retrieve identityfrom event notification")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                zLog.info("\(id) REMOVED")
+                _ = self.zidMgr.loadZids()
+                self.representedObject = Int(0)
+                self.tunnelMgr.restartTunnel()
+            }
+        }
+        
         // listen for Ziti IPC events
-        NotificationCenter.default.addObserver(forName: .onZitiPollResponse, object: nil, queue: OperationQueue.main) { notification in
+        NotificationCenter.default.addObserver(forName: .onAppexNotification, object: nil, queue: OperationQueue.main) { notification in
             guard let msg = notification.userInfo?["ipcMessage"] as? IpcMessage else {
                 zLog.error("Unable to retrieve IPC message from event notification")
                 return
@@ -226,58 +256,9 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
         }
     }
     
-    func onRemovedId(_ idString: String) {
-        DispatchQueue.main.async {
-            //if let match = self.zidMgr.zids.first(where: { $0.id == idString }) {
-                // shouldn't happend unless somebody deletes the file.
-                zLog.info("\(idString) REMOVED")
-                _ = self.zidMgr.loadZids()
-                self.representedObject = Int(0)
-                self.tunnelMgr.restartTunnel()
-            //}
-        }
-    }
-    
-    func onNewOrChangedId(_ zid: ZitiIdentity) {
-        DispatchQueue.main.async {
-            if let match = self.zidMgr.zids.first(where: { $0.id == zid.id }) {
-                zLog.info("\(zid.name):\(zid.id) CHANGED")
-                
-                // TUN will disable if unable to start for zid
-                match.edgeStatus = zid.edgeStatus
-                match.enabled = zid.enabled
-                
-                // always take new service from tunneler...
-                match.services = zid.services
-                match.controllerVersion = zid.controllerVersion
-                match.mfaEnabled = zid.mfaEnabled
-                match.czid?.name = zid.name
-                match.czid?.ztAPI = zid.czid?.ztAPI ?? ""
-            } else {
-                // new one.  generally zids are only added by this app (so will be matched above).
-                // But possible somebody could load one manually or some day via MDM or somesuch
-                zLog.info("\(zid.name):\(zid.id) NEW")
-                self.zidMgr.zids.append(zid)
-            }
-            self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
-            
-            if zid.isEnabled && zid.isEnrolled {
-                let needsRestart = zid.services.filter {
-                    if let status = $0.status, let needsRestart = status.needsRestart {
-                        return needsRestart
-                    }
-                    return false
-                }
-                if needsRestart.count > 0 {
-                    self.tunnelMgr.restartTunnel()
-                }
-            }
-        }
-    }
-    
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
         if let tcvc = segue.destinationController as? TunnelConfigViewController {
-            tcvc.preferredContentSize = CGSize(width: 572, height: 270)
+            tcvc.preferredContentSize = CGSize(width: 440, height: 340)
             tcvc.vc = self
         } else if let svc = segue.destinationController as? ServicesViewController {
             servicesViewController = svc
@@ -455,12 +436,29 @@ class ViewController: NSViewController, NSTextFieldDelegate, ZitiIdentityStoreDe
                     self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
                 }
             }
+        } else {
+            zLog.info("Setup MFA cancelled")
+            zId.mfaEnabled = false
+            zId.mfaVerified = false
+            _ = self.zidMgr.zidStore.store(zId)
+            self.toggleMfa(zId, .off)
         }
     }
     
     @IBAction func onMfaToggle(_ sender: Any) {
+        guard tunnelMgr.status == .connected else {
+            mfaSwitch.state = mfaSwitch.state == .on ? .off : .on
+            dialogAlert("You must be Connected to change MFA state")
+            return
+        }
+        
         if zidMgr.zids.count > 0 {
             let zId = zidMgr.zids[representedObject as! Int]
+            guard zId.isEnabled else {
+                mfaSwitch.state = mfaSwitch.state == .on ? .off : .on
+                dialogAlert("Identity must be Enabled to change MFA state")
+                return
+            }
             
             if mfaSwitch.state == .on {
                 let msg = IpcMfaEnrollRequestMessage(zId.id)
@@ -667,6 +665,7 @@ extension ViewController: NSTableViewDelegate {
                 }
             }
             cell.imageView?.image = NSImage(named:imageName) ?? nil
+            //cell.toolTip = "Tooltip for identity named \(zid.name)"
             return cell
         }
         return nil
