@@ -19,7 +19,12 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     var menuBar:MainMenuBar? = nil
-
+    
+    override init() {
+        Logger.initShared(Logger.APP_TAG)
+        zLog.info(Version.verboseStr)
+    }
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         menuBar = MainMenuBar.shared
     }
