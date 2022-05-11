@@ -35,7 +35,7 @@ class SnapshotViewController: UIViewController, UIActivityItemSource {
     }
     
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return textView.text
+        return textView.text as Any
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
