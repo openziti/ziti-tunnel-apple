@@ -17,7 +17,7 @@
 import Foundation
 import CZiti
 
-protocol ZitiIdentityStoreDelegate: class {
+protocol ZitiIdentityStoreDelegate: AnyObject {
     func onNewOrChangedId(_ zid:ZitiIdentity)
     func onRemovedId(_ idString:String)
 }
