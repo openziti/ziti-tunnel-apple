@@ -22,25 +22,8 @@ class IpcAppexServer : NSObject {
     let decoder = JSONDecoder()
     let encoder = JSONEncoder()
     
-    var queue:[IpcMessage] = []
-    var qLock = NSLock()
-    
     init(_ ptp:PacketTunnelProvider) {
         self.ptp = ptp
-    }
-    
-    func queueMsg(_ msg:IpcMessage) {
-        qLock.lock()
-        pruneMsgQueue()
-        queue.append(msg)
-        qLock.unlock()
-    }
-    
-    func pruneMsgQueue() {
-        queue = queue.filter {
-            let age = -($0.meta.createdAt.timeIntervalSinceNow)
-            return age < TimeInterval(60.0)
-        }
     }
     
     func errData(_ errStr:String) -> Data? {
@@ -48,58 +31,35 @@ class IpcAppexServer : NSObject {
     }
     
     func processMessage(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        guard let ipcMsg = try? decoder.decode(IpcMessage.self, from: messageData) else {
+        guard let polyMsg = try? decoder.decode(IpcPolyMessage.self, from: messageData) else {
             let errStr = "Unable to decode IpcMessage"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
             return
         }
-        zLog.debug("processing message of type \(ipcMsg.meta.msgType)")
         
-        switch ipcMsg.meta.msgType {
-        case .Poll: processPoll(messageData, completionHandler: completionHandler)
-        case .SetLogLevel: processSetLogLevel(messageData, completionHandler: completionHandler)
-        case .DumpRequest: processDumpRequest(messageData, completionHandler: completionHandler)
-        case .MfaEnrollRequest: processMfaEnrollRequest(messageData, completionHandler: completionHandler)
-        case .MfaVerifyRequest: processMfaVerifyRequest(messageData, completionHandler: completionHandler)
-        case .MfaRemoveRequest: processMfaRemoveRequest(messageData, completionHandler: completionHandler)
-        case .MfaAuthQueryResponse: processMfaAuthQueryResponse(messageData, completionHandler: completionHandler)
-        case .MfaGetRecoveryCodesRequest: processMfaGetRecoveryCodesRequest(messageData, completionHandler: completionHandler)
-        case .MfaNewRecoveryCodesRequest: processMfaNewRecoveryCodesRequest(messageData, completionHandler: completionHandler)
+        let baseMsg = polyMsg.msg
+        zLog.debug("processing message of type \(baseMsg.meta.msgType)")
+                
+        switch baseMsg.meta.msgType {
+        case .SetLogLevel: processSetLogLevel(baseMsg, completionHandler: completionHandler)
+        case .DumpRequest: processDumpRequest(baseMsg, completionHandler: completionHandler)
+        case .MfaEnrollRequest: processMfaEnrollRequest(baseMsg, completionHandler: completionHandler)
+        case .MfaVerifyRequest: processMfaVerifyRequest(baseMsg, completionHandler: completionHandler)
+        case .MfaRemoveRequest: processMfaRemoveRequest(baseMsg, completionHandler: completionHandler)
+        case .MfaAuthQueryResponse: processMfaAuthQueryResponse(baseMsg, completionHandler: completionHandler)
+        case .MfaGetRecoveryCodesRequest: processMfaGetRecoveryCodesRequest(baseMsg, completionHandler: completionHandler)
+        case .MfaNewRecoveryCodesRequest: processMfaNewRecoveryCodesRequest(baseMsg, completionHandler: completionHandler)
         default:
-            let errStr = "Unsupported IpcMessageType \(ipcMsg.meta.msgType)"
+            let errStr = "Unsupported IpcMessageType \(baseMsg.meta.msgType)"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
         }
     }
     
-    func processPoll(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        var msg:IpcMessage?
-        
-        qLock.lock()
-        pruneMsgQueue()
-        if queue.count > 0 {
-            msg = queue.removeFirst()
-        }
-        qLock.unlock()
-        
-        if let msg = msg {
-            guard let data = try? encoder.encode(msg) else {
-                let errStr = "Unable to encode popped IpcMessage of type \(msg.meta.msgType)"
-                zLog.error(errStr)
-                completionHandler?(errData(errStr))
-                return
-            }
-            completionHandler?(data)
-        } else {
-            completionHandler?(nil)
-        }
-    }
-    
-    func processSetLogLevel(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        guard let msg = try? decoder.decode(IpcSetLogLevelMessage.self, from: messageData),
-              let logLevel = msg.logLevel else {
-            let errStr = "Unable to decode .SetLogLevel message"
+    func processSetLogLevel(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+        guard let msg = baseMsg as? IpcSetLogLevelMessage, let logLevel = msg.logLevel else {
+            let errStr = "Unexpected message type"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
             return
@@ -112,7 +72,7 @@ class IpcAppexServer : NSObject {
         completionHandler?(nil)
     }
     
-    func processDumpRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
+    func processDumpRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
         let dumpStr = ptp.dumpZitis()
         zLog.info(dumpStr)
         
@@ -125,9 +85,9 @@ class IpcAppexServer : NSObject {
         completionHandler?(data)
     }
     
-    func processMfaEnrollRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        guard let msg = try? decoder.decode(IpcMfaEnrollRequestMessage.self, from: messageData) else {
-            let errStr = "Unable to decode message"
+    func processMfaEnrollRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+        guard let msg = baseMsg as? IpcMfaEnrollRequestMessage else {
+            let errStr = "Unexpected message type"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
             return
@@ -151,9 +111,9 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaVerifyRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        guard let msg = try? decoder.decode(IpcMfaVerifyRequestMessage.self, from: messageData) else {
-            let errStr = "Unable to decode message"
+    func processMfaVerifyRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+        guard let msg = baseMsg as? IpcMfaVerifyRequestMessage else {
+            let errStr = "Unexpected message type"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
             return
@@ -183,9 +143,9 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaRemoveRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        guard let msg = try? decoder.decode(IpcMfaRemoveRequestMessage.self, from: messageData) else {
-            let errStr = "Unable to decode message"
+    func processMfaRemoveRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+        guard let msg = baseMsg as? IpcMfaRemoveRequestMessage else {
+            let errStr = "Unexpected message type"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
             return
@@ -215,9 +175,9 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaAuthQueryResponse(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        guard let msg = try? decoder.decode(IpcMfaAuthQueryResponseMessage.self, from: messageData) else {
-            let errStr = "Unable to decode message"
+    func processMfaAuthQueryResponse(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+        guard let msg = baseMsg as? IpcMfaAuthQueryResponseMessage else {
+            let errStr = "Unexpected message type"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
             return
@@ -247,9 +207,9 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaGetRecoveryCodesRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        guard let msg = try? decoder.decode(IpcMfaGetRecoveryCodesRequestMessage.self, from: messageData) else {
-            let errStr = "Unable to decode message"
+    func processMfaGetRecoveryCodesRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+        guard let msg = baseMsg as? IpcMfaGetRecoveryCodesRequestMessage else {
+            let errStr = "Unexpected message type"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
             return
@@ -279,9 +239,9 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaNewRecoveryCodesRequest(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
-        guard let msg = try? decoder.decode(IpcMfaNewRecoveryCodesRequestMessage.self, from: messageData) else {
-            let errStr = "Unable to decode message"
+    func processMfaNewRecoveryCodesRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+        guard let msg = baseMsg as? IpcMfaNewRecoveryCodesRequestMessage else {
+            let errStr = "Unexpected message type"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
             return

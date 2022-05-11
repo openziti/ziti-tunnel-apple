@@ -25,18 +25,38 @@ enum IpcMessageType : Int32, Codable {
     case MfaEnrollRequest
     case MfaEnrollResponse
     case MfaVerifyRequest
-    case MfaVerifiyResponse
     case MfaRemoveRequest
-    case MfaRemoveResponse
     case MfaAuthQuery
     case MfaAuthQueryResponse
-    case MfaAuthStatus
+    case MfaStatusResponse
     case MfaGetRecoveryCodesRequest
     case MfaNewRecoveryCodesRequest
     case MfaRecoveryCodesResponse
+    
+    var type:IpcMessage.Type {
+        switch self {
+        case .Poll: return IpcPollMessage.self
+        case .ErrorResponse: return IpcErrorResponseMessage.self
+        case .SetLogLevel: return IpcSetLogLevelMessage.self
+        case .DumpRequest: return IpcDumpRequestMessage.self
+        case .DumpResponse: return IpcDumpResponseMessage.self
+        case .MfaEnrollRequest: return IpcMfaEnrollRequestMessage.self
+        case .MfaEnrollResponse: return IpcMfaEnrollResponseMessage.self
+        case .MfaVerifyRequest: return IpcMfaVerifyRequestMessage.self
+        case .MfaRemoveRequest: return IpcMfaRemoveRequestMessage.self
+        case .MfaAuthQuery: return IpcMfaAuthQueryMessage.self
+        case .MfaAuthQueryResponse: return IpcMfaAuthQueryResponseMessage.self
+        case .MfaStatusResponse: return IpcMfaStatusResponseMessage.self
+        case .MfaGetRecoveryCodesRequest: return IpcMfaGetRecoveryCodesRequestMessage.self
+        case .MfaNewRecoveryCodesRequest: return IpcMfaNewRecoveryCodesRequestMessage.self
+        case .MfaRecoveryCodesResponse: return IpcMfaRecoveryCodesResponseMessage.self
+        }
+    }
 }
 
 class IpcMessage : NSObject, Codable {
+    static let IpcURL:URL? = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)?.appendingPathComponent("appex-notifications.ipc", isDirectory:false)
+
     class Meta : NSObject, Codable {
         enum CodingKeys: String, CodingKey { case zid, msgId, msgType }
         var zid:String?
@@ -55,6 +75,24 @@ class IpcMessage : NSObject, Codable {
     var meta:Meta
     init(_ meta:Meta) {
         self.meta = meta
+    }
+}
+
+class IpcPolyMessage : NSObject, Codable {
+    let msg:IpcMessage
+    
+    init(_ msg:IpcMessage) {
+        self.msg = msg
+        super.init()
+    }
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let ipcMessage = try container.decode(IpcMessage.self)
+        msg = try container.decode(ipcMessage.meta.msgType.type)
+    }
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(msg)
     }
 }
 
@@ -209,7 +247,7 @@ class IpcMfaStatusResponseMessage : IpcMessage {
     var status:Int32?
     
     init(_ status:Int32) {
-        let m = Meta(nil, .MfaVerifiyResponse)
+        let m = Meta(nil, .MfaStatusResponse)
         self.status = status
         super.init(m)
     }
