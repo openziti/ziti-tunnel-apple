@@ -120,6 +120,7 @@
 		5AF786992090FFCA0093498C /* DNSEntries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSEntries.swift */; };
 		5AF9C24A2268F84A009CFD71 /* IdentityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9C2492268F84A009CFD71 /* IdentityViewController.swift */; };
 		5AF9C24C226B6FAC009CFD71 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AF9C24B226B6FAC009CFD71 /* Default-568h@2x.png */; };
+		5AFC6A68282B4E8E00A0229C /* IpcMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */; };
 		5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76C225D644A0048B2F6 /* TableViewController.swift */; };
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
@@ -1167,6 +1168,7 @@
 				5A2E11B224B6A579002856F3 /* ZitiService.swift in Sources */,
 				5A2E11B124B6A54E002856F3 /* ZitiError.swift in Sources */,
 				5A2E11AE24B6A52E002856F3 /* ZidMgr.swift in Sources */,
+				5AFC6A68282B4E8E00A0229C /* IpcMessages.swift in Sources */,
 				5A78DEE725631E1000316CE9 /* AppGroup.swift in Sources */,
 				5A2E11B524B7BC25002856F3 /* SpinnerViewController.swift in Sources */,
 				5A2E11B424B797FC002856F3 /* Logger.swift in Sources */,
