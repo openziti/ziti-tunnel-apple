@@ -26,7 +26,7 @@
 #include <ifaddrs.h>
 #include <errno.h>
 
-char **get_mac_addrs() {
+char **get_mac_addrs(void) {
     char **mac_addrs = NULL;
     int i = 0;
     struct ifaddrs *if_addrs = NULL;
