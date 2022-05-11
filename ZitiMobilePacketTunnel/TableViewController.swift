@@ -124,7 +124,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             }
             
             DispatchQueue.main.async { [self] in
-                var count = self.zidMgr.zids.count
+                let count = self.zidMgr.zids.count
                 self.zidMgr.updateIdentity(zid)
                 
                 if count != self.zidMgr.zids.count { // inserted at 0
