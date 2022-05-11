@@ -43,7 +43,7 @@ class SnapshotViewController: UIViewController, UIActivityItemSource {
     }
     
     func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
-        return "Ziti Mobile Edge Snapsot"
+        return "Ziti Mobile Edge Snapshot"
     }
 
 }
