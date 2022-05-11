@@ -182,7 +182,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         tableView.delegate = self
         tableView.dataSource = self
 
-        box.borderType = NSBorderType.lineBorder
+        box.boxType = .custom
+        box.fillColor = .underPageBackgroundColor
+        box.isTransparent = false
         
         // init the manager
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange)
