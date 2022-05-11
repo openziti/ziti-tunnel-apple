@@ -30,6 +30,36 @@ class ZidMgr : NSObject {
         return nil
     }
     
+    func updateIdentity(_ zid:ZitiIdentity) {
+        var found = false
+        for i in 0..<zids.count {
+            if zids[i].id == zid.id {
+                zLog.info("\(zid.name):\(zid.id) CHANGED")
+                found = true
+                zids[i] = zid
+                break
+            }
+        }
+        if !found {
+            zLog.info("\(zid.name):\(zid.id) NEW")
+            zids.insert(zid, at:0)
+        }
+    }
+    
+    func needsRestart(_ zid:ZitiIdentity) -> Bool {
+        var needsRestart = false
+        if zid.isEnabled && zid.isEnrolled {
+            let restarts = zid.services.filter {
+                if let status = $0.status, let needsRestart = status.needsRestart {
+                    return needsRestart
+                }
+                return false
+            }
+            needsRestart = restarts.count > 0
+        }
+        return needsRestart
+    }
+    
     func insertFromJWT(_ url:URL, at:Int) throws {
         let zid = ZitiIdentity()
         
