@@ -143,7 +143,7 @@ class IpcSetLogLevelMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        logLevel = try c.decode(Int32.self, forKey: .logLevel)
+        logLevel = try? c.decode(Int32.self, forKey: .logLevel)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -177,7 +177,7 @@ class IpcDumpResponseMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        dump = try c.decode(String.self, forKey: .dump)
+        dump = try? c.decode(String.self, forKey: .dump)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -210,8 +210,8 @@ class IpcMfaEnrollResponseMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        status = try c.decode(Int32.self, forKey: .status)
-        mfaEnrollment = try c.decode(CZiti.ZitiMfaEnrollment.self, forKey: .mfaEnrollment)
+        status = try? c.decode(Int32.self, forKey: .status)
+        mfaEnrollment = try? c.decode(CZiti.ZitiMfaEnrollment.self, forKey: .mfaEnrollment)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -233,7 +233,7 @@ class IpcMfaVerifyRequestMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        code = try c.decode(String.self, forKey: .code)
+        code = try? c.decode(String.self, forKey: .code)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -254,7 +254,7 @@ class IpcMfaStatusResponseMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        status = try c.decode(Int32.self, forKey: .status)
+        status = try? c.decode(Int32.self, forKey: .status)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -275,7 +275,7 @@ class IpcMfaRemoveRequestMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        code = try c.decode(String.self, forKey: .code)
+        code = try? c.decode(String.self, forKey: .code)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -296,7 +296,7 @@ class IpcMfaAuthQueryMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        query = try c.decode(ZitiMfaAuthQuery.self, forKey: .query)
+        query = try? c.decode(ZitiMfaAuthQuery.self, forKey: .query)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -317,7 +317,7 @@ class IpcMfaAuthQueryResponseMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        code = try c.decode(String.self, forKey: .code)
+        code = try? c.decode(String.self, forKey: .code)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -338,7 +338,7 @@ class IpcMfaGetRecoveryCodesRequestMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        code = try c.decode(String.self, forKey: .code)
+        code = try? c.decode(String.self, forKey: .code)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -359,7 +359,7 @@ class IpcMfaNewRecoveryCodesRequestMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        code = try c.decode(String.self, forKey: .code)
+        code = try? c.decode(String.self, forKey: .code)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
@@ -382,8 +382,8 @@ class IpcMfaRecoveryCodesResponseMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        status = try c.decode(Int32.self, forKey: .status)
-        codes = try c.decode([String].self, forKey: .codes)
+        status = try? c.decode(Int32.self, forKey: .status)
+        codes = try? c.decode([String].self, forKey: .codes)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
