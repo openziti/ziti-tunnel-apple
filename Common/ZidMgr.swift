@@ -60,6 +60,46 @@ class ZidMgr : NSObject {
         return needsRestart
     }
     
+    func postureChecksPassing(_ svc:ZitiService) -> Bool {
+        if let pqs = svc.postureQuerySets {
+            for q in pqs {
+                if q.isPassing ?? false {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
+    func allServicePostureChecksPassing(_ zid:ZitiIdentity) -> Bool {
+        for svc in zid.services {
+            if !postureChecksPassing(svc) {
+                return false
+            }
+        }
+        return true
+    }
+    
+    func failingPostureChecks(_ svc:ZitiService) -> [String] {
+        var fails:[String] = []
+        if let pqs = svc.postureQuerySets {
+            for qs in pqs {
+                if !(qs.isPassing ?? false) {
+                    if let postureQueries = qs.postureQueries {
+                        for q in postureQueries {
+                            if !(q.isPassing ?? false) {
+                                if let qt = q.queryType {
+                                    fails.append(qt)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Array(Set(fails)) // remove duplicates
+    }
+    
     func insertFromJWT(_ url:URL, at:Int) throws {
         let zid = ZitiIdentity()
         
