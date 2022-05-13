@@ -18,6 +18,8 @@ import Cocoa
 import NetworkExtension
 import CZiti
 import UniformTypeIdentifiers
+import CoreImage
+import CoreImage.CIFilterBuiltins
 
 class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var connectButton: NSButton!
@@ -191,7 +193,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange)
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier) {_,_ in 
             DispatchQueue.main.async {
-                self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+                if self.zidMgr.zids.count > 0 {
+                    self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+                }
             }
         }
         
@@ -248,6 +252,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 return
             }
             DispatchQueue.main.async {
+                zid.mfaPending = true
+                _ = self.zidMgr.zidStore.store(zid)
+                self.updateServiceUI(zId:zid)
+                
                 self.doMfaAuth(zid)
             }
         }
@@ -297,6 +305,53 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         return alert.runModal() == .alertFirstButtonReturn
     }
     
+    // brute force a QR code to setup MFA for now...
+    func setupMfaDialog(_ provisioningUrl:String) -> String? {
+        let alert = NSAlert()
+        alert.messageText = "Setup MFA"
+        //alert.informativeText = "Scan QR code and enter valid MFA"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        
+        let stack = NSStackView(frame: NSRect(x: 0, y: 0, width: 220, height: 224))
+        stack.orientation = .vertical
+        stack.spacing = 20
+        stack.alignment = .centerX
+        stack.distribution = .fillProportionally
+                
+        let context = CIContext()
+        let filter = CIFilter.qrCodeGenerator()
+        filter.message = Data(provisioningUrl.utf8)
+        
+        var qrImg = NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: "unavailable") ?? NSImage()
+        if let outputImage = filter.outputImage {
+            let scaledImg = outputImage.transformed(
+                by: CGAffineTransform(scaleX: 200 / outputImage.extent.size.width, y: 200 / outputImage.extent.size.height))
+            
+            if let cgimg = context.createCGImage(scaledImg, from: scaledImg.extent) {
+                qrImg = NSImage(cgImage: cgimg, size: NSSize(width: 200, height: 200))
+            }
+        }
+        let imgView = NSImageView(image: qrImg)
+        imgView.frame = NSRect(x: 0, y: 0, width: 200, height: 200)
+        imgView.layer?.magnificationFilter = .nearest
+        
+        let txtView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        
+        stack.addArrangedSubview(imgView)
+        stack.addArrangedSubview(txtView)
+        alert.accessoryView = stack
+        alert.window.initialFirstResponder = txtView
+        
+        let response = alert.runModal()
+
+        if (response == .alertFirstButtonReturn) {
+            return txtView.stringValue
+        }
+        return nil // Cancel
+    }
+    
     func dialogForString(question: String, text: String) -> String? {
         let alert = NSAlert()
         alert.messageText = question
@@ -307,6 +362,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         let txtView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
         alert.accessoryView = txtView
+        alert.window.initialFirstResponder = txtView
         
         let response = alert.runModal()
 
@@ -407,9 +463,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             zLog.error("Invalid provisioning URL")
             return
         }
+        zLog.info("MFA provisioningUrl: \(provisioningUrl)")
         
-        // TODO: create a 'real' screen with QR code and whatnot
-        if let code = dialogForString(question: "Setup MFA", text: provisioningUrl) {
+        //if let code = dialogForString(question: "Setup MFA", text: provisioningUrl) {
+        if let code = setupMfaDialog(provisioningUrl) {
             let msg = IpcMfaVerifyRequestMessage(zId.id, code)
             tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
                 DispatchQueue.main.async {
@@ -555,6 +612,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     
                     // Success!
                     zid.lastMfaAuth = Date()
+                    zid.mfaPending = false
+                    // TODO: edgeStatus... should be updated when services show up?
                     _ = self.zidMgr.zidStore.store(zid)
                     self.updateServiceUI(zId:zid)
                 }
@@ -659,18 +718,33 @@ extension ViewController: NSTableViewDelegate {
             
             let tunnelStatus = tunnelMgr.status
             var imageName:String = "NSStatusNone"
+            var tooltip:String?
+            
+            if zid.isMfaPending {
+                zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+                tooltip = "MFA Pending"
+            }
             
             if zid.isEnrolled == true, zid.isEnabled == true, let edgeStatus = zid.edgeStatus {
                 switch edgeStatus.status {
-                case .Available: imageName = (tunnelStatus == .connected) ?
-                    "NSStatusAvailable" : "NSStatusPartiallyAvailable"
-                case .PartiallyAvailable: imageName = "NSStatusPartiallyAvailable"
-                case .Unavailable: imageName = "NSStatusUnavailable"
-                default: imageName = "NSStatusNone"
+                case .Available:
+                    imageName = (tunnelStatus == .connected) ? "NSStatusAvailable" : "NSStatusPartiallyAvailable"
+                case .PartiallyAvailable:
+                    imageName = "NSStatusPartiallyAvailable"
+                case .Unavailable:
+                    imageName = "NSStatusUnavailable"
+                default:
+                    imageName = "NSStatusNone"
+                }
+                
+                if tunnelStatus != .connected {
+                    tooltip = "Status: Not Connected"
+                } else if edgeStatus.status != .Available && zidMgr.needsRestart(zid) {
+                    tooltip = "Connection reset may be required to access services"
                 }
             }
             cell.imageView?.image = NSImage(named:imageName) ?? nil
-            //cell.toolTip = "Tooltip for identity named \(zid.name)"
+            cell.toolTip = tooltip // nil intentional if no tooltip set...
             return cell
         }
         return nil
