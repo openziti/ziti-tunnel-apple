@@ -219,7 +219,7 @@
                                         <rect key="frame" x="289" y="290" width="16" height="16"/>
                                     </progressIndicator>
                                     <stackView orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CR7-bk-1hh">
-                                        <rect key="frame" x="231" y="410" width="227" height="20"/>
+                                        <rect key="frame" x="133" y="410" width="325" height="20"/>
                                         <beginningViews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="54A-Ot-3M7">
                                                 <rect key="frame" x="-2" y="4" width="31" height="16"/>
@@ -255,14 +255,26 @@
                                                     <action selector="onMfaCodes:" target="XfG-lQ-9wD" id="ZyP-i0-QP8"/>
                                                 </connections>
                                             </button>
+                                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OYu-ET-6Q0" userLabel="New Codes">
+                                                <rect key="frame" x="228" y="-7" width="104" height="32"/>
+                                                <buttonCell key="cell" type="push" title="New Codes" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yLY-eo-6Z5">
+                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <action selector="onMfaNewCodes:" target="XfG-lQ-9wD" id="htT-wc-6PU"/>
+                                                </connections>
+                                            </button>
                                         </beginningViews>
                                         <visibilityPriorities>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
+                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
@@ -480,6 +492,7 @@
                         <outlet property="mfaAuthNowBtn" destination="G3N-3W-MF7" id="deV-B6-cy0"/>
                         <outlet property="mfaCodesBtn" destination="eXL-hW-ma0" id="ig7-j8-hk4"/>
                         <outlet property="mfaControls" destination="CR7-bk-1hh" id="njM-yF-Rhw"/>
+                        <outlet property="mfaNewCodesBtn" destination="OYu-ET-6Q0" id="Wy4-uh-Nle"/>
                         <outlet property="mfaSwitch" destination="RYQ-9S-sLU" id="mOj-bJ-pcO"/>
                         <outlet property="tableView" destination="Gny-TY-peg" id="4em-sl-JaC"/>
                     </connections>

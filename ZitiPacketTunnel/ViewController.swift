@@ -40,6 +40,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var mfaSwitch: NSSwitch!
     @IBOutlet weak var mfaAuthNowBtn: NSButton!
     @IBOutlet weak var mfaCodesBtn: NSButton!
+    @IBOutlet weak var mfaNewCodesBtn: NSButton!
     
     static var providerBundleIdentifier:String {
         guard let bid = Bundle.main.object(forInfoDictionaryKey: "MAC_EXT_IDENTIFIER") else {
@@ -83,8 +84,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             zLog.warn("Unknown tunnel status")
             break
         }
-        self.tableView.reloadData()
-        tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
+        
+        if self.zidMgr.zids.count > 0 {
+            self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+        } else {
+            self.tableView.reloadData()
+            tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
+        }
     }
     
     override func viewDidAppear() {
@@ -129,10 +135,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             box.alphaValue = 1.0
             idEnabledBtn.isEnabled = zId.isEnrolled
             idEnabledBtn.state = zId.isEnabled ? .on : .off
-            mfaSwitch.isEnabled = true
+            mfaSwitch.isEnabled = tunnelMgr.status == .connected
             mfaSwitch.state = zId.isMfaEnabled ? .on : .off
-            mfaAuthNowBtn.isEnabled = zId.isMfaEnabled
-            mfaCodesBtn.isEnabled = zId.isMfaEnabled
+            mfaAuthNowBtn.isEnabled = zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected)
+            mfaCodesBtn.isEnabled = zId.isMfaEnabled && tunnelMgr.status == .connected
+            mfaNewCodesBtn.isEnabled = zId.isMfaEnabled && tunnelMgr.status == .connected
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
@@ -161,6 +168,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             mfaSwitch.state = .off
             mfaAuthNowBtn.isEnabled = false
             mfaCodesBtn.isEnabled = false
+            mfaNewCodesBtn.isEnabled = false
             idLabel.stringValue = "-"
             idNameLabel.stringValue = "-"
             idNetworkLabel.stringValue = "-"
@@ -658,6 +666,37 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    @IBAction func onMfaNewCodes(_ sender: Any) {
+        let indx = representedObject as! Int
+        let zid = zidMgr.zids[indx]
+        
+        if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
+            let msg = IpcMfaNewRecoveryCodesRequestMessage(zid.id, code)
+            self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                DispatchQueue.main.async {
+                    guard zErr == nil else {
+                        self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                        return
+                    }
+                    guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                          let status = codesMsg.status else {
+                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
+                        return
+                    }
+                    guard status == Ziti.ZITI_OK else {
+                        self.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
+                        self.onMfaCodes(sender)
+                        return
+                    }
+                    
+                    // Success!
+                    let codes = codesMsg.codes?.joined(separator: ", ")
+                    self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
+                }
+            }
+        }
+    }
+    
     @IBAction func onEnrollButton(_ sender: Any) {
         let indx = representedObject as! Int
         let zid = zidMgr.zids[indx]
@@ -723,6 +762,9 @@ extension ViewController: NSTableViewDelegate {
             if zid.isMfaPending {
                 zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 tooltip = "MFA Pending"
+            } else if !zidMgr.allServicePostureChecksPassing(zid) {
+                zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+                tooltip = "Posture check failing"
             }
             
             if zid.isEnrolled == true, zid.isEnabled == true, let edgeStatus = zid.edgeStatus {
@@ -738,7 +780,7 @@ extension ViewController: NSTableViewDelegate {
                 }
                 
                 if tunnelStatus != .connected {
-                    tooltip = "Status: Not Connected"
+                    tooltip = "Status: \(connectStatus.stringValue)"
                 } else if edgeStatus.status != .Available && zidMgr.needsRestart(zid) {
                     tooltip = "Connection reset may be required to access services"
                 }
