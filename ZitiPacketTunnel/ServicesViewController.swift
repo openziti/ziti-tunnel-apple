@@ -101,16 +101,30 @@ class ServicesViewController: NSViewController {
     }
     
     @objc func tableViewDoubleClick(_ sender:AnyObject) {
-        guard tableView.selectedRow >= 0, let svc = zid?.services[tableView.selectedRow] else { return }
+        guard tableView.selectedRow >= 0, let zid = zid else { return }
         
-        if zid?.isEnabled ?? false {
+        if zid.isEnabled {
             let e = JSONEncoder()
             e.outputFormatting = .prettyPrinted
+            let svc = zid.services[tableView.selectedRow]
             if let j = try? e.encode(svc), let jStr = String(data:j, encoding:.utf8) {
                 zLog.info(jStr)
+                let alert = NSAlert()
+                alert.messageText = "\(zid.id):\(zid.name)\n\(svc.name ?? svc.id ?? "")"                
+                
+                let scrollView = NSTextView.scrollableTextView()
+                scrollView.frame = NSRect(x: 0, y: 0, width: 400, height: 250)
+                let textView = scrollView.documentView as? NSTextView
+                textView?.isEditable = false
+                textView?.textStorage?.mutableString.setString(jStr)
+                textView?.backgroundColor = .black
+                textView?.textColor = .white
+                textView?.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+                alert.accessoryView = scrollView
+                alert.runModal()
             }
         } else {
-            zLog.info("\(zid?.name ?? "") not enabled")
+            zLog.info("\(zid.id):\(zid.name) not enabled")
         }
     }
     
