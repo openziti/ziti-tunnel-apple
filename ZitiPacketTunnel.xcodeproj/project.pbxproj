@@ -766,7 +766,7 @@
 					};
 					5A02AACA206EBDD5006261C6 = {
 						CreatedOnToolsVersion = 9.2;
-						LastSwiftMigration = 1150;
+						LastSwiftMigration = "";
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.Mac = {
