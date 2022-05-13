@@ -160,16 +160,16 @@ extension ServicesViewController: NSTableViewDelegate {
         } else if tableColumn == tableView.tableColumns[3] {
             text = String(svc.portRanges ?? "")
             cellIdentifier = CellIdentifiers.PortCell
-        } else if tableColumn == tableView.tableColumns[4] {
-            text = "FAIL"
-            if let pqs = svc.postureQuerySets {
-                for q in pqs {
-                    if q.isPassing ?? false {
-                        text = "PASS"
-                        break
-                    }
+        } else if tableColumn == tableView.tableColumns[4] {            
+            let zidMgr = ZidMgr()
+            if zidMgr.postureChecksPassing(svc) {
+                text = "PASS"
+            } else {
+                text = "FAIL"
+                let fails = zidMgr.failingPostureChecks(svc)
+                if fails.count > 0 {
+                    text += " (\(fails.joined(separator: ",")))"
                 }
-                
             }
             cellIdentifier = CellIdentifiers.PostureCell
         }
