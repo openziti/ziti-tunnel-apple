@@ -123,6 +123,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             }
             self.identitiesLoaded = true
             
+            // notifiy Ziti on unlock
+            #if os(macOS)
+                DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
+                    zLog.debug("---screen unlock----")
+                    self.allZitis.forEach { $0.endpointStateChange(false, true) }
+                }
+            #endif
+            
             // identies have loaded, so go ahead and setup the TUN
             let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
             let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
@@ -216,7 +224,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     override func wake() {
-        //zLog.debug("---Wake---")
+        zLog.debug("---Wake---")
+        allZitis.forEach { $0.endpointStateChange(true, false) }
     }
     
     func readPacketFlow() {
@@ -235,14 +244,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber])
         writeLock.unlock()
     }
-    
+     
     func cidrToDestAndMask(_ cidr:String) -> (String?, String?) {
         var dest = cidr
         var prefix:UInt32 = 32
         
         let parts = dest.components(separatedBy: "/")
         guard (parts.count == 1 || parts.count == 2) && IPUtils.isValidIpV4Address(parts[0]) else {
-            zLog.error("Invalid CIDR: \(cidr)")
             return (nil, nil)
         }
         if parts.count == 2, let prefixPart = UInt32(parts[1]) {
@@ -319,7 +327,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             
             if identitiesLoaded && !alreadyExists {
                 zLog.warn("*** Unable to exclude route for \(destinationAddress) on running tunnel")
-            } 
+            }
         }
         return 0
     }
@@ -386,6 +394,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         return (Int(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
     }
     
+    private func containIpAddresses(_ zSvc:ZitiService) -> Bool {
+        guard let addresses = zSvc.addresses else {
+            return false
+        }
+        for addr in addresses.components(separatedBy: ",") {
+            let (ip, _) = cidrToDestAndMask(addr)
+            if ip != nil {
+                return true
+            }
+        }
+        return false
+    }
+    
     private func processService(_ tzid:ZitiIdentity, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) {
         guard let serviceId = eSvc.id else {
             zLog.error("invalid service for \(tzid.name):(\(tzid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
@@ -405,8 +426,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                         dnsEntries.addDnsEntry(addr, "", serviceId)
                     }
                 }
-                if identitiesLoaded { // TODO: need to check if DNS && providerConfig.interceptMatchedDns or if IP address for needsReset.  need to set edgeStatus.  Also - edgeStatus if mfaEnbled and pending...
-                    zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
+                if identitiesLoaded {
+                    // If intercepting by domains or has IP address, needsRestart
+                    if providerConfig.interceptMatchedDns || containIpAddresses(zSvc) {
+                        zLog.warn("Service \(zSvc.name ?? "unamed"):\(zSvc.id ?? "nil") updated after identities loaded. Re-start required to access service")
+                        tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+                        zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
+                    }
                 }
                 tzid.services.append(zSvc)
             }
@@ -414,11 +440,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     private func handleServiceEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelServiceEvent) {
-        for eSvc in event.removed { processService(tzid, eSvc, remove:true) }
-        for eSvc in event.added   { processService(tzid, eSvc, add:true) }
-
         // Update controller status to .Available
         tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
+        
+        for eSvc in event.removed { processService(tzid, eSvc, remove:true) }
+        for eSvc in event.added   { processService(tzid, eSvc, add:true) }
+        
         _ = zidStore.store(tzid)
     }
     
