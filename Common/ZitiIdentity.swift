@@ -78,6 +78,7 @@ class ZitiIdentity : NSObject, Codable {
     var mfaEnabled:Bool? = false
     var mfaVerified:Bool? = false
     var lastMfaAuth:Date?
+    var mfaPending:Bool? = false
     var enabled:Bool? = false
     var enrolled:Bool? = false
     var enrollmentStatus:EnrollmentStatus {
@@ -110,6 +111,7 @@ class ZitiIdentity : NSObject, Codable {
     
     var isMfaEnabled:Bool { return mfaEnabled ?? false }
     var isMfaVerified:Bool { return isMfaEnabled && (mfaVerified ?? false) }
+    var isMfaPending:Bool { return mfaPending ?? false }
     var isEnabled:Bool { return enabled ?? false }
     var isEnrolled:Bool { return enrolled ?? false }
     var edgeStatus:EdgeStatus?
