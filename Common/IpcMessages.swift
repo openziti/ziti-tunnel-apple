@@ -16,8 +16,9 @@ limitations under the License.
 import Foundation
 import CZiti
 
+
 enum IpcMessageType : Int32, Codable {
-    case Poll = 0
+    case AppexNotification = 0
     case ErrorResponse
     case SetLogLevel
     case DumpRequest
@@ -35,7 +36,7 @@ enum IpcMessageType : Int32, Codable {
     
     var type:IpcMessage.Type {
         switch self {
-        case .Poll: return IpcPollMessage.self
+        case .AppexNotification: return IpcAppexNotificationMessage.self
         case .ErrorResponse: return IpcErrorResponseMessage.self
         case .SetLogLevel: return IpcSetLogLevelMessage.self
         case .DumpRequest: return IpcDumpRequestMessage.self
@@ -96,13 +97,28 @@ class IpcPolyMessage : NSObject, Codable {
     }
 }
 
-class IpcPollMessage : IpcMessage {
-    init() {
-        let m = Meta(nil, .Poll)
+class IpcAppexNotificationMessage : IpcMessage {
+    enum CodingKeys: String, CodingKey { case category, action }
+    var category:String?
+    var action:String?
+    
+    init(_ zid:String?, _ category:String, _ action:String) {
+        let m = Meta(zid, .AppexNotification , nil)
+        self.category = category
+        self.action = action
         super.init(m)
     }
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        category = try? c.decode(String.self, forKey: .category)
+        action = try? c.decode(String.self, forKey: .action)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(category, forKey: .category)
+        try c.encodeIfPresent(action, forKey: .action)
     }
 }
 

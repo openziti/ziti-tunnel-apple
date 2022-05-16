@@ -1,5 +1,5 @@
 //
-// Copyright 2019-2020 NetFoundry, Inc.
+// Copyright NetFoundry, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@
 import NetworkExtension
 import Network
 import CZiti
+import UserNotifications
 
-class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
+class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNotificationCenterDelegate {
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
     var dnsEntries:DNSEntries = DNSEntries()
@@ -32,6 +33,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     let zidStore = ZitiIdentityStore()
     var tzids:[ZitiIdentity]?
     var identitiesLoaded = false // when true, restart is required to update routes for services intercepted by IP
+    let userNotifications = UserNotifications.shared
     
     override init() {
         super.init()
@@ -52,6 +54,32 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         netMon.start(queue: DispatchQueue.global())
         
         ipcServer = IpcAppexServer(self)
+        
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        userNotifications.requestAuth()
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        
+        // method is not reliably called. When it is, results are ignored (notification is not displayed)
+        zLog.debug("\(notification.debugDescription)")
+        completionHandler([.list, .sound])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
+        zLog.debug("\(response.debugDescription)")
+        if let zid = response.notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
+            tzid.addAppexNotification(IpcAppexNotificationMessage(
+                zid, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
+            _ = zidStore.store(tzid)
+        } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
+            tzid.addAppexNotification(IpcAppexNotificationMessage(
+                nil, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
+            _ = zidStore.store(tzid)
+        }
+        completionHandler()
     }
     
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
@@ -68,7 +96,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         // parse config
         let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
         if let error = self.providerConfig.parseDictionary(conf) {
-            zLog.wtf("Unable to startTunnel. Invalid providerConfiguration. \(error)")
+            let errStr = "Unable to start tunnel. Invalid provider configuration. \(error)"
+            zLog.wtf(errStr)
+            userNotifications.post(.Error, nil, errStr)
             completionHandler(error)
             return
         }
@@ -96,7 +126,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         // read in the .zid files
         let (tzids, zErr) = zidStore.loadAll()
         guard zErr == nil, let tzids = tzids else {
-            zLog.error("Error loading .zid files: \(zErr != nil ? zErr!.localizedDescription : "uknown")")
+            let errStr = "Unable load identities. \(zErr != nil ? zErr!.localizedDescription : "")"
+            zLog.error(errStr)
+            userNotifications.post(.Error, nil, errStr)
             completionHandler(zErr ?? ZitiError("Unable to load .zid files"))
             return
         }
@@ -118,6 +150,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         zitiTunnel?.startZiti(zids, ZitiPostureChecks()) { zErr in
             guard zErr == nil else {
                 zLog.error("Unable to load identites: \(zErr!.localizedDescription)")
+                self.userNotifications.post(.Error, nil, "Unable to start Ziti: \(zErr!.localizedDescription)")
                 completionHandler(zErr)
                 return
             }
@@ -184,6 +217,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                     completionHandler(error as NSError)
                 }
                 
+                // interferes with any notifications posted while connecting...
+                //self.userNotifications.post(.Info, "Connected")
+
                 // call completion handler with nil to indicate success
                 completionHandler(nil)
                 
@@ -194,18 +230,24 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
-        //let dumpStr = dumpZitis()
-        //zLog.info(dumpStr)
+        let dumpStr = dumpZitis()
+        zLog.info(dumpStr)
         
         guard let zitiTunnel = zitiTunnel else {
-            zLog.error("No valid zitiTunnel context found. Exiting.")
-            exit(EXIT_SUCCESS)
+            userNotifications.post(.Info, "Disconnected", nil, nil) {
+                zLog.error("No valid zitiTunnel context found. Exiting.")
+                completionHandler()
+                exit(EXIT_SUCCESS)
+            }
+            return
         }
         
         zitiTunnel.shutdownZiti {
-            completionHandler()
-            zLog.info("Exiting")
-            exit(EXIT_SUCCESS)
+            self.userNotifications.post(.Info, "Disconnected", nil, nil) {
+                zLog.info("Exiting")
+                completionHandler()
+               // exit(EXIT_SUCCESS)
+            }
         }
     }
     
@@ -369,6 +411,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         } else if let serviceEvent = event as? ZitiTunnelServiceEvent {
             handleServiceEvent(ziti, tzid, serviceEvent)
         } else if let _ = event as? ZitiTunnelMfaEvent {
+            tzid.mfaPending = true
+            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+            
+            userNotifications.post(.Mfa, "MFA Auth Requested", tzid.name, tzid)
+            
+            // MFA Notification not reliably show.  Force it, since in some instances its important the MFA complete before identits are loaded
             tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
             _ = zidStore.store(tzid)
         }
@@ -426,10 +474,26 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                         dnsEntries.addDnsEntry(addr, "", serviceId)
                     }
                 }
+                
+                // check for failed posture checks
+                let zidMgr = ZidMgr()
+                if !zidMgr.postureChecksPassing(zSvc) {
+                    let msg = "Failed posture check(s) for service \"\(zSvc.name ?? "")\""
+                    zLog.warn(msg)
+                    userNotifications.post(.Posture, tzid.name, msg, tzid)
+                    
+                    let needsRestart = zSvc.status?.needsRestart ?? false
+                    tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+                    zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: needsRestart)
+                }
+                
+                // check if restart is needed
                 if identitiesLoaded {
                     // If intercepting by domains or has IP address, needsRestart
                     if providerConfig.interceptMatchedDns || containIpAddresses(zSvc) {
-                        zLog.warn("Service \(zSvc.name ?? "unamed"):\(zSvc.id ?? "nil") updated after identities loaded. Re-start required to access service")
+                        let msg = "Re-start may be required to access service \"\(zSvc.name ?? "")\""
+                        zLog.warn(msg)
+                        userNotifications.post(.Restart, tzid.name, msg, tzid)
                         tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
                         zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
                     }
@@ -487,6 +551,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     }
     
     func zidToTzid(_ zid:CZiti.ZitiIdentity) -> ZitiIdentity? {
+        return zidToTzid(zid.id)
+    }
+    
+    func zidToTzid(_ zid:String) -> ZitiIdentity? {
         guard var tzids = tzids else {
             zLog.wtf("Invalid identity list")
             return nil
@@ -494,7 +562,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
 
         for i in 0 ..< tzids.count {
             guard let czid = tzids[i].czid else { continue }
-            if czid.id == zid.id {
+            if czid.id == zid {
                 let (curr, zErr) = zidStore.load(czid.id)
                 if let curr = curr, zErr == nil {
                     tzids[i] = curr
