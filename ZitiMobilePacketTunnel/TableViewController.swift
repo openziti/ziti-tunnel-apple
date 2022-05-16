@@ -18,6 +18,7 @@ import UIKit
 import NetworkExtension
 import SafariServices
 import MessageUI
+import UniformTypeIdentifiers
 
 class StatusCell: UITableViewCell {
     @IBOutlet weak var connectStatus: UILabel!
@@ -139,9 +140,9 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 self.tableView.reloadData()
                 self.ivc?.tableView.reloadData()
                 
-                if self.zidMgr.needsRestart(zid) {
-                    self.tunnelMgr.restartTunnel()
-                }
+//                if self.zidMgr.needsRestart(zid) {
+//                    self.tunnelMgr.restartTunnel()
+//                }
             }
         }
         
@@ -159,6 +160,62 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 self.ivc?.tableView.reloadData()
                 self.tunnelMgr.restartTunnel()
             }
+        }
+        
+        // Listen for appexNotifications
+        NotificationCenter.default.addObserver(forName: .onAppexNotification, object: nil, queue: OperationQueue.main) { notification in
+            guard let msg = notification.userInfo?["ipcMessage"] as? IpcMessage else {
+                zLog.error("Unable to retrieve IPC message from event notification")
+                return
+            }
+            
+            if msg.meta.msgType == .MfaAuthQuery {
+                self.notifiyMfaNotSupported()
+            }
+            
+            // Process any specified action
+            if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationMessage {
+                // Always select the zid (if specified)
+                DispatchQueue.main.async {
+                    if let zidStr = msg.meta.zid {
+                        var indx = -1
+                        for i in 0..<self.zidMgr.zids.count {
+                            if self.zidMgr.zids[i].id == zidStr {
+                                indx = i
+                                break
+                            }
+                        }
+                        if indx != -1 {
+                            self.tableView.reloadData()
+                            self.tableView.selectRow(at: IndexPath(row: indx, section: 1), animated: false, scrollPosition: .none)
+                            self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+                        }
+                    }
+                }
+                
+                // Process the action
+                if let action = msg.action {
+                    if action == UserNotifications.Action.MfaAuth.rawValue {
+                        self.notifiyMfaNotSupported()
+                    } else if action == UserNotifications.Action.Restart.rawValue {
+                        self.tunnelMgr.restartTunnel()
+                    }
+                }
+            }
+        }
+    }
+    
+    func notifiyMfaNotSupported() {
+        let alert = UIAlertController(
+            title:"MFA Auth Error",
+            message: "MFA not currently supported on this platform",
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("Ok", comment: "Ok"),
+            style: .default,
+            handler: nil))
+        DispatchQueue.main.async {
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -270,7 +327,9 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     func addViaJWTFile() {
-        let dp = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .import)
+        let supportedTypes: [UTType] = [UTType.data]
+        let dp = UIDocumentPickerViewController(forOpeningContentTypes: supportedTypes, asCopy: true)
+        
         dp.modalPresentationStyle = .formSheet
         dp.allowsMultipleSelection = false
         dp.delegate = self

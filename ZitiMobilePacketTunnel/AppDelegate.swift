@@ -15,6 +15,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -55,6 +56,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         #endif
+        
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        UserNotifications.shared.requestAuth()
+        
         return true
     }
 
@@ -96,6 +102,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func notifyNewURL(_ url:URL) {
         let dict:[String: URL] = ["url": url]
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "NewURL"), object: nil, userInfo: dict)
+    }
+}
+
+extension AppDelegate : UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        zLog.debug("willPresent: \(notification.debugDescription)")
+        completionHandler([.list, .sound])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        zLog.info("didReceive: \(response.debugDescription)")
+        
+        // App gets called on iOS, not the appex. So raise AppexNotification IPC notifications here
+        // This is only called on macOS.  On iOS, the app's AppDelegate gets notified...
+        zLog.debug("didReceive: \(response.debugDescription)")
+        
+        var zidStr:String? = nil
+        if let zid = response.notification.request.content.userInfo["zid"] as? String {
+            zidStr = zid
+        }
+        
+        let msg = IpcAppexNotificationMessage(zidStr, response.notification.request.content.categoryIdentifier, response.actionIdentifier)
+        NotificationCenter.default.post(name: .onAppexNotification, object: self, userInfo: ["ipcMessage":msg])
+        
+        completionHandler()
     }
 }
 

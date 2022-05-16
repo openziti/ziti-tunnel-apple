@@ -216,22 +216,35 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 } else {
                     csStr = cs.status.rawValue
                 }
-                csStr += " (as of \(DateFormatter().timeSince(cs.lastContactAt)))"
+                //csStr += " (as of \(DateFormatter().timeSince(cs.lastContactAt)))"
                 cell?.detailTextLabel?.text = csStr
             } else {
                 cell?.textLabel?.text = "Enrollment Status"
                 cell?.detailTextLabel?.text = zid?.enrollmentStatus.rawValue
             }
         } else if indexPath.section == 2 {
-            if zid?.isEnrolled ?? false {
+            if let zid = zid, zid.isEnrolled {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_SERVICE_CELL", for: indexPath)
-                cell?.textLabel?.text = zid?.services[indexPath.row].name
+                cell?.textLabel?.text = zid.services[indexPath.row].name
                 
                 var protoStr = ""
-                if let protos = zid?.services[indexPath.row].protocols {
+                if let protos = zid.services[indexPath.row].protocols {
                     protoStr = "\(protos)"
                 }
-                cell?.detailTextLabel?.text = "[\(protoStr)]:\(zid?.services[indexPath.row].addresses ?? ""):[\(zid?.services[indexPath.row].portRanges ?? "-1")] "
+                cell?.detailTextLabel?.text = "[\(protoStr)]:\(zid.services[indexPath.row].addresses ?? ""):[\(zid.services[indexPath.row].portRanges ?? "-1")] "
+                
+                let tunnelStatus = tvc?.tunnelMgr.status ?? .disconnected
+                var imageName:String = "StatusNone"
+                
+                if tunnelStatus == .connected, zid.isEnrolled == true, zid.isEnabled == true, let svcStatus = zid.services[indexPath.row].status {
+                    switch svcStatus.status {
+                    case .Available: imageName = "StatusAvailable"
+                    case .PartiallyAvailable: imageName = "StatusPartiallyAvailable"
+                    case .Unavailable: imageName = "StatusUnavailable"
+                    default: imageName = "StatusNone"
+                    }
+                }
+                cell?.imageView?.image = UIImage(named: imageName)
             } else {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_ENROLL_CELL", for: indexPath)
                 if let ivCell = cell as? EnrollIdentityCell { ivCell.ivc = self }
@@ -241,5 +254,13 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             if let ivCell = cell as? ForgetIdentityCell { ivCell.ivc = self }
         }
         return cell! // Don't let this happen!
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let svcVc = segue.destination as? ServiceViewController {
+            if let ip = tableView.indexPathForSelectedRow, ip.section == 2 {
+                svcVc.svc = zid?.services[ip.row]
+            }
+        }
     }
 }
