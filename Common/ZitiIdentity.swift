@@ -78,6 +78,7 @@ class ZitiIdentity : NSObject, Codable {
     var mfaEnabled:Bool? = false
     var mfaVerified:Bool? = false
     var lastMfaAuth:Date?
+    var mfaPending:Bool? = false
     var enabled:Bool? = false
     var enrolled:Bool? = false
     var enrollmentStatus:EnrollmentStatus {
@@ -87,6 +88,22 @@ class ZitiIdentity : NSObject, Codable {
         return .Pending
     }
     
+    var appexNotifications:[IpcPolyMessage]?
+    func getAppexNotifications() -> [IpcMessage] {
+        var msgs:[IpcMessage] = []
+        appexNotifications?.forEach {
+            msgs.append($0.msg)
+        }
+        return msgs
+    }
+    
+    func addAppexNotification(_ msg:IpcMessage) {
+        if appexNotifications == nil {
+            appexNotifications = []
+        }
+        appexNotifications?.append(IpcPolyMessage(msg))
+    }
+    
     func getEnrollmentMethod() -> EnrollmentMethod {
         if let m = claims?.em { return EnrollmentMethod(m) }
         return EnrollmentMethod.ott
@@ -94,6 +111,7 @@ class ZitiIdentity : NSObject, Codable {
     
     var isMfaEnabled:Bool { return mfaEnabled ?? false }
     var isMfaVerified:Bool { return isMfaEnabled && (mfaVerified ?? false) }
+    var isMfaPending:Bool { return mfaPending ?? false }
     var isEnabled:Bool { return enabled ?? false }
     var isEnrolled:Bool { return enrolled ?? false }
     var edgeStatus:EdgeStatus?

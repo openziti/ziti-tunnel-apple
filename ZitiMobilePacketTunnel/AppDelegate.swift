@@ -22,10 +22,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var launchURL:URL?
     
-    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    override init() {
         Logger.initShared(Logger.APP_TAG)
         zLog.info(Version.verboseStr)
-        
+    }
+    
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         #if targetEnvironment(simulator)
             let zidStore = ZitiIdentityStore()
             if let resourceURL = Bundle.main.resourceURL {

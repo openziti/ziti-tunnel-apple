@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5A2EA2DE209B754400437608"
-               BuildableName = "MobilePacketTunnelProvider.appex"
-               BlueprintName = "MobilePacketTunnelProvider"
+               BlueprintIdentifier = "5AF3DCA824B52642005047BC"
+               BuildableName = "MobileShare.appex"
+               BlueprintName = "MobileShare"
                ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -42,15 +42,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5A2EA2DE209B754400437608"
-            BuildableName = "MobilePacketTunnelProvider.appex"
-            BlueprintName = "MobilePacketTunnelProvider"
-            ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <Testables>
       </Testables>
    </TestAction>

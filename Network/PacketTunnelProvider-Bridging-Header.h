@@ -13,5 +13,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-char **get_mac_addrs();
+char **get_mac_addrs(void);
 void free_string_array(char **addrs);

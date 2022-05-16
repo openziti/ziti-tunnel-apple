@@ -2,6 +2,7 @@ abstract_target 'ios_targets' do
   platform :ios, '13.4.3'
   use_frameworks!
   pod 'CZiti-iOS', '~> 0.1'
+  # pod 'CZiti-iOS', :path => './local/'
   # pod 'CZiti-iOS', '~> 0.23.0-beta2'
 
   target 'Ziti Mobile Edge' do

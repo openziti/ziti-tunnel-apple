@@ -15,16 +15,40 @@
 //
 
 import Cocoa
+import UserNotifications
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     var menuBar:MainMenuBar? = nil
-
+    
+    override init() {
+        Logger.initShared(Logger.APP_TAG)
+        zLog.info(Version.verboseStr)
+    }
+    
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        UserNotifications.shared.requestAuth()
+    }
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         menuBar = MainMenuBar.shared
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
+    }
+}
+
+extension AppDelegate : UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        zLog.debug("\(notification.debugDescription)")
+        completionHandler([.list, .sound])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        zLog.info("\(response.debugDescription)")
+        completionHandler()
     }
 }
 
