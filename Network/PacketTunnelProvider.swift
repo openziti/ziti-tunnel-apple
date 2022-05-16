@@ -62,14 +62,15 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
-        // method is not reliably called. When it is, results are ignored (notification is not displayed)
-        zLog.debug("\(notification.debugDescription)")
+        // On macOS, method is not reliably called. When it is, results are ignored (notification is not displayed)
+        zLog.debug("willPresent: \(notification.debugDescription)")
         completionHandler([.list, .sound])
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-        zLog.debug("\(response.debugDescription)")
+        // This is only called on macOS.  On iOS, the app's AppDelegate gets notified...
+        zLog.debug("didReceive: \(response.debugDescription)")
         if let zid = response.notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
             tzid.addAppexNotification(IpcAppexNotificationMessage(
                 zid, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
@@ -416,7 +417,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             
             userNotifications.post(.Mfa, "MFA Auth Requested", tzid.name, tzid)
             
-            // MFA Notification not reliably show.  Force it, since in some instances its important the MFA complete before identits are loaded
+            // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
             tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
             _ = zidStore.store(tzid)
         }
@@ -475,18 +476,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
                     }
                 }
                 
-                // check for failed posture checks
-                let zidMgr = ZidMgr()
-                if !zidMgr.postureChecksPassing(zSvc) {
-                    let msg = "Failed posture check(s) for service \"\(zSvc.name ?? "")\""
-                    zLog.warn(msg)
-                    userNotifications.post(.Posture, tzid.name, msg, tzid)
-                    
-                    let needsRestart = zSvc.status?.needsRestart ?? false
-                    tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
-                    zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: needsRestart)
-                }
-                
                 // check if restart is needed
                 if identitiesLoaded {
                     // If intercepting by domains or has IP address, needsRestart
@@ -497,6 +486,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
                         tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
                         zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
                     }
+                }
+                
+                // check for failed posture checks
+                let zidMgr = ZidMgr()
+                if !zidMgr.postureChecksPassing(zSvc) {
+                    let msg = "Failed posture check(s) for service \"\(zSvc.name ?? "")\""
+                    zLog.warn(msg)
+                    userNotifications.post(.Posture, tzid.name, msg, tzid)
+                    
+                    let needsRestart = zSvc.status?.needsRestart ?? false
+                    tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+                    zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: needsRestart)
                 }
                 tzid.services.append(zSvc)
             }
