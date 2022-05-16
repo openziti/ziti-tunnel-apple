@@ -323,7 +323,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             
             if identitiesLoaded && !alreadyExists {
                 zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
-                        "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
+                        "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
             }
         }
         return 0
@@ -344,7 +344,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             
             if identitiesLoaded{
                 zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
-                        "If route not already available it must be manually added (/sbin/route) or tunnel re-started ***")
+                        "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
             }
         }
         return 0
@@ -491,7 +491,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
                 if identitiesLoaded {
                     // If intercepting by domains or has IP address, needsRestart
                     if providerConfig.interceptMatchedDns || containIpAddresses(zSvc) {
-                        let msg = "Re-start may be required to access service \"\(zSvc.name ?? "")\""
+                        let msg = "Restart may be required to access service \"\(zSvc.name ?? "")\""
                         zLog.warn(msg)
                         userNotifications.post(.Restart, tzid.name, msg, tzid)
                         tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
@@ -504,12 +504,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
     }
     
     private func handleServiceEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelServiceEvent) {
-        // Update controller status to .Available
-        tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
-        
         for eSvc in event.removed { processService(tzid, eSvc, remove:true) }
         for eSvc in event.added   { processService(tzid, eSvc, add:true) }
         
+        let zidMgr = ZidMgr()
+        if zidMgr.allServicePostureChecksPassing(tzid) && !zidMgr.needsRestart(tzid) {
+            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
+        }
         _ = zidStore.store(tzid)
     }
     
