@@ -69,7 +69,8 @@ class UserNotifications {
             
             let content = UNMutableNotificationContent()
             content.categoryIdentifier = category.rawValue
-            content.title = "Ziti Desktop Edge"
+            content.title = ProviderConfig().localizedDescription
+            
             if let subtitle = subtitle { content.subtitle = subtitle }
             if let body = body { content.body = body }
             if let zid = zid {
