@@ -488,8 +488,8 @@
 		5A2EA2C4209B317200437608 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				5AF786982090FFCA0093498C /* DNSEntries.swift */,
 				5AF78688208A8D050093498C /* IPUtils.swift */,
+				5AF786982090FFCA0093498C /* DNSEntries.swift */,
 				5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */,
 				5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */,
 				5A411E7F2523583E005EE351 /* ziti.c */,

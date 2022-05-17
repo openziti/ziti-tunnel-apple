@@ -81,4 +81,32 @@ class DNSEntries : NSObject {
         }
         return nil
     }
+    
+    func getFirstResolver() -> String? {
+        var firstResolver:String?
+        
+        var state = __res_9_state()
+        res_9_ninit(&state)
+        
+        let maxServers = 10
+        var servers = [res_9_sockaddr_union](repeating: res_9_sockaddr_union(), count: maxServers)
+        let nServers = Int(res_9_getservers(&state, &servers, Int32(maxServers)))
+        for i in 0 ..< nServers {
+            var s = servers[i]
+            if s.sin.sin_len > 0 {
+                var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                let sinLen = socklen_t(s.sin.sin_len)
+                let _ = withUnsafePointer(to: &s) {
+                    $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                        getnameinfo($0, sinLen, &hostBuffer, socklen_t(hostBuffer.count), nil, 0, NI_NUMERICHOST)
+                    }
+                }
+                firstResolver = String(cString: hostBuffer)
+                break
+            }
+        }
+        res_9_ndestroy(&state)
+        
+        return firstResolver
+    }
 }
