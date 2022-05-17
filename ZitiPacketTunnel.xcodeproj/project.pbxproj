@@ -15,8 +15,6 @@
 		5A0004902831ADF100351FE2 /* ZidMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A051F602264183500B11CB2 /* ZidMgr.swift */; };
 		5A0004912832769800351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004932832C3DF00351FE2 /* ServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0004922832C3DF00351FE2 /* ServiceViewController.swift */; };
-		5A00049528332A7E00351FE2 /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00049428332A7E00351FE2 /* DNSResolver.swift */; };
-		5A0004962833315400351FE2 /* DNSResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00049428332A7E00351FE2 /* DNSResolver.swift */; };
 		5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */; };
 		5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AAB9206EBD7E006261C6 /* ViewController.swift */; };
 		5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A02AABB206EBD7E006261C6 /* Assets.xcassets */; };
@@ -218,7 +216,6 @@
 		534E7C9041DB42B11BAB0551 /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiMobilePacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
 		59ED0D602622178039E7DE15 /* Pods_ios_targets_MobileShare.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_targets_MobileShare.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A0004922832C3DF00351FE2 /* ServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceViewController.swift; sourceTree = "<group>"; };
-		5A00049428332A7E00351FE2 /* DNSResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResolver.swift; sourceTree = "<group>"; };
 		5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Desktop Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5A02AAB9206EBD7E006261C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -492,7 +489,6 @@
 			isa = PBXGroup;
 			children = (
 				5AF786982090FFCA0093498C /* DNSEntries.swift */,
-				5A00049428332A7E00351FE2 /* DNSResolver.swift */,
 				5AF78688208A8D050093498C /* IPUtils.swift */,
 				5A02AACD206EBDD5006261C6 /* PacketTunnelProvider.swift */,
 				5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */,
@@ -1109,7 +1105,6 @@
 				5A5539102558425900C02F03 /* ZitiPostureChecks.swift in Sources */,
 				5AF786992090FFCA0093498C /* DNSEntries.swift in Sources */,
 				5A00048F2831ADF000351FE2 /* ZidMgr.swift in Sources */,
-				5A00049528332A7E00351FE2 /* DNSResolver.swift in Sources */,
 				5AB0FDD7265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5AF7868B208A91650093498C /* IPUtils.swift in Sources */,
 				5AFC6A6A282F399800A0229C /* UserNotifications.swift in Sources */,
@@ -1170,7 +1165,6 @@
 				5A5539112558425900C02F03 /* ZitiPostureChecks.swift in Sources */,
 				5A91B4CA2222E156006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5A0004902831ADF100351FE2 /* ZidMgr.swift in Sources */,
-				5A0004962833315400351FE2 /* DNSResolver.swift in Sources */,
 				5AB0FDD9265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5A2EA2FC209B771600437608 /* PacketTunnelProvider.swift in Sources */,
 				5AFC6A6B282F399800A0229C /* UserNotifications.swift in Sources */,

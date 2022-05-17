@@ -128,15 +128,44 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         // behave like most Linux systems and automatically resolver#2 to be queried, but now it causes the
         // query to fail), so we have to have a fallback.  Try to determing current first resolver
         // and use if for fallback. Otherwise pick a reasonable default.
-        if upstreamDns == nil {
-            if let firstResolver = Resolver().getservers().map(Resolver.getnameinfo).first {
-                zLog.warn("No fallback DNS provided. Setting to first resolver: \(firstResolver)")
-                upstreamDns = firstResolver
-            } else {
-                upstreamDns = "1.1.1.1"
-                zLog.warn("No fallback DNS provided. Defaulting to 1.1.1.1")
+        // TODO: on iOS, we find the first resolver, but setting any fallbackDNS is causing issues
+        #if os(macOS)
+        if upstreamDns == nil {   
+            var firstResolver:String?
+            
+            var state = __res_9_state()
+            res_9_ninit(&state)
+            
+            let maxServers = 10
+            var servers = [res_9_sockaddr_union](repeating: res_9_sockaddr_union(), count: maxServers)
+            let found = Int(res_9_getservers(&state, &servers, Int32(maxServers)))
+            for i in 0..<found {
+                var s = servers[i]
+                if s.sin.sin_len > 0 {
+                    var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                    let sinlen = socklen_t(s.sin.sin_len)
+                    let _ = withUnsafePointer(to: &s) {
+                        $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                            Darwin.getnameinfo($0, sinlen,
+                                               &hostBuffer, socklen_t(hostBuffer.count),
+                                               nil, 0,
+                                               NI_NUMERICHOST)
+                        }
+                    }
+                    firstResolver = String(cString: hostBuffer)
+                    break
+                }
             }
+            res_9_ndestroy(&state)
+            
+            zLog.warn("No fallback DNS provided. Setting to first resolver: \(firstResolver as Any)")
+            upstreamDns = firstResolver
         }
+        
+        if upstreamDns == nil {
+            upstreamDns = "1.1.1.1"
+        }
+        #endif
         
         zitiTunnel = ZitiTunnel(self, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS, upstreamDns)
         
