@@ -122,6 +122,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         if providerConfig.fallbackDnsEnabled {
             upstreamDns = providerConfig.fallbackDns
         }
+        
+        // Current Ziti Tunneler SDK returns REFUSED for non-Ziti DNS requests, whcih there will be a ton of
+        // when not intercepting by matchDomains.  REFUSED no longer works as expected on macOS (it used to
+        // behave like most Linux systems and automatically resolver#2 to be queried, but now it causes the
+        // query to fail), so we have to have a fallback.  Try to determing current first resolver
+        // and use if for fallback. Otherwise pick a reasonable default.
+        if upstreamDns == nil {
+            if let firstResolver = Resolver().getservers().map(Resolver.getnameinfo).first {
+                zLog.warn("No fallback DNS provided. Setting to first resolver: \(firstResolver)")
+                upstreamDns = firstResolver
+            } else {
+                upstreamDns = "1.1.1.1"
+                zLog.warn("No fallback DNS provided. Defaulting to 1.1.1.1")
+            }
+        }
+        
         zitiTunnel = ZitiTunnel(self, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS, upstreamDns)
         
         // read in the .zid files
