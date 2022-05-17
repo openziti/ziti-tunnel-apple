@@ -84,7 +84,6 @@ class DNSEntries : NSObject {
     
     func getFirstResolver() -> String? {
         var firstResolver:String?
-        
         var state = __res_9_state()
         res_9_ninit(&state)
         

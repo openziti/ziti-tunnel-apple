@@ -130,8 +130,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         // and use if for fallback. Otherwise pick a reasonable default.
         // TODO: on iOS, we find the first resolver, but setting any fallbackDNS is causing issues
         #if os(macOS)
-        if upstreamDns == nil {   
-            
+        if upstreamDns == nil {
             let firstResolver = dnsEntries.getFirstResolver()
             zLog.warn("No fallback DNS provided. Setting to first resolver: \(firstResolver as Any)")
             upstreamDns = firstResolver
