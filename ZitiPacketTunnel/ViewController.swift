@@ -653,7 +653,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     // Success!
                     zid.lastMfaAuth = Date()
                     zid.mfaPending = false
-                    // TODO: edgeStatus... should be updated when services show up?
                     _ = self.zidMgr.zidStore.store(zid)
                     self.updateServiceUI(zId:zid)
                 }
