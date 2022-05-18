@@ -143,6 +143,7 @@ class ServicesViewController: NSViewController {
 
 extension ServicesViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
+        if !(zid?.isEnabled ?? false) { return 0 }
         return zid?.services.count ?? 0
     }
 }
