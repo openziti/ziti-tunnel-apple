@@ -184,6 +184,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         if let svc = servicesViewController {
             svc.zid = zId
+            svc.tunnelMgr = tunnelMgr
         }
     }
    
@@ -315,6 +316,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             servicesViewController = svc
             if zidMgr.zids.count > 0 {
                 svc.zid = zidMgr.zids[representedObject as! Int]
+                svc.tunnelMgr = tunnelMgr
             }
         }
     }
