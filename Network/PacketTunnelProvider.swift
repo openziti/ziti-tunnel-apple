@@ -20,6 +20,11 @@ import CZiti
 import UserNotifications
 
 class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNotificationCenterDelegate {
+    
+    static let MFA_POSTURE_CHECK_TIMER_INTERVAL:UInt64 = 30
+    static let MFA_POSTURE_CHECK_FIRST_NOTICE:UInt64 = 300
+    static let MFA_POSTURE_CHECK_FINAL_NOTICE:UInt64 = 120
+    
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
     var dnsEntries:DNSEntries = DNSEntries()
@@ -183,6 +188,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
                     zLog.debug("---screen unlock----")
                     self.allZitis.forEach { $0.endpointStateChange(false, true) }
                 }
+            
+            
+                // set timer to check pending MFA posture timeouts
+                self.allZitis.first?.startTimer(
+                    PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
+                    PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
+                    self.onMfaPostureTimer()
+                }
             #endif
             
             // identies have loaded, so go ahead and setup the TUN
@@ -306,6 +319,54 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         writeLock.lock()
         packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber])
         writeLock.unlock()
+    }
+    
+    func onMfaPostureTimer() {
+        guard let tzids = tzids else { return }
+        
+        let now = Date()
+        let firstNoticeMin = PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE - PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL
+        let finalNoticeMin = PacketTunnelProvider.MFA_POSTURE_CHECK_FINAL_NOTICE - PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL
+        
+        let zidMgr = ZidMgr()
+        for tzid in tzids {
+            
+            // if already failing posture checks don't bother (user notification was already sent)
+            if !tzid.isEnabled || !tzid.isEnrolled || !zidMgr.allServicePostureChecksPassing(tzid) {
+                continue
+            }
+            
+            // find the lowest MFA timeout set for this identity (if any)
+            var lowestTimeRemaining:Int32 = Int32.max
+            tzid.services.forEach { svc in
+                svc.postureQuerySets?.forEach{ pqs in
+                    if pqs.isPassing ?? true {
+                        pqs.postureQueries?.forEach{ pq in
+                            if let qt = pq.queryType, qt == "MFA", let tr = pq.timeoutRemaining, tr > 0, let lua = svc.status?.lastUpdatedAt {
+                                let lastUpdatedAt = Date(timeIntervalSince1970: lua)
+                                let timeSinceLastUpdate = Int32(now.timeIntervalSince(lastUpdatedAt))
+                                let actualTimeRemaining = tr - timeSinceLastUpdate
+                                if actualTimeRemaining < lowestTimeRemaining {
+                                    lowestTimeRemaining = actualTimeRemaining
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Notify user...
+            if lowestTimeRemaining > firstNoticeMin && lowestTimeRemaining < PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE {
+                zLog.info("\(tzid.name) MFA expiring in less then \(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE) secs \(lowestTimeRemaining)")
+                self.userNotifications.post(.Mfa, "MFA Auth Posture Check",
+                                            "\(tzid.name) MFA expiring in less then \(UInt64(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE/60)) mins",
+                                            tzid)
+            } else if lowestTimeRemaining > finalNoticeMin && lowestTimeRemaining < PacketTunnelProvider.MFA_POSTURE_CHECK_FINAL_NOTICE {
+                self.userNotifications.post(.Mfa, "MFA Auth Posture Check",
+                                            "\(tzid.name) MFA expiring in less then \(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE) secs",
+                                            tzid)
+            }
+        }
     }
      
     func cidrToDestAndMask(_ cidr:String) -> (String?, String?) {
@@ -577,19 +638,16 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
     }
     
     func zidToTzid(_ zid:String) -> ZitiIdentity? {
-        guard var tzids = tzids else {
-            zLog.wtf("Invalid identity list")
-            return nil
-        }
-
-        for i in 0 ..< tzids.count {
-            guard let czid = tzids[i].czid else { continue }
-            if czid.id == zid {
-                let (curr, zErr) = zidStore.load(czid.id)
-                if let curr = curr, zErr == nil {
-                    tzids[i] = curr
+        if tzids != nil {
+            for i in 0 ..< tzids!.count {
+                guard let czid = tzids![i].czid else { continue }
+                if czid.id == zid {
+                    let (curr, zErr) = zidStore.load(czid.id)
+                    if let curr = curr, zErr == nil {
+                        tzids![i] = curr
+                    }
+                    return tzids![i]
                 }
-                return tzids[i]
             }
         }
         return nil
