@@ -46,7 +46,7 @@ class UserNotifications {
             let restartActions = [ restartAction, openAction ]
             let restartCategory = UNNotificationCategory.init(identifier: Category.Restart.rawValue, actions: restartActions, intentIdentifiers: [], options: [])
             
-            let mfaActions = [openAction, mfaAction]
+            let mfaActions = [mfaAction, openAction]
             let mfaCatgory = UNNotificationCategory.init(identifier: Category.Mfa.rawValue, actions: mfaActions, intentIdentifiers: [], options: [])
             
             let categories:Set = [infoCategory, errorCategory, postureCategory, restartCategory, mfaCatgory]
