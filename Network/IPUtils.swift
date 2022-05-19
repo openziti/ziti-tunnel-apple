@@ -15,6 +15,7 @@
 //
 
 import Foundation
+import NetworkExtension
 
 // convenience..
 class IPUtils {
@@ -33,6 +34,20 @@ class IPUtils {
         let parts = addr.components(separatedBy: ".")
         let nums = parts.compactMap { Int($0) }
         return parts.count == 4 && nums.count == 4 && nums.filter { $0 >= 0 && $0 < 256}.count == 4
+    }
+    
+    static func areSameRoutes(_ r1:NEIPv4Route, _ r2:NEIPv4Route) -> Bool {
+        let r1A = ipV4AddressStringToData(r1.destinationAddress)
+        let r1M = ipV4AddressStringToData(r1.destinationSubnetMask)
+        let r2A = ipV4AddressStringToData(r2.destinationAddress)
+        let r2M = ipV4AddressStringToData(r2.destinationSubnetMask)
+        
+        for ((r1A, r1M), (r2A, r2M)) in zip(zip(r1A, r1M), zip(r2A, r2M)) {
+            if (r1A & r1M) != (r2A & r2M) {
+                return false
+            }
+        }
+        return true
     }
     
     static func inV4Subnet(_ dest:Data, network:Data, mask:Data) -> Bool {
