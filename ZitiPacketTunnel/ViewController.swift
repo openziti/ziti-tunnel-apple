@@ -184,6 +184,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         if let svc = servicesViewController {
             svc.zid = zId
+            svc.tunnelMgr = tunnelMgr
         }
     }
    
@@ -315,6 +316,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             servicesViewController = svc
             if zidMgr.zids.count > 0 {
                 svc.zid = zidMgr.zids[representedObject as! Int]
+                svc.tunnelMgr = tunnelMgr
             }
         }
     }
@@ -653,7 +655,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     // Success!
                     zid.lastMfaAuth = Date()
                     zid.mfaPending = false
-                    // TODO: edgeStatus... should be updated when services show up?
                     _ = self.zidMgr.zidStore.store(zid)
                     self.updateServiceUI(zId:zid)
                 }

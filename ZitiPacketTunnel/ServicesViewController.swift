@@ -39,6 +39,8 @@ class ServicesViewController: NSViewController {
         }
     }
     
+    weak var tunnelMgr:TunnelMgr?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -141,6 +143,7 @@ class ServicesViewController: NSViewController {
 
 extension ServicesViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
+        if !(zid?.isEnabled ?? false) { return 0 }
         return zid?.services.count ?? 0
     }
 }
@@ -161,10 +164,35 @@ extension ServicesViewController: NSTableViewDelegate {
         
         var text = ""
         var cellIdentifier = ""
+        var imageName:String?
+        var tooltip:String?
         
         if tableColumn == tableView.tableColumns[0] {
             text = svc.name ?? "-"
             cellIdentifier = CellIdentifiers.NameCell
+            
+            imageName = "NSStatusNone"
+            let tunnelStatus = tunnelMgr?.status ?? .disconnected
+            if tunnelStatus == .connected, let zid = zid, zid.isEnrolled == true, zid.isEnabled == true, let svcStatus = svc.status {
+                switch svcStatus.status {
+                case .Available: imageName = "NSStatusAvailable"
+                case .PartiallyAvailable: imageName = "NSStatusPartiallyAvailable"
+                case .Unavailable: imageName = "NSStatusUnavailable"
+                default: imageName = "NSStatusNone"
+                }
+            }
+            
+            let zidMgr = ZidMgr()
+            if tunnelStatus != .connected {
+                tooltip = "Status: Not Connected"
+            } else if zid?.isMfaPending ?? false {
+                tooltip = "MFA Pending"
+            } else if !zidMgr.postureChecksPassing(svc) {
+                tooltip = "Posture check(s) failing"
+            } else if svc.status?.needsRestart ?? false {
+                tooltip = "Connection reset may be required to access service"
+            }
+            
         } else if tableColumn == tableView.tableColumns[1] {
             text = svc.protocols ?? ""
             cellIdentifier = CellIdentifiers.ProtocolCell
@@ -191,6 +219,11 @@ extension ServicesViewController: NSTableViewDelegate {
         if let cell = tableView.makeView(
             withIdentifier: NSUserInterfaceItemIdentifier(rawValue: cellIdentifier), owner: nil) as? NSTableCellView {
             cell.textField?.stringValue = text
+            
+            if let imageName = imageName {
+                cell.imageView?.image = NSImage(named:imageName) ?? nil
+            }
+            cell.toolTip = tooltip
             return cell
         }
         

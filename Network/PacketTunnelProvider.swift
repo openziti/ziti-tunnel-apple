@@ -20,6 +20,11 @@ import CZiti
 import UserNotifications
 
 class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNotificationCenterDelegate {
+    
+    static let MFA_POSTURE_CHECK_TIMER_INTERVAL:UInt64 = 30
+    static let MFA_POSTURE_CHECK_FIRST_NOTICE:UInt64 = 300
+    static let MFA_POSTURE_CHECK_FINAL_NOTICE:UInt64 = 120
+    
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
     var dnsEntries:DNSEntries = DNSEntries()
@@ -122,6 +127,26 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         if providerConfig.fallbackDnsEnabled {
             upstreamDns = providerConfig.fallbackDns
         }
+        
+        // Current Ziti Tunneler SDK returns REFUSED for non-Ziti DNS requests, whcih there will be a ton of
+        // when not intercepting by matchDomains.  REFUSED no longer works as expected on macOS (it used to
+        // behave like most Linux systems and automatically resolver#2 to be queried, but now it causes the
+        // query to fail), so we have to have a fallback.  Try to determing current first resolver
+        // and use if for fallback. Otherwise pick a reasonable default.
+        // TODO: on iOS, we find the first resolver, but setting any fallbackDNS is causing issues
+        #if os(macOS)
+        if upstreamDns == nil {
+            let firstResolver = dnsEntries.getFirstResolver()
+            zLog.warn("No fallback DNS provided. Setting to first resolver: \(firstResolver as Any)")
+            upstreamDns = firstResolver
+        }
+        
+        if upstreamDns == nil {
+            zLog.warn("No fallback DNS available. Defaulting to 1.1.1.1")
+            upstreamDns = "1.1.1.1"
+        }
+        #endif
+        
         zitiTunnel = ZitiTunnel(self, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS, upstreamDns)
         
         // read in the .zid files
@@ -162,6 +187,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
                 DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
                     zLog.debug("---screen unlock----")
                     self.allZitis.forEach { $0.endpointStateChange(false, true) }
+                }
+            
+            
+                // set timer to check pending MFA posture timeouts
+                self.allZitis.first?.startTimer(
+                    PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
+                    PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
+                    self.onMfaPostureTimer()
                 }
             #endif
             
@@ -287,6 +320,54 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         packetFlow.writePackets([data], withProtocols: [AF_INET as NSNumber])
         writeLock.unlock()
     }
+    
+    func onMfaPostureTimer() {
+        guard let tzids = tzids else { return }
+        
+        let now = Date()
+        let firstNoticeMin = PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE - PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL
+        let finalNoticeMin = PacketTunnelProvider.MFA_POSTURE_CHECK_FINAL_NOTICE - PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL
+        
+        let zidMgr = ZidMgr()
+        for tzid in tzids {
+            
+            // if already failing posture checks don't bother (user notification was already sent)
+            if !tzid.isEnabled || !tzid.isEnrolled || !zidMgr.allServicePostureChecksPassing(tzid) {
+                continue
+            }
+            
+            // find the lowest MFA timeout set for this identity (if any)
+            var lowestTimeRemaining:Int32 = Int32.max
+            tzid.services.forEach { svc in
+                svc.postureQuerySets?.forEach{ pqs in
+                    if pqs.isPassing ?? true {
+                        pqs.postureQueries?.forEach{ pq in
+                            if let qt = pq.queryType, qt == "MFA", let tr = pq.timeoutRemaining, tr > 0, let lua = svc.status?.lastUpdatedAt {
+                                let lastUpdatedAt = Date(timeIntervalSince1970: lua)
+                                let timeSinceLastUpdate = Int32(now.timeIntervalSince(lastUpdatedAt))
+                                let actualTimeRemaining = tr - timeSinceLastUpdate
+                                if actualTimeRemaining < lowestTimeRemaining {
+                                    lowestTimeRemaining = actualTimeRemaining
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Notify user...
+            if lowestTimeRemaining > firstNoticeMin && lowestTimeRemaining < PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE {
+                zLog.info("\(tzid.name) MFA expiring in less then \(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE) secs \(lowestTimeRemaining)")
+                self.userNotifications.post(.Mfa, "MFA Auth Posture Check",
+                                            "\(tzid.name) MFA expiring in less then \(UInt64(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE/60)) mins",
+                                            tzid)
+            } else if lowestTimeRemaining > finalNoticeMin && lowestTimeRemaining < PacketTunnelProvider.MFA_POSTURE_CHECK_FINAL_NOTICE {
+                self.userNotifications.post(.Mfa, "MFA Auth Posture Check",
+                                            "\(tzid.name) MFA expiring in less then \(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE) secs",
+                                            tzid)
+            }
+        }
+    }
      
     func cidrToDestAndMask(_ cidr:String) -> (String?, String?) {
         var dest = cidr
@@ -309,6 +390,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         let (dest, subnetMask) = cidrToDestAndMask(destinationAddress)
         
         if let dest = dest, let subnetMask = subnetMask {
+            
             zLog.info("addRoute \(dest) => \(dest), \(subnetMask)")
             let route = NEIPv4Route(destinationAddress: dest,
                                     subnetMask: subnetMask)
@@ -319,12 +401,15 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
                                         $0.destinationAddress == route.destinationAddress &&
                                         $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
                 alreadyExists = false
-                interceptedRoutes.append(route)
             }
             
-            if identitiesLoaded && !alreadyExists {
-                zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
-                        "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
+            if !alreadyExists {
+                if identitiesLoaded {
+                    zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
+                            "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
+                } else {
+                    interceptedRoutes.append(route)
+                }
             }
         }
         return 0
@@ -338,14 +423,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             let route = NEIPv4Route(destinationAddress: dest,
                                     subnetMask: subnetMask)
             
-            interceptedRoutes = interceptedRoutes.filter {
-                $0.destinationAddress == route.destinationAddress &&
-                $0.destinationSubnetMask == route.destinationSubnetMask
-            }
-            
             if identitiesLoaded{
-                zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
-                        "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
+                zLog.warn("*** Unable to delete route for \(destinationAddress) on running tunnel.")
+            } else {
+                interceptedRoutes = interceptedRoutes.filter {
+                    $0.destinationAddress == route.destinationAddress &&
+                    $0.destinationSubnetMask == route.destinationSubnetMask
+                }
             }
         }
         return 0
@@ -443,13 +527,32 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         return (Int(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
     }
     
-    private func containIpAddresses(_ zSvc:ZitiService) -> Bool {
+    private func containsNewRoute(_ zSvc:ZitiService) -> Bool {
+        guard let addresses = zSvc.addresses else {
+            return false
+        }
+        
+        for addr in addresses.components(separatedBy: ",") {
+            let (dest, subnetMask) = cidrToDestAndMask(addr)
+            
+            if let dest = dest, let subnetMask = subnetMask {
+                let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
+                if interceptedRoutes.first(where: {
+                                            $0.destinationAddress == route.destinationAddress &&
+                                            $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
+    private func containsNewDnsEntry(_ zSvc:ZitiService) -> Bool {
         guard let addresses = zSvc.addresses else {
             return false
         }
         for addr in addresses.components(separatedBy: ",") {
-            let (ip, _) = cidrToDestAndMask(addr)
-            if ip != nil {
+            if dnsEntries.dnsEntries.first(where: { $0.hostname == addr }) == nil {
                 return true
             }
         }
@@ -463,7 +566,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         }
         
         if remove {
-            self.dnsEntries.removeDnsEntry(serviceId)
+            if !identitiesLoaded {
+                self.dnsEntries.removeDnsEntry(serviceId)
+            }
             tzid.services = tzid.services.filter { $0.id != serviceId }
         }
         
@@ -471,15 +576,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             if canDial(eSvc) {
                 let zSvc = ZitiService(eSvc)
                 zSvc.addresses?.components(separatedBy: ",").forEach { addr in
-                    if !IPUtils.isValidIpV4Address(addr) {
+                    let (ip, _) = cidrToDestAndMask(addr)
+                    let isDNS = ip == nil
+                    if !identitiesLoaded && isDNS {
                         dnsEntries.addDnsEntry(addr, "", serviceId)
+                    } else if isDNS && providerConfig.interceptMatchedDns {
+                        zLog.warn("*** Unable to add DNS support for \(addr) to running tunnel when intercepting by matched domains")
                     }
                 }
                 
                 // check if restart is needed
                 if identitiesLoaded {
-                    // If intercepting by domains or has IP address, needsRestart
-                    if providerConfig.interceptMatchedDns || containIpAddresses(zSvc) {
+                    // If intercepting by domains or has new route, needsRestart
+                    if (providerConfig.interceptMatchedDns && containsNewDnsEntry(zSvc)) || containsNewRoute(zSvc) {
                         let msg = "Restart may be required to access service \"\(zSvc.name ?? "")\""
                         zLog.warn(msg)
                         userNotifications.post(.Restart, tzid.name, msg, tzid)
@@ -557,19 +666,16 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
     }
     
     func zidToTzid(_ zid:String) -> ZitiIdentity? {
-        guard var tzids = tzids else {
-            zLog.wtf("Invalid identity list")
-            return nil
-        }
-
-        for i in 0 ..< tzids.count {
-            guard let czid = tzids[i].czid else { continue }
-            if czid.id == zid {
-                let (curr, zErr) = zidStore.load(czid.id)
-                if let curr = curr, zErr == nil {
-                    tzids[i] = curr
+        if tzids != nil {
+            for i in 0 ..< tzids!.count {
+                guard let czid = tzids![i].czid else { continue }
+                if czid.id == zid {
+                    let (curr, zErr) = zidStore.load(czid.id)
+                    if let curr = curr, zErr == nil {
+                        tzids![i] = curr
+                    }
+                    return tzids![i]
                 }
-                return tzids[i]
             }
         }
         return nil

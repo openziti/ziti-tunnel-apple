@@ -33,56 +33,56 @@ class ServiceViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        var nSections = 1
+        if svc?.status?.needsRestart ?? false {
+            nSections += 1
+        }
+        return nSections
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 0 {
             nRows = 5
-            
-            if svc?.status?.needsRestart ?? false {
-                nRows += 1
-            }
         }
         return nRows
     }
 
-
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SERVICE_TABLE_CELL", for: indexPath)
 
-        if indexPath.row == 0 {
-            cell.textLabel?.text = "Name"
-            cell.detailTextLabel?.text = svc?.name
-        } else if indexPath.row == 1 {
-            cell.textLabel?.text = "Protocols"
-            cell.detailTextLabel?.text = svc?.protocols
-        } else if indexPath.row == 2 {
-            cell.textLabel?.text = "Addresses"
-            cell.detailTextLabel?.text = svc?.addresses
-        } else if indexPath.row == 3 {
-            cell.textLabel?.text = "Ports"
-            cell.detailTextLabel?.text = svc?.portRanges
-        } else if indexPath.row == 4 {
-            cell.textLabel?.text = "Posture Checks"
-            
-            var details = ""
-            if let svc = svc {
-                let zidMgr = ZidMgr()
-                if zidMgr.postureChecksPassing(svc) {
-                    details = "PASS"
-                } else {
-                    details = "FAIL"
-                    let fails = zidMgr.failingPostureChecks(svc)
-                    if fails.count > 0 {
-                        details += " (\(fails.joined(separator: ",")))"
+        if indexPath.section == 0 {
+            if indexPath.row == 0 {
+                cell.textLabel?.text = "Name"
+                cell.detailTextLabel?.text = svc?.name
+            } else if indexPath.row == 1 {
+                cell.textLabel?.text = "Protocols"
+                cell.detailTextLabel?.text = svc?.protocols
+            } else if indexPath.row == 2 {
+                cell.textLabel?.text = "Addresses"
+                cell.detailTextLabel?.text = svc?.addresses
+            } else if indexPath.row == 3 {
+                cell.textLabel?.text = "Ports"
+                cell.detailTextLabel?.text = svc?.portRanges
+            } else if indexPath.row == 4 {
+                cell.textLabel?.text = "Posture Checks"
+                
+                var details = ""
+                if let svc = svc {
+                    let zidMgr = ZidMgr()
+                    if zidMgr.postureChecksPassing(svc) {
+                        details = "PASS"
+                    } else {
+                        details = "FAIL"
+                        let fails = zidMgr.failingPostureChecks(svc)
+                        if fails.count > 0 {
+                            details += " (\(fails.joined(separator: ",")))"
+                        }
                     }
                 }
+                cell.detailTextLabel?.text = details
             }
-            cell.detailTextLabel?.text = details
-            
-        } else if indexPath.row == 5 {
+        } else if indexPath.section == 1 {
             cell.textLabel?.text = "Restart may be required to access service"
             cell.detailTextLabel?.text = ""
             cell.imageView?.image = UIImage(systemName:"exclamationmark.triangle.fill")
