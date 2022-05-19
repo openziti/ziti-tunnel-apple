@@ -390,6 +390,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         let (dest, subnetMask) = cidrToDestAndMask(destinationAddress)
         
         if let dest = dest, let subnetMask = subnetMask {
+            
             zLog.info("addRoute \(dest) => \(dest), \(subnetMask)")
             let route = NEIPv4Route(destinationAddress: dest,
                                     subnetMask: subnetMask)
@@ -400,12 +401,15 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
                                         $0.destinationAddress == route.destinationAddress &&
                                         $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
                 alreadyExists = false
-                interceptedRoutes.append(route)
             }
             
-            if identitiesLoaded && !alreadyExists {
-                zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
-                        "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
+            if !alreadyExists {
+                if identitiesLoaded {
+                    zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
+                            "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
+                } else {
+                    interceptedRoutes.append(route)
+                }
             }
         }
         return 0
@@ -419,14 +423,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             let route = NEIPv4Route(destinationAddress: dest,
                                     subnetMask: subnetMask)
             
-            interceptedRoutes = interceptedRoutes.filter {
-                $0.destinationAddress == route.destinationAddress &&
-                $0.destinationSubnetMask == route.destinationSubnetMask
-            }
-            
             if identitiesLoaded{
-                zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
-                        "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
+                zLog.warn("*** Unable to delete route for \(destinationAddress) on running tunnel.")
+            } else {
+                interceptedRoutes = interceptedRoutes.filter {
+                    $0.destinationAddress == route.destinationAddress &&
+                    $0.destinationSubnetMask == route.destinationSubnetMask
+                }
             }
         }
         return 0
@@ -524,13 +527,32 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         return (Int(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
     }
     
-    private func containIpAddresses(_ zSvc:ZitiService) -> Bool {
+    private func containsNewRoute(_ zSvc:ZitiService) -> Bool {
+        guard let addresses = zSvc.addresses else {
+            return false
+        }
+        
+        for addr in addresses.components(separatedBy: ",") {
+            let (dest, subnetMask) = cidrToDestAndMask(addr)
+            
+            if let dest = dest, let subnetMask = subnetMask {
+                let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
+                if interceptedRoutes.first(where: {
+                                            $0.destinationAddress == route.destinationAddress &&
+                                            $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
+    private func containsNewDnsEntry(_ zSvc:ZitiService) -> Bool {
         guard let addresses = zSvc.addresses else {
             return false
         }
         for addr in addresses.components(separatedBy: ",") {
-            let (ip, _) = cidrToDestAndMask(addr)
-            if ip != nil {
+            if dnsEntries.dnsEntries.first(where: { $0.hostname == addr }) == nil {
                 return true
             }
         }
@@ -544,7 +566,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         }
         
         if remove {
-            self.dnsEntries.removeDnsEntry(serviceId)
+            if !identitiesLoaded {
+                self.dnsEntries.removeDnsEntry(serviceId)
+            }
             tzid.services = tzid.services.filter { $0.id != serviceId }
         }
         
@@ -552,15 +576,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             if canDial(eSvc) {
                 let zSvc = ZitiService(eSvc)
                 zSvc.addresses?.components(separatedBy: ",").forEach { addr in
-                    if !IPUtils.isValidIpV4Address(addr) {
+                    let (ip, _) = cidrToDestAndMask(addr)
+                    let isDNS = ip == nil
+                    if !identitiesLoaded && isDNS {
                         dnsEntries.addDnsEntry(addr, "", serviceId)
+                    } else if isDNS && providerConfig.interceptMatchedDns {
+                        zLog.warn("*** Unable to add DNS support for \(addr) to running tunnel when intercepting by matched domains")
                     }
                 }
                 
                 // check if restart is needed
                 if identitiesLoaded {
-                    // If intercepting by domains or has IP address, needsRestart
-                    if providerConfig.interceptMatchedDns || containIpAddresses(zSvc) {
+                    // If intercepting by domains or has new route, needsRestart
+                    if (providerConfig.interceptMatchedDns && containsNewDnsEntry(zSvc)) || containsNewRoute(zSvc) {
                         let msg = "Restart may be required to access service \"\(zSvc.name ?? "")\""
                         zLog.warn(msg)
                         userNotifications.post(.Restart, tzid.name, msg, tzid)
