@@ -383,26 +383,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         }
         let mask:UInt32 = (0xffffffff << (32 - prefix)) & 0xffffffff
         let subnetMask = "\(String((mask & 0xff000000) >> 24)).\(String((mask & 0x00ff0000) >> 16)).\(String((mask & 0x0000ff00) >> 8)).\(String(mask & 0x000000ff))"
-        return (dest, subnetMask)
+        return (dest.trimmingCharacters(in: .whitespaces), subnetMask.trimmingCharacters(in: .whitespaces))
     }
     
     func addRoute(_ destinationAddress: String) -> Int32 {
         let (dest, subnetMask) = cidrToDestAndMask(destinationAddress)
         
         if let dest = dest, let subnetMask = subnetMask {
-            
             zLog.info("addRoute \(dest) => \(dest), \(subnetMask)")
-            let route = NEIPv4Route(destinationAddress: dest,
-                                    subnetMask: subnetMask)
+            let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
             
-            // only add if haven't already..
             var alreadyExists = true
-            if interceptedRoutes.first(where: {
-                                        $0.destinationAddress == route.destinationAddress &&
-                                        $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
+            if interceptedRoutes.first(where: { IPUtils.areSameRoutes($0, route) }) == nil {
                 alreadyExists = false
             }
-            
             if !alreadyExists {
                 if identitiesLoaded {
                     zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
@@ -445,9 +439,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             
             // only exclude if haven't already..
             var alreadyExists = true
-            if excludedRoutes.first(where: {
-                                        $0.destinationAddress == route.destinationAddress &&
-                                        $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
+            if excludedRoutes.first(where: { IPUtils.areSameRoutes($0, route) }) == nil {
                 alreadyExists = false
                 excludedRoutes.append(route)
             }
@@ -531,15 +523,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         guard let addresses = zSvc.addresses else {
             return false
         }
-        
         for addr in addresses.components(separatedBy: ",") {
             let (dest, subnetMask) = cidrToDestAndMask(addr)
-            
             if let dest = dest, let subnetMask = subnetMask {
                 let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
-                if interceptedRoutes.first(where: {
-                                            $0.destinationAddress == route.destinationAddress &&
-                                            $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
+                if interceptedRoutes.first(where: { IPUtils.areSameRoutes($0, route) }) == nil {
                     return true
                 }
             }
