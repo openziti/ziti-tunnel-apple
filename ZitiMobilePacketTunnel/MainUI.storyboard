@@ -272,7 +272,7 @@
                                                     <constraint firstAttribute="width" constant="30" id="SzA-10-dYs"/>
                                                 </constraints>
                                                 <connections>
-                                                    <outletCollection property="gestureRecognizers" destination="fCw-sq-zFc" appends="YES" id="YKZ-kR-RDT"/>
+                                                    <outletCollection property="gestureRecognizers" destination="ooy-AO-z1q" appends="YES" id="5HR-Mx-2Xw"/>
                                                 </connections>
                                             </imageView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iO4-kc-V3k">
@@ -450,9 +450,6 @@
                                         <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="19"/>
                                         <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
-                                        <connections>
-                                            <outletCollection property="gestureRecognizers" destination="cEn-df-sd1" appends="YES" id="iXb-MP-GKO"/>
-                                        </connections>
                                     </label>
                                 </subviews>
                             </stackView>
@@ -490,16 +487,6 @@
                 <tapGestureRecognizer id="oAc-Ya-CgX" userLabel="DisconnectGesture">
                     <connections>
                         <action selector="DoDisconnect:" destination="Be6-zG-vnf" id="sPo-IF-6vs"/>
-                    </connections>
-                </tapGestureRecognizer>
-                <tapGestureRecognizer id="fCw-sq-zFc" userLabel="AddIdentityGesture">
-                    <connections>
-                        <segue destination="QH1-Xl-opX" kind="show" id="8Qc-oG-6Vn"/>
-                    </connections>
-                </tapGestureRecognizer>
-                <tapGestureRecognizer id="cEn-df-sd1" userLabel="AddGesture">
-                    <connections>
-                        <segue destination="QH1-Xl-opX" kind="show" id="SXH-HU-6Jh"/>
                     </connections>
                 </tapGestureRecognizer>
                 <tapGestureRecognizer id="frR-7b-Aab" userLabel="HamburgerGesture">
@@ -541,6 +528,12 @@
                 <tapGestureRecognizer id="HUP-Ub-X5L" userLabel="MainGesture">
                     <connections>
                         <action selector="HideIfOpen:" destination="Be6-zG-vnf" id="lEa-WU-bgq"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer id="ooy-AO-z1q" userLabel="AddIdentityGesture">
+                    <connections>
+                        <action selector="ShowAddIdentity:" destination="Be6-zG-vnf" id="721-S4-fk3"/>
+                        <outlet property="delegate" destination="ryC-zK-Ou2" id="OaH-hs-CGr"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
@@ -2441,7 +2434,7 @@
                                                 <rect key="frame" x="0.0" y="25" width="414" height="75"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8WR-8i-VZD" userLabel="ScreenTitle">
-                                                        <rect key="frame" x="0.0" y="0.0" width="357.33333333333331" height="75"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="353.33333333333331" height="75"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="60" id="Zdo-IF-Vdz"/>
                                                         </constraints>
@@ -2457,23 +2450,23 @@
                                                         <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text=" " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hVc-XB-brL" userLabel="XPad">
-                                                        <rect key="frame" x="352.33333333333331" y="0.0" width="5.6666666666666856" height="75"/>
+                                                        <rect key="frame" x="348.33333333333331" y="0.0" width="5.6666666666666856" height="75"/>
                                                         <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="20"/>
                                                         <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <color key="highlightedColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     </label>
                                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="8j3-Wz-9iq" userLabel="XButton">
-                                                        <rect key="frame" x="353" y="0.0" width="26" height="75"/>
+                                                        <rect key="frame" x="349" y="0.0" width="30" height="75"/>
                                                         <subviews>
                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="close" translatesAutoresizingMaskIntoConstraints="NO" id="ivT-4z-HjA" userLabel="CloseIcon">
-                                                                <rect key="frame" x="0.0" y="0.0" width="26" height="26"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="30" height="26"/>
                                                                 <constraints>
                                                                     <constraint firstAttribute="height" constant="26" id="nNH-aV-TdE"/>
-                                                                    <constraint firstAttribute="width" constant="26" id="pfw-0O-iDG"/>
+                                                                    <constraint firstAttribute="width" constant="30" id="pfw-0O-iDG"/>
                                                                 </constraints>
                                                             </imageView>
-                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ESC" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hOw-3q-mSw" userLabel="CloseLabel">
-                                                                <rect key="frame" x="0.0" y="26" width="26" height="49"/>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="EXIT" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hOw-3q-mSw" userLabel="CloseLabel">
+                                                                <rect key="frame" x="0.0" y="26" width="30" height="49"/>
                                                                 <fontDescription key="fontDescription" name="OpenSans-Light" family="Open Sans" pointSize="14"/>
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <nil key="highlightedColor"/>
@@ -2611,7 +2604,7 @@
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ndy-R5-lnM" userLabel="QrButton">
-                                                                <rect key="frame" x="121.66666666666666" y="253.33333333333331" width="111" height="40"/>
+                                                                <rect key="frame" x="37" y="253.33333333333331" width="280" height="40"/>
                                                                 <color key="backgroundColor" name="PrimaryColor"/>
                                                                 <gestureRecognizers/>
                                                                 <constraints>
@@ -4425,9 +4418,6 @@
             <point key="canvasLocation" x="2391" y="-1570"/>
         </scene>
     </scenes>
-    <inferredMetricsTieBreakers>
-        <segue reference="8Qc-oG-6Vn"/>
-    </inferredMetricsTieBreakers>
     <color key="tintColor" name="PrimaryColor"/>
     <resources>
         <image name="Success" width="53" height="53"/>

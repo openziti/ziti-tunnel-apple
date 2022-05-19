@@ -142,11 +142,11 @@
 		82B6EFD526DCF42A009C5BED /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B6EFD326DCF42A009C5BED /* DragView.swift */; };
 		AC4869DB3BC3248469BDA3EE /* Pods_macos_targets_PacketTunnelProvider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB358217F2F648491E622D4 /* Pods_macos_targets_PacketTunnelProvider.framework */; };
 		CD9455F8E901F5679A734488 /* Pods_macos_targets_Ziti_Desktop_Edge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7ED0BE09D7658F645B45F605 /* Pods_macos_targets_Ziti_Desktop_Edge.framework */; };
+		D7222B1127A0359800E450F0 /* SelectBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = D770F0FD27622973007F5C33 /* SelectBox.swift */; };
 		D76148CD275458CF009BCB36 /* ServiceListItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = D76148CC275458CF009BCB36 /* ServiceListItem.xib */; };
 		D76148CF27545ED3009BCB36 /* ServiceListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76148CE27545ED3009BCB36 /* ServiceListItem.swift */; };
 		D770F0FA275E9947007F5C33 /* IdentityListItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = D770F0F9275E9947007F5C33 /* IdentityListItem.xib */; };
 		D770F0FC275E99C1007F5C33 /* IdentityListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D770F0FB275E99C1007F5C33 /* IdentityListItem.swift */; };
-		D770F0FE27622973007F5C33 /* SelectBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = D770F0FD27622973007F5C33 /* SelectBox.swift */; };
 		D770F0FF2762390F007F5C33 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A02AABB206EBD7E006261C6 /* Assets.xcassets */; };
 		D7DF1A9127315E5D000C6548 /* IdentityOperationGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DF1A9027315E5D000C6548 /* IdentityOperationGesture.swift */; };
 		D7EF44BA2749D60800EC130F /* IdentityListItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7EF44B92749D60800EC130F /* IdentityListItem.xib */; };
@@ -1202,6 +1202,7 @@
 				5AB0FDD6265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5A8702CE2230B24B00314199 /* ZitiService.swift in Sources */,
 				82B6EFD426DCF42A009C5BED /* FlippedClipView.swift in Sources */,
+				D7222B1127A0359800E450F0 /* SelectBox.swift in Sources */,
 				5A34E95E2278F49100E221DD /* Version.swift in Sources */,
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
 				5A78DEE325631E1000316CE9 /* AppGroup.swift in Sources */,
@@ -1261,7 +1262,6 @@
 				82B6EFC626DCF11F009C5BED /* IdentityItemCell.swift in Sources */,
 				5A91B4C92222E155006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */,
-				D770F0FE27622973007F5C33 /* SelectBox.swift in Sources */,
 				82B6EFB526DCF0FE009C5BED /* DashboardScreen.swift in Sources */,
 				5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */,
 				82B6EFBF26DCF0FE009C5BED /* LogDetailScreen.swift in Sources */,

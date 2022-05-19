@@ -19,6 +19,7 @@ import Cocoa
 import NetworkExtension
 import CZiti
 import CoreImage.CIFilterBuiltins
+import CryptoKit
 
 extension NSTextField {
     open override var focusRingType: NSFocusRingType {
@@ -74,6 +75,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var MFASetupBox: NSBox!
     @IBOutlet var ServiceBox: NSBox!
     @IBOutlet var DetailsBox: NSBox!
+    @IBOutlet var MultiAuthBox: NSBox!
     var allViews:[NSBox] = [];
     
     
@@ -110,6 +112,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     @IBOutlet var IdListScroll: NSScrollView!
     var isConnecting = false;
     var isConnected = false;
+    var totalMfa = 0;
+    var mfaIndex = 0;
     
     override func viewWillAppear() {
         self.view.window?.titleVisibility = .hidden;
@@ -142,7 +146,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     override func viewDidLoad() {
         super.viewDidLoad();
-        self.allViews =  [MenuBox,AdvancedBox,AboutBox,LogLevelBox,ConfigBox,RecoveryBox,AuthBox,MFASetupBox,ServiceBox,DetailsBox];
+        self.allViews =  [MenuBox,AdvancedBox,AboutBox,LogLevelBox,ConfigBox,RecoveryBox,AuthBox,MFASetupBox,MultiAuthBox,ServiceBox,DetailsBox];
         
         
         
@@ -180,6 +184,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
         ProgressModal.isHidden = true;
         ProgressModal.alphaValue = 0;
         ProgressModal.shadow = .none;
+        self.totalMfa = 0;
+        self.mfaIndex = 0;
         
         // listen for Ziti IPC events
         NotificationCenter.default.addObserver(forName: .onZitiPollResponse, object: nil, queue: OperationQueue.main) { notification in
@@ -196,6 +202,14 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             if (msg.meta.msgType == .MfaAuthQuery) {
                 zid.mfaEnabled = true;
                 zid.mfaVerified = false;
+                self.totalMfa = self.totalMfa + 1;
+                if (self.MultiAuthBox.isHidden) {
+                    self.mfaIndex = self.mfaIndex + 1;
+                    self.MultiAuthTitle.stringValue = zid.name;
+                    self.MultiAuthBox.isHidden = false;
+                    self.MultiAuthBox.alphaValue = 1;
+                }
+                self.MultiAuthDescription.stringValue = "\(self.mfaIndex) of \(self.totalMfa) identities require authentication prior to starting.";
             }
             
             self.zidMgr.zidStore.store(zid);
@@ -237,6 +251,8 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             ShowProgress("Please Wait", "Disconnecting...");
             break
         case .disconnected:
+            self.totalMfa = 0;
+            self.mfaIndex = 0;
             if (self.isConnecting) {
                 self.isConnecting = false;
                 for zid in zidMgr.zids {
@@ -326,7 +342,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
             }
             self.UpdateList();
             
-            /*
+            
             if zid.isEnabled && zid.isEnrolled {
                 let needsRestart = zid.services.filter {
                     if let status = $0.status, let needsRestart = status.needsRestart {
@@ -338,7 +354,7 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
                     self.tunnelMgr.restartTunnel()
                 }
             }
-             */
+            
         }
     }
     
@@ -1570,9 +1586,25 @@ class DashboardScreen: NSViewController, NSWindowDelegate, ZitiIdentityStoreDele
     
     
     
+    /**
+        Multi Authentication Screen
+     */
+    @IBOutlet var MultiAuthCode: NSTextField!
+    @IBOutlet var MultiAuthButton: NSBox!
+    @IBOutlet var MultiAuthDescription: NSTextField!
+    @IBOutlet var SkipButton: NSTextField!
+    @IBOutlet var MultiAuthTitle: NSTextField!
     
+    @IBAction func SkipMfa(_ sender: NSClickGestureRecognizer) {
+    }
     
+    @IBAction func MultiAuthClick(_ sender: NSClickGestureRecognizer) {
+    }
     
+    @IBAction func CloseAuth(_ sender: Any) {
+        // Skip all
+        MultiAuthBox.isHidden = true;
+    }
     
     
     
