@@ -100,7 +100,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         zLog.info("options=\(options?.debugDescription ?? "nil")")
         
         // parse config
-        let conf = (self.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration! as ProviderConfigDict
+        guard let conf = (self.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration as? ProviderConfigDict else {
+            let errStr = "Unable to start tunnel. Provider configuration not available"
+            zLog.wtf(errStr)
+            userNotifications.post(.Error, nil, errStr)
+            completionHandler(ZitiError(errStr))
+            return
+        }
+        
         if let error = self.providerConfig.parseDictionary(conf) {
             let errStr = "Unable to start tunnel. Invalid provider configuration. \(error)"
             zLog.wtf(errStr)
@@ -108,6 +115,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             completionHandler(error)
             return
         }
+
         zLog.info("\(self.providerConfig.debugDescription)")
         zLog.info("providerConfig.logLevel = \(providerConfig.logLevel)")
         
@@ -175,8 +183,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         // start 'er up
         zitiTunnel?.startZiti(zids, ZitiPostureChecks()) { zErr in
             guard zErr == nil else {
-                zLog.error("Unable to load identites: \(zErr!.localizedDescription)")
-                self.userNotifications.post(.Error, nil, "Unable to start Ziti: \(zErr!.localizedDescription)")
+                let errStr = "Unable to load identites: \(zErr!.localizedDescription)"
+                zLog.error(errStr)
+                self.userNotifications.post(.Error, nil, errStr)
                 completionHandler(zErr)
                 return
             }

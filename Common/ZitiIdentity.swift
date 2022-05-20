@@ -120,8 +120,8 @@ class ZitiIdentity : NSObject, Codable {
     override var debugDescription: String {
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted
-        if let jsonData = try? jsonEncoder.encode(self) {
-            return String(data: jsonData, encoding: .utf8)!
+        if let jsonData = try? jsonEncoder.encode(self), let str = String(data: jsonData, encoding: .utf8) {
+            return str
         }
         return("Unable to json encode \(name)")
     }    

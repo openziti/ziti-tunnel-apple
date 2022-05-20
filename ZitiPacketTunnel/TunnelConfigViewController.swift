@@ -160,8 +160,8 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             return
         }
         
-        if let pc = self.vc?.tunnelMgr.tpm?.protocolConfiguration {
-            (pc as! NETunnelProviderProtocol).providerConfiguration = conf.createDictionary()
+        if let pc = self.vc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol {
+            pc.providerConfiguration = conf.createDictionary()
             
             self.vc?.tunnelMgr.tpm?.saveToPreferences { error in
                 if let error = error {
@@ -172,7 +172,8 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
                     self.dismiss(self)
                     
                     DispatchQueue.main.async {
-                        self.vc?.updateServiceUI(zId: self.vc?.zidMgr.zids[self.vc?.representedObject as! Int])
+                        guard let indx = self.vc?.representedObject as? Int else { return }
+                        self.vc?.updateServiceUI(zId: self.vc?.zidMgr.zids[indx])
                     }
                 }
             }

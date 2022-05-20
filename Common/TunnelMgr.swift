@@ -115,7 +115,7 @@ class TunnelMgr: NSObject {
                     tmgr.tpm = tpm
                     
                     // Get our logLevel from config
-                    if let conf = (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration {
+                    if let conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
                         if let logLevel = conf[ProviderConfig.LOG_LEVEL] as? String {
                             let li = Int32(logLevel) ?? ZitiLog.LogLevel.INFO.rawValue
                             let ll = ZitiLog.LogLevel(rawValue: li) ?? ZitiLog.LogLevel.INFO
@@ -212,12 +212,12 @@ class TunnelMgr: NSObject {
             return
         }
         
-        if var conf = (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration {
+        if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
             // update logLevel
             conf[ProviderConfig.LOG_LEVEL] = String(level.rawValue)
             (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = conf
             
-            zLog.info("Updated providerConfiguration: \(String(describing: (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration))")
+            zLog.info("Updated providerConfiguration: \(conf)")
             
             tpm.saveToPreferences { error in
                 if let error = error {

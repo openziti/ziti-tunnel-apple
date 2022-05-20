@@ -73,11 +73,15 @@ class UserNotifications {
             
             if let subtitle = subtitle { content.subtitle = subtitle }
             if let body = body { content.body = body }
+            
+            var requestId = "ZitiNotification-\(category.rawValue)"
             if let zid = zid {
                 content.userInfo["zid"] = zid.id
+                requestId += "-\(zid.id)"
             }
             
-            let request = UNNotificationRequest(identifier: "ZitiNotification-\(category.rawValue)", content: content, trigger: nil)
+            
+            let request = UNNotificationRequest(identifier: requestId, content: content, trigger: nil)
             center.add(request) { error in
                 if let error = error {
                     zLog.error("Unble to schedule request: \(error.localizedDescription)")

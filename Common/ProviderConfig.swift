@@ -95,8 +95,8 @@ class ProviderConfig : NSObject {
         if !isValidIpAddress(conf[ProviderConfig.SUBNET_KEY]) {
             return ProviderConfigError.invalidSubnetMask
         }
-        if let dns = conf[ProviderConfig.DNS_KEY] {
-            let dnsArray = (dns as! String).components(separatedBy: ",")
+        if let dns = conf[ProviderConfig.DNS_KEY] as? String {
+            let dnsArray = dns.components(separatedBy: ",")
             if dnsArray.count == 0 || dnsArray.contains(where: { !isValidIpAddress($0) }) {
                 return ProviderConfigError.invalidDnsAddresses
             }
@@ -108,7 +108,7 @@ class ProviderConfig : NSObject {
         if fallbackEnabled && !isValidIpAddress(conf[ProviderConfig.FALLBACK_DNS_KEY]) {
             return ProviderConfigError.invalidFallbackDns
         }
-        if (Int(conf[ProviderConfig.MTU_KEY] as! String) == nil) {
+        guard let mtuStr = conf[ProviderConfig.MTU_KEY] as? String, let _ = Int(mtuStr) else {
             return ProviderConfigError.invalidMtu
         }
         return nil
