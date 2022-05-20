@@ -17,7 +17,7 @@
 import Foundation
 import NetworkExtension
 
-class DNSEntries : NSObject {
+class DNSUtils : NSObject {
     class DnsEntry : NSObject {
         let hostname:String
         let ip:String
@@ -29,44 +29,52 @@ class DNSEntries : NSObject {
             self.serviceIds.append(serviceId)
         }
     }
-    var dnsEntries:[DnsEntry] = []
     
-    var hostnames:[String] {
-        var nms:[String] = []
-        dnsEntries.forEach { nms.append($0.hostname) }
-        return nms
-    }
-    
-    func addDnsEntry(_ hostname:String, _ ip:String, _ serviceId: String) {
-        let matches = dnsEntries.filter{ return $0.hostname.caseInsensitiveCompare(hostname) == .orderedSame }
-        if matches.count > 0 {
-            matches.forEach { m in
-                m.serviceIds.append(serviceId)
-            }
-        } else {
-            let newEntry = DnsEntry(hostname, ip, serviceId)
-            dnsEntries.append(newEntry)
-        }
-    }
-    
-    func removeDnsEntry(_ serviceId:String) {
-        // drop this serviceId from all entries
-        dnsEntries.forEach { e in
-            e.serviceIds = e.serviceIds.filter { $0 != serviceId }
+    class DnsEntries : NSObject {
+        var entries:[DnsEntry] = []
+        var hostnames:[String] {
+            var nms:[String] = []
+            entries.forEach { nms.append($0.hostname) }
+            return nms
         }
         
-        // drop all entries with no service Id
-        dnsEntries = dnsEntries.filter { $0.serviceIds.count > 0 }
-    }
-    
-    func dumpDns() {
-        dnsEntries.forEach { e in
-            zLog.debug("hostname: \(e.hostname), ip: \(e.ip), serviceIds: \(e.serviceIds)")
+        func add(_ hostname:String, _ ip:String, _ serviceId: String) {
+            let matches = entries.filter{ return $0.hostname.caseInsensitiveCompare(hostname) == .orderedSame }
+            if matches.count > 0 {
+                matches.forEach { m in
+                    m.serviceIds.append(serviceId)
+                }
+            } else {
+                let newEntry = DnsEntry(hostname, ip, serviceId)
+                entries.append(newEntry)
+            }
+        }
+        
+        func remove(_ serviceId:String) {
+            // drop this serviceId from all entries
+            entries.forEach { e in
+                e.serviceIds = e.serviceIds.filter { $0 != serviceId }
+            }
+            
+            // drop all entries with no service Id
+            entries = entries.filter { $0.serviceIds.count > 0 }
+        }
+        
+        func contains(_ addr:String) -> Bool {
+            return entries.first(where: { $0.hostname == addr }) != nil
+        }
+        
+        public override var debugDescription: String {
+            var str = "DNS Entries:\n"
+            entries.forEach { e in
+                str += "\n   hostname: \(e.hostname), ip: \(e.ip), serviceIds: \(e.serviceIds)"
+            }
+            return str
         }
     }
     
     // To resolve IP addresses we are not intercepting
-    func resolveHostname(_ hostname:String) -> String? {
+    class func resolveHostname(_ hostname:String) -> String? {
         let host = CFHostCreateWithName(nil, hostname as CFString).takeRetainedValue()
         CFHostStartInfoResolution(host, .addresses, nil)
         var success:DarwinBoolean = false
@@ -82,7 +90,7 @@ class DNSEntries : NSObject {
         return nil
     }
     
-    func getFirstResolver() -> String? {
+    class func getFirstResolver() -> String? {
         var firstResolver:String?
         var state = __res_9_state()
         res_9_ninit(&state)

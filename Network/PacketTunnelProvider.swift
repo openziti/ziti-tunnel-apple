@@ -27,7 +27,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
     
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
-    var dnsEntries:DNSEntries = DNSEntries()
+    var dnsEntries = DNSUtils.DnsEntries()
     var interceptedRoutes:[NEIPv4Route] = []
     var excludedRoutes:[NEIPv4Route] = []
     let netMon = NWPathMonitor()
@@ -136,7 +136,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         // TODO: on iOS, we find the first resolver, but setting any fallbackDNS is causing issues
         #if os(macOS)
         if upstreamDns == nil {
-            let firstResolver = dnsEntries.getFirstResolver()
+            let firstResolver = DNSUtils.getFirstResolver()
             zLog.warn("No fallback DNS provided. Setting to first resolver: \(firstResolver as Any)")
             upstreamDns = firstResolver
         }
@@ -205,7 +205,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             if self.providerConfig.interceptMatchedDns {
                 // Add in all the hostnames we want to intercept as 'matchDomains'. We might get some extras, but that's ok...
                 var matchDomains = self.dnsEntries.hostnames.map { // trim of "*." for wildcard domains
-                    $0.starts(with: "*.") ? String($0.dropFirst(2)) : $0 // shaky. come back to this
+                    $0.starts(with: "*.") ? String($0.dropFirst(2)) : $0
                 }
                 
                 // Make sure we don't become primary resolver (specified by having name = "")
@@ -383,26 +383,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         }
         let mask:UInt32 = (0xffffffff << (32 - prefix)) & 0xffffffff
         let subnetMask = "\(String((mask & 0xff000000) >> 24)).\(String((mask & 0x00ff0000) >> 16)).\(String((mask & 0x0000ff00) >> 8)).\(String(mask & 0x000000ff))"
-        return (dest, subnetMask)
+        return (dest.trimmingCharacters(in: .whitespaces), subnetMask.trimmingCharacters(in: .whitespaces))
     }
     
     func addRoute(_ destinationAddress: String) -> Int32 {
         let (dest, subnetMask) = cidrToDestAndMask(destinationAddress)
         
         if let dest = dest, let subnetMask = subnetMask {
-            
             zLog.info("addRoute \(dest) => \(dest), \(subnetMask)")
-            let route = NEIPv4Route(destinationAddress: dest,
-                                    subnetMask: subnetMask)
+            let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
             
-            // only add if haven't already..
             var alreadyExists = true
-            if interceptedRoutes.first(where: {
-                                        $0.destinationAddress == route.destinationAddress &&
-                                        $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
+            if interceptedRoutes.first(where: { IPUtils.areSameRoutes($0, route) }) == nil {
                 alreadyExists = false
             }
-            
             if !alreadyExists {
                 if identitiesLoaded {
                     zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
@@ -445,9 +439,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             
             // only exclude if haven't already..
             var alreadyExists = true
-            if excludedRoutes.first(where: {
-                                        $0.destinationAddress == route.destinationAddress &&
-                                        $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
+            if excludedRoutes.first(where: { IPUtils.areSameRoutes($0, route) }) == nil {
                 alreadyExists = false
                 excludedRoutes.append(route)
             }
@@ -531,15 +523,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         guard let addresses = zSvc.addresses else {
             return false
         }
-        
         for addr in addresses.components(separatedBy: ",") {
             let (dest, subnetMask) = cidrToDestAndMask(addr)
-            
             if let dest = dest, let subnetMask = subnetMask {
                 let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
-                if interceptedRoutes.first(where: {
-                                            $0.destinationAddress == route.destinationAddress &&
-                                            $0.destinationSubnetMask == route.destinationSubnetMask}) == nil {
+                if interceptedRoutes.first(where: { IPUtils.areSameRoutes($0, route) }) == nil {
                     return true
                 }
             }
@@ -548,12 +536,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
     }
     
     private func containsNewDnsEntry(_ zSvc:ZitiService) -> Bool {
-        guard let addresses = zSvc.addresses else {
-            return false
-        }
-        for addr in addresses.components(separatedBy: ",") {
-            if dnsEntries.dnsEntries.first(where: { $0.hostname == addr }) == nil {
-                return true
+        if let addresses = zSvc.addresses  {
+            for addr in addresses.components(separatedBy: ",") {
+                if dnsEntries.contains(addr) {
+                    return true
+                }
             }
         }
         return false
@@ -567,7 +554,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         
         if remove {
             if !identitiesLoaded {
-                self.dnsEntries.removeDnsEntry(serviceId)
+                self.dnsEntries.remove(serviceId)
             }
             tzid.services = tzid.services.filter { $0.id != serviceId }
         }
@@ -579,7 +566,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
                     let (ip, _) = cidrToDestAndMask(addr)
                     let isDNS = ip == nil
                     if !identitiesLoaded && isDNS {
-                        dnsEntries.addDnsEntry(addr, "", serviceId)
+                        dnsEntries.add(addr, "", serviceId)
                     } else if isDNS && providerConfig.interceptMatchedDns {
                         zLog.warn("*** Unable to add DNS support for \(addr) to running tunnel when intercepting by matched domains")
                     }
