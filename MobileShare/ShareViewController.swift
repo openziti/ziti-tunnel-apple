@@ -178,7 +178,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     _ = zidMgr.zidStore.store(zid)
                     self.tableView.reloadData()
                     self.showAlert("Enrolled",
-                        "\(zidResp.name ?? self.url!.lastPathComponent) (\(zidResp.id)) successfully enrolled") { _ in
+                        "\(zidResp.name ?? (self.url?.lastPathComponent ?? "")) (\(zidResp.id)) successfully enrolled") { _ in
                         self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
                     }
                 }

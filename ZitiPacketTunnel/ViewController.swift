@@ -85,11 +85,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             break
         }
         
-        if self.zidMgr.zids.count > 0 {
-            self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+        if let indx = self.representedObject as? Int, self.zidMgr.zids.count > 0 {
+            self.updateServiceUI(zId: self.zidMgr.zids[indx])
         } else {
             self.tableView.reloadData()
-            tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
         }
     }
     
@@ -97,12 +96,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         super.viewDidAppear()
         
         buttonsView.wantsLayer = true
-        buttonsView.layer!.borderWidth = 1.0
-        
-        if UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" {
-            buttonsView.layer!.borderColor = CGColor(gray: 0.25, alpha: 1.0)
-        } else {
-            buttonsView.layer!.borderColor = CGColor(gray: 0.75, alpha: 1.0)
+        if let layer = buttonsView.layer {
+            layer.borderWidth = 1.0
+            
+            if UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" {
+                layer.borderColor = CGColor(gray: 0.25, alpha: 1.0)
+            } else {
+                layer.borderColor = CGColor(gray: 0.75, alpha: 1.0)
+            }
         }
     }
     
@@ -180,7 +181,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
         
         self.tableView.reloadData()
-        tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
+        if let indx = representedObject as? Int {
+            tableView.selectRowIndexes([indx], byExtendingSelection: false)
+        }
         
         if let svc = servicesViewController {
             svc.zid = zId
@@ -202,8 +205,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange)
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier) {_,_ in 
             DispatchQueue.main.async {
-                if self.zidMgr.zids.count > 0 {
-                    self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
+                if let indx = self.representedObject as? Int, self.zidMgr.zids.count > 0 {
+                    self.updateServiceUI(zId: self.zidMgr.zids[indx])
                 }
             }
         }
@@ -215,7 +218,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         tableView.reloadData()
         representedObject = 0
-        tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
+        tableView.selectRowIndexes([0], byExtendingSelection: false)
         
         // listen for newOrChanged
         NotificationCenter.default.addObserver(forName: .onNewOrChangedId, object: nil, queue: OperationQueue.main) { [self] notification in
@@ -226,11 +229,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             DispatchQueue.main.async {
                 self.zidMgr.updateIdentity(zid)
-                self.updateServiceUI(zId: self.zidMgr.zids[self.representedObject as! Int])
-                
-//                if self.zidMgr.needsRestart(zid) {
-//                    self.tunnelMgr.restartTunnel()
-//                }
+                if let indx = self.representedObject as? Int {
+                    self.updateServiceUI(zId: self.zidMgr.zids[indx])
+                }
             }
         }
         
@@ -279,7 +280,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         }
                         if indx != -1 {
                             self.representedObject = indx
-                            self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
+                            self.tableView.selectRowIndexes([indx], byExtendingSelection: false)
                         }
                     }
                     
@@ -304,7 +305,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
 
     override var representedObject: Any? {
         didSet {
-            zidMgr.zids.count == 0 ? updateServiceUI() : updateServiceUI(zId: zidMgr.zids[representedObject as! Int])
+            if let indx = representedObject as? Int {
+                zidMgr.zids.count == 0 ? updateServiceUI() : updateServiceUI(zId: zidMgr.zids[indx])
+            } else if zidMgr.zids.count == 0 {
+                updateServiceUI()
+            }
         }
     }
     
@@ -314,16 +319,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             tcvc.vc = self
         } else if let svc = segue.destinationController as? ServicesViewController {
             servicesViewController = svc
-            if zidMgr.zids.count > 0 {
-                svc.zid = zidMgr.zids[representedObject as! Int]
+            if let indx = representedObject as? Int, zidMgr.zids.count > 0 {
+                svc.zid = zidMgr.zids[indx]
                 svc.tunnelMgr = tunnelMgr
             }
         }
     }
     
     func tableViewSelectionDidChange(_ notification: Notification) {
-        if (tableView.selectedRow >= 0) {
-            if (representedObject as! Int) != tableView.selectedRow {
+        if let indx = representedObject as? Int, tableView.selectedRow >= 0 {
+            if indx != tableView.selectedRow {
                 representedObject = tableView.selectedRow
             }
         }
@@ -427,8 +432,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func onEnableServiceBtn(_ sender: NSButton) {
-        if zidMgr.zids.count > 0 {
-            let zId = zidMgr.zids[representedObject as! Int]
+        if let indx = representedObject as? Int, zidMgr.zids.count > 0 {
+            let zId = zidMgr.zids[indx]
             zId.enabled = sender.state == .on
             _ = zidMgr.zidStore.store(zId)
             updateServiceUI(zId:zId)
@@ -456,7 +461,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                             self.representedObject = 0
-                            self.tableView.selectRowIndexes([self.representedObject as! Int], byExtendingSelection: false)
+                            self.tableView.selectRowIndexes([0], byExtendingSelection: false)
                         }
                     } catch {
                         DispatchQueue.main.async {
@@ -471,8 +476,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func removeIdentityButton(_ sender: Any) {
         guard zidMgr.zids.count > 0 else { return }
+        guard let indx = representedObject as? Int else { return }
         
-        let indx = representedObject as! Int
         let zid = zidMgr.zids[indx]
         let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
         if dialogOKCancel(question: "Are you sure?", text: text) == true {
@@ -489,15 +494,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             } else {
                 representedObject = indx
             }
-            tableView.selectRowIndexes([representedObject as! Int], byExtendingSelection: false)
+            tableView.selectRowIndexes([indx], byExtendingSelection: false)
         }
     }
     
     func toggleMfa(_ zId:ZitiIdentity, _ flag:NSControl.StateValue) {
-        //DispatchQueue.main.async {
-            self.mfaSwitch.state = flag
-            self.updateServiceUI(zId:zId)
-        //}
+        self.mfaSwitch.state = flag
+        self.updateServiceUI(zId:zId)
     }
     
     func mfaVerify(_ zId:ZitiIdentity, _ mfaEnrollment:ZitiMfaEnrollment) {
@@ -556,8 +559,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             return
         }
         
-        if zidMgr.zids.count > 0 {
-            let zId = zidMgr.zids[representedObject as! Int]
+        if let indx = representedObject as? Int, zidMgr.zids.count > 0 {
+            let zId = zidMgr.zids[indx]
             guard zId.isEnabled else {
                 mfaSwitch.state = mfaSwitch.state == .on ? .off : .on
                 dialogAlert("Identity must be Enabled to change MFA state")
@@ -663,13 +666,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func onMfaAuthNow(_ sender: Any) {
-        let indx = representedObject as! Int
+        guard let indx = representedObject as? Int else { return }
         let zid = zidMgr.zids[indx]
         doMfaAuth(zid)
     }
     
     @IBAction func onMfaCodes(_ sender: Any) {
-        let indx = representedObject as! Int
+        guard let indx = representedObject as? Int else { return }
         let zid = zidMgr.zids[indx]
         
         if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
@@ -700,7 +703,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func onMfaNewCodes(_ sender: Any) {
-        let indx = representedObject as! Int
+        guard let indx = representedObject as? Int else { return }
         let zid = zidMgr.zids[indx]
         
         if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
@@ -731,7 +734,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func onEnrollButton(_ sender: Any) {
-        let indx = representedObject as! Int
+        guard let indx = representedObject as? Int else { return }
         let zid = zidMgr.zids[indx]
         enrollingIds.append(zid)
         updateServiceUI(zId: zid)

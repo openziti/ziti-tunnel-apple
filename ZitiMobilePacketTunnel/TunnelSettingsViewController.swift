@@ -79,8 +79,8 @@ class TunnelSettingsViewController: UITableViewController {
             return
         }
         
-        if let pc = tvc?.tunnelMgr.tpm?.protocolConfiguration {
-            (pc as! NETunnelProviderProtocol).providerConfiguration = conf.createDictionary()
+        if let pc = tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol {
+            pc.providerConfiguration = conf.createDictionary()
             
             self.tvc?.tunnelMgr.tpm?.saveToPreferences { error in
                 if let error = error {
