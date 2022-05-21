@@ -107,16 +107,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        zLog.debug("willPresent: \(notification.debugDescription)")
+        zLog.debug("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
         completionHandler([.list, .sound])
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        zLog.info("didReceive: \(response.debugDescription)")
         
         // App gets called on iOS, not the appex. So raise AppexNotification IPC notifications here
         // This is only called on macOS.  On iOS, the app's AppDelegate gets notified...
-        zLog.debug("didReceive: \(response.debugDescription)")
+        zLog.debug("didReceive: \(response.notification.request.content.subtitle), \(response.notification.request.content.body)")
         
         var zidStr:String? = nil
         if let zid = response.notification.request.content.userInfo["zid"] as? String {

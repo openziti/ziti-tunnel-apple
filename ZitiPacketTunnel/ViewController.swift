@@ -266,10 +266,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 }
             }
             
-            // Process any specified action
+            // Process any notification action
             if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationMessage {
-                // Always bring main window to front and select the zid (if specified)
                 DispatchQueue.main.async {
+                    // Select the zid (if specified)
                     if let zidStr = msg.meta.zid {
                         var indx = -1
                         for i in 0..<self.zidMgr.zids.count {
@@ -284,19 +284,20 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         }
                     }
                     
+                    // Bring the app to the foreground
                     if let appD = NSApp.delegate as? AppDelegate {
                         appD.menuBar?.showPanel(nil)
                     }
-                }
-                
-                // Process the action
-                if let action = msg.action {
-                    if action == UserNotifications.Action.MfaAuth.rawValue {
-                        if let zidStr = msg.meta.zid, let zid = self.zidMgr.zids.first(where: { $0.id == zidStr })  {
-                            DispatchQueue.main.async { self.doMfaAuth(zid) }
+                    
+                    // Process the action
+                    if let action = msg.action {
+                        if action == UserNotifications.Action.MfaAuth.rawValue {
+                            if let zidStr = msg.meta.zid, let zid = self.zidMgr.zids.first(where: { $0.id == zidStr })  {
+                                self.doMfaAuth(zid)
+                            }
+                        } else if action == UserNotifications.Action.Restart.rawValue {
+                            self.tunnelMgr.restartTunnel()
                         }
-                    } else if action == UserNotifications.Action.Restart.rawValue {
-                        self.tunnelMgr.restartTunnel()
                     }
                 }
             }

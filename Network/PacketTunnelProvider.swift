@@ -480,8 +480,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             userNotifications.post(.Mfa, "MFA Auth Requested", tzid.name, tzid)
             
             // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
-            tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
-            _ = zidStore.store(tzid)
+            //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
+            //_ = zidStore.store(tzid)
         }
     }
     
@@ -668,14 +668,15 @@ extension PacketTunnelProvider: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
         // On macOS, method is not reliably called. When it is, results are ignored (notification is not displayed)
-        zLog.debug("willPresent: \(notification.debugDescription)")
+        zLog.debug("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
         completionHandler([.list, .sound])
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
         // This is only called on macOS.  On iOS, the app's AppDelegate gets notified...
-        zLog.debug("didReceive: \(response.debugDescription)")
+        zLog.debug("didReceive: \(response.notification.request.content.subtitle), \(response.notification.request.content.body)")
+        
         if let zid = response.notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
             tzid.addAppexNotification(IpcAppexNotificationMessage(
                 zid, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
