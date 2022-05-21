@@ -80,7 +80,6 @@ class UserNotifications {
                 requestId += "-\(zid.id)"
             }
             
-            
             let request = UNNotificationRequest(identifier: requestId, content: content, trigger: nil)
             center.add(request) { error in
                 if let error = error {
