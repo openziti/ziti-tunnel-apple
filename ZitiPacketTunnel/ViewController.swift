@@ -517,17 +517,26 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 DispatchQueue.main.async {
                     guard zErr == nil else {
                         self.dialogAlert("Error sending provider message to verify MFA", zErr!.localizedDescription)
+                        zId.mfaEnabled = false
+                        zId.mfaVerified = false
+                        _ = self.zidMgr.zidStore.store(zId)
                         self.toggleMfa(zId, .off)
                         return
                     }
                     guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage,
                           let status = statusMsg.status else {
                         self.dialogAlert("IPC Error", "Unable to parse verification response message")
+                        zId.mfaEnabled = false
+                        zId.mfaVerified = false
+                        _ = self.zidMgr.zidStore.store(zId)
                         self.toggleMfa(zId, .off)
                         return
                     }
                     guard status == Ziti.ZITI_OK else {
                         self.dialogAlert("MFA Verification Error", Ziti.zitiErrorString(status: status))
+                        zId.mfaEnabled = false
+                        zId.mfaVerified = false
+                        _ = self.zidMgr.zidStore.store(zId)
                         self.toggleMfa(zId, .off)
                         return
                     }
