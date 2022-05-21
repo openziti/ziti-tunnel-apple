@@ -361,40 +361,69 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: "Cancel")
         
-        let stack = NSStackView(frame: NSRect(x: 0, y: 0, width: 220, height: 224))
+        let stack = NSStackView(frame: NSRect(x: 0, y: 0, width: 200, height: 229))
         stack.orientation = .vertical
-        stack.spacing = 20
+        stack.spacing = 10
         stack.alignment = .centerX
-        stack.distribution = .fillProportionally
+        stack.distribution = .fill
+        //stack.translatesAutoresizingMaskIntoConstraints = false
                 
+        // QR Code
         let context = CIContext()
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(provisioningUrl.utf8)
         
+        let qrSize = CGFloat(175)
         var qrImg = NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: "unavailable") ?? NSImage()
         if let outputImage = filter.outputImage {
             let scaledImg = outputImage.transformed(
-                by: CGAffineTransform(scaleX: 200 / outputImage.extent.size.width, y: 200 / outputImage.extent.size.height))
+                by: CGAffineTransform(scaleX: qrSize / outputImage.extent.size.width, y: qrSize / outputImage.extent.size.height))
             
             if let cgimg = context.createCGImage(scaledImg, from: scaledImg.extent) {
-                qrImg = NSImage(cgImage: cgimg, size: NSSize(width: 200, height: 200))
+                qrImg = NSImage(cgImage: cgimg, size: NSSize(width: qrSize, height: qrSize))
             }
         }
         let imgView = NSImageView(image: qrImg)
-        imgView.frame = NSRect(x: 0, y: 0, width: 200, height: 200)
+        imgView.frame = NSRect(x: 0, y: 0, width: qrSize, height: qrSize)
         imgView.layer?.magnificationFilter = .nearest
-        
-        let txtView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        
         stack.addArrangedSubview(imgView)
-        stack.addArrangedSubview(txtView)
+        
+        // Secret
+        if let url = URL(string: provisioningUrl) {
+            var secret:String = provisioningUrl
+            if let components = URLComponents(url: url, resolvingAgainstBaseURL: true), let queryItems = components.queryItems {
+                for i in queryItems {
+                    if i.name == "secret" {
+                        secret = i.value ?? provisioningUrl
+                        break
+                    }
+                }
+            }
+            
+            let urlTextView = NSTextView(frame: NSRect(x: 0, y: 0, width: 200, height: 20))
+            let attributedString = NSMutableAttributedString(string: secret)
+            attributedString.setAttributes([.link: url], range: NSMakeRange(0, secret.count))
+            urlTextView.textStorage?.setAttributedString(attributedString)
+            urlTextView.alignment = .center
+            urlTextView.isEditable = false
+            urlTextView.drawsBackground = false
+            urlTextView.linkTextAttributes = [
+                .foregroundColor: NSColor.blue,
+                .underlineStyle: NSUnderlineStyle.single.rawValue
+            ]
+            stack.addArrangedSubview(urlTextView)
+        }
+        
+        // Enter Code
+        let codeTextView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        stack.addArrangedSubview(codeTextView)
+        
         alert.accessoryView = stack
-        alert.window.initialFirstResponder = txtView
+        alert.window.initialFirstResponder = codeTextView
         
         let response = alert.runModal()
-
         if (response == .alertFirstButtonReturn) {
-            return txtView.stringValue
+            return codeTextView.stringValue
         }
         return nil // Cancel
     }
