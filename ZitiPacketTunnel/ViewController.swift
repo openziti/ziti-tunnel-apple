@@ -138,9 +138,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idEnabledBtn.state = zId.isEnabled ? .on : .off
             mfaSwitch.isEnabled = tunnelMgr.status == .connected
             mfaSwitch.state = zId.isMfaEnabled ? .on : .off
-            mfaAuthNowBtn.isEnabled = zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected)
-            mfaCodesBtn.isEnabled = zId.isMfaEnabled && tunnelMgr.status == .connected
-            mfaNewCodesBtn.isEnabled = zId.isMfaEnabled && tunnelMgr.status == .connected
+            mfaAuthNowBtn.isHidden = !(zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected))
+            mfaCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
+            mfaNewCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
@@ -583,12 +583,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         guard zErr == nil else {
                             self.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
                             self.toggleMfa(zId, .off)
+                            _ = self.zidMgr.zidStore.store(zId)
                             return
                         }
                         guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage,
                             let mfaEnrollment = enrollResp.mfaEnrollment else {
                             self.dialogAlert("IPC Error", "Unable to parse enrollment response message")
                             self.toggleMfa(zId, .off)
+                            _ = self.zidMgr.zidStore.store(zId)
                             return
                         }
                         
@@ -618,12 +620,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             guard zErr == nil else {
                                 self.dialogAlert("Error sending provider message to disable MFA", zErr!.localizedDescription)
                                 self.toggleMfa(zId, .on)
+                                self.updateServiceUI(zId:zId)
                                 return
                             }
                             guard let removeResp = respMsg as? IpcMfaStatusResponseMessage,
                                   let status = removeResp.status else {
                                 self.dialogAlert("IPC Error", "Unable to parse MFA removal response message")
                                 self.toggleMfa(zId, .on)
+                                self.updateServiceUI(zId:zId)
                                 return
                             }
                             
@@ -639,6 +643,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             }
                         }
                     }
+                } else {
+                    self.updateServiceUI(zId:zId)
                 }
             }
         }
