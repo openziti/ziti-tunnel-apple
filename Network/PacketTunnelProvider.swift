@@ -19,7 +19,7 @@ import Network
 import CZiti
 import UserNotifications
 
-class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNotificationCenterDelegate {
+class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
     
     static let MFA_POSTURE_CHECK_TIMER_INTERVAL:UInt64 = 30
     static let MFA_POSTURE_CHECK_FIRST_NOTICE:UInt64 = 300
@@ -63,29 +63,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         userNotifications.requestAuth()
-    }
-    
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        
-        // On macOS, method is not reliably called. When it is, results are ignored (notification is not displayed)
-        zLog.debug("willPresent: \(notification.debugDescription)")
-        completionHandler([.list, .sound])
-    }
-    
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        
-        // This is only called on macOS.  On iOS, the app's AppDelegate gets notified...
-        zLog.debug("didReceive: \(response.debugDescription)")
-        if let zid = response.notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
-            tzid.addAppexNotification(IpcAppexNotificationMessage(
-                zid, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
-            _ = zidStore.store(tzid)
-        } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
-            tzid.addAppexNotification(IpcAppexNotificationMessage(
-                nil, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
-            _ = zidStore.store(tzid)
-        }
-        completionHandler()
     }
     
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
@@ -683,5 +660,31 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider, UNUserNo
             let (vers, rev, buildDate) = z.getCSDKVersion()
             return "\(Version.verboseStr); ziti-sdk-c version \(vers)-\(rev)(\(buildDate))"
         }
+    }
+}
+
+extension PacketTunnelProvider: UNUserNotificationCenterDelegate {
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        
+        // On macOS, method is not reliably called. When it is, results are ignored (notification is not displayed)
+        zLog.debug("willPresent: \(notification.debugDescription)")
+        completionHandler([.list, .sound])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
+        // This is only called on macOS.  On iOS, the app's AppDelegate gets notified...
+        zLog.debug("didReceive: \(response.debugDescription)")
+        if let zid = response.notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
+            tzid.addAppexNotification(IpcAppexNotificationMessage(
+                zid, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
+            _ = zidStore.store(tzid)
+        } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
+            tzid.addAppexNotification(IpcAppexNotificationMessage(
+                nil, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
+            _ = zidStore.store(tzid)
+        }
+        completionHandler()
     }
 }
