@@ -100,6 +100,14 @@ class ZidMgr : NSObject {
         return Array(Set(fails)) // remove duplicates
     }
     
+    func failingPostureChecks(_ zid:ZitiIdentity) -> [String] {
+        var fails:[String] = []
+        zid.services.forEach { svc in
+            fails += failingPostureChecks(svc)
+        }
+        return Array(Set(fails))
+    }
+    
     func insertFromJWT(_ url:URL, at:Int) throws {
         let zid = ZitiIdentity()
         
