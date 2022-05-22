@@ -69,12 +69,11 @@ class ServiceViewController: UITableViewController {
                 
                 var details = ""
                 if let svc = svc {
-                    let zidMgr = ZidMgr()
-                    if zidMgr.postureChecksPassing(svc) {
+                    if svc.postureChecksPassing() {
                         details = "PASS"
                     } else {
                         details = "FAIL"
-                        let fails = zidMgr.failingPostureChecks(svc)
+                        let fails = svc.failingPostureChecks()
                         if fails.count > 0 {
                             details += " (\(fails.joined(separator: ",")))"
                         }

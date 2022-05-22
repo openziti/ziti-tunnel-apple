@@ -42,11 +42,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        zLog.debug("willPresent: \(notification.debugDescription)")
+        zLog.debug("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
         completionHandler([.list, .sound])
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        zLog.debug("didReceive: \(response.notification.request.content.subtitle), \(response.notification.request.content.body)")
         zLog.info("didReceive: \(response.debugDescription)")
         completionHandler()
     }

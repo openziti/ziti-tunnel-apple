@@ -88,7 +88,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         return "\(bid)"
     }
     var tunnelMgr = TunnelMgr.shared
-    var zidMgr = ZidMgr()
+    var zids:[ZitiIdentity] = []
+    var zidStore = ZitiIdentityStore()
     weak var ivc:IdentityViewController?
     let sc = ScannerViewController()
 
@@ -99,10 +100,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         
         sc.delegate = self
         
-        
         // watch for new URLs
         NotificationCenter.default.addObserver(self, selector: #selector(self.onNewUrlNotification(_:)), name: NSNotification.Name(rawValue: "NewURL"), object: nil)
-
 
         // init the manager
         tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
@@ -112,9 +111,12 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         }
         
         // Load previous identities
-        if let err = zidMgr.loadZids() {
-            zLog.error(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
+        let (loadedZids, err) = zidStore.loadAll()
+        if err != nil || loadedZids == nil {
+            zLog.warn(err?.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
+        self.zids = loadedZids ?? []
+        
         tableView.reloadData()
         
         // listen for newOrChanged
@@ -125,10 +127,10 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             }
             
             DispatchQueue.main.async { [self] in
-                let count = self.zidMgr.zids.count
-                self.zidMgr.updateIdentity(zid)
+                let count = self.zids.count
+                self.zids.updateIdentity(zid)
                 
-                if count != self.zidMgr.zids.count { // inserted at 0
+                if count != self.zids.count { // inserted at 0
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
                         self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
@@ -140,7 +142,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 self.tableView.reloadData()
                 self.ivc?.tableView.reloadData()
                 
-//                if self.zidMgr.needsRestart(zid) {
+//                if zid.needsRestart() {
 //                    self.tunnelMgr.restartTunnel()
 //                }
             }
@@ -155,7 +157,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             
             DispatchQueue.main.async {
                 zLog.info("\(id) REMOVED")
-                _ = self.zidMgr.loadZids()
+                let (loadedZids, _) = self.zidStore.loadAll()
+                self.zids = loadedZids ?? []
                 self.tableView.reloadData()
                 self.ivc?.tableView.reloadData()
                 self.tunnelMgr.restartTunnel()
@@ -179,8 +182,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 DispatchQueue.main.async {
                     if let zidStr = msg.meta.zid {
                         var indx = -1
-                        for i in 0..<self.zidMgr.zids.count {
-                            if self.zidMgr.zids[i].id == zidStr {
+                        for i in 0..<self.zids.count {
+                            if self.zids[i].id == zidStr {
                                 indx = i
                                 break
                             }
@@ -222,14 +225,14 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     // MARK: - Table view data source
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
+        if indexPath.section == 1 && indexPath.row == zids.count {
             return true
         }
         return false
     }
     
     override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
+        if indexPath.section == 1 && indexPath.row == zids.count {
             return .insert
         }
         return .none
@@ -242,7 +245,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 1 {
-            nRows = zidMgr.zids.count + 1
+            nRows = zids.count + 1
         } else if section == 2 {
             nRows = 4
         }
@@ -260,14 +263,14 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 tunnelMgr.tsChangedCallbacks.append(statusCell.tunnelStatusDidChange)
             }
         } else if indexPath.section == 1 {
-            if indexPath.row == zidMgr.zids.count {
+            if indexPath.row == zids.count {
                 cell = tableView.dequeueReusableCell(withIdentifier: "ADD_IDENTITY_CELL", for: indexPath)
                 //let btn = UIButton(type: .contactAdd)
                 //btn.isUserInteractionEnabled = false
                 //cell?.accessoryView = btn // Lookes better with green insert button...
             } else {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_CELL", for: indexPath)
-                let zid = zidMgr.zids[indexPath.row]
+                let zid = zids[indexPath.row]
                 cell?.tag = indexPath.row
                 cell?.textLabel?.text = zid.name
                 cell?.detailTextLabel?.text = zid.id
@@ -381,7 +384,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 1 && indexPath.row == zidMgr.zids.count {
+        if indexPath.section == 1 && indexPath.row == zids.count {
             let alert = UIAlertController(
                 title:"Select Enrollment Method",
                 message: "Which enrollment method would you like to use?",
@@ -464,7 +467,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     func onNewUrl(_ url:URL) {
         DispatchQueue(label: "JwtLoader").async {
             do {
-                try self.zidMgr.insertFromJWT(url, at: 0)
+                try self.zids.insertFromJWT(url, self.zidStore, at: 0)
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                     self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
@@ -492,7 +495,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             ivc.tvc = self
             if let ip = tableView.indexPathForSelectedRow {
                 let cell = tableView.cellForRow(at: ip)
-                ivc.zid = zidMgr.zids[cell?.tag ?? 0]
+                ivc.zid = zids[cell?.tag ?? 0]
             }
         }
     }

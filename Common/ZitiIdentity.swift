@@ -117,6 +117,37 @@ class ZitiIdentity : NSObject, Codable {
     var edgeStatus:EdgeStatus?
     var services:[ZitiService] = []
     
+    func needsRestart() -> Bool {
+        var needsRestart = false
+        if isEnabled && isEnrolled {
+            let restarts = services.filter {
+                if let status = $0.status, let needsRestart = status.needsRestart {
+                    return needsRestart
+                }
+                return false
+            }
+            needsRestart = restarts.count > 0
+        }
+        return needsRestart
+    }
+    
+    func allServicePostureChecksPassing() -> Bool {
+        for svc in services {
+            if !svc.postureChecksPassing() {
+                return false
+            }
+        }
+        return true
+    }
+    
+    func failingPostureChecks() -> [String] {
+        var fails:[String] = []
+        services.forEach { svc in
+            fails += svc.failingPostureChecks()
+        }
+        return Array(Set(fails))
+    }
+    
     override var debugDescription: String {
         let jsonEncoder = JSONEncoder()
         jsonEncoder.outputFormatting = .prettyPrinted

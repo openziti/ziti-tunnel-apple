@@ -37,6 +37,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var idEnrollBtn: NSButton!
     @IBOutlet weak var idSpinner: NSProgressIndicator!
     @IBOutlet weak var mfaControls: NSStackView!
+    @IBOutlet weak var mfaLockImageView: NSImageView!
     @IBOutlet weak var mfaSwitch: NSSwitch!
     @IBOutlet weak var mfaAuthNowBtn: NSButton!
     @IBOutlet weak var mfaCodesBtn: NSButton!
@@ -52,7 +53,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     weak var servicesViewController:ServicesViewController? = nil
     var tunnelMgr = TunnelMgr.shared
-    var zidMgr = ZidMgr()
+    var zids:[ZitiIdentity] = []
+    var zidStore = ZitiIdentityStore()
     var enrollingIds:[ZitiIdentity] = []
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
@@ -85,8 +87,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             break
         }
         
-        if let indx = self.representedObject as? Int, self.zidMgr.zids.count > 0 {
-            self.updateServiceUI(zId: self.zidMgr.zids[indx])
+        if let indx = self.representedObject as? Int, self.zids.count > 0 {
+            // set mfaPending if disconnecting or re-connecting.  purely cosmetic for UI as appex will reset correctly when it starts
+            for zid in zids {
+                if zid.isMfaEnabled && status == .disconnecting || status == .disconnected || status == .reasserting {
+                    zid.mfaPending = true
+                }
+            }
+            self.updateServiceUI(zId: self.zids[indx])
         } else {
             self.tableView.reloadData()
         }
@@ -136,11 +144,39 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             box.alphaValue = 1.0
             idEnabledBtn.isEnabled = zId.isEnrolled
             idEnabledBtn.state = zId.isEnabled ? .on : .off
-            mfaSwitch.isEnabled = tunnelMgr.status == .connected
+            mfaSwitch.isEnabled = zId.isEnabled && tunnelMgr.status == .connected
             mfaSwitch.state = zId.isMfaEnabled ? .on : .off
-            mfaAuthNowBtn.isEnabled = zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected)
-            mfaCodesBtn.isEnabled = zId.isMfaEnabled && tunnelMgr.status == .connected
-            mfaNewCodesBtn.isEnabled = zId.isMfaEnabled && tunnelMgr.status == .connected
+            mfaAuthNowBtn.isHidden = !(zId.isEnabled && zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected))
+            mfaCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
+            mfaNewCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
+            
+            mfaLockImageView.image = NSImage(systemSymbolName: "lock.slash", accessibilityDescription: "MFA: N/A")
+            mfaLockImageView.contentTintColor = nil
+            let mfaPostureChecksFailing = zId.failingPostureChecks().filter({ $0 == "MFA"}).first != nil
+            if !mfaAuthNowBtn.isHidden {
+                if zId.isMfaPending {
+                    // lock.open is confusing.  Just go with colors...
+                    mfaLockImageView.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MFA: Pending")
+                    mfaLockImageView.contentTintColor = .systemRed
+                } else {
+                    if !mfaPostureChecksFailing {
+                        //mfaLockImageView.contentTintColor = .init(red: 0.16, green: 0.78, blue: 0.50, alpha: 1.0)
+                        mfaLockImageView.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MFA: Session Authenticated")
+                        mfaLockImageView.contentTintColor = .systemGreen
+                    } else {
+                        mfaLockImageView.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MFA: Session Authenticated, Posture Checks Failing")
+                        mfaLockImageView.contentTintColor = .systemYellow
+                        if let img = mfaLockImageView.image {
+                            img.accessibilityDescription = img.accessibilityDescription ?? "" + ", MFA Posture Checks Failing"
+                        }
+                    }
+                }
+            } else if mfaPostureChecksFailing {
+                mfaLockImageView.contentTintColor = .systemYellow
+                mfaLockImageView.image?.accessibilityDescription = "MFA Posture Checks Failing"
+            }
+            mfaLockImageView.toolTip = mfaLockImageView.image?.accessibilityDescription
+            
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
@@ -205,16 +241,18 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange)
         tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier) {_,_ in 
             DispatchQueue.main.async {
-                if let indx = self.representedObject as? Int, self.zidMgr.zids.count > 0 {
-                    self.updateServiceUI(zId: self.zidMgr.zids[indx])
+                if let indx = self.representedObject as? Int, self.zids.count > 0 {
+                    self.updateServiceUI(zId: self.zids[indx])
                 }
             }
         }
         
         // Load previous identities
-        if let err = zidMgr.loadZids() {
-            zLog.error(err.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
+        let (loadedZids, err) = zidStore.loadAll()
+        if err != nil || loadedZids == nil {
+            zLog.warn(err?.errorDescription ?? "Error loading identities from store") // TODO: async alert dialog? just log it for now..
         }
+        self.zids = loadedZids ?? []
         
         tableView.reloadData()
         representedObject = 0
@@ -228,9 +266,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             
             DispatchQueue.main.async {
-                self.zidMgr.updateIdentity(zid)
+                self.zids.updateIdentity(zid)
                 if let indx = self.representedObject as? Int {
-                    self.updateServiceUI(zId: self.zidMgr.zids[indx])
+                    self.updateServiceUI(zId: self.zids[indx])
                 }
             }
         }
@@ -244,7 +282,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             DispatchQueue.main.async {
                 zLog.info("\(id) REMOVED")
-                _ = self.zidMgr.loadZids()
+                let (loadedZids, _) = self.zidStore.loadAll()
+                self.zids = loadedZids ?? []
                 self.representedObject = Int(0)
                 self.tunnelMgr.restartTunnel()
             }
@@ -258,7 +297,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             
             if msg.meta.msgType == .MfaAuthQuery {
-                if let zidStr = msg.meta.zid, let zid = self.zidMgr.zids.first(where: { $0.id == zidStr })  {
+                if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr })  {
                     DispatchQueue.main.async { self.doMfaAuth(zid) }
                 } else {
                     zLog.error("Unsupported IPC message type \(msg.meta.msgType) for id \(msg.meta.zid as Any)")
@@ -266,14 +305,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 }
             }
             
-            // Process any specified action
+            // Process any notification action
             if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationMessage {
-                // Always bring main window to front and select the zid (if specified)
                 DispatchQueue.main.async {
+                    // Select the zid (if specified)
                     if let zidStr = msg.meta.zid {
                         var indx = -1
-                        for i in 0..<self.zidMgr.zids.count {
-                            if self.zidMgr.zids[i].id == zidStr {
+                        for i in 0..<self.zids.count {
+                            if self.zids[i].id == zidStr {
                                 indx = i
                                 break
                             }
@@ -284,19 +323,20 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         }
                     }
                     
+                    // Bring the app to the foreground
                     if let appD = NSApp.delegate as? AppDelegate {
                         appD.menuBar?.showPanel(nil)
                     }
-                }
-                
-                // Process the action
-                if let action = msg.action {
-                    if action == UserNotifications.Action.MfaAuth.rawValue {
-                        if let zidStr = msg.meta.zid, let zid = self.zidMgr.zids.first(where: { $0.id == zidStr })  {
-                            DispatchQueue.main.async { self.doMfaAuth(zid) }
+                    
+                    // Process the action
+                    if let action = msg.action {
+                        if action == UserNotifications.Action.MfaAuth.rawValue {
+                            if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr })  {
+                                self.doMfaAuth(zid)
+                            }
+                        } else if action == UserNotifications.Action.Restart.rawValue {
+                            self.tunnelMgr.restartTunnel()
                         }
-                    } else if action == UserNotifications.Action.Restart.rawValue {
-                        self.tunnelMgr.restartTunnel()
                     }
                 }
             }
@@ -306,8 +346,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     override var representedObject: Any? {
         didSet {
             if let indx = representedObject as? Int {
-                zidMgr.zids.count == 0 ? updateServiceUI() : updateServiceUI(zId: zidMgr.zids[indx])
-            } else if zidMgr.zids.count == 0 {
+                zids.count == 0 ? updateServiceUI() : updateServiceUI(zId: zids[indx])
+            } else if zids.count == 0 {
                 updateServiceUI()
             }
         }
@@ -319,8 +359,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             tcvc.vc = self
         } else if let svc = segue.destinationController as? ServicesViewController {
             servicesViewController = svc
-            if let indx = representedObject as? Int, zidMgr.zids.count > 0 {
-                svc.zid = zidMgr.zids[indx]
+            if let indx = representedObject as? Int, zids.count > 0 {
+                svc.zid = zids[indx]
                 svc.tunnelMgr = tunnelMgr
             }
         }
@@ -361,40 +401,69 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: "Cancel")
         
-        let stack = NSStackView(frame: NSRect(x: 0, y: 0, width: 220, height: 224))
+        let stack = NSStackView(frame: NSRect(x: 0, y: 0, width: 200, height: 229))
         stack.orientation = .vertical
-        stack.spacing = 20
+        stack.spacing = 10
         stack.alignment = .centerX
-        stack.distribution = .fillProportionally
+        stack.distribution = .fill
+        //stack.translatesAutoresizingMaskIntoConstraints = false
                 
+        // QR Code
         let context = CIContext()
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(provisioningUrl.utf8)
         
+        let qrSize = CGFloat(175)
         var qrImg = NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: "unavailable") ?? NSImage()
         if let outputImage = filter.outputImage {
             let scaledImg = outputImage.transformed(
-                by: CGAffineTransform(scaleX: 200 / outputImage.extent.size.width, y: 200 / outputImage.extent.size.height))
+                by: CGAffineTransform(scaleX: qrSize / outputImage.extent.size.width, y: qrSize / outputImage.extent.size.height))
             
             if let cgimg = context.createCGImage(scaledImg, from: scaledImg.extent) {
-                qrImg = NSImage(cgImage: cgimg, size: NSSize(width: 200, height: 200))
+                qrImg = NSImage(cgImage: cgimg, size: NSSize(width: qrSize, height: qrSize))
             }
         }
         let imgView = NSImageView(image: qrImg)
-        imgView.frame = NSRect(x: 0, y: 0, width: 200, height: 200)
+        imgView.frame = NSRect(x: 0, y: 0, width: qrSize, height: qrSize)
         imgView.layer?.magnificationFilter = .nearest
-        
-        let txtView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        
         stack.addArrangedSubview(imgView)
-        stack.addArrangedSubview(txtView)
+        
+        // Secret
+        if let url = URL(string: provisioningUrl) {
+            var secret:String = provisioningUrl
+            if let components = URLComponents(url: url, resolvingAgainstBaseURL: true), let queryItems = components.queryItems {
+                for i in queryItems {
+                    if i.name == "secret" {
+                        secret = i.value ?? provisioningUrl
+                        break
+                    }
+                }
+            }
+            
+            let urlTextView = NSTextView(frame: NSRect(x: 0, y: 0, width: 200, height: 20))
+            let attributedString = NSMutableAttributedString(string: secret)
+            attributedString.setAttributes([.link: url], range: NSMakeRange(0, secret.count))
+            urlTextView.textStorage?.setAttributedString(attributedString)
+            urlTextView.alignment = .center
+            urlTextView.isEditable = false
+            urlTextView.drawsBackground = false
+            urlTextView.linkTextAttributes = [
+                .foregroundColor: NSColor.blue,
+                .underlineStyle: NSUnderlineStyle.single.rawValue
+            ]
+            stack.addArrangedSubview(urlTextView)
+        }
+        
+        // Enter Code
+        let codeTextView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        stack.addArrangedSubview(codeTextView)
+        
         alert.accessoryView = stack
-        alert.window.initialFirstResponder = txtView
+        alert.window.initialFirstResponder = codeTextView
         
         let response = alert.runModal()
-
         if (response == .alertFirstButtonReturn) {
-            return txtView.stringValue
+            return codeTextView.stringValue
         }
         return nil // Cancel
     }
@@ -432,10 +501,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func onEnableServiceBtn(_ sender: NSButton) {
-        if let indx = representedObject as? Int, zidMgr.zids.count > 0 {
-            let zId = zidMgr.zids[indx]
+        if let indx = representedObject as? Int, zids.count > 0 {
+            let zId = zids[indx]
             zId.enabled = sender.state == .on
-            _ = zidMgr.zidStore.store(zId)
+            _ = zidStore.store(zId)
             updateServiceUI(zId:zId)
             tunnelMgr.restartTunnel()
         }
@@ -457,7 +526,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             //DispatchQueue(label: "JwtLoader").async {
                 if result == NSApplication.ModalResponse.OK {
                     do {
-                        try self.zidMgr.insertFromJWT(panel.urls[0], at: 0)
+                        try self.zids.insertFromJWT(panel.urls[0], self.zidStore, at: 0)
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                             self.representedObject = 0
@@ -475,22 +544,22 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func removeIdentityButton(_ sender: Any) {
-        guard zidMgr.zids.count > 0 else { return }
+        guard zids.count > 0 else { return }
         guard let indx = representedObject as? Int else { return }
         
-        let zid = zidMgr.zids[indx]
+        let zid = zids[indx]
         let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
         if dialogOKCancel(question: "Are you sure?", text: text) == true {
-            let error = zidMgr.zidStore.remove(zid)
+            let error = zidStore.remove(zid)
             guard error == nil else {
                 dialogAlert("Unable to remove identity", error!.localizedDescription)
                 return
             }
             
-            self.zidMgr.zids.remove(at: indx)
+            self.zids.remove(at: indx)
             tableView.reloadData()
-            if indx >= self.zidMgr.zids.count {
-                representedObject = self.zidMgr.zids.count - 1
+            if indx >= self.zids.count {
+                representedObject = self.zids.count - 1
             } else {
                 representedObject = indx
             }
@@ -517,17 +586,26 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 DispatchQueue.main.async {
                     guard zErr == nil else {
                         self.dialogAlert("Error sending provider message to verify MFA", zErr!.localizedDescription)
+                        zId.mfaEnabled = false
+                        zId.mfaVerified = false
+                        _ = self.zidStore.store(zId)
                         self.toggleMfa(zId, .off)
                         return
                     }
                     guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage,
                           let status = statusMsg.status else {
                         self.dialogAlert("IPC Error", "Unable to parse verification response message")
+                        zId.mfaEnabled = false
+                        zId.mfaVerified = false
+                        _ = self.zidStore.store(zId)
                         self.toggleMfa(zId, .off)
                         return
                     }
                     guard status == Ziti.ZITI_OK else {
                         self.dialogAlert("MFA Verification Error", Ziti.zitiErrorString(status: status))
+                        zId.mfaEnabled = false
+                        zId.mfaVerified = false
+                        _ = self.zidStore.store(zId)
                         self.toggleMfa(zId, .off)
                         return
                     }
@@ -535,10 +613,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     // Success!
                     zId.mfaVerified = true
                     zId.lastMfaAuth = Date()
-                    _ = self.zidMgr.zidStore.store(zId)
+                    _ = self.zidStore.store(zId)
                     self.updateServiceUI(zId:zId)
                     
-                    // TODO: Show recovery codes to a "real" screen
                     let codes = mfaEnrollment.recoveryCodes?.joined(separator: ", ")
                     self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
                 }
@@ -547,7 +624,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             zLog.info("Setup MFA cancelled")
             zId.mfaEnabled = false
             zId.mfaVerified = false
-            _ = self.zidMgr.zidStore.store(zId)
+            _ = self.zidStore.store(zId)
             self.toggleMfa(zId, .off)
         }
     }
@@ -559,8 +636,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             return
         }
         
-        if let indx = representedObject as? Int, zidMgr.zids.count > 0 {
-            let zId = zidMgr.zids[indx]
+        if let indx = representedObject as? Int, zids.count > 0 {
+            let zId = zids[indx]
             guard zId.isEnabled else {
                 mfaSwitch.state = mfaSwitch.state == .on ? .off : .on
                 dialogAlert("Identity must be Enabled to change MFA state")
@@ -574,18 +651,21 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         guard zErr == nil else {
                             self.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
                             self.toggleMfa(zId, .off)
+                            _ = self.zidStore.store(zId)
                             return
                         }
                         guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage,
                             let mfaEnrollment = enrollResp.mfaEnrollment else {
                             self.dialogAlert("IPC Error", "Unable to parse enrollment response message")
                             self.toggleMfa(zId, .off)
+                            _ = self.zidStore.store(zId)
                             return
                         }
                         
                         zId.mfaEnabled = true
+                        zId.mfaPending = true
                         zId.mfaVerified = mfaEnrollment.isVerified
-                        _ = self.zidMgr.zidStore.store(zId)
+                        _ = self.zidStore.store(zId)
                         self.updateServiceUI(zId:zId)
                         
                         if !zId.isMfaVerified {
@@ -609,12 +689,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             guard zErr == nil else {
                                 self.dialogAlert("Error sending provider message to disable MFA", zErr!.localizedDescription)
                                 self.toggleMfa(zId, .on)
+                                self.updateServiceUI(zId:zId)
                                 return
                             }
                             guard let removeResp = respMsg as? IpcMfaStatusResponseMessage,
                                   let status = removeResp.status else {
                                 self.dialogAlert("IPC Error", "Unable to parse MFA removal response message")
                                 self.toggleMfa(zId, .on)
+                                self.updateServiceUI(zId:zId)
                                 return
                             }
                             
@@ -625,11 +707,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             } else {
                                 zLog.info("MFA removed for \(zId.name):\(zId.id)")
                                 zId.mfaEnabled = false
-                                _ = self.zidMgr.zidStore.store(zId)
+                                _ = self.zidStore.store(zId)
                                 self.updateServiceUI(zId:zId)
                             }
                         }
                     }
+                } else {
+                    self.updateServiceUI(zId:zId)
                 }
             }
         }
@@ -658,7 +742,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     // Success!
                     zid.lastMfaAuth = Date()
                     zid.mfaPending = false
-                    _ = self.zidMgr.zidStore.store(zid)
+                    _ = self.zidStore.store(zid)
                     self.updateServiceUI(zId:zid)
                 }
             }
@@ -667,13 +751,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func onMfaAuthNow(_ sender: Any) {
         guard let indx = representedObject as? Int else { return }
-        let zid = zidMgr.zids[indx]
+        let zid = zids[indx]
         doMfaAuth(zid)
     }
     
     @IBAction func onMfaCodes(_ sender: Any) {
         guard let indx = representedObject as? Int else { return }
-        let zid = zidMgr.zids[indx]
+        let zid = zids[indx]
         
         if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
             let msg = IpcMfaGetRecoveryCodesRequestMessage(zid.id, code)
@@ -704,7 +788,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func onMfaNewCodes(_ sender: Any) {
         guard let indx = representedObject as? Int else { return }
-        let zid = zidMgr.zids[indx]
+        let zid = zids[indx]
         
         if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
             let msg = IpcMfaNewRecoveryCodesRequestMessage(zid.id, code)
@@ -735,11 +819,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func onEnrollButton(_ sender: Any) {
         guard let indx = representedObject as? Int else { return }
-        let zid = zidMgr.zids[indx]
+        let zid = zids[indx]
         enrollingIds.append(zid)
         updateServiceUI(zId: zid)
         
-        guard let presentedItemURL = zidMgr.zidStore.presentedItemURL else {
+        guard let presentedItemURL = zidStore.presentedItemURL else {
             self.dialogAlert("Unable to enroll \(zid.name)", "Unable to access group container")
             return
         }
@@ -753,7 +837,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 DispatchQueue.main.async {
                     self.enrollingIds.removeAll { $0.id == zid.id }
                     guard zErr == nil, let zidResp = zidResp else {
-                        _ = self.zidMgr.zidStore.store(zid)
+                        _ = self.zidStore.store(zid)
                         self.updateServiceUI(zId:zid)
                         self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
                         return
@@ -769,7 +853,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                                         
                     zid.enabled = true
                     zid.enrolled = true
-                    _ = self.zidMgr.zidStore.store(zid)
+                    _ = self.zidStore.store(zid)
                     self.updateServiceUI(zId:zid)
                     self.tunnelMgr.restartTunnel()
                 }
@@ -780,7 +864,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
 
 extension ViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return zidMgr.zids.count
+        return zids.count
     }
 }
 
@@ -788,16 +872,16 @@ extension ViewController: NSTableViewDelegate {
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "defaultRow"), owner: nil) as? NSTableCellView {
             
-            let zid = zidMgr.zids[row]
+            let zid = zids[row]
             cell.textField?.stringValue = zid.name
             
             let tunnelStatus = tunnelMgr.status
             var imageName:String = "NSStatusNone"
             var tooltip:String?
             
-            if zid.isMfaPending {
+            if zid.isEnabled && zid.isMfaEnabled && zid.isMfaPending {
                 tooltip = "MFA Pending"
-            } else if !zidMgr.allServicePostureChecksPassing(zid) {
+            } else if !zid.allServicePostureChecksPassing() {
                 tooltip = "Posture check(s) failing"
             }
             
@@ -815,7 +899,7 @@ extension ViewController: NSTableViewDelegate {
                 
                 if tunnelStatus != .connected {
                     tooltip = "Status: \(connectStatus.stringValue)"
-                } else if edgeStatus.status != .Available && zidMgr.needsRestart(zid) {
+                } else if edgeStatus.status != .Available && zid.needsRestart() {
                     tooltip = "Connection reset may be required to access services"
                 }
             }

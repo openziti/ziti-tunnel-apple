@@ -65,19 +65,22 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     }
                          
                     if let url = data as? URL {
-                        let zidMgr = ZidMgr()
-                        let zErr = zidMgr.loadZids()
+                        
+                        let zidStore = ZitiIdentityStore()
+                        let (loadedZids, zErr) = zidStore.loadAll()
+                        
                         if zErr != nil {
                             self?.showAlert(alertTitle, zErr!.localizedDescription) { _ in
                                 self?.extensionContext?.cancelRequest(withError: zErr!)
                             }
                         } else {
                             do {
-                                try zidMgr.insertFromJWT(url, at: 0)
+                                var zids = loadedZids ?? []
+                                try zids.insertFromJWT(url, zidStore, at: 0)
                                 DispatchQueue.main.async {
                                     self?.url = url
                                     self?.fileLabel.text = url.lastPathComponent
-                                    self?.zid = zidMgr.zids.first
+                                    self?.zid = zids.first
                                     self?.tableView.reloadData()
                                     self?.view.isHidden = false
                                 }
@@ -157,9 +160,9 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     spinner.view.removeFromSuperview()
                     spinner.removeFromParent()
                     
-                    let zidMgr = ZidMgr()
+                    let zidStore = ZitiIdentityStore()
                     guard zErr == nil, let zidResp = zidResp else {
-                        _ = zidMgr.zidStore.store(zid)
+                        _ = zidStore.store(zid)
                         self.tableView.reloadData()
                         self.showAlert("Unable to enroll", zErr != nil ? zErr!.localizedDescription : "")
                         return
@@ -175,7 +178,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     
                     zid.enabled = true
                     zid.enrolled = true
-                    _ = zidMgr.zidStore.store(zid)
+                    _ = zidStore.store(zid)
                     self.tableView.reloadData()
                     self.showAlert("Enrolled",
                         "\(zidResp.name ?? (self.url?.lastPathComponent ?? "")) (\(zidResp.id)) successfully enrolled") { _ in

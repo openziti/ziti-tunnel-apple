@@ -53,7 +53,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     func onEnabledValueChanged(_ enabled:Bool) {
         if let zid = self.zid {
             zid.enabled = enabled
-            _ = tvc?.zidMgr.zidStore.store(zid)
+            _ = tvc?.zidStore.store(zid)
             tableView.reloadData()
             tvc?.tunnelMgr.restartTunnel()
             tvc?.tableView.reloadData()
@@ -71,9 +71,9 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             style: .default,
             handler: { _ in
                 if let zid = self.zid {
-                    _ = self.tvc?.zidMgr.zidStore.remove(zid)
-                    if let indx = self.tvc?.zidMgr.zids.firstIndex(of: zid) {
-                        self.tvc?.zidMgr.zids.remove(at: indx)
+                    _ = self.tvc?.zidStore.remove(zid)
+                    if let indx = self.tvc?.zids.firstIndex(of: zid) {
+                        self.tvc?.zids.remove(at: indx)
                     }
                 }
                 self.navigationController?.popViewController(animated: true)
@@ -86,7 +86,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     
     func onEnroll() {
         guard let zid = self.zid else { return }
-        guard let presentedItemURL = self.tvc?.zidMgr.zidStore.presentedItemURL else {
+        guard let presentedItemURL = self.tvc?.zidStore.presentedItemURL else {
             let alert = UIAlertController(
                 title:"Unable to enroll \(zid.name)",
                 message: "Unable to access group container",
@@ -117,7 +117,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     spinner.removeFromParent()
                     
                     guard zErr == nil, let zidResp = zidResp else {
-                        _ = self.tvc?.zidMgr.zidStore.store(zid)
+                        _ = self.tvc?.zidStore.store(zid)
                         self.tableView.reloadData()
                         self.tvc?.tableView.reloadData()
                         
@@ -143,7 +143,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     
                     zid.enabled = true
                     zid.enrolled = true
-                    _ = self.tvc?.zidMgr.zidStore.store(zid)
+                    _ = self.tvc?.zidStore.store(zid)
                     self.tableView.reloadData()
                     self.tvc?.tableView.reloadData()
                     self.tvc?.tunnelMgr.restartTunnel()
