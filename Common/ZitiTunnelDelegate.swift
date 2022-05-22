@@ -303,6 +303,11 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                     tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
                     zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: needsRestart)
                 }
+                
+                // if services are being add, MFA isn't penging...
+                tzid.mfaPending = false
+                
+                // add the service
                 tzid.services.append(zSvc)
             }
         }
