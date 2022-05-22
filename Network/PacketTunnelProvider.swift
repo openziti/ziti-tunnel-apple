@@ -151,6 +151,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             if let czid = tzid.czid, tzid.isEnabled == true {
                 tzid.appexNotifications = nil
                 tzid.services = []
+                if tzid.isMfaEnabled {
+                    tzid.mfaPending = true
+                }
                 tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 _ = zidStore.store(tzid)
                 zids.append(czid)
@@ -481,7 +484,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             
             // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
             //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
-            //_ = zidStore.store(tzid)
+            _ = zidStore.store(tzid)
         }
     }
     
