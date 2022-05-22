@@ -557,20 +557,20 @@
 				5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */,
 				5A2EA2A52097890400437608 /* ProviderConfig.swift */,
 				5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */,
-				5A8702CD2230B24B00314199 /* ZitiService.swift */,
+				5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */,
 				5A379ACB221EDB1400051475 /* ZitiIdentity.swift */,
+				5A298534283A93770056C9A7 /* ZitiIdentityArray.swift */,
+				5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */,
+				5A8702CD2230B24B00314199 /* ZitiService.swift */,
 				5ABA5ED92274D2EB00B2221D /* Logger.swift */,
 				5A34E95D2278F49100E221DD /* Version.swift */,
 				5A0D1D2B222B093F00D01F30 /* ZitiError.swift */,
-				5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */,
 				5A55390F2558425900C02F03 /* ZitiPostureChecks.swift */,
 				5A78DEE225631E1000316CE9 /* AppGroup.swift */,
 				5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */,
 				5AB5F9F826ED46D600F198F2 /* IpcAppClient.swift */,
 				5A6C80B926F63DC000F283AE /* IpcAppexServer.swift */,
 				5AFC6A69282F399800A0229C /* UserNotifications.swift */,
-				5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */,
-				5A298534283A93770056C9A7 /* ZitiIdentityArray.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1484,7 +1484,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 448;
+				CURRENT_PROJECT_VERSION = 450;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
@@ -1509,7 +1509,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 448;
+				CURRENT_PROJECT_VERSION = 450;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
@@ -1534,7 +1534,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 448;
+				CURRENT_PROJECT_VERSION = 450;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
@@ -1563,7 +1563,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 448;
+				CURRENT_PROJECT_VERSION = 450;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
