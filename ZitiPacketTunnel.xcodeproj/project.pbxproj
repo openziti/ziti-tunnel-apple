@@ -27,9 +27,9 @@
 		5A0D1D2F222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
 		5A2985322839DA860056C9A7 /* ZitiTunnelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */; };
 		5A2985332839DA860056C9A7 /* ZitiTunnelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */; };
-		5A298535283A93770056C9A7 /* ZitiIdentityArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* ZitiIdentityArray.swift */; };
-		5A298536283A93770056C9A7 /* ZitiIdentityArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* ZitiIdentityArray.swift */; };
-		5A298537283A96F80056C9A7 /* ZitiIdentityArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* ZitiIdentityArray.swift */; };
+		5A298535283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */; };
+		5A298536283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */; };
+		5A298537283A96F80056C9A7 /* Array+ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */; };
 		5A2D2FE124AA6CB900D154AA /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */; };
 		5A2D2FE324AB899E00D154AA /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D2FE224AB899E00D154AA /* ScannerViewController.swift */; };
 		5A2E11AF24B6A538002856F3 /* ZitiIdentityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */; };
@@ -230,7 +230,7 @@
 		5A02AADB206EBE85006261C6 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		5A0D1D2B222B093F00D01F30 /* ZitiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiError.swift; sourceTree = "<group>"; };
 		5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiTunnelDelegate.swift; sourceTree = "<group>"; };
-		5A298534283A93770056C9A7 /* ZitiIdentityArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentityArray.swift; sourceTree = "<group>"; };
+		5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+ZitiIdentity.swift"; sourceTree = "<group>"; };
 		5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		5A2D2FE224AB899E00D154AA /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
 		5A2E11B324B6A5BD002856F3 /* MobileShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobileShare.entitlements; sourceTree = "<group>"; };
@@ -554,12 +554,10 @@
 		5A8702D722372E7800314199 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */,
 				5A2EA2A52097890400437608 /* ProviderConfig.swift */,
 				5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */,
 				5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */,
 				5A379ACB221EDB1400051475 /* ZitiIdentity.swift */,
-				5A298534283A93770056C9A7 /* ZitiIdentityArray.swift */,
 				5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */,
 				5A8702CD2230B24B00314199 /* ZitiService.swift */,
 				5ABA5ED92274D2EB00B2221D /* Logger.swift */,
@@ -571,6 +569,8 @@
 				5AB5F9F826ED46D600F198F2 /* IpcAppClient.swift */,
 				5A6C80B926F63DC000F283AE /* IpcAppexServer.swift */,
 				5AFC6A69282F399800A0229C /* UserNotifications.swift */,
+				5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */,
+				5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -1084,7 +1084,7 @@
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
 				5A78DEE325631E1000316CE9 /* AppGroup.swift in Sources */,
 				5A0D1D2C222B093F00D01F30 /* ZitiError.swift in Sources */,
-				5A298535283A93770056C9A7 /* ZitiIdentityArray.swift in Sources */,
+				5A298535283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */,
 				5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */,
 				5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */,
 				5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */,
@@ -1134,7 +1134,7 @@
 				5A8702DA22372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */,
 				5A91B4C92222E155006C4277 /* ZitiIdentityStore.swift in Sources */,
-				5A298536283A93770056C9A7 /* ZitiIdentityArray.swift in Sources */,
+				5A298536283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */,
 				5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */,
 				5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */,
 				5A8702D02230B24B00314199 /* ZitiService.swift in Sources */,
@@ -1186,7 +1186,7 @@
 			files = (
 				5A2E11AF24B6A538002856F3 /* ZitiIdentityStore.swift in Sources */,
 				5A2E11B224B6A579002856F3 /* ZitiService.swift in Sources */,
-				5A298537283A96F80056C9A7 /* ZitiIdentityArray.swift in Sources */,
+				5A298537283A96F80056C9A7 /* Array+ZitiIdentity.swift in Sources */,
 				5A2E11B124B6A54E002856F3 /* ZitiError.swift in Sources */,
 				5AFC6A68282B4E8E00A0229C /* IpcMessages.swift in Sources */,
 				5A78DEE725631E1000316CE9 /* AppGroup.swift in Sources */,
