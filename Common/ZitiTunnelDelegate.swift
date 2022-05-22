@@ -304,7 +304,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                     zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: needsRestart)
                 }
                 
-                // if services are being add, MFA isn't penging...
+                // if services are being added, MFA isn't pending...
                 tzid.mfaPending = false
                 
                 // add the service
