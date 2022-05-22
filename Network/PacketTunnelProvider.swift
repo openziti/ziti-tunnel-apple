@@ -79,6 +79,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler(error)
             return
         }
+        
+        guard let zitiTunnelDelegate = zitiTunnelDelegate else {
+            let errStr = "Unable to start tunnel. Invalid provider tunnel delegate."
+            zLog.wtf(errStr)
+            userNotifications.post(.Error, nil, errStr)
+            completionHandler(ZitiError(errStr))
+            return
+        }
 
         zLog.info("\(self.providerConfig.debugDescription)")
         zLog.info("providerConfig.logLevel = \(providerConfig.logLevel)")
@@ -122,20 +130,16 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         zitiTunnel = ZitiTunnel(zitiTunnelDelegate, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS, upstreamDns)
         
         // read in the .zid files
-        var czids:[CZiti.ZitiIdentity]?
-        if let ztd = zitiTunnelDelegate {
-            let (zids, zErr) = ztd.loadIdentites()
-            guard zErr == nil else  {
-                let errStr = "Unable load identities. \(zErr!.localizedDescription)"
-                zLog.error(errStr)
-                userNotifications.post(.Error, nil, errStr)
-                completionHandler(zErr!)
-                return
-            }
-            czids = zids
+        let (zids, zErr) = zitiTunnelDelegate.loadIdentites()
+        guard zErr == nil else  {
+            let errStr = "Unable load identities. \(zErr!.localizedDescription)"
+            zLog.error(errStr)
+            userNotifications.post(.Error, nil, errStr)
+            completionHandler(zErr!)
+            return
         }
         
-        guard let czids = czids else {
+        guard let czids = zids else {
             let errStr = "Unable load identities"
             zLog.error(errStr)
             userNotifications.post(.Error, nil, errStr)

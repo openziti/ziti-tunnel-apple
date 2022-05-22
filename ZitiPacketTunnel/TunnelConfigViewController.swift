@@ -173,7 +173,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
                     
                     DispatchQueue.main.async {
                         guard let indx = self.vc?.representedObject as? Int else { return }
-                        self.vc?.updateServiceUI(zId: self.vc?.zidMgr.zids[indx])
+                        self.vc?.updateServiceUI(zId: self.vc?.zids[indx])
                     }
                 }
             }
