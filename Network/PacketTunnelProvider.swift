@@ -345,13 +345,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
             
             // Notify user...
             if lowestTimeRemaining > firstNoticeMin && lowestTimeRemaining < PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE {
-                zLog.info("\(tzid.name) MFA expiring in less then \(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE) secs \(lowestTimeRemaining)")
                 self.userNotifications.post(.Mfa, "MFA Auth Posture Check",
                                             "\(tzid.name) MFA expiring in less then \(UInt64(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE/60)) mins",
                                             tzid)
             } else if lowestTimeRemaining > finalNoticeMin && lowestTimeRemaining < PacketTunnelProvider.MFA_POSTURE_CHECK_FINAL_NOTICE {
                 self.userNotifications.post(.Mfa, "MFA Auth Posture Check",
-                                            "\(tzid.name) MFA expiring in less then \(PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE) secs",
+                                            "\(tzid.name) MFA expiring in less then \(PacketTunnelProvider.MFA_POSTURE_CHECK_FINAL_NOTICE) secs",
                                             tzid)
             }
         }
