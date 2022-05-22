@@ -144,7 +144,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             box.alphaValue = 1.0
             idEnabledBtn.isEnabled = zId.isEnrolled
             idEnabledBtn.state = zId.isEnabled ? .on : .off
-            mfaSwitch.isEnabled = zId.isEnabled && tunnelMgr.status == .connected
+            mfaSwitch.isEnabled = zId.isEnabled && (tunnelMgr.status == .connected || tunnelMgr.status == .connecting)
             mfaSwitch.state = zId.isMfaEnabled ? .on : .off
             mfaAuthNowBtn.isHidden = !(zId.isEnabled && zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected))
             mfaCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
@@ -631,7 +631,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func onMfaToggle(_ sender: Any) {
-        guard tunnelMgr.status == .connected else {
+        guard tunnelMgr.status == .connected || tunnelMgr.status == .connecting else {
             mfaSwitch.state = mfaSwitch.state == .on ? .off : .on
             dialogAlert("You must be Connected to change MFA state")
             return
