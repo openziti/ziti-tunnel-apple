@@ -92,7 +92,7 @@ class IpcAppexServer : NSObject {
             completionHandler?(errData(errStr))
             return
         }
-        guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
+        guard let ziti = ptp.zitiTunnelDelegate?.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
             let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
@@ -118,7 +118,7 @@ class IpcAppexServer : NSObject {
             completionHandler?(errData(errStr))
             return
         }
-        guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
+        guard let ziti = ptp.zitiTunnelDelegate?.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
             let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
@@ -150,7 +150,7 @@ class IpcAppexServer : NSObject {
             completionHandler?(errData(errStr))
             return
         }
-        guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
+        guard let ziti = ptp.zitiTunnelDelegate?.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
             let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
@@ -182,7 +182,7 @@ class IpcAppexServer : NSObject {
             completionHandler?(errData(errStr))
             return
         }
-        guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
+        guard let ziti = ptp.zitiTunnelDelegate?.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
             let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
@@ -214,7 +214,7 @@ class IpcAppexServer : NSObject {
             completionHandler?(errData(errStr))
             return
         }
-        guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
+        guard let ziti = ptp.zitiTunnelDelegate?.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
             let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
@@ -246,7 +246,7 @@ class IpcAppexServer : NSObject {
             completionHandler?(errData(errStr))
             return
         }
-        guard let ziti = ptp.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
+        guard let ziti = ptp.zitiTunnelDelegate?.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
             let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
             zLog.error(errStr)
             completionHandler?(errData(errStr))
