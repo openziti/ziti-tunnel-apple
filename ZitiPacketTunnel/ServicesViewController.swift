@@ -182,12 +182,11 @@ extension ServicesViewController: NSTableViewDelegate {
                 }
             }
             
-            let zidMgr = ZidMgr()
             if tunnelStatus != .connected {
                 tooltip = "Status: Not Connected"
             } else if (zid?.mfaEnabled ?? false) && (zid?.mfaPending ?? false) {
                 tooltip = "MFA Pending"
-            } else if !zidMgr.postureChecksPassing(svc) {
+            } else if !svc.postureChecksPassing() {
                 tooltip = "Posture check(s) failing"
             } else if svc.status?.needsRestart ?? false {
                 tooltip = "Connection reset may be required to access service"
@@ -203,12 +202,11 @@ extension ServicesViewController: NSTableViewDelegate {
             text = String(svc.portRanges ?? "")
             cellIdentifier = CellIdentifiers.PortCell
         } else if tableColumn == tableView.tableColumns[4] {            
-            let zidMgr = ZidMgr()
-            if zidMgr.postureChecksPassing(svc) {
+            if svc.postureChecksPassing() {
                 text = "PASS"
             } else {
                 text = "FAIL"
-                let fails = zidMgr.failingPostureChecks(svc)
+                let fails = svc.failingPostureChecks()
                 if fails.count > 0 {
                     text += " (\(fails.joined(separator: ",")))"
                 }

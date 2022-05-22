@@ -151,7 +151,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             mfaLockImageView.image = NSImage(systemSymbolName: "lock.slash", accessibilityDescription: "MFA: N/A")
             mfaLockImageView.contentTintColor = nil
-            let mfaPostureChecksFailing = zidMgr.failingPostureChecks(zId).filter({ $0 == "MFA"}).first != nil
+            let mfaPostureChecksFailing = zId.failingPostureChecks().filter({ $0 == "MFA"}).first != nil
             if !mfaAuthNowBtn.isHidden {
                 if zId.isMfaPending {
                     // lock.open is confusing.  Just go with colors...
@@ -877,7 +877,7 @@ extension ViewController: NSTableViewDelegate {
             
             if zid.isEnabled && zid.isMfaEnabled && zid.isMfaPending {
                 tooltip = "MFA Pending"
-            } else if !zidMgr.allServicePostureChecksPassing(zid) {
+            } else if !zid.allServicePostureChecksPassing() {
                 tooltip = "Posture check(s) failing"
             }
             
@@ -895,7 +895,7 @@ extension ViewController: NSTableViewDelegate {
                 
                 if tunnelStatus != .connected {
                     tooltip = "Status: \(connectStatus.stringValue)"
-                } else if edgeStatus.status != .Available && zidMgr.needsRestart(zid) {
+                } else if edgeStatus.status != .Available && zid.needsRestart() {
                     tooltip = "Connection reset may be required to access services"
                 }
             }

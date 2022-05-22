@@ -317,11 +317,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         let firstNoticeMin = PacketTunnelProvider.MFA_POSTURE_CHECK_FIRST_NOTICE - PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL
         let finalNoticeMin = PacketTunnelProvider.MFA_POSTURE_CHECK_FINAL_NOTICE - PacketTunnelProvider.MFA_POSTURE_CHECK_TIMER_INTERVAL
         
-        let zidMgr = ZidMgr()
         for tzid in tzids {
             
             // if already failing posture checks don't bother (user notification was already sent)
-            if !tzid.isEnabled || !tzid.isEnrolled || !zidMgr.allServicePostureChecksPassing(tzid) {
+            if !tzid.isEnabled || !tzid.isEnrolled || !tzid.allServicePostureChecksPassing() {
                 continue
             }
             
@@ -574,8 +573,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
                 }
                 
                 // check for failed posture checks
-                let zidMgr = ZidMgr()
-                if !zidMgr.postureChecksPassing(zSvc) {
+                if !zSvc.postureChecksPassing() {
                     let msg = "Failed posture check(s) for service \"\(zSvc.name ?? "")\""
                     zLog.warn(msg)
                     userNotifications.post(.Posture, tzid.name, msg, tzid)
@@ -593,8 +591,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider, ZitiTunnelProvider {
         for eSvc in event.removed { processService(tzid, eSvc, remove:true) }
         for eSvc in event.added   { processService(tzid, eSvc, add:true) }
         
-        let zidMgr = ZidMgr()
-        if zidMgr.allServicePostureChecksPassing(tzid) && !zidMgr.needsRestart(tzid) {
+        if tzid.allServicePostureChecksPassing() && !tzid.needsRestart() {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
         }
         _ = zidStore.store(tzid)

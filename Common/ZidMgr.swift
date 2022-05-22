@@ -46,68 +46,6 @@ class ZidMgr : NSObject {
         }
     }
     
-    func needsRestart(_ zid:ZitiIdentity) -> Bool {
-        var needsRestart = false
-        if zid.isEnabled && zid.isEnrolled {
-            let restarts = zid.services.filter {
-                if let status = $0.status, let needsRestart = status.needsRestart {
-                    return needsRestart
-                }
-                return false
-            }
-            needsRestart = restarts.count > 0
-        }
-        return needsRestart
-    }
-    
-    func postureChecksPassing(_ svc:ZitiService) -> Bool {
-        if let pqs = svc.postureQuerySets {
-            for q in pqs {
-                if q.isPassing ?? false {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-    
-    func allServicePostureChecksPassing(_ zid:ZitiIdentity) -> Bool {
-        for svc in zid.services {
-            if !postureChecksPassing(svc) {
-                return false
-            }
-        }
-        return true
-    }
-    
-    func failingPostureChecks(_ svc:ZitiService) -> [String] {
-        var fails:[String] = []
-        if let pqs = svc.postureQuerySets {
-            for qs in pqs {
-                if !(qs.isPassing ?? false) {
-                    if let postureQueries = qs.postureQueries {
-                        for q in postureQueries {
-                            if !(q.isPassing ?? false) {
-                                if let qt = q.queryType {
-                                    fails.append(qt)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return Array(Set(fails)) // remove duplicates
-    }
-    
-    func failingPostureChecks(_ zid:ZitiIdentity) -> [String] {
-        var fails:[String] = []
-        zid.services.forEach { svc in
-            fails += failingPostureChecks(svc)
-        }
-        return Array(Set(fails))
-    }
-    
     func insertFromJWT(_ url:URL, at:Int) throws {
         let zid = ZitiIdentity()
         

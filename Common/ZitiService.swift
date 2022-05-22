@@ -60,4 +60,35 @@ class ZitiService : Codable {
         }
         status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
     }
+    
+    func postureChecksPassing() -> Bool {
+        if let pqs = postureQuerySets {
+            for q in pqs {
+                if q.isPassing ?? false {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
+    func failingPostureChecks() -> [String] {
+        var fails:[String] = []
+        if let pqs = postureQuerySets {
+            for qs in pqs {
+                if !(qs.isPassing ?? false) {
+                    if let postureQueries = qs.postureQueries {
+                        for q in postureQueries {
+                            if !(q.isPassing ?? false) {
+                                if let qt = q.queryType {
+                                    fails.append(qt)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Array(Set(fails)) // remove duplicates
+    }
 }
