@@ -612,6 +612,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     
                     // Success!
                     zId.mfaVerified = true
+                    zId.mfaPending = false
                     zId.lastMfaAuth = Date()
                     _ = self.zidStore.store(zId)
                     self.updateServiceUI(zId:zId)
