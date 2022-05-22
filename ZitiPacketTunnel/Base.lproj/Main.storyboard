@@ -219,11 +219,15 @@
                                         <rect key="frame" x="334" y="290" width="16" height="16"/>
                                     </progressIndicator>
                                     <stackView orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CR7-bk-1hh">
-                                        <rect key="frame" x="240" y="410" width="351" height="20"/>
+                                        <rect key="frame" x="238" y="410" width="353" height="20"/>
                                         <beginningViews>
-                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FTl-qP-2Nj">
+                                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FTl-qP-2Nj">
                                                 <rect key="frame" x="0.0" y="1.5" width="18" height="19"/>
-                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="8tX-6X-td4">
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="20" id="8CX-IR-98x"/>
+                                                    <constraint firstAttribute="height" constant="20" id="9kQ-ZV-fJV"/>
+                                                </constraints>
+                                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="8tX-6X-td4">
                                                     <imageReference key="image" image="lock.fill" catalog="system" symbolScale="large"/>
                                                 </imageCell>
                                             </imageView>
