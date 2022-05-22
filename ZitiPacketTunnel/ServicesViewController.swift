@@ -185,7 +185,7 @@ extension ServicesViewController: NSTableViewDelegate {
             let zidMgr = ZidMgr()
             if tunnelStatus != .connected {
                 tooltip = "Status: Not Connected"
-            } else if zid?.isMfaPending ?? false {
+            } else if (zid?.mfaEnabled ?? false) && (zid?.mfaPending ?? false) {
                 tooltip = "MFA Pending"
             } else if !zidMgr.postureChecksPassing(svc) {
                 tooltip = "Posture check(s) failing"
