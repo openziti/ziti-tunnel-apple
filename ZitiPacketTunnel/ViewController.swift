@@ -37,6 +37,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var idEnrollBtn: NSButton!
     @IBOutlet weak var idSpinner: NSProgressIndicator!
     @IBOutlet weak var mfaControls: NSStackView!
+    @IBOutlet weak var mfaLockImageView: NSImageView!
     @IBOutlet weak var mfaSwitch: NSSwitch!
     @IBOutlet weak var mfaAuthNowBtn: NSButton!
     @IBOutlet weak var mfaCodesBtn: NSButton!
@@ -86,6 +87,12 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
         
         if let indx = self.representedObject as? Int, self.zidMgr.zids.count > 0 {
+            // set mfaPending if disconnecting or re-connecting.  purely cosmetic for UI as appex will reset correctly when it starts
+            for zid in zidMgr.zids {
+                if zid.isMfaEnabled && status == .disconnecting || status == .disconnected || status == .reasserting {
+                    zid.mfaPending = true
+                }
+            }
             self.updateServiceUI(zId: self.zidMgr.zids[indx])
         } else {
             self.tableView.reloadData()
@@ -136,11 +143,39 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             box.alphaValue = 1.0
             idEnabledBtn.isEnabled = zId.isEnrolled
             idEnabledBtn.state = zId.isEnabled ? .on : .off
-            mfaSwitch.isEnabled = tunnelMgr.status == .connected
+            mfaSwitch.isEnabled = zId.isEnabled && tunnelMgr.status == .connected
             mfaSwitch.state = zId.isMfaEnabled ? .on : .off
-            mfaAuthNowBtn.isHidden = !(zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected))
+            mfaAuthNowBtn.isHidden = !(zId.isEnabled && zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected))
             mfaCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
             mfaNewCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
+            
+            mfaLockImageView.image = NSImage(systemSymbolName: "lock.slash", accessibilityDescription: "MFA: N/A")
+            mfaLockImageView.contentTintColor = nil
+            let mfaPostureChecksFailing = zidMgr.failingPostureChecks(zId).filter({ $0 == "MFA"}).first != nil
+            if !mfaAuthNowBtn.isHidden {
+                if zId.isMfaPending {
+                    // lock.open is confusing.  Just go with colors...
+                    mfaLockImageView.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MFA: Pending")
+                    mfaLockImageView.contentTintColor = .systemRed
+                } else {
+                    if !mfaPostureChecksFailing {
+                        //mfaLockImageView.contentTintColor = .init(red: 0.16, green: 0.78, blue: 0.50, alpha: 1.0)
+                        mfaLockImageView.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MFA: Session Authenticated")
+                        mfaLockImageView.contentTintColor = .systemGreen
+                    } else {
+                        mfaLockImageView.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: "MFA: Session Authenticated, Posture Checks Failing")
+                        mfaLockImageView.contentTintColor = .systemYellow
+                        if let img = mfaLockImageView.image {
+                            img.accessibilityDescription = img.accessibilityDescription ?? "" + ", MFA Posture Checks Failing"
+                        }
+                    }
+                }
+            } else if mfaPostureChecksFailing {
+                mfaLockImageView.contentTintColor = .systemYellow
+                mfaLockImageView.image?.accessibilityDescription = "MFA Posture Checks Failing"
+            }
+            mfaLockImageView.toolTip = mfaLockImageView.image?.accessibilityDescription
+            
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
@@ -577,7 +612,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     _ = self.zidMgr.zidStore.store(zId)
                     self.updateServiceUI(zId:zId)
                     
-                    // TODO: Show recovery codes to a "real" screen
                     let codes = mfaEnrollment.recoveryCodes?.joined(separator: ", ")
                     self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
                 }
@@ -625,6 +659,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         }
                         
                         zId.mfaEnabled = true
+                        zId.mfaPending = true
                         zId.mfaVerified = mfaEnrollment.isVerified
                         _ = self.zidMgr.zidStore.store(zId)
                         self.updateServiceUI(zId:zId)
@@ -840,7 +875,7 @@ extension ViewController: NSTableViewDelegate {
             var imageName:String = "NSStatusNone"
             var tooltip:String?
             
-            if zid.isMfaPending {
+            if zid.isEnabled && zid.isMfaEnabled && zid.isMfaPending {
                 tooltip = "MFA Pending"
             } else if !zidMgr.allServicePostureChecksPassing(zid) {
                 tooltip = "Posture check(s) failing"
