@@ -180,6 +180,7 @@ class Logger {
                     let to = currLog.appendingPathExtension("\(i+1)")
                     
                     do {
+                        zLog.info("Rotating log: \(from.path) to \(to.path)")
                         try? fm.removeItem(at: to)
                         try fm.moveItem(at: from, to: to)
                     } catch {
@@ -194,6 +195,7 @@ class Logger {
                     
                     // copy instead of mv since we want to manipulate file handle to move to start of the file
                     // to preserve any running `tail -f` on current log
+                    zLog.info("Rotating logs: \(currLog.path) to \(to.path)")
                     try fm.copyItem(at: currLog, to: to)
                     try lfh.truncate(atOffset: 0)
                     try lfh.seek(toOffset: 0)
