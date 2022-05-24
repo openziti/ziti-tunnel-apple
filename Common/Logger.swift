@@ -125,10 +125,11 @@ class Logger {
         }
     }
     
-    func rotateLogs(_ force:Bool=false) -> Bool {
+    // note that if this method errors we just continue,a s zLog sill log to stderr, which is picked up by the OS logging system
+    func rotateLogs(_ force:Bool=false) {
         guard let currLog = currLog else {
             zLog.error("Invalid log URL")
-            return false
+            return
         }
         
         let fm = FileManager.default
@@ -140,7 +141,7 @@ class Logger {
                 try "".write(toFile: currLog.path, atomically: true, encoding: .utf8)
             } catch {
                 zLog.error("Unable to create log file \(currLog.path)")
-                return false
+                return
             }
         }
         
@@ -149,7 +150,7 @@ class Logger {
         // file. This allows logging to restart the next time this method is called)
         guard let lfh = FileHandle(forUpdatingAtPath: currLog.path) else {
             zLog.error("Unable to get file handle for updating \(currLog.path)")
-            return false
+            return
         }
         
         lfh.seekToEndOfFile()
@@ -206,7 +207,6 @@ class Logger {
                 lastRotateTime = Date()
             }
         }
-        return true
     }
     
     static func initShared(_ tag:String) {
@@ -217,12 +217,12 @@ class Logger {
         ZitiLog.setLogLevel(.INFO)
         
         // Process once at startup to make sure we have log dir, roll logs from previos runs if necessary
-        _ = Logger.shared?.rotateLogs(false)
+        Logger.shared?.rotateLogs(false)
         
         // fire timer periodically for clean-up and rolling
         DispatchQueue.main.async {
             Logger.shared?.timer = Timer.scheduledTimer(withTimeInterval: Logger.PROCESS_LOGS_INTERVAL, repeats: true) { _ in
-                _ = Logger.shared?.rotateLogs(false)
+                Logger.shared?.rotateLogs(false)
             }
         }
     }
