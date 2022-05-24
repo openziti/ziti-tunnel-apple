@@ -28,16 +28,20 @@ class Logger {
     static let TUN_TAG = "appex"
     static let APP_TAG = "app"
     
-    static let FILE_SIZE_THRESHOLD = 5_000_000 // bytes
+    static let FILE_SIZE_THRESHOLD = 5_000_000 // "minsize" bytes
     static let MAX_NUM_LOGS = 3
     static let PROCESS_LOGS_INTERVAL = TimeInterval(60*15) // secs
+    
+    private let rotateDaily:Bool
+    private var lastRotateTime:Date?
     
     private let tag:String
     private var timer:Timer? = nil
     let zitiLog:ZitiLog
     
-    private init(_ tag:String) {
+    private init(_ tag:String, _ rotateDaily:Bool=true) {
         self.tag = tag
+        self.rotateDaily = rotateDaily
         self.zitiLog = ZitiLog(Bundle.main.displayName ?? tag)
     }
     
@@ -109,9 +113,19 @@ class Logger {
                 }
             }
         }
+        
+        // Set lastRotateTime
+        if let currLog = currLog {
+            let prev = currLog.appendingPathExtension("1")
+            if let attrs = try? fm.attributesOfItem(atPath: prev.path) as NSDictionary {
+                if let modDate = attrs.fileModificationDate() {
+                    lastRotateTime = modDate
+                }
+            }
+        }
     }
     
-    private func processLogs() -> Bool {
+    func rotateLogs(_ force:Bool=false) -> Bool {
         guard let currLog = currLog else {
             zLog.error("Invalid log URL")
             return false
@@ -147,10 +161,18 @@ class Logger {
         }
         setbuf(__stdoutp, nil) // set stdout to flush
         
-        // rotate logs if they are getting too big
+        // rotate logs (potentially))
         if let attrs = try? fm.attributesOfItem(atPath: currLog.path) as NSDictionary {
             let sz = attrs.fileSize()
-            if sz >= Logger.FILE_SIZE_THRESHOLD {
+            
+            var dailyRotateNeeded = false
+            if rotateDaily, let lrt = lastRotateTime {
+                if !Calendar.current.isDate(lrt, inSameDayAs:Date()) {
+                    dailyRotateNeeded = true
+                }
+            }
+            
+            if force || dailyRotateNeeded || (sz >= Logger.FILE_SIZE_THRESHOLD) {
                 for i in (1...(Logger.MAX_NUM_LOGS-2)).reversed() {
                     let from = currLog.appendingPathExtension("\(i)")
                     let to = currLog.appendingPathExtension("\(i+1)")
@@ -179,6 +201,9 @@ class Logger {
                 } catch {
                     zLog.error("Error rotating \(currLog.path) to \(to.path): \(error.localizedDescription)")
                 }
+                
+                // update lastRotateTime
+                lastRotateTime = Date()
             }
         }
         return true
@@ -192,12 +217,12 @@ class Logger {
         ZitiLog.setLogLevel(.INFO)
         
         // Process once at startup to make sure we have log dir, roll logs from previos runs if necessary
-        _ = Logger.shared?.processLogs()
+        _ = Logger.shared?.rotateLogs(false)
         
         // fire timer periodically for clean-up and rolling
         DispatchQueue.main.async {
             Logger.shared?.timer = Timer.scheduledTimer(withTimeInterval: Logger.PROCESS_LOGS_INTERVAL, repeats: true) { _ in
-                _ = Logger.shared?.processLogs()
+                _ = Logger.shared?.rotateLogs(false)
             }
         }
     }
