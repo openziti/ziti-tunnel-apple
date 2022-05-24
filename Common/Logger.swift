@@ -126,17 +126,10 @@ class Logger {
         }
     }
     
-    // note that if this method errors we just continue,a s zLog sill log to stderr, which is picked up by the OS logging system
-    func rotateLogs(_ force:Bool=false) {
-        guard let currLog = currLog else {
-            zLog.error("Invalid log URL")
-            return
-        }
-        
+    private func setupCurrLog(_ currLog:URL) {
         let fm = FileManager.default
                 
-        // create empty logfile if not present (do here rather than e.g., in init() to handle case of log directory
-        // being deleted while running)
+        // create empty log file if not present
         if !fm.isWritableFile(atPath: currLog.path) {
             do {
                 try "".write(toFile: currLog.path, atomically: true, encoding: .utf8)
@@ -146,9 +139,7 @@ class Logger {
             }
         }
         
-        // set redirects to go to to current log file
-        // do this here (rather than e.g., in init()) to handle the case where somebody deletes the log
-        // file. This allows logging to restart the next time this method is called)
+        // redirect stdout and stderr to the file
         guard let lfh = FileHandle(forUpdatingAtPath: currLog.path) else {
             zLog.error("Unable to get file handle for updating \(currLog.path)")
             return
@@ -162,8 +153,20 @@ class Logger {
             zLog.error("Unable to capture stdout and stderr to file \(currLog.path)")
         }
         setbuf(__stdoutp, nil) // set stdout to flush
+    }
+    
+    // note that if this method errors we just continue. zLog sill logs to stderr, which is picked up by the OS logging system
+    func rotateLogs(_ force:Bool=false) {
+        guard let currLog = currLog else {
+            zLog.error("Invalid log URL")
+            return
+        }
+        
+        // always make sure we have a currLog to write
+        setupCurrLog(currLog)
         
         // rotate logs (potentially))
+        let fm = FileManager.default
         if let attrs = try? fm.attributesOfItem(atPath: currLog.path) as NSDictionary {
             let sz = attrs.fileSize()
             
@@ -180,9 +183,11 @@ class Logger {
                     let to = currLog.appendingPathExtension("\(i+1)")
                     
                     do {
-                        zLog.info("Rotating log: \(from.path) to \(to.path)")
                         try? fm.removeItem(at: to)
-                        try fm.moveItem(at: from, to: to)
+                        if fm.fileExists(atPath: from.path) {
+                            zLog.info("Rotating log: \(from.path) to \(to.path)")
+                            try fm.moveItem(at: from, to: to)
+                        }
                     } catch {
                         zLog.error("Error rotating \(from.path) to \(to.path): \(error.localizedDescription)")
                     }
@@ -191,14 +196,10 @@ class Logger {
                 // roll out the current log
                 let to = currLog.appendingPathExtension("1")
                 do {
-                    try? fm.removeItem(at: to)
-                    
-                    // copy instead of mv since we want to manipulate file handle to move to start of the file
-                    // to preserve any running `tail -f` on current log
                     zLog.info("Rotating logs: \(currLog.path) to \(to.path)")
-                    try fm.copyItem(at: currLog, to: to)
-                    try lfh.truncate(atOffset: 0)
-                    try lfh.seek(toOffset: 0)
+                    try? fm.removeItem(at: to)
+                    try fm.moveItem(at: currLog, to: to)
+                    setupCurrLog(currLog)
                     
                     // Start each log by logging app version
                     zLog.info(Version.verboseStr)
