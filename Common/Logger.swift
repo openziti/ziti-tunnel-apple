@@ -107,6 +107,7 @@ class Logger {
         list.forEach { url in
             if url.lastPathComponent.starts(with: "TUN_") ||  url.lastPathComponent.starts(with: "APP_") && url.pathExtension == "log" {
                 do {
+                    zLog.warn("Removing old style log file \(url.path).  Logs are now stored in dedicated logs directory")
                     try fm.removeItem(at: url)
                 } catch {
                     zLog.error("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)")
