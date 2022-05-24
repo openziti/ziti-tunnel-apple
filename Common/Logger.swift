@@ -25,8 +25,12 @@ var zLog:ZitiLog {
 
 class Logger {
     static var shared:Logger?
-    static let TUN_TAG = "TUN"
-    static let APP_TAG = "APP"
+    static let TUN_TAG = "appex"
+    static let APP_TAG = "app"
+    
+    static let FILE_SIZE_THRESHOLD = 5_000_000 // bytes
+    static let MAX_NUM_LOGS = 3
+    static let PROCESS_LOGS_INTERVAL = TimeInterval(60*15) // secs
     
     private let tag:String
     private var timer:Timer? = nil
@@ -50,67 +54,87 @@ class Logger {
             forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)  else {
                 return nil
         }
-        
-        let df = DateFormatter()
-        df.dateFormat = "yyyy-MM-dd"
-        let dateStr = df.string(from: Date())
-        return appGroupURL.appendingPathComponent("\(tag)_\(dateStr).log", isDirectory:false)
+        return appGroupURL.appendingPathComponent("logs/\(tag).log", isDirectory:false)
     }
     
-    // Delete \(tag)*.logs more than 48 hours old
-    private func cleanup() {
+    private func initLogDir() {
         guard let appGroupURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)  else {
             zLog.error("currLogfile: Invalid app group URL")
-                return
-        }
-        
-        let fm = FileManager.default
-        guard let list = try? fm.contentsOfDirectory(at: appGroupURL, includingPropertiesForKeys: nil, options: []) else {
-            zLog.warn("Logger.cleanup Unable to search log directory for log files to clear")
             return
         }
         
-        let now = Date()
+        // create log directory if doesn't already exist
+        let fm = FileManager.default
+        let logDir = appGroupURL.appendingPathComponent("logs", isDirectory:true)
+        do {
+           try fm.createDirectory(at: logDir, withIntermediateDirectories: true)
+        } catch {
+            zLog.error("Error creating log dir \(error.localizedDescription)")
+            return
+        }
+        
+        // remove any logs > NLOGS
+        guard let list = try? fm.contentsOfDirectory(at: logDir, includingPropertiesForKeys: nil, options: []) else {
+            zLog.warn("Logger.cleanup Unable to search log dir for log files to clear")
+            return
+        }
         list.forEach { url in
-            if url.lastPathComponent.starts(with: tag) && url.pathExtension == "log" {
-                if let attrs = try? fm.attributesOfItem(atPath: url.path), let iat = attrs[.creationDate] as? Date {
-                    let daysOld = ((now.timeIntervalSince(iat) / 60) / 60) / 24
-                    if daysOld > 2.0 {
-                        zLog.info("Removing \(url.lastPathComponent) (is over \(Int(daysOld)) days old)")
-                        do { try fm.removeItem(at: url) }
-                        catch { zLog.error("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)") }
+            let fn = url.lastPathComponent
+            if fn.starts(with: tag) {
+                let comps = fn.components(separatedBy: ".")
+                if comps.count >= 3, let indxStr = comps.last, let indx = Int(indxStr) {
+                    if indx >= Logger.MAX_NUM_LOGS {
+                        do {
+                            try fm.removeItem(at: url)
+                        } catch {
+                            zLog.error("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)")
+                        }
                     }
-                } else {
-                    zLog.error("Logger.cleanup Unable to get file attributes pf \(url.lastPathComponent)")
+                }
+            }
+        }
+        
+        // remove "old style" logs from previous version that were stored in app group directory
+        guard let list = try? fm.contentsOfDirectory(at: appGroupURL, includingPropertiesForKeys: nil, options: []) else {
+            zLog.warn("Logger.cleanup Unable to search app directory for old-style log files to clear")
+            return
+        }
+        list.forEach { url in
+            if url.lastPathComponent.starts(with: "TUN_") ||  url.lastPathComponent.starts(with: "APP_") && url.pathExtension == "log" {
+                do {
+                    try fm.removeItem(at: url)
+                } catch {
+                    zLog.error("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)")
                 }
             }
         }
     }
     
-    private func updateLogger() -> Bool {
-        guard let url = currLog else {
-            zLog.error("updateLogger: Invalid log URL")
+    private func processLogs() -> Bool {
+        guard let currLog = currLog else {
+            zLog.error("Invalid log URL")
             return false
         }
         
-        // cleanup all log files...
-        defer {
-            cleanup()
-        }
-        
-        // create empty logfile if not present
-        if !FileManager.default.isWritableFile(atPath: url.path) {
+        let fm = FileManager.default
+                
+        // create empty logfile if not present (do here rather than e.g., in init() to handle case of log directory
+        // being deleted while running)
+        if !fm.isWritableFile(atPath: currLog.path) {
             do {
-                try "".write(toFile: url.path, atomically: true, encoding: .utf8)
+                try "".write(toFile: currLog.path, atomically: true, encoding: .utf8)
             } catch {
-                zLog.error("Unable to create log file \(url.path)")
+                zLog.error("Unable to create log file \(currLog.path)")
                 return false
             }
         }
         
-        guard let lfh = FileHandle(forUpdatingAtPath: url.path) else {
-            zLog.error("Unable to get file handle for updating \(url.path)")
+        // set redirects to go to to current log file
+        // do this here (rather than e.g., in init()) to handle the case where somebody deletes the log
+        // file. This allows logging to restart the next time this method is called)
+        guard let lfh = FileHandle(forUpdatingAtPath: currLog.path) else {
+            zLog.error("Unable to get file handle for updating \(currLog.path)")
             return false
         }
         
@@ -119,29 +143,61 @@ class Logger {
         let stdOutDes = dup2(lfh.fileDescriptor, FileHandle.standardOutput.fileDescriptor)
         
         if (stdErrDes != FileHandle.standardError.fileDescriptor) || (stdOutDes != FileHandle.standardOutput.fileDescriptor) {
-            zLog.error("Unable to capture stdout and stderr to file \(url.path)")
-            return false
+            zLog.error("Unable to capture stdout and stderr to file \(currLog.path)")
         }
         setbuf(__stdoutp, nil) // set stdout to flush
         
+        // rotate logs if they are getting too big
+        if let attrs = try? fm.attributesOfItem(atPath: currLog.path) as NSDictionary {
+            let sz = attrs.fileSize()
+            if sz >= Logger.FILE_SIZE_THRESHOLD {
+                for i in (1...(Logger.MAX_NUM_LOGS-2)).reversed() {
+                    let from = currLog.appendingPathExtension("\(i)")
+                    let to = currLog.appendingPathExtension("\(i+1)")
+                    
+                    do {
+                        try? fm.removeItem(at: to)
+                        try fm.moveItem(at: from, to: to)
+                    } catch {
+                        zLog.error("Error rotating \(from.path) to \(to.path): \(error.localizedDescription)")
+                    }
+                }
+                
+                // roll out the current log
+                let to = currLog.appendingPathExtension("1")
+                do {
+                    try? fm.removeItem(at: to)
+                    
+                    // copy instead of mv since we want to manipulate file handle to move to start of the file
+                    // to preserve any running `tail -f` on current log
+                    try fm.copyItem(at: currLog, to: to)
+                    try lfh.truncate(atOffset: 0)
+                    try lfh.seek(toOffset: 0)
+                    
+                    // Start each log by logging app version
+                    zLog.info(Version.verboseStr)
+                } catch {
+                    zLog.error("Error rotating \(currLog.path) to \(to.path): \(error.localizedDescription)")
+                }
+            }
+        }
         return true
     }
     
     static func initShared(_ tag:String) {
         Logger.shared = Logger(tag)
+        Logger.shared?.initLogDir()
+        
         zLog.info("Setting log level to \(ZitiLog.LogLevel.INFO)")
         ZitiLog.setLogLevel(.INFO)
-        if Logger.shared?.updateLogger() == false {
-            // Do what?  invalidate Logger? revisit when add #file #function #line stuff
-            zLog.error("Unable to created shared Logger")
-        }
-
+        
+        // Process once at startup to make sure we have log dir, roll logs from previos runs if necessary
+        _ = Logger.shared?.processLogs()
+        
         // fire timer periodically for clean-up and rolling
-        // (do this on main queue since need to guarentee its done in a run loop)
         DispatchQueue.main.async {
-            let timeInterval = TimeInterval(60*60) // hourly (could be a lot smarter about this...)
-            Logger.shared?.timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
-                _ = Logger.shared?.updateLogger()
+            Logger.shared?.timer = Timer.scheduledTimer(withTimeInterval: Logger.PROCESS_LOGS_INTERVAL, repeats: true) { _ in
+                _ = Logger.shared?.processLogs()
             }
         }
     }
