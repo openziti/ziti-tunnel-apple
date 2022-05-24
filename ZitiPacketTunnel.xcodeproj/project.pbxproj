@@ -30,6 +30,7 @@
 		5A298535283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */; };
 		5A298536283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */; };
 		5A298537283A96F80056C9A7 /* Array+ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */; };
+		5A29853A283CFB540056C9A7 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A34E95D2278F49100E221DD /* Version.swift */; };
 		5A2D2FE124AA6CB900D154AA /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */; };
 		5A2D2FE324AB899E00D154AA /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D2FE224AB899E00D154AA /* ScannerViewController.swift */; };
 		5A2E11AF24B6A538002856F3 /* ZitiIdentityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */; };
@@ -1194,6 +1195,7 @@
 				5A2E11B424B797FC002856F3 /* Logger.swift in Sources */,
 				5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */,
 				5A2E11B024B6A543002856F3 /* ZitiIdentity.swift in Sources */,
+				5A29853A283CFB540056C9A7 /* Version.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
