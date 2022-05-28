@@ -1,5 +1,5 @@
 //
-// Copyright 2019-2020 NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             zidStr = zid
         }
         
-        let msg = IpcAppexNotificationMessage(zidStr, response.notification.request.content.categoryIdentifier, response.actionIdentifier)
+        let msg = IpcAppexNotificationActionMessage(zidStr, response.notification.request.content.categoryIdentifier, response.actionIdentifier)
         NotificationCenter.default.post(name: .onAppexNotification, object: self, userInfo: ["ipcMessage":msg])
         
         completionHandler()
