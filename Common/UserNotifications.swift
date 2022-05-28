@@ -1,5 +1,5 @@
 //
-// Copyright NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,39 +18,81 @@ import Foundation
 import UserNotifications
 
 class UserNotifications {
-    enum Category : String {
-        case Info = "INFO", Error = "ERROR", Posture = "POSTURE", Restart = "RESTART", Mfa = "MFA"
-    }
-    
     enum Action : String {
         case Open = "Open", MfaAuth = "MfaAuth", Restart = "Restart"
+        
+        var title:String {
+            switch self {
+            case .Open:    return "Open"
+            case .MfaAuth: return "Auth Now"
+            case .Restart: return "Restart"
+            }
+        }
+        
+        static func actionForTitle(_ title:String) -> Action? {
+            switch title {
+            case Action.Open.title: return Action.Open
+            case Action.MfaAuth.title: return Action.MfaAuth
+            case Action.Restart.title: return Action.Restart
+            default: return nil
+            }
+        }
+        
+        var action:UNNotificationAction {
+            switch self {
+            case .Open:    return UNNotificationAction(identifier: Action.Open.rawValue, title: Action.Open.title, options: [.foreground])
+            case .MfaAuth: return UNNotificationAction(identifier: Action.MfaAuth.rawValue, title: Action.MfaAuth.title, options: [.foreground])
+            case .Restart: return UNNotificationAction(identifier: Action.Restart.rawValue, title: Action.Restart.title, options: [.foreground])
+            }
+        }
+    }
+    
+    enum Category : String {
+        case Info = "INFO", Error = "ERROR", Posture = "POSTURE", Restart = "RESTART", Mfa = "MFA"
+        
+        var actions:[UNNotificationAction] {
+            switch self {
+            case .Info:    return []
+            case .Error:   return []
+            case .Posture: return []
+            case .Restart: return [ Action.Restart.action, Action.Open.action ]
+            case .Mfa:     return [ Action.MfaAuth.action, Action.Open.action ]
+            }
+        }
+        
+        var category:UNNotificationCategory {
+            switch self {
+            case .Info:    return UNNotificationCategory.init(identifier: Category.Info.rawValue,
+                                                              actions: Category.Info.actions,
+                                                              intentIdentifiers: [], options: [])
+            case .Error:   return UNNotificationCategory.init(identifier: Category.Error.rawValue,
+                                                              actions: Category.Error.actions,
+                                                              intentIdentifiers: [], options: [])
+            case .Posture: return UNNotificationCategory.init(identifier: Category.Posture.rawValue,
+                                                              actions: Category.Posture.actions,
+                                                              intentIdentifiers: [], options: [])
+            case .Restart: return UNNotificationCategory.init(identifier: Category.Restart.rawValue,
+                                                              actions: Category.Restart.actions,
+                                                              intentIdentifiers: [], options: [])
+            case .Mfa:     return UNNotificationCategory.init(identifier: Category.Mfa.rawValue,
+                                                              actions: Category.Mfa.actions,
+                                                              intentIdentifiers: [], options: [])
+            }
+        }
+        
+        static var allCategories:Set<UNNotificationCategory> {
+            return [ Category.Info.category, Category.Error.category, Category.Posture.category, Category.Restart.category, Category.Mfa.category ]
+        }
     }
     
     static let shared = UserNotifications()
     private init() {}
-    
+        
     func requestAuth() {
         let center = UNUserNotificationCenter.current()
-
         center.requestAuthorization(options: [.alert, .sound, .badge]) { authorized, error in
             zLog.info("Auth request authorized? \(authorized)")
-            
-            let openAction = UNNotificationAction(identifier: Action.Open.rawValue, title: "Open", options: [.foreground])
-            let mfaAction = UNNotificationAction(identifier: Action.MfaAuth.rawValue, title: "Auth Now", options: [.foreground])
-            let restartAction = UNNotificationAction(identifier: Action.Restart.rawValue, title: "Restart", options: [.foreground])
-            
-            let infoCategory = UNNotificationCategory.init(identifier: Category.Info.rawValue, actions: [], intentIdentifiers: [], options: [])
-            let errorCategory = UNNotificationCategory.init(identifier: Category.Error.rawValue, actions: [], intentIdentifiers: [], options: [])
-            let postureCategory = UNNotificationCategory.init(identifier: Category.Posture.rawValue, actions: [], intentIdentifiers: [], options: [])
-            
-            let restartActions = [ restartAction, openAction ]
-            let restartCategory = UNNotificationCategory.init(identifier: Category.Restart.rawValue, actions: restartActions, intentIdentifiers: [], options: [])
-            
-            let mfaActions = [mfaAction, openAction]
-            let mfaCatgory = UNNotificationCategory.init(identifier: Category.Mfa.rawValue, actions: mfaActions, intentIdentifiers: [], options: [])
-            
-            let categories:Set = [infoCategory, errorCategory, postureCategory, restartCategory, mfaCatgory]
-            center.setNotificationCategories(categories)
+            center.setNotificationCategories(Category.allCategories)
         }
     }
     
