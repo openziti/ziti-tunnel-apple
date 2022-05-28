@@ -1,5 +1,5 @@
 /*
-Copyright NetFoundry, Inc.
+Copyright NetFoundry Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import CZiti
 
 enum IpcMessageType : Int32, Codable {
     case AppexNotification = 0
+    case AppexNotificationAction
     case ErrorResponse
     case SetLogLevel
     case DumpRequest
@@ -37,6 +38,7 @@ enum IpcMessageType : Int32, Codable {
     var type:IpcMessage.Type {
         switch self {
         case .AppexNotification: return IpcAppexNotificationMessage.self
+        case .AppexNotificationAction: return IpcAppexNotificationActionMessage.self
         case .ErrorResponse: return IpcErrorResponseMessage.self
         case .SetLogLevel: return IpcSetLogLevelMessage.self
         case .DumpRequest: return IpcDumpRequestMessage.self
@@ -98,12 +100,49 @@ class IpcPolyMessage : NSObject, Codable {
 }
 
 class IpcAppexNotificationMessage : IpcMessage {
+    enum CodingKeys: String, CodingKey { case category, title, subtitle, body, actions }
+    var category:String?
+    var title:String?
+    var subtitle:String?
+    var body:String?
+    var actions:[String]?
+    
+    init(_ zid:String?, _ category:String, _ title:String, _ subtitle:String, _ body:String, _ actions:[String]) {
+        let m = Meta(zid, .AppexNotification , nil)
+        self.category = category
+        self.title = title
+        self.subtitle = subtitle
+        self.body = body
+        self.actions = actions
+        super.init(m)
+    }
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        category = try? c.decode(String.self, forKey: .category)
+        title = try? c.decode(String.self, forKey: .title)
+        subtitle = try? c.decode(String.self, forKey: .subtitle)
+        body = try? c.decode(String.self, forKey: .body)
+        actions = try? c.decode([String].self, forKey: .actions)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(category, forKey: .category)
+        try c.encodeIfPresent(title, forKey: .title)
+        try c.encodeIfPresent(subtitle, forKey: .subtitle)
+        try c.encodeIfPresent(body, forKey: .body)
+        try c.encodeIfPresent(actions, forKey: .actions)
+    }
+}
+
+class IpcAppexNotificationActionMessage : IpcMessage {
     enum CodingKeys: String, CodingKey { case category, action }
     var category:String?
     var action:String?
     
     init(_ zid:String?, _ category:String, _ action:String) {
-        let m = Meta(zid, .AppexNotification , nil)
+        let m = Meta(zid, .AppexNotificationAction , nil)
         self.category = category
         self.action = action
         super.init(m)
