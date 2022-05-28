@@ -1,5 +1,5 @@
 //
-// Copyright 2019-2020 NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -177,7 +177,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             }
             
             // Process any specified action
-            if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationMessage {
+            if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationActionMessage {
                 // Always select the zid (if specified)
                 DispatchQueue.main.async {
                     if let zidStr = msg.meta.zid {
