@@ -159,7 +159,7 @@ class InAppdNotification: NSView {
         // Dismiss on mouse click outside of the notification window
         eventHandler = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseUp]) { [weak self] event in
             if let pt = self?.window?.mouseLocationOutsideOfEventStream, let theView = self?.window?.contentView?.hitTest(pt) {
-                if theView != self && theView.superview != self {
+                if (theView as? InAppdNotification == nil) && theView.superview != self {
                     self?.isHidden = true
                 }
             } else {
@@ -188,7 +188,7 @@ class InAppdNotification: NSView {
         v.layer?.masksToBounds = false
     }
      
-    // drop all references to can be free'd up
+    // drop all references so can be free'd up
     func destroy() {
         self.dismissTimer?.invalidate()
         self.dismissTimer = nil
@@ -282,7 +282,9 @@ class InAppdNotification: NSView {
     override func mouseUp(with event: NSEvent) {
         // if not in front, bring to front.  Otherwise do the default action.
         if InAppdNotification.allNotices.count > 1 {
+            let constraints = self.constraints
             self.removeFromSuperview()
+            constraints.forEach { self.addConstraint($0) }
             self.parent?.addSubview(self)
         } else {
             if let msg = msg {
