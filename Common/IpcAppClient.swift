@@ -1,5 +1,5 @@
 //
-// Copyright NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,14 @@ class IpcAppClient : NSObject, ZitiIdentityStoreDelegate {
         
         // appexNotifications
         zid.appexNotifications?.forEach { polyMsg in
-            NotificationCenter.default.post(name: .onAppexNotification, object: self, userInfo: ["ipcMessage":polyMsg.msg])
+            // filter out old notification IpcMessages since app won't always be running
+            let now = Date().timeIntervalSince1970
+            let msgTime = polyMsg.msg.meta.createdAt.timeIntervalSince1970
+            if (now - msgTime) < TimeInterval(5.0) {
+                NotificationCenter.default.post(name: .onAppexNotification, object: self, userInfo: ["ipcMessage":polyMsg.msg])
+            } else {
+                zLog.warn("Discarding stale message of type \(polyMsg.msg.meta.msgType)")
+            }
         }
         if zid.appexNotifications != nil {
             zid.appexNotifications = nil

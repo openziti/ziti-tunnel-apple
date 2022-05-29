@@ -1,5 +1,5 @@
 //
-// Copyright 2019-2020 NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -305,8 +305,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 }
             }
             
-            // Process any notification action
+            // Process any notifications
             if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationMessage {
+                InAppdNotification().show(self.view, msg)
+            }
+            
+            // Process any notification action
+            if msg.meta.msgType == .AppexNotificationAction, let msg = msg as? IpcAppexNotificationActionMessage {
                 DispatchQueue.main.async {
                     // Select the zid (if specified)
                     if let zidStr = msg.meta.zid {

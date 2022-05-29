@@ -1,5 +1,5 @@
 //
-// Copyright NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -445,8 +445,30 @@ extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
         // On macOS, method is not reliably called. When it is, results are ignored (notification is not displayed)
-        zLog.debug("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
-        completionHandler([.list, .sound])
+        zLog.error("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
+        
+        var actions:[String] = []
+        if let category = UserNotifications.Category(rawValue: notification.request.content.categoryIdentifier) {
+            actions = category.actions.map { $0.identifier }
+        }
+        if let zid = notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
+            tzid.addAppexNotification(IpcAppexNotificationMessage(zid,
+                notification.request.content.categoryIdentifier,
+                notification.request.content.title,
+                notification.request.content.subtitle,
+                notification.request.content.body,
+                actions))
+            _ = zidStore.store(tzid)
+        } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
+            tzid.addAppexNotification(IpcAppexNotificationMessage(nil,
+                notification.request.content.categoryIdentifier,
+                notification.request.content.title,
+                notification.request.content.subtitle,
+                notification.request.content.body,
+                actions))
+            _ = zidStore.store(tzid)
+        }
+        completionHandler([]) // [.list, .sound])
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -455,11 +477,11 @@ extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
         zLog.debug("didReceive: \(response.notification.request.content.subtitle), \(response.notification.request.content.body)")
         
         if let zid = response.notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
-            tzid.addAppexNotification(IpcAppexNotificationMessage(
+            tzid.addAppexNotification(IpcAppexNotificationActionMessage(
                 zid, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
             _ = zidStore.store(tzid)
         } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
-            tzid.addAppexNotification(IpcAppexNotificationMessage(
+            tzid.addAppexNotification(IpcAppexNotificationActionMessage (
                 nil, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
             _ = zidStore.store(tzid)
         }

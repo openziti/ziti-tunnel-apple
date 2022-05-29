@@ -1,5 +1,5 @@
 //
-// Copyright NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,6 +63,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         zLog.info("")
         zLog.info("options=\(options?.debugDescription ?? "nil")")
         
+        guard let zitiTunnelDelegate = zitiTunnelDelegate else {
+            let errStr = "Unable to start tunnel. Invalid provider tunnel delegate."
+            zLog.wtf(errStr)
+            userNotifications.post(.Error, nil, errStr)
+            completionHandler(ZitiError(errStr))
+            return
+        }
+        
         // parse config
         guard let conf = (self.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration as? ProviderConfigDict else {
             let errStr = "Unable to start tunnel. Provider configuration not available"
@@ -77,14 +85,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             zLog.wtf(errStr)
             userNotifications.post(.Error, nil, errStr)
             completionHandler(error)
-            return
-        }
-        
-        guard let zitiTunnelDelegate = zitiTunnelDelegate else {
-            let errStr = "Unable to start tunnel. Invalid provider tunnel delegate."
-            zLog.wtf(errStr)
-            userNotifications.post(.Error, nil, errStr)
-            completionHandler(ZitiError(errStr))
             return
         }
 
