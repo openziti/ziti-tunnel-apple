@@ -167,33 +167,33 @@
                                             <action selector="onEnrollButton:" target="XfG-lQ-9wD" id="JMS-Fb-PNX"/>
                                         </connections>
                                     </button>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Rw-cE-4Xu">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7Rw-cE-4Xu" customClass="EditableNSTextField" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
                                         <rect key="frame" x="213" y="386" width="380" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="654ad670-2f85-11e9-af13-5329fe65c42d" id="PVC-Xa-NhD">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" title="654ad670-2f85-11e9-af13-5329fe65c42d" id="PVC-Xa-NhD">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yAm-ab-8PC">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yAm-ab-8PC" customClass="EditableNSTextField" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
                                         <rect key="frame" x="213" y="362" width="380" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="dave-macbook-pro" id="LB7-DA-OjI">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" title="dave-macbook-pro" id="LB7-DA-OjI">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="u4K-4k-Eda">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="u4K-4k-Eda" customClass="EditableNSTextField" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
                                         <rect key="frame" x="213" y="338" width="380" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="https://18.204.122.162:1080/" id="1pj-7Y-z3L">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" title="https://18.204.122.162:1080/" id="1pj-7Y-z3L">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PJs-YU-hJE">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PJs-YU-hJE" customClass="EditableNSTextField" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
                                         <rect key="frame" x="213" y="314" width="380" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="v0.0.0" id="VDm-rb-7ag">
+                                        <textFieldCell key="cell" lineBreakMode="clipping" selectable="YES" title="v0.0.0" id="VDm-rb-7ag">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
