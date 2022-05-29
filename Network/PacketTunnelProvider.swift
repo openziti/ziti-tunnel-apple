@@ -212,7 +212,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
                 
                 // interferes with any notifications posted while connecting...
-                //self.userNotifications.postToApp(zitiTunnelDelegate.zidStore, .Info, "Connected")
+                //self.userNotifications.post(.Info, "Connected")
 
                 // call completion handler with nil to indicate success
                 completionHandler(nil)
