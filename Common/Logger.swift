@@ -117,13 +117,19 @@ class Logger {
         
         // Set lastRotateTime
         if let currLog = currLog {
-            let prev = currLog.appendingPathExtension("1")
-            if let attrs = try? fm.attributesOfItem(atPath: prev.path) as NSDictionary {
-                if let modDate = attrs.fileModificationDate() {
-                    lastRotateTime = modDate
+            setupCurrLog(currLog)
+            if let attrs = try? fm.attributesOfItem(atPath: currLog.path) as NSDictionary {
+                if let createDate = attrs.fileCreationDate() {
+                    zLog.info("Setting lastRotateTime to log creation date: \(createDate)")
+                    lastRotateTime = createDate
                 }
             }
         }
+        
+        if lastRotateTime == nil {
+            lastRotateTime = Date()
+        }
+        zLog.info("lastRotateTime: \(lastRotateTime as Any)")
     }
     
     private func setupCurrLog(_ currLog:URL) {
