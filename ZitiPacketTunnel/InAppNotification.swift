@@ -38,6 +38,13 @@ class ResizableTestView : NSTextView {
     }
 }
 
+class OptionsButton: NSButton {
+    override open func draw(_ dirtyRect: NSRect) {
+        self.highlight(true)
+        super.draw(dirtyRect)
+    }
+}
+
 class InAppdNotification: NSView {
     var eventHandler:Any?
     var dismissTimer:Timer?
@@ -122,8 +129,15 @@ class InAppdNotification: NSView {
         bodyTextView.frame.origin.x = borderWidth + logoSize
         bodyTextView.frame.origin.y =  borderWidth 
         
-        optionsBtn = NSButton(title: "Options", target: self, action: #selector(onOptionsButton))
+        if let img = NSImage(systemSymbolName: "chevron.down", accessibilityDescription: "open") {
+            optionsBtn = OptionsButton(title: "Options", image: img, target: self, action: #selector(onOptionsButton))
+            optionsBtn?.imagePosition = .imageTrailing
+        } else {
+            optionsBtn = OptionsButton(title: "Options", target: self, action: #selector(onOptionsButton))
+        }
+        
         if let obtn = optionsBtn {
+            obtn.font = NSFont.systemFont(ofSize: 12)
             obtn.frame.origin.x = totalWidth - (optionsBtn?.frame.width ?? 0.0)
             obtn.frame.origin.y = 0
             self.addSubview(obtn)
