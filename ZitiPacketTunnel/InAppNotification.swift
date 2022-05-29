@@ -114,7 +114,7 @@ class InAppdNotification: NSView {
         // Add self to parent view
         parent.addSubview(self)
         
-        // Update intrinsic constraints to all stack's .fillProportionally to calculate sizes
+        // Update intrinsic constraints to allow stack's .fillProportionally to calculate sizes
         //headingTextView.invalidateIntrinsicContentSize()
         //bodyTextView.invalidateIntrinsicContentSize()
         
