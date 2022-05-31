@@ -53,8 +53,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     weak var servicesViewController:ServicesViewController? = nil
     var tunnelMgr = TunnelMgr.shared
-    var zids:[ZitiIdentity] = []
-    var zidStore = ZitiIdentityStore()
+    var zids:[ZitiIdentity] {
+        get { return tunnelMgr.zids }
+        set { tunnelMgr.zids = newValue }
+    }
+    var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     var enrollingIds:[ZitiIdentity] = []
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
