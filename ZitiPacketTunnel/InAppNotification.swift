@@ -267,7 +267,7 @@ class InAppdNotification: NSView {
         self.dismissTimer?.invalidate()
         self.dismissTimer = nil
         closeBtn?.isHidden = false
-        optionsBtn?.isHidden = false
+        optionsBtn?.isHidden = msg?.actions?.count ?? 0 == 0
     }
     
     override func mouseExited(with event: NSEvent) {
