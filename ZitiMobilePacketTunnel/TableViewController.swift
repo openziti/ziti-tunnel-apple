@@ -88,8 +88,11 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         return "\(bid)"
     }
     var tunnelMgr = TunnelMgr.shared
-    var zids:[ZitiIdentity] = []
-    var zidStore = ZitiIdentityStore()
+    var zids:[ZitiIdentity] {
+        get { return tunnelMgr.zids }
+        set { tunnelMgr.zids = newValue }
+    }
+    var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     weak var ivc:IdentityViewController?
     let sc = ScannerViewController()
 
