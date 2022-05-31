@@ -99,6 +99,19 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         
         getMainWindow()?.delegate = self
         TunnelMgr.shared.tsChangedCallbacks.append(self.tunnelStatusDidChange)
+        
+        // listen for newOrChanged
+        NotificationCenter.default.addObserver(forName: .onNewOrChangedId, object: nil, queue: OperationQueue.main) { [self] notification in
+            DispatchQueue.main.async {
+                if TunnelMgr.shared.status == .connected {
+                    if TunnelMgr.shared.allEnabledZidsFullyAvailable() {
+                        self.statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
+                    } else {
+                        self.statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarAttention"))
+                    }
+                }
+            }
+        }
     }
     
     func menuDidBeginTracking(n: Notification) {
@@ -111,15 +124,22 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         case .connecting:
             tunStatusItem.title = "Status: Connecting..."
             tunConnectItem.title = "Disconnect"
+            statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarAttention"))
             break
         case .connected:
             tunStatusItem.title = "Status: Connected"
             tunConnectItem.title = "Disconnect"
             snapshotItem.action = #selector(MainMenuBar.showSnapshot(_:))
-            statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
+            
+            if TunnelMgr.shared.allEnabledZidsFullyAvailable() {
+                statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
+            } else {
+                statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarAttention"))
+            }
             break
         case .disconnecting:
             tunStatusItem.title = "Status: Disconnecting..."
+            statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarAttention"))
             break
         case .disconnected:
             tunStatusItem.title = "Status: Not Connected"
@@ -132,6 +152,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
             break
         case .reasserting:
             tunStatusItem.title = "Status: Reasserting..."
+            statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarAttention"))
             break
         @unknown default:
             zLog.warn("Unknown tunnel status...")
