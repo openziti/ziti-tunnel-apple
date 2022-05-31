@@ -23,6 +23,9 @@ class TunnelMgr: NSObject {
     var tunnelRestarting = false
     let ipcClient = IpcAppClient()
     
+    var zids:[ZitiIdentity] = []
+    var zidStore = ZitiIdentityStore()
+    
     typealias TunnelStateChangedCallback = ((NEVPNStatus)->Void)
     var tsChangedCallbacks:[TunnelStateChangedCallback] = []
     
@@ -202,6 +205,24 @@ class TunnelMgr: NSObject {
             stopTunnel()
         }
         #endif
+    }
+    
+    func loadZids() -> ZitiError? {
+        let (loadedZids, err) = zidStore.loadAll()
+        if err != nil || loadedZids == nil {
+            zLog.warn(err?.errorDescription ?? "Error loading identities from store")
+        }
+        self.zids = loadedZids ?? []
+        return err
+    }
+    
+    func allEnabledZidsFullyAvailable() -> Bool {
+        for z in zids {
+            if z.isEnabled && (z.edgeStatus?.status ?? .Unavailable != .Available) {
+                return false
+            }
+        }
+        return true
     }
     
     func updateLogLevel(_ level:ZitiLog.LogLevel) {
