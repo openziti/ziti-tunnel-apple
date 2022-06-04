@@ -68,7 +68,7 @@
         <scene sceneID="hIz-AP-VOD">
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
+                    <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl" customClass="MainView" customModule="Ziti_Desktop_Edge" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="525"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -246,7 +246,7 @@
                                                 </connections>
                                             </switch>
                                             <button toolTip="Auth Now" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G3N-3W-MF7">
-                                                <rect key="frame" x="88" y="-7" width="47" height="32"/>
+                                                <rect key="frame" x="88" y="-7" width="52" height="32"/>
                                                 <buttonCell key="cell" type="push" alternateTitle="Auth Now" bezelStyle="rounded" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NNy-JJ-gHS">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -257,7 +257,7 @@
                                                 </connections>
                                             </button>
                                             <button toolTip="Retrieve recovery codes" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eXL-hW-ma0">
-                                                <rect key="frame" x="125" y="-7" width="46" height="32"/>
+                                                <rect key="frame" x="130" y="-7" width="51" height="32"/>
                                                 <buttonCell key="cell" type="push" alternateTitle="Codes" bezelStyle="rounded" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="R8O-4S-wNu">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
@@ -268,7 +268,7 @@
                                                 </connections>
                                             </button>
                                             <button toolTip="Generate new recovery codes" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OYu-ET-6Q0" userLabel="New Codes">
-                                                <rect key="frame" x="161" y="-7" width="46" height="32"/>
+                                                <rect key="frame" x="171" y="-7" width="51" height="32"/>
                                                 <buttonCell key="cell" type="push" alternateTitle="New Codes" bezelStyle="rounded" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yLY-eo-6Z5">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
