@@ -60,6 +60,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     var enrollingIds:[ZitiIdentity] = []
     
+    let notificationsPanel = NotificationsPanel()
+    
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
         connectButton.isEnabled = true
         switch status {
@@ -233,6 +235,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.addSubview(notificationsPanel)
+        
         tableView.delegate = self
         tableView.dataSource = self
 
@@ -310,7 +314,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             // Process any notifications
             if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationMessage {
-                InAppdNotification().show(self.view, msg)
+                self.notificationsPanel.add(msg)
             }
             
             // Process any notification action
@@ -484,7 +488,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: "Cancel")
         
-        let txtView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        let txtView = EditableNSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
         alert.accessoryView = txtView
         alert.window.initialFirstResponder = txtView
         
