@@ -224,6 +224,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+        zitiTunnelDelegate?.shuttingDown()
+        
         let dumpStr = dumpZitis()
         zLog.info(dumpStr)
         
