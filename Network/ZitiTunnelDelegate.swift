@@ -33,6 +33,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     var dnsEntries = DNSUtils.DnsEntries()
     var interceptedRoutes:[NEIPv4Route] = []
     var excludedRoutes:[NEIPv4Route] = []
+    var tunnelShuttingDown = false
     
     private var _identitesLoaded = false // when true, restart is required to update routes for services intercepted by IP
     var identitiesLoaded:Bool {
@@ -57,7 +58,6 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
         get { return _identitesLoaded }
     }
-    
     
     init(_ ptp:PacketTunnelProvider) {
         super.init()
@@ -103,6 +103,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             return
         }
         allZitis.append(ziti)
+    }
+    
+    func shuttingDown() {
+        if let opsZiti = allZitis.first {
+            opsZiti.perform { self.tunnelShuttingDown = true }
+        }
     }
     
     func addRoute(_ destinationAddress: String) -> Int32 {
@@ -215,12 +221,16 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             tzid.controllerVersion = cVersion
         }
         
-        if event.status == "OK" { // hardocded string in TSDK. was Ziti.ZITI_OK {
+        if event.code == Ziti.ZITI_OK {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
         } else {
-            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+            
+            // Only raise notifications if not shutting down to reduce noise
+            if !tunnelShuttingDown {
+                userNotifications.post(.Error, event.status, "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
+            }
         }
-        
         _ = zidStore.store(tzid)
     }
     
@@ -441,11 +451,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
 }
 
 extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
-    
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
-        // On macOS, method is not reliably called. When it is, results are ignored (notification is not displayed)
-        zLog.error("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
+        // This is only called on macOS.  On iOS, the app's AppDelegate gets notified and works as expected.  Since on macOS the call shows up here
+        // in the appex, we'll send a message to the app so the app can display it to the user.  Note that this method won't be called if the user
+        // has disabled notifications (which is what we want/expect).
+        zLog.debug("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
         
         var actions:[String] = []
         if let category = UserNotifications.Category(rawValue: notification.request.content.categoryIdentifier) {
