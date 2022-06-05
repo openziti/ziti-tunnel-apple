@@ -914,6 +914,8 @@ extension ViewController: NSTableViewDelegate {
                     tooltip = "Status: \(connectStatus.stringValue)"
                 } else if edgeStatus.status != .Available && zid.needsRestart() {
                     tooltip = "Connection reset may be required to access services"
+                } else {
+                    tooltip = "Controller Status: \(edgeStatus.status.rawValue)"
                 }
             }
             cell.imageView?.image = NSImage(named:imageName) ?? nil
