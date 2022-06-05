@@ -223,12 +223,21 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         
         if event.code == Ziti.ZITI_OK {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
+            
+            // Notifiy when controller comes (back) online after inital startup. Don't notify during startup to reduce noise
+            if identitiesLoaded {
+                userNotifications.post(.Info, "Controller: \(ZitiIdentity.ConnectivityStatus.Available.rawValue)",
+                                       "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
+            }
         } else {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
             
             // Only raise notifications if not shutting down to reduce noise
             if !tunnelShuttingDown {
-                userNotifications.post(.Error, event.status, "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
+                let subtitle = event.code == Ziti.ZITI_CONTROLLER_UNAVAILABLE ?
+                "Controller: \(ZitiIdentity.ConnectivityStatus.Unavailable.rawValue)"
+                : event.status
+                userNotifications.post(.Error, subtitle, "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
             }
         }
         _ = zidStore.store(tzid)
