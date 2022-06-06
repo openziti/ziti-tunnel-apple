@@ -48,7 +48,7 @@ class IpcAppClient : NSObject, ZitiIdentityStoreDelegate {
             }
             if zid.appexNotifications != nil {
                 zid.appexNotifications = nil
-                _ = self.zidStore.store(zid)
+                _ = self.zidStore.update(zid, [.AppexNotifications])
             }
         }
     }

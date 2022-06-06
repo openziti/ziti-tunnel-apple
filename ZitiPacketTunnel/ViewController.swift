@@ -516,7 +516,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if let indx = representedObject as? Int, zids.count > 0 {
             let zId = zids[indx]
             zId.enabled = sender.state == .on
-            _ = zidStore.store(zId)
+            zids[indx] = zidStore.update(zId, [.Enabled])
             updateServiceUI(zId:zId)
             tunnelMgr.restartTunnel()
         }
@@ -584,7 +584,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         self.updateServiceUI(zId:zId)
     }
     
-    func mfaVerify(_ zId:ZitiIdentity, _ mfaEnrollment:ZitiMfaEnrollment) {
+    func mfaVerify(_ zId: ZitiIdentity, _ mfaEnrollment:ZitiMfaEnrollment) {
         guard let provisioningUrl = mfaEnrollment.provisioningUrl else {
             zLog.error("Invalid provisioning URL")
             return
@@ -600,8 +600,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         self.dialogAlert("Error sending provider message to verify MFA", zErr!.localizedDescription)
                         zId.mfaEnabled = false
                         zId.mfaVerified = false
-                        _ = self.zidStore.store(zId)
-                        self.toggleMfa(zId, .off)
+                        let updatedZid = self.zidStore.update(zId, [.Mfa])
+                        self.toggleMfa(updatedZid, .off)
                         return
                     }
                     guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage,
@@ -609,16 +609,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         self.dialogAlert("IPC Error", "Unable to parse verification response message")
                         zId.mfaEnabled = false
                         zId.mfaVerified = false
-                        _ = self.zidStore.store(zId)
-                        self.toggleMfa(zId, .off)
+                        let updatedZid = self.zidStore.update(zId, [.Mfa])
+                        self.toggleMfa(updatedZid, .off)
                         return
                     }
                     guard status == Ziti.ZITI_OK else {
                         self.dialogAlert("MFA Verification Error", Ziti.zitiErrorString(status: status))
                         zId.mfaEnabled = false
                         zId.mfaVerified = false
-                        _ = self.zidStore.store(zId)
-                        self.toggleMfa(zId, .off)
+                        let updatedZid = self.zidStore.update(zId, [.Mfa])
+                        self.toggleMfa(updatedZid, .off)
                         return
                     }
                     
@@ -626,8 +626,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     zId.mfaVerified = true
                     zId.mfaPending = false
                     zId.lastMfaAuth = Date()
-                    _ = self.zidStore.store(zId)
-                    self.updateServiceUI(zId:zId)
+                    let updatedZid = self.zidStore.update(zId, [.Mfa])
+                    self.updateServiceUI(zId:updatedZid)
                     
                     let codes = mfaEnrollment.recoveryCodes?.joined(separator: ", ")
                     self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
@@ -637,8 +637,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             zLog.info("Setup MFA cancelled")
             zId.mfaEnabled = false
             zId.mfaVerified = false
-            _ = self.zidStore.store(zId)
-            self.toggleMfa(zId, .off)
+            let updatedZid = self.zidStore.update(zId, [.Mfa])
+            self.toggleMfa(updatedZid, .off)
         }
     }
     
@@ -650,7 +650,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
         
         if let indx = representedObject as? Int, zids.count > 0 {
-            let zId = zids[indx]
+            var zId = zids[indx]
             guard zId.isEnabled else {
                 mfaSwitch.state = mfaSwitch.state == .on ? .off : .on
                 dialogAlert("Identity must be Enabled to change MFA state")
@@ -664,26 +664,26 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         guard zErr == nil else {
                             self.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
                             self.toggleMfa(zId, .off)
-                            _ = self.zidStore.store(zId)
                             return
                         }
                         guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage,
                             let mfaEnrollment = enrollResp.mfaEnrollment else {
                             self.dialogAlert("IPC Error", "Unable to parse enrollment response message")
                             self.toggleMfa(zId, .off)
-                            _ = self.zidStore.store(zId)
                             return
                         }
                         
                         zId.mfaEnabled = true
                         zId.mfaPending = true
                         zId.mfaVerified = mfaEnrollment.isVerified
-                        _ = self.zidStore.store(zId)
+                        zId = self.zidStore.update(zId, [.Mfa])
+                        self.zids[indx] = zId
                         self.updateServiceUI(zId:zId)
                         
                         if !zId.isMfaVerified {
                             self.mfaVerify(zId, mfaEnrollment)
                         }
+                        
                     }
                 }
             } else {
@@ -720,7 +720,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             } else {
                                 zLog.info("MFA removed for \(zId.name):\(zId.id)")
                                 zId.mfaEnabled = false
-                                _ = self.zidStore.store(zId)
+                                zId = self.zidStore.update(zId, [.Mfa])
+                                self.zids[indx] = zId
                                 self.updateServiceUI(zId:zId)
                             }
                         }
@@ -732,7 +733,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
-    func doMfaAuth(_ zid:ZitiIdentity) {
+    func doMfaAuth(_ zid: ZitiIdentity) {
         if let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)", text: "Enter your authentication code") {
             let msg = IpcMfaAuthQueryResponseMessage(zid.id, code)
             self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
@@ -755,8 +756,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     // Success!
                     zid.lastMfaAuth = Date()
                     zid.mfaPending = false
-                    _ = self.zidStore.store(zid)
-                    self.updateServiceUI(zId:zid)
+                    let updatedZid = self.zidStore.update(zid, [.Mfa])
+                    self.updateServiceUI(zId:updatedZid)
                 }
             }
         }
@@ -832,7 +833,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func onEnrollButton(_ sender: Any) {
         guard let indx = representedObject as? Int else { return }
-        let zid = zids[indx]
+        var zid = zids[indx]
         enrollingIds.append(zid)
         updateServiceUI(zId: zid)
         
@@ -866,7 +867,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                                         
                     zid.enabled = true
                     zid.enrolled = true
-                    _ = self.zidStore.store(zid)
+                    zid = self.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
+                    self.zids[indx] = zid
                     self.updateServiceUI(zId:zid)
                     self.tunnelMgr.restartTunnel()
                 }

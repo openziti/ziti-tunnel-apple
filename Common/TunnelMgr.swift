@@ -41,7 +41,7 @@ class TunnelMgr: NSObject {
                 if zid.isEnabled {
                     zid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
                 }
-                _ = zidStore.store(zid)
+                _ = zidStore.update(zid, [.EdgeStatus])
             }
             tunnelStatusDidChange(Notification(name: NSNotification.Name.NEVPNStatusDidChange))
         }

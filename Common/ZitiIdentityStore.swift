@@ -24,6 +24,18 @@ protocol ZitiIdentityStoreDelegate: AnyObject {
 
 class ZitiIdentityStore : NSObject, NSFilePresenter {
     
+    enum UpdateOptions {
+        case Replace
+        case Enabled
+        case Enrolled
+        case EdgeStatus
+        case ControllerVersion
+        case CZitiIdentity
+        case Mfa
+        case Services
+        case AppexNotifications
+    }
+    
     var presentedItemURL:URL? = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)
     lazy var presentedItemOperationQueue = OperationQueue.main
     var haveFilePresenter = false
@@ -83,7 +95,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         let url = presentedItemURL.appendingPathComponent("\(idString).zid", isDirectory:false)
         var zErr:ZitiError?
         var zid:ZitiIdentity?
-        fc.coordinate(readingItemAt:url, options:.withoutChanges, error:nil) { url in
+        fc.coordinate(readingItemAt:url, options:[], error:nil) { url in
             do {
                 let data = try Data.init(contentsOf: url)
                 let jsonDecoder = JSONDecoder()
@@ -117,6 +129,77 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
             }
         }
         return zErr
+    }
+    
+    func update(_ zid:ZitiIdentity, _ options:[UpdateOptions]) -> ZitiIdentity {
+        guard let presentedItemURL = self.presentedItemURL else {
+            zLog.wtf("Invalid container URL")
+            return zid
+        }
+        
+        // short circuit Replace option
+        if options.contains(.Replace) {
+            if let zErr = store(zid) {
+                zLog.error("Error replacing identity \(zid.name):\(zid.id): \(zErr.localizedDescription)")
+            }
+            return zid
+        }
+        
+        let fc = NSFileCoordinator()
+        let url = presentedItemURL.appendingPathComponent("\(zid.id).zid", isDirectory:false)
+        var zidOnDisk:ZitiIdentity?
+        fc.coordinate(readingItemAt: url, writingItemAt: url, error: nil) { readURL, writeURL in
+            // read from disk
+            do {
+                let data = try Data.init(contentsOf: readURL)
+                let jsonDecoder = JSONDecoder()
+                zidOnDisk = try jsonDecoder.decode(ZitiIdentity.self, from: data)
+            } catch {
+                zLog.error("Unable to load zid \(zid.name):\(zid.id) - \(error.localizedDescription)")
+                zidOnDisk = zid
+            }
+            
+            // update per options
+            if options.contains(.Enabled) {
+                zidOnDisk?.enabled = zid.enabled
+            }
+            if options.contains(.Enrolled) {
+                zidOnDisk?.enrolled = zid.enrolled
+            }
+            if options.contains(.EdgeStatus) {
+                zidOnDisk?.edgeStatus = zid.edgeStatus
+            }
+            if options.contains(.ControllerVersion) {
+                zidOnDisk?.controllerVersion = zid.controllerVersion
+            }
+            if options.contains(.CZitiIdentity) {
+                zidOnDisk?.czid = zid.czid
+            }
+            if options.contains(.AppexNotifications) {
+                zidOnDisk?.appexNotifications = zid.appexNotifications
+            }
+            if options.contains(.Mfa) {
+                zidOnDisk?.mfaEnabled = zid.mfaEnabled
+                zidOnDisk?.mfaPending = zid.mfaPending
+                zidOnDisk?.mfaVerified = zid.mfaVerified
+                zidOnDisk?.lastMfaAuth = zid.lastMfaAuth
+            }
+            if options.contains(.Services) {
+                zidOnDisk?.services = zid.services
+            }
+            
+            // store to disk
+            autoreleasepool {
+                do {
+                    let jsonEncoder = JSONEncoder()
+                    let data = try jsonEncoder.encode(zidOnDisk)
+                    try data.write(to: writeURL, options: .atomic)
+                } catch {
+                    zLog.error("Unable to store zid \(zid.name):\(zid.id) - \(error.localizedDescription)")
+                }
+            }
+        }
+        return zidOnDisk ?? zid
     }
     
     func storeJWT(_ zId:ZitiIdentity, _ jwtOrig:URL) -> ZitiError? {

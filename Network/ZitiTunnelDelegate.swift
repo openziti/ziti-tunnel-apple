@@ -99,7 +99,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         guard error == nil else {
             zLog.error("Unable to init \(tzid.name):\(tzid.id), err: \(error!.localizedDescription)")
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.EdgeStatus])
             return
         }
         allZitis.append(ziti)
@@ -210,7 +210,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             
             // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
             //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.Mfa, .EdgeStatus, .ControllerVersion])
         }
     }
     
@@ -229,18 +229,17 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 userNotifications.post(.Info, "Controller: \(ZitiIdentity.ConnectivityStatus.Available.rawValue)",
                                        "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
             }
-        } else {
+        } else if event.code == Ziti.ZITI_CONTROLLER_UNAVAILABLE {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
             
             // Only raise notifications if not shutting down to reduce noise
             if !tunnelShuttingDown {
-                let subtitle = event.code == Ziti.ZITI_CONTROLLER_UNAVAILABLE ?
-                "Controller: \(ZitiIdentity.ConnectivityStatus.Unavailable.rawValue)"
-                : event.status
-                userNotifications.post(.Error, subtitle, "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
+                userNotifications.post(.Error, "Controller: \(ZitiIdentity.ConnectivityStatus.Unavailable.rawValue)", "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
             }
+        } else {
+            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
         }
-        _ = zidStore.store(tzid)
+        _ = zidStore.update(tzid, [.ControllerVersion, .CZitiIdentity, .EdgeStatus])
     }
     
     private func canDial(_ eSvc:CZiti.ZitiService) -> Bool {
@@ -339,13 +338,13 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         if tzid.allServicePostureChecksPassing() && !tzid.needsRestart() {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
         }
-        _ = zidStore.store(tzid)
+        _ = zidStore.update(tzid, [.Services, .EdgeStatus, .Mfa, .ControllerVersion])
     }
     
     private func handleApiEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelApiEvent) {
         zLog.info("Saving zid file, newControllerAddress=\(event.newControllerAddress).")
         tzid.czid?.ztAPI = event.newControllerAddress
-        _ = zidStore.store(tzid)
+        _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
     }
     
     func dumpZitis() -> String {
@@ -478,7 +477,7 @@ extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
                 notification.request.content.subtitle,
                 notification.request.content.body,
                 actions))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.AppexNotifications])
         } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
             tzid.addAppexNotification(IpcAppexNotificationMessage(nil,
                 notification.request.content.categoryIdentifier,
@@ -486,7 +485,7 @@ extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
                 notification.request.content.subtitle,
                 notification.request.content.body,
                 actions))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.AppexNotifications])
         }
         completionHandler([]) // [.list, .sound])
     }
@@ -499,11 +498,11 @@ extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
         if let zid = response.notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
             tzid.addAppexNotification(IpcAppexNotificationActionMessage(
                 zid, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.AppexNotifications])
         } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
             tzid.addAppexNotification(IpcAppexNotificationActionMessage (
                 nil, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.AppexNotifications])
         }
         completionHandler()
     }

@@ -53,7 +53,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     func onEnabledValueChanged(_ enabled:Bool) {
         if let zid = self.zid {
             zid.enabled = enabled
-            _ = tvc?.zidStore.store(zid)
+            self.zid = tvc?.zidStore.update(zid, [.Enabled])
             tableView.reloadData()
             tvc?.tunnelMgr.restartTunnel()
             tvc?.tableView.reloadData()
@@ -143,7 +143,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     
                     zid.enabled = true
                     zid.enrolled = true
-                    _ = self.tvc?.zidStore.store(zid)
+                    self.zid = self.tvc?.zidStore.update(zid, [.Enabled, .Enabled, .CZitiIdentity])
                     self.tableView.reloadData()
                     self.tvc?.tableView.reloadData()
                     self.tvc?.tunnelMgr.restartTunnel()
