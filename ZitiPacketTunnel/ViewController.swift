@@ -282,8 +282,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         // listen for removedId
         NotificationCenter.default.addObserver(forName: .onRemovedId, object: nil, queue: OperationQueue.main) { [self] notification in
-            guard let id = notification.userInfo?["id"] as? Int else {
-                zLog.error("Unable to retrieve identityfrom event notification")
+            guard let id = notification.userInfo?["id"] as? String else {
+                zLog.error("Unable to retrieve identityf rom event notification")
                 return
             }
             
