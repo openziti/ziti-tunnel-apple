@@ -683,7 +683,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         if !zId.isMfaVerified {
                             self.mfaVerify(zId, mfaEnrollment)
                         }
-                        
                     }
                 }
             } else {
