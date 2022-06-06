@@ -157,6 +157,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
             } catch {
                 zLog.error("Unable to load zid \(zid.name):\(zid.id) - \(error.localizedDescription)")
                 zidOnDisk = zid
+                return
             }
             
             // update per options
