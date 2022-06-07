@@ -426,12 +426,16 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                     if let url = logger.currLog(forTag: Logger.TUN_TAG), let data = try? Data(contentsOf: url) {
                         mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
                         let prev = url.appendingPathExtension("1")
-                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                        if let prevData = try? Data(contentsOf: prev) {
+                            mail.addAttachmentData(prevData, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                        }
                     }
                     if let url = logger.currLog(forTag: Logger.APP_TAG), let data = try? Data(contentsOf: url) {
                         mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
                         let prev = url.appendingPathExtension("1")
-                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                        if let prevData = try? Data(contentsOf: prev) {
+                            mail.addAttachmentData(prevData, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                        }
                     }
                 }
                 self.present(mail, animated: true)
