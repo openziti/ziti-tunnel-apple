@@ -35,28 +35,30 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     var excludedRoutes:[NEIPv4Route] = []
     var tunnelShuttingDown = false
     
-    private var _identitesLoaded = false // when true, restart is required to update routes for services intercepted by IP
+    private var _identitiesLoaded = false // when true, restart is required to update routes for services intercepted by IP
     var identitiesLoaded:Bool {
         set {
-            _identitesLoaded = newValue
+            _identitiesLoaded = newValue
             
             // notifiy Ziti on unlock
             #if os(macOS)
-                DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
-                    zLog.debug("---screen unlock----")
-                    self.allZitis.forEach { $0.endpointStateChange(false, true) }
-                }
-            
-            
-                // set timer to check pending MFA posture timeouts
-                allZitis.first?.startTimer(
-                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
-                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
-                    self.onMfaPostureTimer()
+                if _identitiesLoaded {
+                    DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
+                        zLog.debug("---screen unlock----")
+                        self.allZitis.forEach { $0.endpointStateChange(false, true) }
+                    }
+                
+                
+                    // set timer to check pending MFA posture timeouts
+                    allZitis.first?.startTimer(
+                        ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
+                        ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
+                        self.onMfaPostureTimer()
+                    }
                 }
             #endif
         }
-        get { return _identitesLoaded }
+        get { return _identitiesLoaded }
     }
     
     init(_ ptp:PacketTunnelProvider) {
