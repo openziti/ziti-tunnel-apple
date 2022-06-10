@@ -35,31 +35,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     var excludedRoutes:[NEIPv4Route] = []
     var tunnelShuttingDown = false
     
-    private var _identitiesLoaded = false // when true, restart is required to update routes for services intercepted by IP
-    var identitiesLoaded:Bool {
-        set {
-            _identitiesLoaded = newValue
-            
-            // notifiy Ziti on unlock
-            #if os(macOS)
-                if _identitiesLoaded {
-                    DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
-                        zLog.debug("---screen unlock----")
-                        self.allZitis.forEach { $0.endpointStateChange(false, true) }
-                    }
-                
-                
-                    // set timer to check pending MFA posture timeouts
-                    allZitis.first?.startTimer(
-                        ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
-                        ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
-                        self.onMfaPostureTimer()
-                    }
-                }
-            #endif
-        }
-        get { return _identitiesLoaded }
-    }
+    private var identitiesLoaded:Bool = false // when true, restart is required to update routes for services intercepted by IP
     
     init(_ ptp:PacketTunnelProvider) {
         super.init()
@@ -99,12 +75,34 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             return
         }
         guard error == nil else {
-            zLog.error("Unable to init \(tzid.name):\(tzid.id), err: \(error!.localizedDescription)")
+            let errStr = "Unable to init \(tzid.name):\(tzid.id), err: \(error!.localizedDescription)"
+            zLog.error(errStr)
+            userNotifications.post(.Info, "Initialization Failure", errStr, tzid)
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
             _ = zidStore.update(tzid, [.EdgeStatus])
             return
         }
         allZitis.append(ziti)
+    }
+    
+    func onIdentitiesLoaded() {
+        identitiesLoaded = true
+        
+        #if os(macOS)
+            // notifiy Ziti on unlock
+            DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
+                zLog.debug("---screen unlock----")
+                self.allZitis.forEach { $0.endpointStateChange(false, true) }
+            }
+        
+        
+            // set timer to check pending MFA posture timeouts
+            allZitis.first?.startTimer(
+                ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
+                ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
+                self.onMfaPostureTimer()
+            }
+        #endif
     }
     
     func shuttingDown() {
