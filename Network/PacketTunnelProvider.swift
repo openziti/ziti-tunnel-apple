@@ -275,7 +275,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // TODO: on iOS, we find the first resolver, but setting any fallbackDNS is causing issues
         #if os(macOS)        
             if upstreamDns == nil {
-                let excludedRoute = NEIPv4Route(destinationAddress: providerConfig.ipAddress, subnetMask: providerConfig.subnetMask)
+                var excludedRoute:NEIPv4Route?
+                if let ipDNS = providerConfig.dnsAddresses.first {
+                    excludedRoute = NEIPv4Route(destinationAddress: ipDNS, subnetMask: "255.255.255.255")
+                }
                 let firstResolver = DNSUtils.getFirstResolver(excludedRoute)
                 if let fr = firstResolver {
                     zLog.warn("No fallback DNS provided. Setting to first resolver: \(fr)")
