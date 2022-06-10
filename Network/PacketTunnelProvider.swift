@@ -237,7 +237,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override func wake() {
         zLog.debug("---Wake---")
-        zitiTunnelDelegate?.allZitis.forEach { $0.endpointStateChange(true, false) }
+        zitiTunnelDelegate?.allZitis.forEach { z in
+            z.perform {
+                z.endpointStateChange(true, false)
+            }
+        }
     }
     
     func readPacketFlow() {
