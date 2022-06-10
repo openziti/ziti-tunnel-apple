@@ -281,14 +281,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
                 let firstResolver = DNSUtils.getFirstResolver(excludedRoute)
                 if let fr = firstResolver {
-                    zLog.warn("No fallback DNS provided. Setting to first resolver: \(fr)")
+                    zLog.warn("No fallback DNS configured. Setting to first resolver: \(fr)")
                 }
                 upstreamDns = firstResolver
             }
             
             if upstreamDns == nil {
-                zLog.warn("No fallback DNS available. Defaulting to 1.1.1.1")
                 upstreamDns = "1.1.1.1"
+                zLog.warn("No fallback DNS available. Defaulting to \(upstreamDns!)")
             }
         #endif
         
