@@ -135,7 +135,7 @@ class DNSUtils : NSObject {
     // before the tunnel is connected, but not helpful after connected since the first resolver is now us.  So,
     // when network monitor triggers, we're gonna parse the results of `scutil --dns` to find the resolver to use for
     // fallback DNS...
-    class func getFirstResolver(_ excludedRoute:NEIPv4Route) -> String? {
+    class func getFirstResolver(_ excludedRoute:NEIPv4Route?=nil) -> String? {
         var firstResolver:String?
 #if os(macOS)
         let task = Process()
@@ -161,13 +161,19 @@ class DNSUtils : NSObject {
                     let comps = line.components(separatedBy: ":")
                     if comps.count == 2 {
                         let resolver = comps[1].trimmingCharacters(in: .whitespaces)
-                        let net = IPUtils.ipV4AddressStringToData(excludedRoute.destinationAddress)
-                        let mask = IPUtils.ipV4AddressStringToData(excludedRoute.destinationSubnetMask)
-                        let dest = IPUtils.ipV4AddressStringToData(resolver)
-                        if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
+                        if let excludedRoute = excludedRoute {
+                            let net = IPUtils.ipV4AddressStringToData(excludedRoute.destinationAddress)
+                            let mask = IPUtils.ipV4AddressStringToData(excludedRoute.destinationSubnetMask)
+                            let dest = IPUtils.ipV4AddressStringToData(resolver)
+                            if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
+                                firstResolver = resolver
+                                break
+                            }
+                        } else {
                             firstResolver = resolver
                             break
                         }
+                        
                     }
                 }
             }
