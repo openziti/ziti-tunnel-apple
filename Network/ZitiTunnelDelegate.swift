@@ -92,7 +92,11 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             // notifiy Ziti on unlock
             DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
                 zLog.debug("---screen unlock----")
-                self.allZitis.forEach { $0.endpointStateChange(false, true) }
+                self.allZitis.forEach { z in
+                    z.perform {
+                        z.endpointStateChange(false, true)
+                    }
+                }
             }
         
         
