@@ -143,7 +143,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     
                     zid.enabled = true
                     zid.enrolled = true
-                    self.zid = self.tvc?.zidStore.update(zid, [.Enabled, .Enabled, .CZitiIdentity])
+                    self.zid = self.tvc?.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
                     self.tableView.reloadData()
                     self.tvc?.tableView.reloadData()
                     self.tvc?.tunnelMgr.restartTunnel()
