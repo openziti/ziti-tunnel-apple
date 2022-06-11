@@ -161,19 +161,20 @@ class DNSUtils : NSObject {
                     let comps = line.components(separatedBy: ":")
                     if comps.count == 2 {
                         let resolver = comps[1].trimmingCharacters(in: .whitespaces)
-                        if let excludedRoute = excludedRoute {
-                            let net = IPUtils.ipV4AddressStringToData(excludedRoute.destinationAddress)
-                            let mask = IPUtils.ipV4AddressStringToData(excludedRoute.destinationSubnetMask)
-                            let dest = IPUtils.ipV4AddressStringToData(resolver)
-                            if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
+                        if IPUtils.isValidIpV4Address(resolver) {
+                            if let excludedRoute = excludedRoute {
+                                let net = IPUtils.ipV4AddressStringToData(excludedRoute.destinationAddress)
+                                let mask = IPUtils.ipV4AddressStringToData(excludedRoute.destinationSubnetMask)
+                                let dest = IPUtils.ipV4AddressStringToData(resolver)
+                                if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
+                                    firstResolver = resolver
+                                    break
+                                }
+                            } else {
                                 firstResolver = resolver
                                 break
                             }
-                        } else {
-                            firstResolver = resolver
-                            break
                         }
-                        
                     }
                 }
             }
