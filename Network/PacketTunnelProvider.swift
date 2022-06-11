@@ -97,7 +97,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         zitiTunnel = ZitiTunnel(zitiTunnelDelegate, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS)
         
         if let upstreamDns = getUpstreamDns() {
-            self.setUpstreamDns(upstreamDns)
+            if zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
+                zLog.warn("Unable to set upstream D?NS to \(upstreamDns)")
+            }
         }
         
         // read in the .zid files
@@ -299,17 +301,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         return upstreamDns
     }
     
-    func setUpstreamDns(_ upstreamDns:String) {
-        // This rots.  After tunnels starts, when network monitor detects newly satisfied status occasionally the initial
-        // uttempt to set this address for upstream DNS fails.  So we're gonna retry it...
+    func setUpstreamDns(_ upstreamDns:String, _ attemptNum:Int=1) {
+        // This rots.  After tunnels starts, when network monitor detects newly satisfied status the initial
+        // attempt to set this address for upstream DNS fails. So we're gonna retry it...
         let nAttempts = 3
         let waitInterval = 1.0 / Double(nAttempts)
-        for i in 0..<nAttempts {
-            if self.zitiTunnel?.setUpstreamDns(upstreamDns) == 0 {
-                break
-            } else {
-                zLog.error("Attempt \(i+1) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
-                Thread.sleep(forTimeInterval: waitInterval)
+        if attemptNum <= nAttempts {
+            zitiTunnel?.perform {
+                if self.zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
+                    zLog.error("Attempt \(attemptNum) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
+                    DispatchQueue.global().async {
+                        Thread.sleep(forTimeInterval: waitInterval)
+                        self.setUpstreamDns(upstreamDns, attemptNum + 1)
+                    }
+                }
             }
         }
     }
