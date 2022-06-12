@@ -367,7 +367,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
         if let tcvc = segue.destinationController as? TunnelConfigViewController {
-            tcvc.preferredContentSize = CGSize(width: 440, height: 340)
+            tcvc.preferredContentSize = CGSize(width: 575, height: 340)
             tcvc.vc = self
         } else if let svc = segue.destinationController as? ServicesViewController {
             servicesViewController = svc
