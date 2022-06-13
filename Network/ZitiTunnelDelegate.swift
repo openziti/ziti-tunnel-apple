@@ -29,7 +29,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     
     let zidStore = ZitiIdentityStore()
     var tzids:[ZitiIdentity]?
-    var allZitis:[Ziti] = [] // for ziti.dump...
+    var allZitis:[Ziti] = []
     var dnsEntries = DNSUtils.DnsEntries()
     var interceptedRoutes:[NEIPv4Route] = []
     var excludedRoutes:[NEIPv4Route] = []
@@ -92,27 +92,26 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             // notifiy Ziti on unlock
             DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
                 zLog.debug("---screen unlock----")
-                self.allZitis.forEach { z in
-                    z.perform {
+                self.ptp?.zitiTunnel?.perform {
+                    self.allZitis.forEach { z in
                         z.endpointStateChange(false, true)
                     }
                 }
             }
         
-        
             // set timer to check pending MFA posture timeouts
-            allZitis.first?.startTimer(
-                ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
-                ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
-                self.onMfaPostureTimer()
+            self.ptp?.zitiTunnel?.perform {
+                self.allZitis.first?.startTimer(
+                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
+                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
+                    self.onMfaPostureTimer()
+                }
             }
         #endif
     }
     
     func shuttingDown() {
-        if let opsZiti = allZitis.first {
-            opsZiti.perform { self.tunnelShuttingDown = true }
-        }
+        self.ptp?.zitiTunnel?.perform { self.tunnelShuttingDown = true }
     }
     
     func addRoute(_ destinationAddress: String) -> Int32 {
@@ -356,10 +355,9 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         let cond = NSCondition()
         var count = allZitis.count
         
-        allZitis.forEach { z in
-            z.perform {
+        ptp?.zitiTunnel?.perform{
+            self.allZitis.forEach { z in
                 z.dump { str += $0; return 0 }
-
                 cond.lock()
                 count -= 1
                 cond.signal()

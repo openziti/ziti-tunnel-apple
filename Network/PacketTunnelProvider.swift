@@ -239,8 +239,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override func wake() {
         zLog.debug("---Wake---")
-        zitiTunnelDelegate?.allZitis.forEach { z in
-            z.perform {
+        zitiTunnel?.perform {
+            self.zitiTunnelDelegate?.allZitis.forEach { z in
                 z.endpointStateChange(true, false)
             }
         }
@@ -325,7 +325,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             
             if path.status == .satisfied {
                 if let upstreamDns = self.getUpstreamDns() {
-                    self.zitiTunnelDelegate?.allZitis.first?.perform {
+                    self.zitiTunnel?.perform {
                         zLog.info("Setting fallback DNS to \(upstreamDns)")
                         self.setUpstreamDns(upstreamDns)
                     }
