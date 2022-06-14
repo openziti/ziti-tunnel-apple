@@ -29,35 +29,13 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     
     let zidStore = ZitiIdentityStore()
     var tzids:[ZitiIdentity]?
-    var allZitis:[Ziti] = [] // for ziti.dump...
+    var allZitis:[Ziti] = []
     var dnsEntries = DNSUtils.DnsEntries()
     var interceptedRoutes:[NEIPv4Route] = []
     var excludedRoutes:[NEIPv4Route] = []
+    var tunnelShuttingDown = false
     
-    private var _identitesLoaded = false // when true, restart is required to update routes for services intercepted by IP
-    var identitiesLoaded:Bool {
-        set {
-            _identitesLoaded = newValue
-            
-            // notifiy Ziti on unlock
-            #if os(macOS)
-                DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
-                    zLog.debug("---screen unlock----")
-                    self.allZitis.forEach { $0.endpointStateChange(false, true) }
-                }
-            
-            
-                // set timer to check pending MFA posture timeouts
-                allZitis.first?.startTimer(
-                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
-                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
-                    self.onMfaPostureTimer()
-                }
-            #endif
-        }
-        get { return _identitesLoaded }
-    }
-    
+    private var identitiesLoaded:Bool = false // when true, restart is required to update routes for services intercepted by IP
     
     init(_ ptp:PacketTunnelProvider) {
         super.init()
@@ -97,12 +75,43 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             return
         }
         guard error == nil else {
-            zLog.error("Unable to init \(tzid.name):\(tzid.id), err: \(error!.localizedDescription)")
+            let errStr = "Unable to init \(tzid.name):\(tzid.id), err: \(error!.localizedDescription)"
+            zLog.error(errStr)
+            userNotifications.post(.Info, "Initialization Failure", errStr, tzid)
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.EdgeStatus])
             return
         }
         allZitis.append(ziti)
+    }
+    
+    func onIdentitiesLoaded() {
+        identitiesLoaded = true
+        
+        #if os(macOS)
+            // notifiy Ziti on unlock
+            DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
+                zLog.debug("---screen unlock----")
+                self.ptp?.zitiTunnel?.perform {
+                    self.allZitis.forEach { z in
+                        z.endpointStateChange(false, true)
+                    }
+                }
+            }
+        
+            // set timer to check pending MFA posture timeouts
+            self.ptp?.zitiTunnel?.perform {
+                self.allZitis.first?.startTimer(
+                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
+                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
+                    self.onMfaPostureTimer()
+                }
+            }
+        #endif
+    }
+    
+    func shuttingDown() {
+        self.ptp?.zitiTunnel?.perform { self.tunnelShuttingDown = true }
     }
     
     func addRoute(_ destinationAddress: String) -> Int32 {
@@ -204,7 +213,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             
             // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
             //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.Mfa, .EdgeStatus, .ControllerVersion])
         }
     }
     
@@ -215,13 +224,25 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             tzid.controllerVersion = cVersion
         }
         
-        if event.status == "OK" { // hardocded string in TSDK. was Ziti.ZITI_OK {
+        if event.code == Ziti.ZITI_OK {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
+            
+            // Notifiy when controller comes (back) online after inital startup. Don't notify during startup to reduce noise
+            if identitiesLoaded {
+                userNotifications.post(.Info, "Controller: \(ZitiIdentity.ConnectivityStatus.Available.rawValue)",
+                                       "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
+            }
+        } else if event.code == Ziti.ZITI_CONTROLLER_UNAVAILABLE {
+            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+            
+            // Only raise notifications if not shutting down to reduce noise
+            if !tunnelShuttingDown {
+                userNotifications.post(.Error, "Controller: \(ZitiIdentity.ConnectivityStatus.Unavailable.rawValue)", "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
+            }
         } else {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
         }
-        
-        _ = zidStore.store(tzid)
+        _ = zidStore.update(tzid, [.ControllerVersion, .CZitiIdentity, .EdgeStatus])
     }
     
     private func canDial(_ eSvc:CZiti.ZitiService) -> Bool {
@@ -320,13 +341,13 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         if tzid.allServicePostureChecksPassing() && !tzid.needsRestart() {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
         }
-        _ = zidStore.store(tzid)
+        _ = zidStore.update(tzid, [.Services, .EdgeStatus, .Mfa, .ControllerVersion])
     }
     
     private func handleApiEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelApiEvent) {
         zLog.info("Saving zid file, newControllerAddress=\(event.newControllerAddress).")
         tzid.czid?.ztAPI = event.newControllerAddress
-        _ = zidStore.store(tzid)
+        _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
     }
     
     func dumpZitis() -> String {
@@ -334,10 +355,9 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         let cond = NSCondition()
         var count = allZitis.count
         
-        allZitis.forEach { z in
-            z.perform {
+        ptp?.zitiTunnel?.perform{
+            self.allZitis.forEach { z in
                 z.dump { str += $0; return 0 }
-
                 cond.lock()
                 count -= 1
                 cond.signal()
@@ -441,11 +461,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
 }
 
 extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
-    
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
-        // On macOS, method is not reliably called. When it is, results are ignored (notification is not displayed)
-        zLog.error("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
+        // This is only called on macOS.  On iOS, the app's AppDelegate gets notified and works as expected.  Since on macOS the call shows up here
+        // in the appex, we'll send a message to the app so the app can display it to the user.  Note that this method won't be called if the user
+        // has disabled notifications (which is what we want/expect).
+        zLog.debug("willPresent: \(notification.request.content.subtitle), \(notification.request.content.body)")
         
         var actions:[String] = []
         if let category = UserNotifications.Category(rawValue: notification.request.content.categoryIdentifier) {
@@ -458,7 +479,7 @@ extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
                 notification.request.content.subtitle,
                 notification.request.content.body,
                 actions))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.AppexNotifications])
         } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
             tzid.addAppexNotification(IpcAppexNotificationMessage(nil,
                 notification.request.content.categoryIdentifier,
@@ -466,7 +487,7 @@ extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
                 notification.request.content.subtitle,
                 notification.request.content.body,
                 actions))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.AppexNotifications])
         }
         completionHandler([]) // [.list, .sound])
     }
@@ -479,11 +500,11 @@ extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
         if let zid = response.notification.request.content.userInfo["zid"] as? String, let tzid = zidToTzid(zid) {
             tzid.addAppexNotification(IpcAppexNotificationActionMessage(
                 zid, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.AppexNotifications])
         } else if let zid = tzids?.first?.id, let tzid = zidToTzid(zid)   {
             tzid.addAppexNotification(IpcAppexNotificationActionMessage (
                 nil, response.notification.request.content.categoryIdentifier, response.actionIdentifier))
-            _ = zidStore.store(tzid)
+            _ = zidStore.update(tzid, [.AppexNotifications])
         }
         completionHandler()
     }

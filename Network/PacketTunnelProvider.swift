@@ -39,15 +39,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         CZiti.Ziti.setAppInfo(Bundle.main.bundleIdentifier ?? "Ziti", Version.str)
         
-        netMon.pathUpdateHandler = { path in
-            var ifaceStr = ""
-            for i in path.availableInterfaces {
-                ifaceStr += " \n     \(i.index): name:\(i.name), type:\(i.type)"
-            }
-            zLog.info("Network Path Update:\nStatus:\(path.status), Expensive:\(path.isExpensive), Cellular:\(path.usesInterfaceType(.cellular))\n   Interfaces:\(ifaceStr)")
-        }
-        netMon.start(queue: DispatchQueue.global())
-        
         zitiTunnelDelegate = ZitiTunnelDelegate(self)
         ipcServer = IpcAppexServer(self)
     }
@@ -102,32 +93,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
                         
         // setup ZitiTunnel
-        let ipDNS = self.providerConfig.dnsAddresses.first ?? ""
-        var upstreamDns:String?
-        if providerConfig.fallbackDnsEnabled {
-            upstreamDns = providerConfig.fallbackDns
-        }
+        let ipDNS = providerConfig.dnsAddresses.first ?? ""
+        zitiTunnel = ZitiTunnel(zitiTunnelDelegate, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS)
         
-        // Current Ziti Tunneler SDK returns REFUSED for non-Ziti DNS requests, whcih there will be a ton of
-        // when not intercepting by matchDomains.  REFUSED no longer works as expected on macOS (it used to
-        // behave like most Linux systems and automatically resolver#2 to be queried, but now it causes the
-        // query to fail), so we have to have a fallback.  Try to determing current first resolver
-        // and use if for fallback. Otherwise pick a reasonable default.
-        // TODO: on iOS, we find the first resolver, but setting any fallbackDNS is causing issues
-        #if os(macOS)
-        if upstreamDns == nil {
-            let firstResolver = DNSUtils.getFirstResolver()
-            zLog.warn("No fallback DNS provided. Setting to first resolver: \(firstResolver as Any)")
-            upstreamDns = firstResolver
+        if let upstreamDns = getUpstreamDns() {
+            if zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
+                zLog.warn("Unable to set upstream D?NS to \(upstreamDns)")
+            }
         }
-        
-        if upstreamDns == nil {
-            zLog.warn("No fallback DNS available. Defaulting to 1.1.1.1")
-            upstreamDns = "1.1.1.1"
-        }
-        #endif
-        
-        zitiTunnel = ZitiTunnel(zitiTunnelDelegate, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS, upstreamDns)
         
         // read in the .zid files
         let (zids, zErr) = zitiTunnelDelegate.loadIdentites()
@@ -156,7 +129,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 completionHandler(zErr)
                 return
             }
-            self.zitiTunnelDelegate?.identitiesLoaded = true
+            self.zitiTunnelDelegate?.onIdentitiesLoaded()
+            
+            // watch for interface changes
+            self.startNetworkMonitor()
             
             // identies have loaded, so go ahead and setup the TUN
             let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
@@ -224,6 +200,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+        zitiTunnelDelegate?.shuttingDown()
+        
         let dumpStr = dumpZitis()
         zLog.info(dumpStr)
         
@@ -255,13 +233,17 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func sleep(completionHandler: @escaping () -> Void) {
-        //zLog.debug("---Sleep---")
+        zLog.debug("---Sleep---")
         completionHandler()
     }
     
     override func wake() {
         zLog.debug("---Wake---")
-        zitiTunnelDelegate?.allZitis.forEach { $0.endpointStateChange(true, false) }
+        zitiTunnel?.perform {
+            self.zitiTunnelDelegate?.allZitis.forEach { z in
+                z.endpointStateChange(true, false)
+            }
+        }
     }
     
     func readPacketFlow() {
@@ -283,6 +265,83 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func dumpZitis() -> String {
         return zitiTunnelDelegate?.dumpZitis() ?? ""
+    }
+    
+    func getUpstreamDns() -> String? {
+        var upstreamDns:String?
+        if providerConfig.fallbackDnsEnabled {
+            upstreamDns = providerConfig.fallbackDns
+        }
+        
+        // Current Ziti Tunneler SDK returns REFUSED for non-Ziti DNS requests, whcih there will be a ton of
+        // when not intercepting by matchDomains.  REFUSED no longer works as expected on macOS (it used to
+        // behave like most Linux systems and automatically resolver#2 to be queried, but now it causes the
+        // query to fail), so we have to have a fallback.  Try to determing current first resolver
+        // and use if for fallback. Otherwise pick a reasonable default.
+        // TODO: on iOS, we find the first resolver, but setting any fallbackDNS is causing issues
+        #if os(macOS)        
+            if upstreamDns == nil {
+                var excludedRoute:NEIPv4Route?
+                if let ipDNS = providerConfig.dnsAddresses.first {
+                    excludedRoute = NEIPv4Route(destinationAddress: ipDNS, subnetMask: "255.255.255.255")
+                }
+                let firstResolver = DNSUtils.getFirstResolver(excludedRoute)
+                if let fr = firstResolver {
+                    zLog.warn("No fallback DNS configured. Setting to first resolver: \(fr)")
+                }
+                upstreamDns = firstResolver
+            }
+            
+            if upstreamDns == nil {
+                upstreamDns = "1.1.1.1"
+                zLog.warn("No fallback DNS available. Defaulting to \(upstreamDns!)")
+            }
+        #endif
+        
+        return upstreamDns
+    }
+    
+    func setUpstreamDns(_ upstreamDns:String, _ attemptNum:Int=1) {
+        // This rots.  After tunnels starts, when network monitor detects newly satisfied status the initial
+        // attempt to set this address for upstream DNS fails. So we're gonna retry it...
+        let nAttempts = 3
+        let waitInterval = 1.0 / Double(nAttempts)
+        if attemptNum <= nAttempts {
+            zitiTunnel?.perform {
+                if self.zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
+                    zLog.error("Attempt \(attemptNum) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
+                    DispatchQueue.global().async {
+                        Thread.sleep(forTimeInterval: waitInterval)
+                        self.setUpstreamDns(upstreamDns, attemptNum + 1)
+                    }
+                }
+            }
+        }
+    }
+    
+    func startNetworkMonitor() {
+        netMon.pathUpdateHandler = { path in
+            self.logNetworkPath(path)
+            
+            if path.status == .satisfied {
+                if let upstreamDns = self.getUpstreamDns() {
+                    self.zitiTunnel?.perform {
+                        zLog.info("Setting fallback DNS to \(upstreamDns)")
+                        self.setUpstreamDns(upstreamDns)
+                    }
+                }
+            }
+            //isSatisfied = path.status == .satisfied
+        }
+        netMon.start(queue: DispatchQueue.global())
+    }
+    
+    func logNetworkPath(_ path:Network.NWPath) {
+        var ifaceStr = ""
+        for i in path.availableInterfaces {
+            ifaceStr += " \n     \(i.index): name:\(i.name), type:\(i.type)"
+        }
+        zLog.info("Network Path Update:\nStatus:\(path.status), Expensive:\(path.isExpensive), Cellular:\(path.usesInterfaceType(.cellular)), DNS:\(path.supportsDNS)\n   Interfaces:\(ifaceStr)")
     }
     
     override var debugDescription: String {

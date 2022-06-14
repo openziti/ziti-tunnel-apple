@@ -45,10 +45,10 @@ class OptionsButton: NSButton {
     }
 }
 
-class InAppdNotification: NSView {
+class InAppNotification: NSView {
     var eventHandler:Any?
-    var dismissTimer:Timer?
-    let dismissSecs = 5.0
+    
+    static let edgeOffset = 10.0
     let logoSize = 48.0
     let borderWidth = 10.0
     let spacing = 3.0
@@ -58,12 +58,22 @@ class InAppdNotification: NSView {
     var optionsBtn:NSButton?
     var optionsMenu: NSMenu!
     
-    static var allNotices:[InAppdNotification] = []
-    
-    weak var parent:NSView?
+    var topConstraint:NSLayoutConstraint?
+    var trailingConstraint:NSLayoutConstraint?
+        
+    weak var parent:NotificationsPanel?
     var msg:IpcAppexNotificationMessage?
-
-    func show(_ parent:NSView, _ msg:IpcAppexNotificationMessage) {
+    
+    init(_ parent:NotificationsPanel, _ msg:IpcAppexNotificationMessage) {
+        super.init(frame: NSRect.zero)
+        add(parent, msg)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func add(_ parent:NotificationsPanel, _ msg:IpcAppexNotificationMessage) {
         self.parent = parent
         self.msg = msg
         
@@ -72,7 +82,6 @@ class InAppdNotification: NSView {
         self.layer?.cornerRadius = 17.5
         addShadow(self)
         
-        let edgeOffset = 10.0 + (Double(InAppdNotification.allNotices.count) * 10.0)
         let textWidth = totalWidth - (borderWidth*2) - logoSize
         
         // Close Button
@@ -145,43 +154,23 @@ class InAppdNotification: NSView {
         }
         
         self.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: parent, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: edgeOffset).isActive = true
-        let trailing = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.trailing, relatedBy: NSLayoutConstraint.Relation.equal, toItem: parent, attribute: NSLayoutConstraint.Attribute.trailing, multiplier: 1, constant: (totalWidth + edgeOffset))
-        NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: totalWidth).isActive = true
-        NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: height).isActive = true
-        trailing.isActive = true
+        topConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.top,
+                                           relatedBy: NSLayoutConstraint.Relation.equal, toItem: parent, attribute: NSLayoutConstraint.Attribute.top,
+                                           multiplier: 1, constant: InAppNotification.edgeOffset)
+        trailingConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.trailing,
+                                                relatedBy: NSLayoutConstraint.Relation.equal, toItem: parent, attribute: NSLayoutConstraint.Attribute.trailing,
+                                                multiplier: 1, constant: totalWidth)
+        NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.width,
+                           relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute,
+                           multiplier: 1, constant: totalWidth).isActive = true
+        NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.height,
+                           relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute,
+                           multiplier: 1, constant: height).isActive = true
         
-        // Slide the notication in...
-        DispatchQueue.main.async {
-            NSAnimationContext.runAnimationGroup({ context in
-                context.duration = 0.15
-                var origin = self.frame.origin
-                origin.x -= self.frame.width + edgeOffset
-                self.animator().frame.origin = origin
-            }) {
-                // Handle completion
-                trailing.isActive = false
-                NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.trailing, relatedBy: NSLayoutConstraint.Relation.equal, toItem: parent, attribute: NSLayoutConstraint.Attribute.trailing, multiplier: 1, constant: -(edgeOffset)).isActive = true
-            }
-        }
+        topConstraint?.isActive = true
+        trailingConstraint?.isActive = true
         
-        // Slide notification out if nothing happens for a few secs
-        dismissTimer = Timer.scheduledTimer(withTimeInterval: dismissSecs, repeats: false) { _ in
-            self.dismiss(true)
-        }
-        
-        // Dismiss on mouse click outside of the notification window
-        eventHandler = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseUp]) { [weak self] event in
-            if let pt = self?.window?.mouseLocationOutsideOfEventStream, let theView = self?.window?.contentView?.hitTest(pt) {
-                if (theView as? InAppdNotification == nil) && theView.superview != self {
-                    self?.isHidden = true
-                }
-            } else {
-                self?.isHidden = true
-            }
-            return event
-        }
-        InAppdNotification.allNotices.append(self)
+        layoutSubtreeIfNeeded()
     }
     
     // make hits on any subview (except the close and options buttons) show up here (so we can react to any click...)
@@ -203,34 +192,15 @@ class InAppdNotification: NSView {
     }
      
     // drop all references so can be free'd up
-    func destroy() {
-        self.dismissTimer?.invalidate()
-        self.dismissTimer = nil
-        
+    func remove() {
         if let ev = eventHandler {
             NSEvent.removeMonitor(ev)
         }
-        self.removeFromSuperview()
-        InAppdNotification.allNotices = InAppdNotification.allNotices.filter { $0 != self }
-    }
-    
-    func dismiss(_ animate:Bool) {
-        if animate {
-            NSAnimationContext.runAnimationGroup({ context in
-                context.duration = 0.15
-                var origin = self.frame.origin
-                origin.x += self.frame.width
-                self.animator().frame.origin = origin
-            }) {
-                self.destroy()
-            }
-        } else {
-            self.destroy()
-        }
+        parent?.remove(self)
     }
     
     @objc func onCloseButton() {
-        self.destroy()
+        self.remove()
     }
     
     // Options Menu
@@ -259,25 +229,29 @@ class InAppdNotification: NSView {
              NotificationCenter.default.post(name: .onAppexNotification, object: self,
                                              userInfo: ["ipcMessage":IpcAppexNotificationActionMessage(msg.meta.zid, msg.category ?? "", actionStr)])
          }
-         self.destroy()
+         self.remove()
      }
     
     // Show/hit close button and options menu based on where the mouse is
     override func mouseEntered(with event: NSEvent) {
-        self.dismissTimer?.invalidate()
-        self.dismissTimer = nil
         closeBtn?.isHidden = false
-        optionsBtn?.isHidden = false
+        optionsBtn?.isHidden = msg?.actions?.count ?? 0 == 0
+        parent?.notificationMouseEntered(self)
     }
     
     override func mouseExited(with event: NSEvent) {
-        if dismissTimer == nil {
-            dismissTimer = Timer.scheduledTimer(withTimeInterval: self.dismissSecs, repeats: false) { _ in
-                self.dismiss(true)
-            }
-        }
         closeBtn?.isHidden = true
         optionsBtn?.isHidden = true
+        parent?.notificationMouseExisted(self)
+    }
+    
+    // triggered on any mouse up in the notice view except on close and options menu
+    override func mouseUp(with event: NSEvent) {
+        if let msg = msg {
+            NotificationCenter.default.post(name: .onAppexNotification, object: self,
+                                            userInfo: ["ipcMessage":IpcAppexNotificationActionMessage(msg.meta.zid, msg.category ?? "", "")])
+        }
+        self.remove()
     }
     
     // to pick-up the mouse events from all views inside this notice view
@@ -290,22 +264,5 @@ class InAppdNotification: NSView {
         let options:NSTrackingArea.Options = [.mouseEnteredAndExited, .activeAlways]
         let trackingArea = NSTrackingArea(rect: self.bounds, options: options, owner: self, userInfo: nil)
         self.addTrackingArea(trackingArea)
-    }
-    
-    // triggered on any mouse up in the notice view except on close and options menu
-    override func mouseUp(with event: NSEvent) {
-        // if not in front, bring to front.  Otherwise do the default action.
-        if InAppdNotification.allNotices.count > 1 {
-            let constraints = self.constraints
-            self.removeFromSuperview()
-            constraints.forEach { self.addConstraint($0) }
-            self.parent?.addSubview(self)
-        } else {
-            if let msg = msg {
-                NotificationCenter.default.post(name: .onAppexNotification, object: self,
-                                                userInfo: ["ipcMessage":IpcAppexNotificationActionMessage(msg.meta.zid, msg.category ?? "", "")])
-            }
-            self.destroy()
-        }
     }
 }

@@ -90,30 +90,98 @@ class DNSUtils : NSObject {
         return nil
     }
     
-    class func getFirstResolver() -> String? {
+//    class func getFirstResolver(_ excludedRoute:NEIPv4Route) -> String? {
+//        var firstResolver:String?
+//        var state = __res_9_state()
+//        res_9_ninit(&state)
+//
+//        let maxServers = 20 // NI_MAXSERV
+//        var servers = [res_9_sockaddr_union](repeating: res_9_sockaddr_union(), count: maxServers)
+//        let nServers = Int(res_9_getservers(&state, &servers, Int32(maxServers)))
+//        for i in 0 ..< nServers {
+//            var s = servers[i]
+//
+//            // only IPv4 supported by ziti-tunnel-sdk-c
+//            if s.sin.sin_family != AF_INET {
+//                zLog.info("Skipping non-IPv4 address")
+//                continue
+//            }
+//            if s.sin.sin_len > 0 {
+//                var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+//                let sinLen = socklen_t(s.sin.sin_len)
+//                let _ = withUnsafePointer(to: &s) {
+//                    $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+//                        getnameinfo($0, sinLen, &hostBuffer, socklen_t(hostBuffer.count), nil, 0, NI_NUMERICHOST)
+//                    }
+//                }
+//
+//                let resolver = String(cString: hostBuffer)
+//                let net = IPUtils.ipV4AddressStringToData(excludedRoute.destinationAddress)
+//                let mask = IPUtils.ipV4AddressStringToData(excludedRoute.destinationSubnetMask)
+//                let dest = IPUtils.ipV4AddressStringToData(resolver)
+//                zLog.info("Cheking resolver \(i+1) of \(nServers): \(resolver)")
+//                if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
+//                    firstResolver = resolver
+//                    break
+//                }
+//            }
+//        }
+//        res_9_ndestroy(&state)
+//
+//        return firstResolver
+//    }
+    
+    // The resolv9 code above only returns the nameservers for the first resolver.  That's great for getting the address
+    // before the tunnel is connected, but not helpful after connected since the first resolver is now us.  So,
+    // when network monitor triggers, we're gonna parse the results of `scutil --dns` to find the resolver to use for
+    // fallback DNS...
+    class func getFirstResolver(_ excludedRoute:NEIPv4Route?=nil) -> String? {
         var firstResolver:String?
-        var state = __res_9_state()
-        res_9_ninit(&state)
+#if os(macOS)
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/sbin/scutil")
+        task.arguments = ["--dns"]
         
-        let maxServers = 10
-        var servers = [res_9_sockaddr_union](repeating: res_9_sockaddr_union(), count: maxServers)
-        let nServers = Int(res_9_getservers(&state, &servers, Int32(maxServers)))
-        for i in 0 ..< nServers {
-            var s = servers[i]
-            if s.sin.sin_len > 0 {
-                var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                let sinLen = socklen_t(s.sin.sin_len)
-                let _ = withUnsafePointer(to: &s) {
-                    $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-                        getnameinfo($0, sinLen, &hostBuffer, socklen_t(hostBuffer.count), nil, 0, NI_NUMERICHOST)
+        let outputPipe = Pipe()
+        task.standardOutput = outputPipe
+        
+        do {
+            try task.run()
+            
+            let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(decoding: outputData, as: UTF8.self)
+            let lines = output.split(whereSeparator: \.isNewline)
+            
+            var scoped = false
+            for line in lines {
+                if line == "DNS configuration (for scoped queries)" {
+                    scoped = true
+                }
+                if scoped && line.starts(with: "  nameserver[") {
+                    let comps = line.components(separatedBy: ":")
+                    if comps.count == 2 {
+                        let resolver = comps[1].trimmingCharacters(in: .whitespaces)
+                        if IPUtils.isValidIpV4Address(resolver) {
+                            if let excludedRoute = excludedRoute {
+                                let net = IPUtils.ipV4AddressStringToData(excludedRoute.destinationAddress)
+                                let mask = IPUtils.ipV4AddressStringToData(excludedRoute.destinationSubnetMask)
+                                let dest = IPUtils.ipV4AddressStringToData(resolver)
+                                if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
+                                    firstResolver = resolver
+                                    break
+                                }
+                            } else {
+                                firstResolver = resolver
+                                break
+                            }
+                        }
                     }
                 }
-                firstResolver = String(cString: hostBuffer)
-                break
             }
+        } catch {
+            zLog.error(error.localizedDescription)
         }
-        res_9_ndestroy(&state)
-        
+#endif
         return firstResolver
     }
 }

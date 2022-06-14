@@ -32,27 +32,31 @@ class IpcAppClient : NSObject, ZitiIdentityStoreDelegate {
     }
     
     func onNewOrChangedId(_ zid: ZitiIdentity) {
-        NotificationCenter.default.post(name: .onNewOrChangedId, object: self, userInfo: ["zid":zid])
-        
-        // appexNotifications
-        zid.appexNotifications?.forEach { polyMsg in
-            // filter out old notification IpcMessages since app won't always be running
-            let now = Date().timeIntervalSince1970
-            let msgTime = polyMsg.msg.meta.createdAt.timeIntervalSince1970
-            if (now - msgTime) < TimeInterval(5.0) {
-                NotificationCenter.default.post(name: .onAppexNotification, object: self, userInfo: ["ipcMessage":polyMsg.msg])
-            } else {
-                zLog.warn("Discarding stale message of type \(polyMsg.msg.meta.msgType)")
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .onNewOrChangedId, object: self, userInfo: ["zid":zid])
+            
+            // appexNotifications
+            zid.appexNotifications?.forEach { polyMsg in
+                // filter out old notification IpcMessages since app won't always be running
+                let now = Date().timeIntervalSince1970
+                let msgTime = polyMsg.msg.meta.createdAt.timeIntervalSince1970
+                if (now - msgTime) < TimeInterval(5.0) {
+                    NotificationCenter.default.post(name: .onAppexNotification, object: self, userInfo: ["ipcMessage":polyMsg.msg])
+                } else {
+                    zLog.warn("Discarding stale message of type \(polyMsg.msg.meta.msgType)")
+                }
             }
-        }
-        if zid.appexNotifications != nil {
-            zid.appexNotifications = nil
-            _ = zidStore.store(zid)
+            if zid.appexNotifications != nil {
+                zid.appexNotifications = nil
+                _ = self.zidStore.update(zid, [.AppexNotifications])
+            }
         }
     }
     
     func onRemovedId(_ idString: String) {
-        NotificationCenter.default.post(name: .onRemovedId, object: self, userInfo: ["id":idString])
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .onRemovedId, object: self, userInfo: ["id":idString])
+        }
     }
     
     func sendToAppex(_ msg:IpcMessage, _ cb:IpcResponseCallback?) {

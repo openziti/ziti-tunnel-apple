@@ -178,7 +178,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     
                     zid.enabled = true
                     zid.enrolled = true
-                    _ = zidStore.store(zid)
+                    self.zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
                     self.tableView.reloadData()
                     self.showAlert("Enrolled",
                         "\(zidResp.name ?? (self.url?.lastPathComponent ?? "")) (\(zidResp.id)) successfully enrolled") { _ in

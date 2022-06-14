@@ -55,8 +55,8 @@ class UserNotifications {
             case .Info:    return []
             case .Error:   return []
             case .Posture: return []
-            case .Restart: return [ Action.Restart.action, Action.Open.action ]
-            case .Mfa:     return [ Action.MfaAuth.action, Action.Open.action ]
+            case .Restart: return [ Action.Restart.action ]
+            case .Mfa:     return [ Action.MfaAuth.action ]
             }
         }
         

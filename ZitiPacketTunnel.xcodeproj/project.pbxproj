@@ -13,6 +13,7 @@
 		5A00048E2830724000351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004912832769800351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004932832C3DF00351FE2 /* ServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0004922832C3DF00351FE2 /* ServiceViewController.swift */; };
+		5A00FB9F2849731D00479380 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A00FB9E2849731D00479380 /* MainView.swift */; };
 		5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */; };
 		5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A02AAB9206EBD7E006261C6 /* ViewController.swift */; };
 		5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5A02AABB206EBD7E006261C6 /* Assets.xcassets */; };
@@ -25,6 +26,7 @@
 		5A0D1D2D222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
 		5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
 		5A0D1D2F222B093F00D01F30 /* ZitiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0D1D2B222B093F00D01F30 /* ZitiError.swift */; };
+		5A22383628459247004E7765 /* NotificationsPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A22383528459247004E7765 /* NotificationsPanel.swift */; };
 		5A2985322839DA860056C9A7 /* ZitiTunnelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */; };
 		5A2985332839DA860056C9A7 /* ZitiTunnelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */; };
 		5A298535283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */; };
@@ -93,6 +95,7 @@
 		5A91B4CB2222E19E006C4277 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A94B33B283EF77F00C07599 /* InAppNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33A283EF77F00C07599 /* InAppNotification.swift */; };
+		5A94B3402843D10F00C07599 /* EditableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33F2843D10F00C07599 /* EditableTextField.swift */; };
 		5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
 		5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
 		5AB0FDD6265B2E0700B41D58 /* IpcMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */; };
@@ -218,6 +221,7 @@
 		534E7C9041DB42B11BAB0551 /* Pods-ZitiMobilePacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZitiMobilePacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-ZitiMobilePacketTunnel/Pods-ZitiMobilePacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
 		59ED0D602622178039E7DE15 /* Pods_ios_targets_MobileShare.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios_targets_MobileShare.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A0004922832C3DF00351FE2 /* ServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceViewController.swift; sourceTree = "<group>"; };
+		5A00FB9E2849731D00479380 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Desktop Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5A02AAB9206EBD7E006261C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -231,6 +235,7 @@
 		5A02AAD0206EBDD5006261C6 /* PacketTunnelProvider.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PacketTunnelProvider.entitlements; sourceTree = "<group>"; };
 		5A02AADB206EBE85006261C6 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		5A0D1D2B222B093F00D01F30 /* ZitiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiError.swift; sourceTree = "<group>"; };
+		5A22383528459247004E7765 /* NotificationsPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsPanel.swift; sourceTree = "<group>"; };
 		5A2985312839DA860056C9A7 /* ZitiTunnelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiTunnelDelegate.swift; sourceTree = "<group>"; };
 		5A298534283A93770056C9A7 /* Array+ZitiIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+ZitiIdentity.swift"; sourceTree = "<group>"; };
 		5A2D2FE024AA6CB900D154AA /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
@@ -275,6 +280,7 @@
 		5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+timeAgo.swift"; sourceTree = "<group>"; };
 		5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentityStore.swift; sourceTree = "<group>"; };
 		5A94B33A283EF77F00C07599 /* InAppNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotification.swift; sourceTree = "<group>"; };
+		5A94B33F2843D10F00C07599 /* EditableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableTextField.swift; sourceTree = "<group>"; };
 		5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelMgr.swift; sourceTree = "<group>"; };
 		5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcMessages.swift; sourceTree = "<group>"; };
 		5AB5F9F826ED46D600F198F2 /* IpcAppClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcAppClient.swift; sourceTree = "<group>"; };
@@ -430,17 +436,20 @@
 			isa = PBXGroup;
 			children = (
 				5A76B936226FB9CC00204A46 /* bundle */,
-				5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */,
-				5A6BA264226F6AB400224F09 /* MainMenuBar.swift */,
 				5A02AABB206EBD7E006261C6 /* Assets.xcassets */,
 				5A02AAC0206EBD7E006261C6 /* Info.plist */,
+				5A02AAC1206EBD7E006261C6 /* ZitiPacketTunnel.entitlements */,
 				5A02AABD206EBD7E006261C6 /* Main.storyboard */,
+				5A02AAB7206EBD7E006261C6 /* AppDelegate.swift */,
+				5A6BA264226F6AB400224F09 /* MainMenuBar.swift */,
+				5A00FB9E2849731D00479380 /* MainView.swift */,
+				5A02AAB9206EBD7E006261C6 /* ViewController.swift */,
 				5A379AD0221F937D00051475 /* ServicesViewController.swift */,
 				5A379AC8221C448A00051475 /* TunnelConfigViewController.swift */,
 				5ABF9862260C13EF00AA982F /* SnapshotViewController.swift */,
-				5A02AAB9206EBD7E006261C6 /* ViewController.swift */,
-				5A02AAC1206EBD7E006261C6 /* ZitiPacketTunnel.entitlements */,
+				5A22383528459247004E7765 /* NotificationsPanel.swift */,
 				5A94B33A283EF77F00C07599 /* InAppNotification.swift */,
+				5A94B33F2843D10F00C07599 /* EditableTextField.swift */,
 			);
 			path = ZitiPacketTunnel;
 			sourceTree = "<group>";
@@ -1081,12 +1090,15 @@
 				5A379AD1221F937D00051475 /* ServicesViewController.swift in Sources */,
 				5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */,
 				5ABA5EDA2274D2EB00B2221D /* Logger.swift in Sources */,
+				5A22383628459247004E7765 /* NotificationsPanel.swift in Sources */,
 				5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */,
 				5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */,
 				5AB0FDD6265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5A8702CE2230B24B00314199 /* ZitiService.swift in Sources */,
 				5A34E95E2278F49100E221DD /* Version.swift in Sources */,
+				5A94B3402843D10F00C07599 /* EditableTextField.swift in Sources */,
 				5A2EA2A72097894400437608 /* ProviderConfig.swift in Sources */,
+				5A00FB9F2849731D00479380 /* MainView.swift in Sources */,
 				5A78DEE325631E1000316CE9 /* AppGroup.swift in Sources */,
 				5A0D1D2C222B093F00D01F30 /* ZitiError.swift in Sources */,
 				5A298535283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */,
@@ -1490,7 +1502,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 452;
+				CURRENT_PROJECT_VERSION = 456;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
@@ -1515,7 +1527,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 452;
+				CURRENT_PROJECT_VERSION = 456;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
@@ -1540,7 +1552,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 452;
+				CURRENT_PROJECT_VERSION = 456;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
@@ -1569,7 +1581,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 452;
+				CURRENT_PROJECT_VERSION = 456;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;

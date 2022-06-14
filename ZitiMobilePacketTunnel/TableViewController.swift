@@ -88,8 +88,11 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         return "\(bid)"
     }
     var tunnelMgr = TunnelMgr.shared
-    var zids:[ZitiIdentity] = []
-    var zidStore = ZitiIdentityStore()
+    var zids:[ZitiIdentity] {
+        get { return tunnelMgr.zids }
+        set { tunnelMgr.zids = newValue }
+    }
+    var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     weak var ivc:IdentityViewController?
     let sc = ScannerViewController()
 
@@ -150,8 +153,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         
         // listen for removedId
         NotificationCenter.default.addObserver(forName: .onRemovedId, object: nil, queue: OperationQueue.main) { [self] notification in
-            guard let id = notification.userInfo?["id"] as? Int else {
-                zLog.error("Unable to retrieve identityfrom event notification")
+            guard let id = notification.userInfo?["id"] as? String else {
+                zLog.error("Unable to retrieve identity from event notification")
                 return
             }
             
@@ -423,12 +426,16 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                     if let url = logger.currLog(forTag: Logger.TUN_TAG), let data = try? Data(contentsOf: url) {
                         mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
                         let prev = url.appendingPathExtension("1")
-                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                        if let prevData = try? Data(contentsOf: prev) {
+                            mail.addAttachmentData(prevData, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                        }
                     }
                     if let url = logger.currLog(forTag: Logger.APP_TAG), let data = try? Data(contentsOf: url) {
                         mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
                         let prev = url.appendingPathExtension("1")
-                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                        if let prevData = try? Data(contentsOf: prev) {
+                            mail.addAttachmentData(prevData, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                        }
                     }
                 }
                 self.present(mail, animated: true)

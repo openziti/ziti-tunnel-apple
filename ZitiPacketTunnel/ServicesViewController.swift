@@ -173,7 +173,11 @@ extension ServicesViewController: NSTableViewDelegate {
             
             imageName = "NSStatusNone"
             let tunnelStatus = tunnelMgr?.status ?? .disconnected
-            if tunnelStatus == .connected, let zid = zid, zid.isEnrolled == true, zid.isEnabled == true, let svcStatus = svc.status {
+            let edgeStatus = zid?.edgeStatus?.status ?? .Unavailable
+            
+            if tunnelStatus == .connected, edgeStatus != .Unavailable,
+                let zid = zid, zid.isEnrolled == true, zid.isEnabled == true, let svcStatus = svc.status {
+                
                 switch svcStatus.status {
                 case .Available: imageName = "NSStatusAvailable"
                 case .PartiallyAvailable: imageName = "NSStatusPartiallyAvailable"
@@ -184,6 +188,8 @@ extension ServicesViewController: NSTableViewDelegate {
             
             if tunnelStatus != .connected {
                 tooltip = "Status: Not Connected"
+            } else if edgeStatus == .Unavailable {
+                tooltip = "Controller Status: \(edgeStatus.rawValue)"
             } else if (zid?.mfaEnabled ?? false) && (zid?.mfaPending ?? false) {
                 tooltip = "MFA Pending"
             } else if !svc.postureChecksPassing() {
@@ -191,7 +197,6 @@ extension ServicesViewController: NSTableViewDelegate {
             } else if svc.status?.needsRestart ?? false {
                 tooltip = "Connection reset may be required to access service"
             }
-            
         } else if tableColumn == tableView.tableColumns[1] {
             text = svc.protocols ?? ""
             cellIdentifier = CellIdentifiers.ProtocolCell
