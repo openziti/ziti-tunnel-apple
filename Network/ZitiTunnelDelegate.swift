@@ -268,7 +268,10 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     private func containsNewDnsEntry(_ zSvc:ZitiService) -> Bool {
         if let addresses = zSvc.addresses  {
             for addr in addresses.components(separatedBy: ",") {
-                if dnsEntries.contains(addr) {
+                let (ip, _) = cidrToDestAndMask(addr)
+                let isDNS = ip == nil
+                
+                if isDNS && !dnsEntries.contains(addr) {
                     return true
                 }
             }
