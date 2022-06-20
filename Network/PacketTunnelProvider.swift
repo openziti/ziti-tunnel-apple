@@ -234,11 +234,26 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override func sleep(completionHandler: @escaping () -> Void) {
         zLog.debug("---Sleep---")
-        completionHandler()
+        
+        if providerConfig.lowPowerMode {
+            zitiTunnel?.perform {
+                self.zitiTunnelDelegate?.onSleep()
+                completionHandler()
+            }
+        } else {
+            completionHandler()
+        }
     }
     
     override func wake() {
         zLog.debug("---Wake---")
+        
+        if providerConfig.lowPowerMode {
+            zitiTunnel?.perform {
+                self.zitiTunnelDelegate?.onWake()
+            }
+        }
+        
         zitiTunnel?.perform {
             self.zitiTunnelDelegate?.allZitis.forEach { z in
                 z.endpointStateChange(true, false)

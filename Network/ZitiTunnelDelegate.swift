@@ -459,6 +459,26 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
         }
     }
+    
+    func onSleep() {
+        allZitis.forEach { z in
+            if let tzid = zidToTzid(z.id.id) {
+                if tzid.isEnabled {
+                    z.setEnabled(false)
+                }
+            }
+        }
+    }
+    
+    func onWake() {
+        allZitis.forEach { z in
+            if let tzid = zidToTzid(z.id.id) {
+                if tzid.isEnabled {
+                    z.setEnabled(true)
+                }
+            }
+        }
+    }
 }
 
 extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
