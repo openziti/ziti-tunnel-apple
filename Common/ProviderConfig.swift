@@ -71,6 +71,9 @@ class ProviderConfig : NSObject {
     var interceptMatchedDns:Bool = true
     var enableMfa:Bool = false
     
+    //TODO: Placeholder for now - need to make configurable & store (and setable in UI at least for ZME)...
+    var lowPowerMode:Bool = false
+    
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,
                 ProviderConfig.SUBNET_KEY: self.subnetMask,
