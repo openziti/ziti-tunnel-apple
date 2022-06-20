@@ -300,9 +300,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                     let isDNS = ip == nil
                     if !identitiesLoaded && isDNS {
                         dnsEntries.add(addr, "", serviceId)
-                    } else if isDNS && (ptp?.providerConfig.interceptMatchedDns ?? true) {
-                        zLog.warn("*** Unable to add DNS support for \(addr) to running tunnel when intercepting by matched domains")
-                    }
+                    } 
                 }
                 
                 // check if restart is needed
