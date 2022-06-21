@@ -43,6 +43,7 @@ class IpcAppexServer : NSObject {
                 
         switch baseMsg.meta.msgType {
         case .SetLogLevel: processSetLogLevel(baseMsg, completionHandler: completionHandler)
+        case .Reassert: processReassert(baseMsg, completionHandler: completionHandler)
         case .DumpRequest: processDumpRequest(baseMsg, completionHandler: completionHandler)
         case .MfaEnrollRequest: processMfaEnrollRequest(baseMsg, completionHandler: completionHandler)
         case .MfaVerifyRequest: processMfaVerifyRequest(baseMsg, completionHandler: completionHandler)
@@ -70,6 +71,20 @@ class IpcAppexServer : NSObject {
         ZitiLog.setLogLevel(lvl)
         ptp.appLogLevel = lvl
         completionHandler?(nil)
+    }
+    
+    func processReassert(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+        if let error = ptp.loadConfig() {
+            zLog.error("Error loading tunnel config: \(error.localizedDescription)")
+            // Don't return on error here - there are other reasons to reassert...
+        }
+        
+        ptp.updateTunnelNetworkSettings { error in
+            if let error = error {
+                zLog.error("Error updating tunnel network settings: \(error.localizedDescription)")
+            }
+            completionHandler?(nil)
+        }
     }
     
     func processDumpRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
