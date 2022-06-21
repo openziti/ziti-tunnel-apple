@@ -66,25 +66,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
         
-        // parse config
-        guard let conf = (self.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration as? ProviderConfigDict else {
-            let errStr = "Unable to start tunnel. Provider configuration not available"
-            zLog.wtf(errStr)
-            userNotifications.post(.Error, nil, errStr)
-            completionHandler(ZitiError(errStr))
-            return
-        }
-        
-        if let error = self.providerConfig.parseDictionary(conf) {
+        // load config
+        if let error = loadConfig() {
             let errStr = "Unable to start tunnel. Invalid provider configuration. \(error)"
             zLog.wtf(errStr)
             userNotifications.post(.Error, nil, errStr)
             completionHandler(error)
             return
         }
-
-        zLog.info("\(self.providerConfig.debugDescription)")
-        zLog.info("providerConfig.logLevel = \(providerConfig.logLevel)")
         
         // setup logLevel
         if let appLogLevel = self.appLogLevel, appLogLevel.rawValue != Int32(providerConfig.logLevel) {
@@ -152,6 +141,25 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 self.readPacketFlow()
             }
         }
+    }
+    
+    func loadConfig() -> Error? {
+        guard let conf = (self.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration as? ProviderConfigDict else {
+            let errStr = "Unable to load configuration. Provider configuration not available"
+            zLog.wtf(errStr)
+            userNotifications.post(.Error, nil, errStr)
+            return ZitiError(errStr)
+        }
+        
+        if let error = self.providerConfig.parseDictionary(conf) {
+            let errStr = "Unable to load configuration: \(error.localizedDescription)"
+            zLog.wtf(errStr)
+            userNotifications.post(.Error, nil, errStr)
+            return error
+        }
+        
+        zLog.info("\(self.providerConfig.debugDescription)")
+        return nil
     }
     
     func updateTunnelNetworkSettings(_ completionHandler: @escaping (Error?) -> Void) {
