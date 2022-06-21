@@ -259,4 +259,15 @@ class TunnelMgr: NSObject {
             zLog.info("No log level found.  Using default")
         }
     }
+    
+    func reassert() {
+        zLog.info("Notifying appex to reassert tunnel configuration")
+        let msg = IpcReassertMessage()
+        self.ipcClient.sendToAppex(msg) { _, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message to reassert tunnel configuration: \(zErr!.localizedDescription)")
+                return
+            }
+        }
+    }
 }
