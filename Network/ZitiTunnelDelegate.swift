@@ -128,7 +128,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             if !alreadyExists {
                 interceptedRoutes.append(route)
                 if identitiesLoaded {
-                    self.ptp?.updateTunnelNetworkSettings(true) { error in
+                    self.ptp?.updateTunnelNetworkSettings { error in
                         if let error = error {
                             zLog.error("Error adding route \(destinationAddress): \(error.localizedDescription)")
                         }
@@ -154,7 +154,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
                 
             if identitiesLoaded {
-                self.ptp?.updateTunnelNetworkSettings(true) { error in
+                self.ptp?.updateTunnelNetworkSettings { error in
                     if let error = error {
                         zLog.error("Error removing route \(destinationAddress): \(error.localizedDescription)")
                     }
@@ -180,7 +180,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
             
             if identitiesLoaded && !alreadyExists {
-                self.ptp?.updateTunnelNetworkSettings(true) { error in
+                self.ptp?.updateTunnelNetworkSettings { error in
                     if let error = error {
                         zLog.error("Error excluding route \(destinationAddress): \(error.localizedDescription)")
                     }
@@ -357,7 +357,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
         
         if reassert {
-            ptp?.updateTunnelNetworkSettings(true) { error in
+            ptp?.updateTunnelNetworkSettings { error in
                 if let error = error {
                     zLog.error("Error updating tunnel network settings: \(error.localizedDescription)")
                 }
