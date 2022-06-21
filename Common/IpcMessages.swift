@@ -22,6 +22,7 @@ enum IpcMessageType : Int32, Codable {
     case AppexNotificationAction
     case ErrorResponse
     case SetLogLevel
+    case Reassert
     case DumpRequest
     case DumpResponse
     case MfaEnrollRequest
@@ -41,6 +42,7 @@ enum IpcMessageType : Int32, Codable {
         case .AppexNotificationAction: return IpcAppexNotificationActionMessage.self
         case .ErrorResponse: return IpcErrorResponseMessage.self
         case .SetLogLevel: return IpcSetLogLevelMessage.self
+        case .Reassert: return IpcReassertMessage.self
         case .DumpRequest: return IpcDumpRequestMessage.self
         case .DumpResponse: return IpcDumpResponseMessage.self
         case .MfaEnrollRequest: return IpcMfaEnrollRequestMessage.self
@@ -204,6 +206,19 @@ class IpcSetLogLevelMessage : IpcMessage {
         try super.encode(to: encoder)
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encodeIfPresent(logLevel, forKey: .logLevel)
+    }
+}
+
+class IpcReassertMessage : IpcMessage {
+    init() {
+        let m = Meta(nil, .Reassert)
+        super.init(m)
+    }
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
     }
 }
 
