@@ -229,6 +229,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
         
+        // shutdown tun (prob not necessary, but it seems to speed up the shutodwn)
+        self.setTunnelNetworkSettings(nil)
+                
+        // shutdown all the ziti stuff
         zitiTunnel.shutdownZiti {
             self.userNotifications.post(.Info, "Disconnected", nil, nil) {
                 zLog.info("Exiting")
