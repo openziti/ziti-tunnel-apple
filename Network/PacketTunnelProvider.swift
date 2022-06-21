@@ -39,6 +39,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         CZiti.Ziti.setAppInfo(Bundle.main.bundleIdentifier ?? "Ziti", Version.str)
         
+        // Give a short timeout for services to load, avoiding need to reassert tunnel networking settings
+        // (and associated user notification)
+        CZiti.ZitiTunnel.SERVICE_WAIT_TIMEOUT = 5.0
+        
         zitiTunnelDelegate = ZitiTunnelDelegate(self)
         ipcServer = IpcAppexServer(self)
     }
@@ -135,67 +139,77 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             self.startNetworkMonitor()
             
             // identies have loaded, so go ahead and setup the TUN
-            let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
-            let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
-            
-            if self.providerConfig.interceptMatchedDns {
-                // Add in all the hostnames we want to intercept as 'matchDomains'. We might get some extras, but that's ok...
-                var matchDomains = self.zitiTunnelDelegate?.dnsEntries.hostnames.map { // trim of "*." for wildcard domains
-                    $0.starts(with: "*.") ? String($0.dropFirst(2)) : $0
-                }
-                
-                // Make sure we don't become primary resolver (specified by having name = "")
-                matchDomains = matchDomains?.filter { $0 != "" }
-                if matchDomains?.count ?? 0 == 0 {
-                    matchDomains = [ "ziti-test.netfoundry.io" ]
-                }
-                dnsSettings.matchDomains = matchDomains
-            } else {
-                // intercept and proxy all to upstream DNS (if set, else rejects)
-                dnsSettings.matchDomains = [""]
-            }
-            tunnelNetworkSettings.dnsSettings = dnsSettings
-            
-            // add dnsServer routes if configured outside of configured subnet
-            let net = IPUtils.ipV4AddressStringToData(self.providerConfig.ipAddress)
-            let mask = IPUtils.ipV4AddressStringToData(self.providerConfig.subnetMask)
-            dnsSettings.servers.forEach { svr in
-                let dest = IPUtils.ipV4AddressStringToData(svr)
-                if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
-                    self.zitiTunnelDelegate?.interceptedRoutes.append(NEIPv4Route(destinationAddress: svr, subnetMask: "255.255.255.255"))
-                }
-            }
-            
-            tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [self.providerConfig.ipAddress],
-                                                                subnetMasks: [self.providerConfig.subnetMask])
-            let includedRoute = NEIPv4Route(destinationAddress: self.providerConfig.ipAddress,
-                                            subnetMask: self.providerConfig.subnetMask)
-            self.zitiTunnelDelegate?.interceptedRoutes.append(includedRoute)
-            self.zitiTunnelDelegate?.interceptedRoutes.forEach { r in
-                zLog.info("route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
-            }
-            self.zitiTunnelDelegate?.excludedRoutes.forEach { r in
-                zLog.info("excluding route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
-            }
-            tunnelNetworkSettings.ipv4Settings?.includedRoutes = self.zitiTunnelDelegate?.interceptedRoutes
-            tunnelNetworkSettings.ipv4Settings?.excludedRoutes = self.zitiTunnelDelegate?.excludedRoutes
-            tunnelNetworkSettings.mtu = self.providerConfig.mtu as NSNumber
-            
-            self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
+            self.updateTunnelNetworkSettings(false) { error in
                 if let error = error {
                     zLog.error(error.localizedDescription)
                     completionHandler(error as NSError)
                 }
                 
-                // interferes with any notifications posted while connecting...
-                //self.userNotifications.post(.Info, "Connected")
-
                 // call completion handler with nil to indicate success
                 completionHandler(nil)
                 
                 // Start listening for traffic headed our way via the tun interface
                 self.readPacketFlow()
             }
+        }
+    }
+    
+    func updateTunnelNetworkSettings(_ reasserting:Bool, _ completionHandler: @escaping (Error?) -> Void) {
+        if reasserting {
+            self.reasserting = true
+        }
+        
+        let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
+        let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
+        
+        if self.providerConfig.interceptMatchedDns {
+            // Add in all the hostnames we want to intercept as 'matchDomains'. We might get some extras, but that's ok...
+            var matchDomains = self.zitiTunnelDelegate?.dnsEntries.hostnames.map { // trim of "*." for wildcard domains
+                $0.starts(with: "*.") ? String($0.dropFirst(2)) : $0
+            }
+            
+            // Make sure we don't become primary resolver (specified by having name = "")
+            matchDomains = matchDomains?.filter { $0 != "" }
+            if matchDomains?.count ?? 0 == 0 {
+                matchDomains = [ "ziti-test.netfoundry.io" ]
+            }
+            dnsSettings.matchDomains = matchDomains
+        } else {
+            // intercept and proxy all to upstream DNS (if set, else rejects)
+            dnsSettings.matchDomains = [""]
+        }
+        tunnelNetworkSettings.dnsSettings = dnsSettings
+        
+        // add dnsServer routes if configured outside of configured subnet
+        let net = IPUtils.ipV4AddressStringToData(self.providerConfig.ipAddress)
+        let mask = IPUtils.ipV4AddressStringToData(self.providerConfig.subnetMask)
+        dnsSettings.servers.forEach { svr in
+            let dest = IPUtils.ipV4AddressStringToData(svr)
+            if IPUtils.inV4Subnet(dest, network: net, mask: mask) == false {
+                self.zitiTunnelDelegate?.interceptedRoutes.append(NEIPv4Route(destinationAddress: svr, subnetMask: "255.255.255.255"))
+            }
+        }
+        
+        tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [self.providerConfig.ipAddress],
+                                                            subnetMasks: [self.providerConfig.subnetMask])
+        let includedRoute = NEIPv4Route(destinationAddress: self.providerConfig.ipAddress,
+                                        subnetMask: self.providerConfig.subnetMask)
+        self.zitiTunnelDelegate?.interceptedRoutes.append(includedRoute)
+        self.zitiTunnelDelegate?.interceptedRoutes.forEach { r in
+            zLog.info("route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
+        }
+        self.zitiTunnelDelegate?.excludedRoutes.forEach { r in
+            zLog.info("excluding route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
+        }
+        tunnelNetworkSettings.ipv4Settings?.includedRoutes = self.zitiTunnelDelegate?.interceptedRoutes
+        tunnelNetworkSettings.ipv4Settings?.excludedRoutes = self.zitiTunnelDelegate?.excludedRoutes
+        tunnelNetworkSettings.mtu = self.providerConfig.mtu as NSNumber
+        
+        self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
+            if reasserting {
+                self.reasserting = false
+            }
+            completionHandler(error)
         }
     }
     
@@ -236,9 +250,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         zLog.debug("---Sleep---")
         
         if providerConfig.lowPowerMode {
-            zitiTunnel?.perform {
-                self.zitiTunnelDelegate?.onSleep()
-                completionHandler()
+            self.setTunnelNetworkSettings(nil) { _ in
+                self.zitiTunnel?.perform {
+                    self.zitiTunnelDelegate?.onSleep()
+                    completionHandler()
+                }
             }
         } else {
             completionHandler()
@@ -251,6 +267,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         if providerConfig.lowPowerMode {
             zitiTunnel?.perform {
                 self.zitiTunnelDelegate?.onWake()
+                self.updateTunnelNetworkSettings(true) { error in
+                    if let error = error {
+                        zLog.error("Error resetting tunnel network settings on waks: \(error.localizedDescription)")
+                    }
+                }
             }
         }
         
