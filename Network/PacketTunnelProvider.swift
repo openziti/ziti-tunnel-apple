@@ -139,7 +139,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             self.startNetworkMonitor()
             
             // identies have loaded, so go ahead and setup the TUN
-            self.updateTunnelNetworkSettings(false) { error in
+            self.updateTunnelNetworkSettings { error in
                 if let error = error {
                     zLog.error(error.localizedDescription)
                     completionHandler(error as NSError)
@@ -154,11 +154,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
     
-    func updateTunnelNetworkSettings(_ reasserting:Bool, _ completionHandler: @escaping (Error?) -> Void) {
-        if reasserting {
-            self.reasserting = true
-        }
-        
+    func updateTunnelNetworkSettings(_ completionHandler: @escaping (Error?) -> Void) {
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
         
@@ -206,9 +202,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         tunnelNetworkSettings.mtu = self.providerConfig.mtu as NSNumber
         
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
-            if reasserting {
-                self.reasserting = false
-            }
             completionHandler(error)
         }
     }
@@ -250,6 +243,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         zLog.debug("---Sleep---")
         
         if providerConfig.lowPowerMode {
+            self.reasserting = true
             self.setTunnelNetworkSettings(nil) { _ in
                 self.zitiTunnel?.perform {
                     self.zitiTunnelDelegate?.onSleep()
@@ -267,10 +261,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         if providerConfig.lowPowerMode {
             zitiTunnel?.perform {
                 self.zitiTunnelDelegate?.onWake()
-                self.updateTunnelNetworkSettings(true) { error in
+                self.updateTunnelNetworkSettings { error in
                     if let error = error {
                         zLog.error("Error resetting tunnel network settings on waks: \(error.localizedDescription)")
                     }
+                    self.reasserting = false
                 }
             }
         }
