@@ -126,11 +126,13 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 alreadyExists = false
             }
             if !alreadyExists {
+                interceptedRoutes.append(route)
                 if identitiesLoaded {
-                    zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
-                            "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
-                } else {
-                    interceptedRoutes.append(route)
+                    self.ptp?.updateTunnelNetworkSettings(true) { error in
+                        if let error = error {
+                            zLog.error("Error adding route \(destinationAddress): \(error.localizedDescription)")
+                        }
+                    }
                 }
             }
         }
@@ -145,12 +147,17 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             let route = NEIPv4Route(destinationAddress: dest,
                                     subnetMask: subnetMask)
             
-            if identitiesLoaded{
-                zLog.warn("*** Unable to delete route for \(destinationAddress) on running tunnel.")
-            } else {
-                interceptedRoutes = interceptedRoutes.filter {
-                    $0.destinationAddress == route.destinationAddress &&
-                    $0.destinationSubnetMask == route.destinationSubnetMask
+            // TODO: What if route is being used by a different service (which would cause its own problems...)?
+            // TODO: Add a refernce count (create a NEIPv4RouteRef class...)?
+            interceptedRoutes = interceptedRoutes.filter {
+                !IPUtils.areSameRoutes($0, route)
+            }
+                
+            if identitiesLoaded {
+                self.ptp?.updateTunnelNetworkSettings(true) { error in
+                    if let error = error {
+                        zLog.error("Error removing route \(destinationAddress): \(error.localizedDescription)")
+                    }
                 }
             }
         }
@@ -173,7 +180,11 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
             
             if identitiesLoaded && !alreadyExists {
-                zLog.warn("*** Unable to exclude route for \(destinationAddress) on running tunnel")
+                self.ptp?.updateTunnelNetworkSettings(true) { error in
+                    if let error = error {
+                        zLog.error("Error excluding route \(destinationAddress): \(error.localizedDescription)")
+                    }
+                }
             }
         }
         return 0
@@ -271,7 +282,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 let (ip, _) = cidrToDestAndMask(addr)
                 let isDNS = ip == nil
                 
-                if isDNS && !dnsEntries.contains(addr) {
+                if isDNS && !dnsEntries.contains(addr.trimmingCharacters(in: .whitespaces)) {
                     return true
                 }
             }
@@ -279,39 +290,35 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         return false
     }
     
-    private func processService(_ tzid:ZitiIdentity, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) {
+    private func processService(_ tzid:ZitiIdentity, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) -> Bool {
         guard let serviceId = eSvc.id else {
             zLog.error("invalid service for \(tzid.name):(\(tzid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
-            return
+            return false
         }
         
+        var reassert = false
+        
         if remove {
-            if !identitiesLoaded {
-                self.dnsEntries.remove(serviceId)
-            }
+            self.dnsEntries.remove(serviceId)
             tzid.services = tzid.services.filter { $0.id != serviceId }
+            reassert = true // could be smarter about this, but won't hurt (and removing service is less common that adding)
         }
         
         if add {
             if canDial(eSvc) {
                 let zSvc = ZitiService(eSvc)
+                let hasNewDnsEntry = containsNewDnsEntry(zSvc)
                 zSvc.addresses?.components(separatedBy: ",").forEach { addr in
                     let (ip, _) = cidrToDestAndMask(addr)
                     let isDNS = ip == nil
-                    if !identitiesLoaded && isDNS {
-                        dnsEntries.add(addr, "", serviceId)
-                    } 
+                    if isDNS { dnsEntries.add(addr.trimmingCharacters(in: .whitespaces), "", serviceId) }
                 }
                 
-                // check if restart is needed
+                // check if reassert is needed
                 if identitiesLoaded {
-                    // If intercepting by domains or has new route, needsRestart
-                    if ((ptp?.providerConfig.interceptMatchedDns ?? true) && containsNewDnsEntry(zSvc)) || containsNewRoute(zSvc) {
-                        let msg = "Restart may be required to access service \"\(zSvc.name ?? "")\""
-                        zLog.warn(msg)
-                        userNotifications.post(.Restart, tzid.name, msg, tzid)
-                        tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
-                        zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
+                    // If intercepting by domains or has new route, need to reassert
+                    if ((ptp?.providerConfig.interceptMatchedDns ?? true) && hasNewDnsEntry) { //} || containsNewRoute(zSvc) {
+                        reassert = true
                     }
                 }
                 
@@ -333,11 +340,29 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 tzid.services.append(zSvc)
             }
         }
+        return reassert
     }
     
     private func handleServiceEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelServiceEvent) {
-        for eSvc in event.removed { processService(tzid, eSvc, remove:true) }
-        for eSvc in event.added   { processService(tzid, eSvc, add:true) }
+        var reassert = false
+        for eSvc in event.removed {
+            if processService(tzid, eSvc, remove:true) {
+                reassert = true
+            }
+        }
+        for eSvc in event.added {
+            if processService(tzid, eSvc, add:true) {
+                reassert = true
+            }
+        }
+        
+        if reassert {
+            ptp?.updateTunnelNetworkSettings(true) { error in
+                if let error = error {
+                    zLog.error("Error updating tunnel network settings: \(error.localizedDescription)")
+                }
+            }
+        }
         
         if tzid.allServicePostureChecksPassing() && !tzid.needsRestart() {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
