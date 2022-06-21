@@ -20,6 +20,8 @@ import CZiti
 
 class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     weak var vc: ViewController?
+    var restartRequired = false
+    var requireRestart:[NSTextField] = []
     
     @IBOutlet weak var box: NSBox!
     @IBOutlet weak var ipAddressText: NSTextField!
@@ -44,6 +46,8 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.mtuText.delegate = self
         self.dnsServersText.delegate = self
         self.fallbackDNSText.delegate = self
+        
+        self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText ]
         
         self.updateConfigControls()
     }
@@ -114,10 +118,14 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             }
         }
     }
-        
+    
     // Occurs whenever you input first symbol after focus is here
     func controlTextDidBeginEditing(_ obj: Notification) {
         self.saveButton.isEnabled = true
+        
+        if let object = obj.object as? NSTextField, self.requireRestart.contains(object) {
+            self.restartRequired = true
+        }
     }
     
     @IBAction func onFallbackDNSCheck(_ sender: Any) {
@@ -167,7 +175,12 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
                 if let error = error {
                     NSAlert(error:error).runModal()
                 } else {
-                    self.vc?.tunnelMgr.restartTunnel()
+                    if self.restartRequired {
+                        self.vc?.tunnelMgr.restartTunnel()
+                    } else {
+                        self.vc?.tunnelMgr.reassert()
+                    }
+                    self.restartRequired = false
                     self.saveButton.isEnabled = false
                     self.dismiss(self)
                     
