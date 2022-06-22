@@ -32,7 +32,6 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var fallbackDNSCheck: NSButton!
     @IBOutlet weak var fallbackDNSText: NSTextField!
     @IBOutlet weak var interceptMatchedDomainsSwitch: NSSwitch!
-    @IBOutlet weak var enableMfaSwitch: NSSwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,7 +61,6 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.fallbackDNSCheck.state = defaults.fallbackDnsEnabled ? .on : .off
         self.fallbackDNSText.stringValue = defaults.fallbackDns
         self.interceptMatchedDomainsSwitch.state = defaults.interceptMatchedDns ? .on : .off
-        self.enableMfaSwitch.state = defaults.enableMfa ? .on : .off
         
         guard
             let pp = vc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
@@ -97,26 +95,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.interceptMatchedDomainsSwitch.state = interceptMatchedDomains ? .on : .off
         }
         
-        if let enableMfa = conf[ProviderConfig.ENABLE_MFA_KEY] as? Bool {
-            self.enableMfaSwitch.state = enableMfa ? .on : .off
-        }
         self.ipAddressText.becomeFirstResponder()
-    }
-    
-    func configCheck(_ enabledSwitch:NSSwitch, _ toDisableSwitch:NSSwitch, _ text:String) {
-        if enabledSwitch.state == .on && toDisableSwitch.state == .on {
-            let alert = NSAlert()
-            alert.messageText = "Configuration Notice"
-            alert.informativeText = text
-            alert.alertStyle = .warning
-            alert.addButton(withTitle: "OK")
-            alert.addButton(withTitle: "Cancel")
-            if alert.runModal() == .alertFirstButtonReturn { // OK
-                toDisableSwitch.state = .off
-            } else { // Cancel
-                enabledSwitch.state = .off
-            }
-        }
     }
     
     // Occurs whenever you input first symbol after focus is here
@@ -135,14 +114,10 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func onInterceptMatchedDomainsToggle(_ sender: Any) {
         self.saveButton.isEnabled = true
-        configCheck(interceptMatchedDomainsSwitch, enableMfaSwitch,
-                    "Enabling this mode requires MFA to be disabled.  Disable MFA and continue?")
     }
     
     @IBAction func onEnableMfaToggle(_ sender: Any) {
         self.saveButton.isEnabled = true
-        configCheck(enableMfaSwitch, interceptMatchedDomainsSwitch,
-                    "Enabling MFA requires intercepting by matching domains to be diabled. Disable and continue?")
     }
     
     @IBAction func onSaveButton(_ sender: Any) {
@@ -154,7 +129,6 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         dict[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] = self.fallbackDNSCheck.state == .on
         dict[ProviderConfig.FALLBACK_DNS_KEY] = self.fallbackDNSText.stringValue
         dict[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] = self.interceptMatchedDomainsSwitch.state == .on
-        dict[ProviderConfig.ENABLE_MFA_KEY] = self.enableMfaSwitch.state == .on
         dict[ProviderConfig.LOG_LEVEL] = String(ZitiLog.getLogLevel().rawValue)
         
         let conf:ProviderConfig = ProviderConfig()
