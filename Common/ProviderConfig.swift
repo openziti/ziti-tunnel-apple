@@ -69,7 +69,13 @@ class ProviderConfig : NSObject {
 #endif
     var logLevel:Int = Int(ZitiLog.LogLevel.INFO.rawValue)
     var interceptMatchedDns:Bool = true
-    var enableMfa:Bool = false
+   
+    // MFA no longer a beta feature on macOS - hardcode it to "enabled"
+#if os(macOS)
+    let enableMfa = true
+#else
+    let enableMfa = false
+#endif
     
     //TODO: Placeholder for now - need to make configurable & store (and setable in UI at least for ZME)...
     var lowPowerMode:Bool = false
@@ -136,7 +142,6 @@ class ProviderConfig : NSObject {
         }
         self.fallbackDnsEnabled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool ?? false
         self.interceptMatchedDns = conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] as? Bool ?? true
-        self.enableMfa = conf[ProviderConfig.ENABLE_MFA_KEY] as? Bool ?? false
         self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL] as? String ?? "3") ?? 3
         return nil
     }
