@@ -125,13 +125,14 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             if interceptedRoutes.first(where: { IPUtils.areSameRoutes($0, route) }) == nil {
                 alreadyExists = false
             }
-            if !alreadyExists {
-                interceptedRoutes.append(route)
-                if identitiesLoaded {
-                    self.ptp?.updateTunnelNetworkSettings { error in
-                        if let error = error {
-                            zLog.error("Error adding route \(destinationAddress): \(error.localizedDescription)")
-                        }
+            
+            // always add it, even if already there. This gives us "poor man's refernece counting" since Apple handles duplicates just fine.
+            interceptedRoutes.append(route)
+            
+            if !alreadyExists && identitiesLoaded {
+                self.ptp?.updateTunnelNetworkSettings { error in
+                    if let error = error {
+                        zLog.error("Error adding route \(destinationAddress): \(error.localizedDescription)")
                     }
                 }
             }
@@ -144,15 +145,13 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         
         if let dest = dest, let subnetMask = subnetMask {
             zLog.info("deleteRoute \(dest) => \(dest), \(subnetMask)")
-            let route = NEIPv4Route(destinationAddress: dest,
-                                    subnetMask: subnetMask)
+            let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
             
-            // TODO: What if route is being used by a different service (which would cause its own problems...)?
-            // TODO: Add a refernce count (create a NEIPv4RouteRef class...)?
-            interceptedRoutes = interceptedRoutes.filter {
-                !IPUtils.areSameRoutes($0, route)
+            // Remove only the first occurrence (poor man's reference counting)
+            if let index = interceptedRoutes.firstIndex(where: { IPUtils.areSameRoutes($0, route)}) {
+                interceptedRoutes.remove(at: index)
             }
-                
+                            
             if identitiesLoaded {
                 self.ptp?.updateTunnelNetworkSettings { error in
                     if let error = error {
