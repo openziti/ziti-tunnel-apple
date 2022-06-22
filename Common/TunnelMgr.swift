@@ -119,7 +119,7 @@ class TunnelMgr: NSObject {
                     
                     // Get our logLevel from config
                     if let conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
-                        if let logLevel = conf[ProviderConfig.LOG_LEVEL] as? String {
+                        if let logLevel = conf[ProviderConfig.LOG_LEVEL_KEY] as? String {
                             let li = Int32(logLevel) ?? ZitiLog.LogLevel.INFO.rawValue
                             let ll = ZitiLog.LogLevel(rawValue: li) ?? ZitiLog.LogLevel.INFO
                             zLog.info("Updating log level to \(logLevel) (\(ll))") 
@@ -235,7 +235,7 @@ class TunnelMgr: NSObject {
         
         if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
             // update logLevel
-            conf[ProviderConfig.LOG_LEVEL] = String(level.rawValue)
+            conf[ProviderConfig.LOG_LEVEL_KEY] = String(level.rawValue)
             (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = conf
             
             zLog.info("Updated providerConfiguration: \(conf)")
