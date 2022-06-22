@@ -48,7 +48,8 @@ class ProviderConfig : NSObject {
     static var FALLBACK_DNS_KEY = "fallbackDns"
     static var INTERCEPT_MATCHED_DNS_KEY = "interceptMatchedDns"
     static var ENABLE_MFA_KEY = "enableMfa"
-    static var LOG_LEVEL = "logLevel"
+    static var LOG_LEVEL_KEY = "logLevel"
+    static var LOW_POWER_MODE_KEY = "lowPowerMode"
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "100.64.0.1"
@@ -84,11 +85,12 @@ class ProviderConfig : NSObject {
         return [ProviderConfig.IP_KEY: self.ipAddress,
                 ProviderConfig.SUBNET_KEY: self.subnetMask,
                 ProviderConfig.MTU_KEY: String(self.mtu),
-                ProviderConfig.LOG_LEVEL: String(self.logLevel),
+                ProviderConfig.LOG_LEVEL_KEY: String(self.logLevel),
                 ProviderConfig.DNS_KEY: self.dnsAddresses.joined(separator: ","),
                 ProviderConfig.FALLBACK_DNS_ENABLED_KEY: self.fallbackDnsEnabled,
                 ProviderConfig.FALLBACK_DNS_KEY: self.fallbackDns,
                 ProviderConfig.ENABLE_MFA_KEY: self.enableMfa,
+                ProviderConfig.LOW_POWER_MODE_KEY: self.lowPowerMode,
                 ProviderConfig.INTERCEPT_MATCHED_DNS_KEY: self.interceptMatchedDns]
     }
     
@@ -142,7 +144,8 @@ class ProviderConfig : NSObject {
         }
         self.fallbackDnsEnabled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool ?? false
         self.interceptMatchedDns = conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] as? Bool ?? true
-        self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL] as? String ?? "3") ?? 3
+        self.lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool ?? true
+        self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL_KEY] as? String ?? "3") ?? 3
         return nil
     }
     
@@ -156,6 +159,7 @@ class ProviderConfig : NSObject {
             "fallbackDns: \(self.fallbackDns)\n" +
             "interceptMatchedDns: \(self.interceptMatchedDns)\n" +
             "enableMfa: \(self.enableMfa)\n" +
+            "lowPowerMode: \(self.lowPowerMode)\n" +
             "logLevel: \(self.logLevel)"
     }
 }
