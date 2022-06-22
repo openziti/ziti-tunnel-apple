@@ -194,11 +194,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
         
-        tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [self.providerConfig.ipAddress],
-                                                            subnetMasks: [self.providerConfig.subnetMask])
-        let includedRoute = NEIPv4Route(destinationAddress: self.providerConfig.ipAddress,
-                                        subnetMask: self.providerConfig.subnetMask)
-        self.zitiTunnelDelegate?.interceptedRoutes.append(includedRoute)
+        tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [providerConfig.ipAddress], subnetMasks: [providerConfig.subnetMask])
+        
         self.zitiTunnelDelegate?.interceptedRoutes.forEach { r in
             zLog.info("route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
         }
