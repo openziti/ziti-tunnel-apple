@@ -129,7 +129,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         dict[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] = self.fallbackDNSCheck.state == .on
         dict[ProviderConfig.FALLBACK_DNS_KEY] = self.fallbackDNSText.stringValue
         dict[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] = self.interceptMatchedDomainsSwitch.state == .on
-        dict[ProviderConfig.LOG_LEVEL] = String(ZitiLog.getLogLevel().rawValue)
+        dict[ProviderConfig.LOG_LEVEL_KEY] = String(ZitiLog.getLogLevel().rawValue)
         
         let conf:ProviderConfig = ProviderConfig()
         if let error = conf.parseDictionary(dict) {
