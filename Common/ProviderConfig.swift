@@ -54,11 +54,11 @@ class ProviderConfig : NSObject {
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "100.64.0.1"
     var subnetMask:String = "255.192.0.0"
-    #if os(macOS)
+#if os(macOS)
     var mtu:Int = 4000
-    #else
+#else
     var mtu:Int = 4000
-    #endif
+#endif
     var dnsAddresses:[String] = ["100.64.0.2"]
     var fallbackDnsEnabled = false
     var fallbackDns:String = "1.1.1.1"
@@ -78,8 +78,12 @@ class ProviderConfig : NSObject {
     let enableMfa = false
 #endif
     
-    //TODO: Placeholder for now - need to make configurable & store (and setable in UI at least for ZME)...
+    // If never stored, set default value to false on macOS, otherwise true
+#if os(macOS)
     var lowPowerMode:Bool = false
+#else
+    var lowPowerMode:Bool = true
+#endif
     
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,
@@ -144,7 +148,12 @@ class ProviderConfig : NSObject {
         }
         self.fallbackDnsEnabled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool ?? false
         self.interceptMatchedDns = conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] as? Bool ?? true
-        self.lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool ?? true
+        
+        // only update lowPowerMode if present in the stored config, otherwise leave it as the default value
+        // (which differs per operating system)
+        if let lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool {
+            self.lowPowerMode = lowPowerMode
+        }
         self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL_KEY] as? String ?? "3") ?? 3
         return nil
     }
