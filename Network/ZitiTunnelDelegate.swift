@@ -118,6 +118,16 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         let (dest, subnetMask) = cidrToDestAndMask(destinationAddress)
         
         if let dest = dest, let subnetMask = subnetMask {
+            // TSDK is adding the DNS intercept IP addresses for some reason.  Filter 'em out...
+            if subnetMask == "255.255.255.255", let tunNet = ptp?.providerConfig.ipAddress, let tunMask = ptp?.providerConfig.subnetMask {
+                let destData = IPUtils.ipV4AddressStringToData(dest)
+                let tunNetData = IPUtils.ipV4AddressStringToData(tunNet)
+                let tunMaskData = IPUtils.ipV4AddressStringToData(tunMask)
+                if IPUtils.inV4Subnet(destData, network: tunNetData, mask: tunMaskData) {
+                    return 0
+                }
+            }
+            
             zLog.info("addRoute \(dest) => \(dest), \(subnetMask)")
             let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
             
