@@ -249,7 +249,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func sleep(completionHandler: @escaping () -> Void) {
-        zLog.debug("---Sleep---")
+        zLog.info("---Sleep---")
         
         if providerConfig.lowPowerMode {
             self.reasserting = true
@@ -265,7 +265,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func wake() {
-        zLog.debug("---Wake---")
+        zLog.info("---Wake---")
         
         if providerConfig.lowPowerMode {
             zitiTunnel?.perform {
