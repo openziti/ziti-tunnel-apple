@@ -261,6 +261,10 @@ class TunnelMgr: NSObject {
     }
     
     func reassert() {
+        guard self.status == .connected else {
+            return
+        }
+        
         zLog.info("Notifying appex to reassert tunnel configuration")
         let msg = IpcReassertMessage()
         self.ipcClient.sendToAppex(msg) { _, zErr in
