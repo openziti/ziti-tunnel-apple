@@ -196,12 +196,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         
         tunnelNetworkSettings.ipv4Settings = NEIPv4Settings(addresses: [providerConfig.ipAddress], subnetMasks: [providerConfig.subnetMask])
         let includedRoute = NEIPv4Route(destinationAddress: providerConfig.ipAddress, subnetMask: providerConfig.subnetMask)
-        self.zitiTunnelDelegate?.interceptedRoutes.append(includedRoute)
+        if zitiTunnelDelegate?.interceptedRoutes.first(where: { IPUtils.areSameRoutes($0, includedRoute) }) == nil {
+            zitiTunnelDelegate?.interceptedRoutes.append(includedRoute)
+        }
         
-        self.zitiTunnelDelegate?.interceptedRoutes.forEach { r in
+        zitiTunnelDelegate?.interceptedRoutes.forEach { r in
             zLog.info("route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
         }
-        self.zitiTunnelDelegate?.excludedRoutes.forEach { r in
+        zitiTunnelDelegate?.excludedRoutes.forEach { r in
             zLog.info("excluding route: \(r.destinationAddress) / \(r.destinationSubnetMask)")
         }
         tunnelNetworkSettings.ipv4Settings?.includedRoutes = self.zitiTunnelDelegate?.interceptedRoutes
