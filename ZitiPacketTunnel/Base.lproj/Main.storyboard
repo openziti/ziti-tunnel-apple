@@ -522,14 +522,14 @@
             <objects>
                 <viewController title="Ziti Desktop Edge Config" showSeguePresentationStyle="single" id="c8W-la-m0J" customClass="TunnelConfigViewController" customModule="Ziti_Desktop_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Kqz-8q-KOl">
-                        <rect key="frame" x="0.0" y="0.0" width="573" height="300"/>
+                        <rect key="frame" x="0.0" y="0.0" width="573" height="337"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ifg-7P-d1D" customClass="NSBox">
-                                <rect key="frame" x="20" y="20" width="533" height="260"/>
+                                <rect key="frame" x="20" y="20" width="533" height="297"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EOS-7b-PVg">
-                                        <rect key="frame" x="114" y="221" width="88" height="16"/>
+                                        <rect key="frame" x="114" y="258" width="88" height="16"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="IPv4 Address:" id="reu-Qo-qYk">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -537,7 +537,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="R5l-fq-71L" userLabel="Ip Address Text">
-                                        <rect key="frame" x="215" y="219" width="113" height="21"/>
+                                        <rect key="frame" x="215" y="256" width="113" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="113" id="PZT-PS-dts"/>
                                         </constraints>
@@ -548,7 +548,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wlj-BJ-x5U">
-                                        <rect key="frame" x="115" y="190" width="87" height="16"/>
+                                        <rect key="frame" x="115" y="227" width="87" height="16"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Subnet Mask:" id="Lla-d0-nXz">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -556,7 +556,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6EP-Cs-i5f">
-                                        <rect key="frame" x="124" y="128" width="78" height="16"/>
+                                        <rect key="frame" x="124" y="165" width="78" height="16"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DNS Server:" id="2vC-tH-tRF">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -564,7 +564,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rQ4-dP-mvk" userLabel="DNS Servers Text">
-                                        <rect key="frame" x="215" y="126" width="113" height="21"/>
+                                        <rect key="frame" x="215" y="163" width="113" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="113" id="T9V-XM-aoW"/>
                                         </constraints>
@@ -575,7 +575,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="r05-Sw-HDm" userLabel="Fallback DNS Text">
-                                        <rect key="frame" x="215" y="95" width="113" height="21"/>
+                                        <rect key="frame" x="215" y="132" width="113" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="113" id="Eoo-hQ-5nW"/>
                                         </constraints>
@@ -609,7 +609,7 @@ Gw
                                         </connections>
                                     </button>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="veP-3d-Bo2" userLabel="Mtu Text">
-                                        <rect key="frame" x="215" y="157" width="50" height="21"/>
+                                        <rect key="frame" x="215" y="194" width="50" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="50" id="YOH-Ia-8zZ"/>
                                         </constraints>
@@ -620,7 +620,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d48-wG-Ve4" userLabel="Subnet Mask Text">
-                                        <rect key="frame" x="215" y="188" width="113" height="21"/>
+                                        <rect key="frame" x="215" y="225" width="113" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="113" id="08y-Yh-Aei"/>
                                         </constraints>
@@ -631,7 +631,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="i3q-fy-Hz3">
-                                        <rect key="frame" x="165" y="159" width="37" height="16"/>
+                                        <rect key="frame" x="165" y="196" width="37" height="16"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="MTU:" id="AlR-Kq-tjl">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -639,13 +639,13 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <switch horizontalHuggingPriority="750" verticalHuggingPriority="750" baseWritingDirection="leftToRight" alignment="left" translatesAutoresizingMaskIntoConstraints="NO" id="mwG-vo-zOj" userLabel="InterceptOnlyMatchedDomainsSwitch">
-                                        <rect key="frame" x="160" y="58" width="42" height="25"/>
+                                        <rect key="frame" x="160" y="95" width="42" height="25"/>
                                         <connections>
                                             <action selector="onInterceptMatchedDomainsToggle:" target="c8W-la-m0J" id="fMf-ul-eev"/>
                                         </connections>
                                     </switch>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0oc-Ca-F2f" userLabel="interceptMatchedText">
-                                        <rect key="frame" x="213" y="63" width="302" height="16"/>
+                                        <rect key="frame" x="213" y="100" width="302" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Intercept DNS by Matching Domains" id="48W-Xt-DBO" userLabel="Intercept only matched domains">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -653,7 +653,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LdH-Sp-Ffk">
-                                        <rect key="frame" x="33" y="96" width="167" height="18"/>
+                                        <rect key="frame" x="33" y="133" width="167" height="18"/>
                                         <buttonCell key="cell" type="check" title="Override Fallback DNS:" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ekh-IY-1IZ">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -662,6 +662,20 @@ Gw
                                             <action selector="onFallbackDNSCheck:" target="c8W-la-m0J" id="TvU-4O-G8Q"/>
                                         </connections>
                                     </button>
+                                    <switch horizontalHuggingPriority="750" verticalHuggingPriority="750" baseWritingDirection="leftToRight" alignment="left" translatesAutoresizingMaskIntoConstraints="NO" id="d9z-5h-aKt">
+                                        <rect key="frame" x="160" y="58" width="42" height="25"/>
+                                        <connections>
+                                            <action selector="onLowPowerModeToggle:" target="c8W-la-m0J" id="5PP-Yq-GIM"/>
+                                        </connections>
+                                    </switch>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gTn-Nw-Oi3">
+                                        <rect key="frame" x="213" y="63" width="302" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Low Power Mode" id="cIC-5L-12P">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="69z-G3-tKB" firstAttribute="leading" secondItem="lFO-aE-CEb" secondAttribute="trailing" constant="10" id="3ar-di-XM8"/>
@@ -677,15 +691,20 @@ Gw
                                     <constraint firstItem="69z-G3-tKB" firstAttribute="width" secondItem="lFO-aE-CEb" secondAttribute="width" id="F18-ay-B9k"/>
                                     <constraint firstItem="0oc-Ca-F2f" firstAttribute="centerY" secondItem="mwG-vo-zOj" secondAttribute="centerY" id="GOK-uZ-C1A"/>
                                     <constraint firstItem="6EP-Cs-i5f" firstAttribute="trailing" secondItem="Ifg-7P-d1D" secondAttribute="centerX" multiplier="0.75" id="KsH-UN-8oa"/>
+                                    <constraint firstAttribute="trailing" secondItem="gTn-Nw-Oi3" secondAttribute="trailing" constant="20" id="MG6-Gy-IMx"/>
                                     <constraint firstAttribute="bottom" secondItem="lFO-aE-CEb" secondAttribute="bottom" constant="20" id="MOC-i0-JRD"/>
                                     <constraint firstItem="rQ4-dP-mvk" firstAttribute="centerY" secondItem="6EP-Cs-i5f" secondAttribute="centerY" id="ORJ-Rq-MQg"/>
                                     <constraint firstItem="R5l-fq-71L" firstAttribute="leading" secondItem="Ifg-7P-d1D" secondAttribute="centerX" multiplier="0.75" constant="15" id="P6A-Ud-jLr"/>
                                     <constraint firstItem="i3q-fy-Hz3" firstAttribute="top" secondItem="wlj-BJ-x5U" secondAttribute="bottom" constant="15" id="P8U-f8-leM"/>
                                     <constraint firstItem="r05-Sw-HDm" firstAttribute="leading" secondItem="Ifg-7P-d1D" secondAttribute="centerX" multiplier="0.75" constant="15" id="S3R-fe-4kN"/>
                                     <constraint firstItem="i3q-fy-Hz3" firstAttribute="trailing" secondItem="Ifg-7P-d1D" secondAttribute="centerX" multiplier="0.75" id="VBI-Ed-LOu"/>
+                                    <constraint firstItem="d9z-5h-aKt" firstAttribute="trailing" secondItem="Ifg-7P-d1D" secondAttribute="centerX" multiplier="0.75" id="Zu2-B4-HsT"/>
                                     <constraint firstItem="d48-wG-Ve4" firstAttribute="centerY" secondItem="wlj-BJ-x5U" secondAttribute="centerY" id="c0A-7m-w3y"/>
                                     <constraint firstItem="6EP-Cs-i5f" firstAttribute="top" secondItem="i3q-fy-Hz3" secondAttribute="bottom" constant="15" id="de5-V5-ZnG"/>
+                                    <constraint firstItem="d9z-5h-aKt" firstAttribute="top" secondItem="mwG-vo-zOj" secondAttribute="bottom" constant="15" id="eiK-rp-qP6"/>
                                     <constraint firstItem="R5l-fq-71L" firstAttribute="centerY" secondItem="EOS-7b-PVg" secondAttribute="centerY" id="fqQ-tU-hPR"/>
+                                    <constraint firstItem="gTn-Nw-Oi3" firstAttribute="centerY" secondItem="d9z-5h-aKt" secondAttribute="centerY" id="gHM-tE-gwe"/>
+                                    <constraint firstItem="gTn-Nw-Oi3" firstAttribute="leading" secondItem="Ifg-7P-d1D" secondAttribute="centerX" multiplier="0.75" constant="15" id="hGm-SJ-uZX"/>
                                     <constraint firstAttribute="bottom" secondItem="69z-G3-tKB" secondAttribute="bottom" constant="20" id="i5n-my-2pe"/>
                                     <constraint firstItem="LdH-Sp-Ffk" firstAttribute="centerY" secondItem="r05-Sw-HDm" secondAttribute="centerY" id="keP-AW-u73"/>
                                     <constraint firstAttribute="trailing" secondItem="69z-G3-tKB" secondAttribute="trailing" constant="20" id="nyj-0v-dzb"/>
@@ -711,6 +730,7 @@ Gw
                         <outlet property="fallbackDNSText" destination="r05-Sw-HDm" id="zvY-Nd-NtX"/>
                         <outlet property="interceptMatchedDomainsSwitch" destination="mwG-vo-zOj" id="WiL-BI-3Va"/>
                         <outlet property="ipAddressText" destination="R5l-fq-71L" id="mIr-k5-JMQ"/>
+                        <outlet property="lowPowerModeSwitch" destination="d9z-5h-aKt" id="iNr-qb-rgk"/>
                         <outlet property="mtuText" destination="veP-3d-Bo2" id="dfH-My-Vb2"/>
                         <outlet property="saveButton" destination="lFO-aE-CEb" id="GJl-hb-kVN"/>
                         <outlet property="subnetMaskText" destination="d48-wG-Ve4" id="6EX-Ql-ajZ"/>
@@ -718,7 +738,7 @@ Gw
                 </viewController>
                 <customObject id="AAY-tP-rne" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="104.5" y="1529"/>
+            <point key="canvasLocation" x="104.5" y="1547.5"/>
         </scene>
         <!--Snapshot Window Controller-->
         <scene sceneID="hsq-tL-Dza">

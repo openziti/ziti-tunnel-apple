@@ -1,5 +1,5 @@
 //
-// Copyright 2019-2020 NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var fallbackDNSCheck: NSButton!
     @IBOutlet weak var fallbackDNSText: NSTextField!
     @IBOutlet weak var interceptMatchedDomainsSwitch: NSSwitch!
+    @IBOutlet weak var lowPowerModeSwitch: NSSwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,7 +53,6 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     }
     
     private func updateConfigControls() {
-        
         let defaults = ProviderConfig()
         self.ipAddressText.stringValue = defaults.ipAddress
         self.subnetMaskText.stringValue = defaults.subnetMask
@@ -61,6 +61,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.fallbackDNSCheck.state = defaults.fallbackDnsEnabled ? .on : .off
         self.fallbackDNSText.stringValue = defaults.fallbackDns
         self.interceptMatchedDomainsSwitch.state = defaults.interceptMatchedDns ? .on : .off
+        self.lowPowerModeSwitch.state = defaults.lowPowerMode ? .on : .off
         
         guard
             let pp = vc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
@@ -95,6 +96,10 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.interceptMatchedDomainsSwitch.state = interceptMatchedDomains ? .on : .off
         }
         
+        if let lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool {
+            self.lowPowerModeSwitch.state = lowPowerMode ? .on : .off
+        }
+        
         self.ipAddressText.becomeFirstResponder()
     }
     
@@ -116,7 +121,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.saveButton.isEnabled = true
     }
     
-    @IBAction func onEnableMfaToggle(_ sender: Any) {
+    @IBAction func onLowPowerModeToggle(_ sender: Any) {
         self.saveButton.isEnabled = true
     }
     
@@ -129,6 +134,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         dict[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] = self.fallbackDNSCheck.state == .on
         dict[ProviderConfig.FALLBACK_DNS_KEY] = self.fallbackDNSText.stringValue
         dict[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] = self.interceptMatchedDomainsSwitch.state == .on
+        dict[ProviderConfig.LOW_POWER_MODE_KEY] = self.lowPowerModeSwitch.state == .on
         dict[ProviderConfig.LOG_LEVEL_KEY] = String(ZitiLog.getLogLevel().rawValue)
         
         let conf:ProviderConfig = ProviderConfig()
