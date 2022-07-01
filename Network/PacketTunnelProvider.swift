@@ -254,14 +254,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override func sleep(completionHandler: @escaping () -> Void) {
         zLog.info("---Sleep---")
-        
         if providerConfig.lowPowerMode {
-            self.reasserting = true
-            self.setTunnelNetworkSettings(nil) { _ in
-                self.zitiTunnel?.perform {
-                    self.zitiTunnelDelegate?.onSleep()
-                    completionHandler()
-                }
+            self.zitiTunnel?.perform {
+                self.zitiTunnelDelegate?.onSleep(completionHandler)
             }
         } else {
             completionHandler()
@@ -270,22 +265,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override func wake() {
         zLog.info("---Wake---")
-        
         if providerConfig.lowPowerMode {
             zitiTunnel?.perform {
                 self.zitiTunnelDelegate?.onWake()
-                self.updateTunnelNetworkSettings { error in
-                    if let error = error {
-                        zLog.error("Error resetting tunnel network settings on waks: \(error.localizedDescription)")
-                    }
-                    self.reasserting = false
-                }
-            }
-        }
-        
-        zitiTunnel?.perform {
-            self.zitiTunnelDelegate?.allZitis.forEach { z in
-                z.endpointStateChange(true, false)
             }
         }
     }
