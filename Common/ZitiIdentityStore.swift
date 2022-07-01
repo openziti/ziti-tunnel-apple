@@ -96,14 +96,16 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         var zErr:ZitiError?
         var zid:ZitiIdentity?
         fc.coordinate(readingItemAt:url, options:[], error:nil) { url in
-            do {
-                let data = try Data.init(contentsOf: url)
-                let jsonDecoder = JSONDecoder()
-                zid = try jsonDecoder.decode(ZitiIdentity.self, from: data)
-            } catch let error as NSError where error.code == ZitiError.NoSuchFile {
-                zErr = ZitiError("Unable to load zid \(idString): \(error.localizedDescription)", errorCode:ZitiError.NoSuchFile)
-            } catch {
-                zErr = ZitiError("Unable to load zid \(idString): \(error.localizedDescription)")
+            autoreleasepool {
+                do {
+                    let data = try Data.init(contentsOf: url)
+                    let jsonDecoder = JSONDecoder()
+                    zid = try jsonDecoder.decode(ZitiIdentity.self, from: data)
+                } catch let error as NSError where error.code == ZitiError.NoSuchFile {
+                    zErr = ZitiError("Unable to load zid \(idString): \(error.localizedDescription)", errorCode:ZitiError.NoSuchFile)
+                } catch {
+                    zErr = ZitiError("Unable to load zid \(idString): \(error.localizedDescription)")
+                }
             }
         }
         return (zid, zErr)
@@ -150,13 +152,19 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         var zidOnDisk:ZitiIdentity?
         fc.coordinate(readingItemAt: url, writingItemAt: url, error: nil) { readURL, writeURL in
             // read from disk
-            do {
-                let data = try Data.init(contentsOf: readURL)
-                let jsonDecoder = JSONDecoder()
-                zidOnDisk = try jsonDecoder.decode(ZitiIdentity.self, from: data)
-            } catch {
-                zLog.error("Unable to load zid \(zid.name):\(zid.id) - \(error.localizedDescription)")
-                zidOnDisk = zid
+            var readError = false
+            autoreleasepool {
+                do {
+                    let data = try Data.init(contentsOf: readURL)
+                    let jsonDecoder = JSONDecoder()
+                    zidOnDisk = try jsonDecoder.decode(ZitiIdentity.self, from: data)
+                } catch {
+                    zLog.error("Unable to load zid \(zid.name):\(zid.id) - \(error.localizedDescription)")
+                    zidOnDisk = zid
+                    readError = true
+                }
+            }
+            if readError {
                 return
             }
             
