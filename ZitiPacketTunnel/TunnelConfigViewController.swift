@@ -1,5 +1,5 @@
 //
-// Copyright 2019-2020 NetFoundry, Inc.
+// Copyright NetFoundry Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import CZiti
 
 class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     weak var vc: ViewController?
+    var restartRequired = false
+    var requireRestart:[NSTextField] = []
     
     @IBOutlet weak var box: NSBox!
     @IBOutlet weak var ipAddressText: NSTextField!
@@ -30,7 +32,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var fallbackDNSCheck: NSButton!
     @IBOutlet weak var fallbackDNSText: NSTextField!
     @IBOutlet weak var interceptMatchedDomainsSwitch: NSSwitch!
-    @IBOutlet weak var enableMfaSwitch: NSSwitch!
+    @IBOutlet weak var lowPowerModeSwitch: NSSwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,11 +47,12 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.dnsServersText.delegate = self
         self.fallbackDNSText.delegate = self
         
+        self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText ]
+        
         self.updateConfigControls()
     }
     
     private func updateConfigControls() {
-        
         let defaults = ProviderConfig()
         self.ipAddressText.stringValue = defaults.ipAddress
         self.subnetMaskText.stringValue = defaults.subnetMask
@@ -58,7 +61,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.fallbackDNSCheck.state = defaults.fallbackDnsEnabled ? .on : .off
         self.fallbackDNSText.stringValue = defaults.fallbackDns
         self.interceptMatchedDomainsSwitch.state = defaults.interceptMatchedDns ? .on : .off
-        self.enableMfaSwitch.state = defaults.enableMfa ? .on : .off
+        self.lowPowerModeSwitch.state = defaults.lowPowerMode ? .on : .off
         
         guard
             let pp = vc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
@@ -93,31 +96,20 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.interceptMatchedDomainsSwitch.state = interceptMatchedDomains ? .on : .off
         }
         
-        if let enableMfa = conf[ProviderConfig.ENABLE_MFA_KEY] as? Bool {
-            self.enableMfaSwitch.state = enableMfa ? .on : .off
+        if let lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool {
+            self.lowPowerModeSwitch.state = lowPowerMode ? .on : .off
         }
+        
         self.ipAddressText.becomeFirstResponder()
     }
     
-    func configCheck(_ enabledSwitch:NSSwitch, _ toDisableSwitch:NSSwitch, _ text:String) {
-        if enabledSwitch.state == .on && toDisableSwitch.state == .on {
-            let alert = NSAlert()
-            alert.messageText = "Configuration Notice"
-            alert.informativeText = text
-            alert.alertStyle = .warning
-            alert.addButton(withTitle: "OK")
-            alert.addButton(withTitle: "Cancel")
-            if alert.runModal() == .alertFirstButtonReturn { // OK
-                toDisableSwitch.state = .off
-            } else { // Cancel
-                enabledSwitch.state = .off
-            }
-        }
-    }
-        
     // Occurs whenever you input first symbol after focus is here
     func controlTextDidBeginEditing(_ obj: Notification) {
         self.saveButton.isEnabled = true
+        
+        if let object = obj.object as? NSTextField, self.requireRestart.contains(object) {
+            self.restartRequired = true
+        }
     }
     
     @IBAction func onFallbackDNSCheck(_ sender: Any) {
@@ -127,14 +119,10 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func onInterceptMatchedDomainsToggle(_ sender: Any) {
         self.saveButton.isEnabled = true
-        configCheck(interceptMatchedDomainsSwitch, enableMfaSwitch,
-                    "Enabling this mode requires MFA to be disabled.  Disable MFA and continue?")
     }
     
-    @IBAction func onEnableMfaToggle(_ sender: Any) {
+    @IBAction func onLowPowerModeToggle(_ sender: Any) {
         self.saveButton.isEnabled = true
-        configCheck(enableMfaSwitch, interceptMatchedDomainsSwitch,
-                    "Enabling MFA requires intercepting by matching domains to be diabled. Disable and continue?")
     }
     
     @IBAction func onSaveButton(_ sender: Any) {
@@ -146,8 +134,8 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         dict[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] = self.fallbackDNSCheck.state == .on
         dict[ProviderConfig.FALLBACK_DNS_KEY] = self.fallbackDNSText.stringValue
         dict[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] = self.interceptMatchedDomainsSwitch.state == .on
-        dict[ProviderConfig.ENABLE_MFA_KEY] = self.enableMfaSwitch.state == .on
-        dict[ProviderConfig.LOG_LEVEL] = String(ZitiLog.getLogLevel().rawValue)
+        dict[ProviderConfig.LOW_POWER_MODE_KEY] = self.lowPowerModeSwitch.state == .on
+        dict[ProviderConfig.LOG_LEVEL_KEY] = String(ZitiLog.getLogLevel().rawValue)
         
         let conf:ProviderConfig = ProviderConfig()
         if let error = conf.parseDictionary(dict) {
@@ -167,7 +155,12 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
                 if let error = error {
                     NSAlert(error:error).runModal()
                 } else {
-                    self.vc?.tunnelMgr.restartTunnel()
+                    if self.restartRequired {
+                        self.vc?.tunnelMgr.restartTunnel()
+                    } else {
+                        self.vc?.tunnelMgr.reassert()
+                    }
+                    self.restartRequired = false
                     self.saveButton.isEnabled = false
                     self.dismiss(self)
                     

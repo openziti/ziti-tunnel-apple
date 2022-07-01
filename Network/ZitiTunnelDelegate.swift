@@ -26,7 +26,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     
     weak var ptp:PacketTunnelProvider?
     let userNotifications = UserNotifications.shared
-    
+    let encoder = JSONEncoder()
     let zidStore = ZitiIdentityStore()
     var tzids:[ZitiIdentity]?
     var allZitis:[Ziti] = []
@@ -34,6 +34,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     var interceptedRoutes:[NEIPv4Route] = []
     var excludedRoutes:[NEIPv4Route] = []
     var tunnelShuttingDown = false
+    var lastWakeTime:Date?
     
     private var identitiesLoaded:Bool = false // when true, restart is required to update routes for services intercepted by IP
     
@@ -55,7 +56,8 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         // create list of CZiti.ZitiIdenty type used by CZiti.ZitiTunnel
         var zids:[CZiti.ZitiIdentity] = []
         tzids.forEach { tzid in
-            if let czid = tzid.czid, tzid.isEnabled == true {
+            if let czid = tzid.czid { // , tzid.isEnabled == true {
+                czid.startDisabled = !tzid.isEnabled
                 tzid.appexNotifications = nil
                 tzid.services = []
                 if tzid.isMfaEnabled {
@@ -118,6 +120,16 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         let (dest, subnetMask) = cidrToDestAndMask(destinationAddress)
         
         if let dest = dest, let subnetMask = subnetMask {
+            // TSDK is adding the DNS intercept IP addresses for some reason.  Filter 'em out...
+            if subnetMask == "255.255.255.255", let tunNet = ptp?.providerConfig.ipAddress, let tunMask = ptp?.providerConfig.subnetMask {
+                let destData = IPUtils.ipV4AddressStringToData(dest)
+                let tunNetData = IPUtils.ipV4AddressStringToData(tunNet)
+                let tunMaskData = IPUtils.ipV4AddressStringToData(tunMask)
+                if IPUtils.inV4Subnet(destData, network: tunNetData, mask: tunMaskData) {
+                    return 0
+                }
+            }
+            
             zLog.info("addRoute \(dest) => \(dest), \(subnetMask)")
             let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
             
@@ -125,12 +137,15 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             if interceptedRoutes.first(where: { IPUtils.areSameRoutes($0, route) }) == nil {
                 alreadyExists = false
             }
-            if !alreadyExists {
-                if identitiesLoaded {
-                    zLog.warn("*** Unable to add route for \(destinationAddress) to running tunnel. " +
-                            "If route not already available it must be manually added (/sbin/route) or tunnel restarted ***")
-                } else {
-                    interceptedRoutes.append(route)
+            
+            // always add it, even if already there. This gives us "poor man's refernece counting" since Apple handles duplicates just fine.
+            interceptedRoutes.append(route)
+            
+            if !alreadyExists && identitiesLoaded {
+                self.ptp?.updateTunnelNetworkSettings { error in
+                    if let error = error {
+                        zLog.error("Error adding route \(destinationAddress): \(error.localizedDescription)")
+                    }
                 }
             }
         }
@@ -141,16 +156,29 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         let (dest, subnetMask) = cidrToDestAndMask(destinationAddress)
         
         if let dest = dest, let subnetMask = subnetMask {
-            zLog.info("deleteRoute \(dest) => \(dest), \(subnetMask)")
-            let route = NEIPv4Route(destinationAddress: dest,
-                                    subnetMask: subnetMask)
+            // TSDK is adding the DNS intercept IP addresses for some reason.  Filter 'em out here since we never added 'em
+            if subnetMask == "255.255.255.255", let tunNet = ptp?.providerConfig.ipAddress, let tunMask = ptp?.providerConfig.subnetMask {
+                let destData = IPUtils.ipV4AddressStringToData(dest)
+                let tunNetData = IPUtils.ipV4AddressStringToData(tunNet)
+                let tunMaskData = IPUtils.ipV4AddressStringToData(tunMask)
+                if IPUtils.inV4Subnet(destData, network: tunNetData, mask: tunMaskData) {
+                    return 0
+                }
+            }
             
-            if identitiesLoaded{
-                zLog.warn("*** Unable to delete route for \(destinationAddress) on running tunnel.")
-            } else {
-                interceptedRoutes = interceptedRoutes.filter {
-                    $0.destinationAddress == route.destinationAddress &&
-                    $0.destinationSubnetMask == route.destinationSubnetMask
+            zLog.info("deleteRoute \(dest) => \(dest), \(subnetMask)")
+            let route = NEIPv4Route(destinationAddress: dest, subnetMask: subnetMask)
+            
+            // Remove only the first occurrence (poor man's reference counting)
+            if let index = interceptedRoutes.firstIndex(where: { IPUtils.areSameRoutes($0, route)}) {
+                interceptedRoutes.remove(at: index)
+            }
+                            
+            if identitiesLoaded {
+                self.ptp?.updateTunnelNetworkSettings { error in
+                    if let error = error {
+                        zLog.error("Error removing route \(destinationAddress): \(error.localizedDescription)")
+                    }
                 }
             }
         }
@@ -173,7 +201,11 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
             
             if identitiesLoaded && !alreadyExists {
-                zLog.warn("*** Unable to exclude route for \(destinationAddress) on running tunnel")
+                self.ptp?.updateTunnelNetworkSettings { error in
+                    if let error = error {
+                        zLog.error("Error excluding route \(destinationAddress): \(error.localizedDescription)")
+                    }
+                }
             }
         }
         return 0
@@ -195,25 +227,29 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             return
         }
         
-        tzid.czid = ziti.id
-        let (cvers, _, _) = ziti.getControllerVersion()
-        tzid.controllerVersion = cvers
-        
-        if let contextEvent = event as? ZitiTunnelContextEvent {
-            handleContextEvent(ziti, tzid, contextEvent)
-        } else if let apiEvent = event as? ZitiTunnelApiEvent {
-            handleApiEvent(ziti, tzid, apiEvent)
-        } else if let serviceEvent = event as? ZitiTunnelServiceEvent {
-            handleServiceEvent(ziti, tzid, serviceEvent)
-        } else if let _ = event as? ZitiTunnelMfaEvent {
-            tzid.mfaPending = true
-            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+        // I hate to do this.  But without it memory piles up enough to sometimes cause iOS app to exit
+        // from going over the hard limit an mem usage Apple sets for network extensions
+        autoreleasepool { // TODO: also the route updates (or at least all of the IP checks...)
+            tzid.czid = ziti.id
+            let (cvers, _, _) = ziti.getControllerVersion()
+            tzid.controllerVersion = cvers
             
-            userNotifications.post(.Mfa, "MFA Auth Requested", tzid.name, tzid)
-            
-            // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
-            //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
-            _ = zidStore.update(tzid, [.Mfa, .EdgeStatus, .ControllerVersion])
+            if let contextEvent = event as? ZitiTunnelContextEvent {
+                handleContextEvent(ziti, tzid, contextEvent)
+            } else if let apiEvent = event as? ZitiTunnelApiEvent {
+                handleApiEvent(ziti, tzid, apiEvent)
+            } else if let serviceEvent = event as? ZitiTunnelServiceEvent {
+                handleServiceEvent(ziti, tzid, serviceEvent)
+            } else if let _ = event as? ZitiTunnelMfaEvent {
+                tzid.mfaPending = true
+                tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+                
+                userNotifications.post(.Mfa, "MFA Auth Requested", tzid.name, tzid)
+                
+                // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
+                //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
+                _ = zidStore.update(tzid, [.Mfa, .EdgeStatus, .ControllerVersion])
+            }
         }
     }
     
@@ -227,8 +263,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         if event.code == Ziti.ZITI_OK {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
             
-            // Notifiy when controller comes (back) online after inital startup. Don't notify during startup to reduce noise
-            if identitiesLoaded {
+            // Notifiy when controller comes (back) online after inital startup. Don't notify during startup or right after weke to reduce noise
+            var justWokeUp = false
+            if let lwt = lastWakeTime, lwt.timeIntervalSinceNow > -3.0 {
+                justWokeUp = true
+            }
+            if identitiesLoaded && !justWokeUp {
                 userNotifications.post(.Info, "Controller: \(ZitiIdentity.ConnectivityStatus.Available.rawValue)",
                                        "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
             }
@@ -243,6 +283,15 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
         }
         _ = zidStore.update(tzid, [.ControllerVersion, .CZitiIdentity, .EdgeStatus])
+        
+        if let ipcCompletionHandler = ziti.userData.removeValue(forKey: IpcAppexServer.CONTEXT_EVENT_ENABLED_CALLBACK_KEY) as? IpcAppexServer.CompletionHandler {
+            zLog.debug("Completion handler found fo IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI)")
+            let respMsg = IpcSetEnabledResponseMessage(ziti.id.id, event.code)
+            if let data = try? encoder.encode(respMsg) {
+                zLog.info("Responding to IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI), with status code \(event.code)")
+                ipcCompletionHandler(data)
+            }
+        }
     }
     
     private func canDial(_ eSvc:CZiti.ZitiService) -> Bool {
@@ -268,7 +317,10 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     private func containsNewDnsEntry(_ zSvc:ZitiService) -> Bool {
         if let addresses = zSvc.addresses  {
             for addr in addresses.components(separatedBy: ",") {
-                if dnsEntries.contains(addr) {
+                let (ip, _) = cidrToDestAndMask(addr)
+                let isDNS = ip == nil
+                
+                if isDNS && !dnsEntries.contains(addr.trimmingCharacters(in: .whitespaces)) {
                     return true
                 }
             }
@@ -276,41 +328,35 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         return false
     }
     
-    private func processService(_ tzid:ZitiIdentity, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) {
+    private func processService(_ tzid:ZitiIdentity, _ eSvc:CZiti.ZitiService, remove:Bool=false, add:Bool=false) -> Bool {
         guard let serviceId = eSvc.id else {
             zLog.error("invalid service for \(tzid.name):(\(tzid.id)), name=\(eSvc.name ?? "nil"), id=\(eSvc.id ?? "nil")")
-            return
+            return false
         }
         
+        var reassert = false
+        
         if remove {
-            if !identitiesLoaded {
-                self.dnsEntries.remove(serviceId)
-            }
+            self.dnsEntries.remove(serviceId)
             tzid.services = tzid.services.filter { $0.id != serviceId }
+            reassert = true // could be smarter about this, but won't hurt (and removing service is less common that adding)
         }
         
         if add {
             if canDial(eSvc) {
                 let zSvc = ZitiService(eSvc)
+                let hasNewDnsEntry = containsNewDnsEntry(zSvc)
                 zSvc.addresses?.components(separatedBy: ",").forEach { addr in
                     let (ip, _) = cidrToDestAndMask(addr)
                     let isDNS = ip == nil
-                    if !identitiesLoaded && isDNS {
-                        dnsEntries.add(addr, "", serviceId)
-                    } else if isDNS && (ptp?.providerConfig.interceptMatchedDns ?? true) {
-                        zLog.warn("*** Unable to add DNS support for \(addr) to running tunnel when intercepting by matched domains")
-                    }
+                    if isDNS { dnsEntries.add(addr.trimmingCharacters(in: .whitespaces), "", serviceId) }
                 }
                 
-                // check if restart is needed
+                // check if reassert is needed
                 if identitiesLoaded {
-                    // If intercepting by domains or has new route, needsRestart
-                    if ((ptp?.providerConfig.interceptMatchedDns ?? true) && containsNewDnsEntry(zSvc)) || containsNewRoute(zSvc) {
-                        let msg = "Restart may be required to access service \"\(zSvc.name ?? "")\""
-                        zLog.warn(msg)
-                        userNotifications.post(.Restart, tzid.name, msg, tzid)
-                        tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
-                        zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .PartiallyAvailable, needsRestart: true)
+                    // If intercepting by domains or has new route, need to reassert
+                    if ((ptp?.providerConfig.interceptMatchedDns ?? true) && hasNewDnsEntry) { //} || containsNewRoute(zSvc) {
+                        reassert = true
                     }
                 }
                 
@@ -332,11 +378,29 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 tzid.services.append(zSvc)
             }
         }
+        return reassert
     }
     
     private func handleServiceEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelServiceEvent) {
-        for eSvc in event.removed { processService(tzid, eSvc, remove:true) }
-        for eSvc in event.added   { processService(tzid, eSvc, add:true) }
+        var reassert = false
+        for eSvc in event.removed {
+            if processService(tzid, eSvc, remove:true) {
+                reassert = true
+            }
+        }
+        for eSvc in event.added {
+            if processService(tzid, eSvc, add:true) {
+                reassert = true
+            }
+        }
+        
+        if reassert {
+            ptp?.updateTunnelNetworkSettings { error in
+                if let error = error {
+                    zLog.error("Error updating tunnel network settings: \(error.localizedDescription)")
+                }
+            }
+        }
         
         if tzid.allServicePostureChecksPassing() && !tzid.needsRestart() {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
@@ -455,6 +519,50 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 self.userNotifications.post(.Mfa, "MFA Auth Posture Check",
                                             "\(tzid.name) MFA expiring in less then \(ZitiTunnelDelegate.MFA_POSTURE_CHECK_FINAL_NOTICE/60) mins",
                                             tzid)
+            }
+        }
+    }
+    
+    func onSleep(_ completionHandler: @escaping () -> Void) {
+        var sleepsPending = 0
+        allZitis.forEach { z in
+            if let tzid = zidToTzid(z.id.id), tzid.isEnabled {
+                sleepsPending += 1
+            }
+        }
+        
+        if sleepsPending == 0 {
+            zLog.info("----Nobody going to sleep, so we're done...")
+            completionHandler()
+            return
+        }
+        
+        allZitis.forEach { z in
+            if let tzid = zidToTzid(z.id.id) {
+                let disableCompleteHandler:IpcAppexServer.CompletionHandler = { _ in
+                    sleepsPending -= 1
+                    if sleepsPending == 0 {
+                        zLog.info("  ----ALL SLEEPS PENDING COMPLETE ----")
+                        completionHandler()
+                    }
+                }
+                z.userData[IpcAppexServer.CONTEXT_EVENT_ENABLED_CALLBACK_KEY] = disableCompleteHandler
+                
+                if tzid.isEnabled {
+                    z.setEnabled(false)
+                }
+            }
+        }
+    }
+    
+    func onWake() {
+        lastWakeTime = Date()
+        allZitis.forEach { z in
+            if let tzid = zidToTzid(z.id.id) {
+                if tzid.isEnabled {
+                    if !z.isEnabled() { z.setEnabled(true) }
+                    z.endpointStateChange(true, false)
+                }
             }
         }
     }

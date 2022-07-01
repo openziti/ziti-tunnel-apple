@@ -119,7 +119,7 @@ class TunnelMgr: NSObject {
                     
                     // Get our logLevel from config
                     if let conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
-                        if let logLevel = conf[ProviderConfig.LOG_LEVEL] as? String {
+                        if let logLevel = conf[ProviderConfig.LOG_LEVEL_KEY] as? String {
                             let li = Int32(logLevel) ?? ZitiLog.LogLevel.INFO.rawValue
                             let ll = ZitiLog.LogLevel(rawValue: li) ?? ZitiLog.LogLevel.INFO
                             zLog.info("Updating log level to \(logLevel) (\(ll))") 
@@ -235,7 +235,7 @@ class TunnelMgr: NSObject {
         
         if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
             // update logLevel
-            conf[ProviderConfig.LOG_LEVEL] = String(level.rawValue)
+            conf[ProviderConfig.LOG_LEVEL_KEY] = String(level.rawValue)
             (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = conf
             
             zLog.info("Updated providerConfiguration: \(conf)")
@@ -257,6 +257,48 @@ class TunnelMgr: NSObject {
             }
         } else {
             zLog.info("No log level found.  Using default")
+        }
+    }
+    
+    func reassert() {
+        guard self.status == .connected else {
+            return
+        }
+        
+        zLog.info("Notifying appex to reassert tunnel configuration")
+        let msg = IpcReassertMessage()
+        self.ipcClient.sendToAppex(msg) { _, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message to reassert tunnel configuration: \(zErr!.localizedDescription)")
+                return
+            }
+        }
+    }
+    
+    func sendEnabledMessage(_ zid:ZitiIdentity, _ completionHandler: @escaping (Int32) -> Void) {
+        guard self.status == .connected else {
+            completionHandler(0)
+            return
+        }
+        
+        let enabled = zid.isEnabled
+        zLog.info("Sending message to set enabled to \(enabled) for identity \(zid.name):\(zid.id), controller: \(zid.czid?.ztAPI ?? "--")")
+        let msg = IpcSetEnabledMessage(zid.id, enabled)
+        self.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message to set enabled to \(enabled) for identity \(zid.name):\(zid.id), \(zErr!.localizedDescription)")
+                return
+            }
+            guard let setEnabledRespMsg = respMsg as? IpcSetEnabledResponseMessage else {
+                let msgType = respMsg != nil ? "\(respMsg!.meta.msgType)" : "unknown"
+                zLog.error("Unexpected response message type \(msgType)")
+                return
+            }
+            guard let code = setEnabledRespMsg.code else {
+                zLog.error("Invalid code for IPC Set Enabled Response for \(zid.name):\(zid.id), controller: \(zid.czid?.ztAPI ?? "--")")
+                return
+            }
+            completionHandler(code)
         }
     }
 }

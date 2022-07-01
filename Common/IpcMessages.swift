@@ -22,6 +22,9 @@ enum IpcMessageType : Int32, Codable {
     case AppexNotificationAction
     case ErrorResponse
     case SetLogLevel
+    case Reassert
+    case SetEnabled
+    case SetEnabledResponse
     case DumpRequest
     case DumpResponse
     case MfaEnrollRequest
@@ -41,6 +44,9 @@ enum IpcMessageType : Int32, Codable {
         case .AppexNotificationAction: return IpcAppexNotificationActionMessage.self
         case .ErrorResponse: return IpcErrorResponseMessage.self
         case .SetLogLevel: return IpcSetLogLevelMessage.self
+        case .Reassert: return IpcReassertMessage.self
+        case .SetEnabled: return IpcSetEnabledMessage.self
+        case .SetEnabledResponse: return IpcSetEnabledResponseMessage.self
         case .DumpRequest: return IpcDumpRequestMessage.self
         case .DumpResponse: return IpcDumpResponseMessage.self
         case .MfaEnrollRequest: return IpcMfaEnrollRequestMessage.self
@@ -204,6 +210,61 @@ class IpcSetLogLevelMessage : IpcMessage {
         try super.encode(to: encoder)
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encodeIfPresent(logLevel, forKey: .logLevel)
+    }
+}
+
+class IpcReassertMessage : IpcMessage {
+    init() {
+        let m = Meta(nil, .Reassert)
+        super.init(m)
+    }
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+class IpcSetEnabledMessage : IpcMessage {
+    enum CodingKeys: String, CodingKey { case enabled }
+    var enabled:Bool?
+    
+    init(_ zid:String, _ enabled:Bool) {
+        let m = Meta(zid, .SetEnabled, IpcSetEnabledResponseMessage.self)
+        self.enabled = enabled
+        super.init(m)
+    }
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        enabled = try? c.decode(Bool.self, forKey: .enabled)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(enabled, forKey: .enabled)
+    }
+}
+
+class IpcSetEnabledResponseMessage : IpcMessage {
+    enum CodingKeys: String, CodingKey { case code }
+    var code:Int32?
+    
+    init(_ zid:String, _ code:Int32) {
+        let m = Meta(zid, .SetEnabledResponse)
+        self.code = code
+        super.init(m)
+    }
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        code = try? c.decode(Int32.self, forKey: .code)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(code, forKey: .code)
     }
 }
 

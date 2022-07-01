@@ -48,16 +48,17 @@ class ProviderConfig : NSObject {
     static var FALLBACK_DNS_KEY = "fallbackDns"
     static var INTERCEPT_MATCHED_DNS_KEY = "interceptMatchedDns"
     static var ENABLE_MFA_KEY = "enableMfa"
-    static var LOG_LEVEL = "logLevel"
+    static var LOG_LEVEL_KEY = "logLevel"
+    static var LOW_POWER_MODE_KEY = "lowPowerMode"
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "100.64.0.1"
     var subnetMask:String = "255.192.0.0"
-    #if os(macOS)
+#if os(macOS)
     var mtu:Int = 4000
-    #else
+#else
     var mtu:Int = 4000
-    #endif
+#endif
     var dnsAddresses:[String] = ["100.64.0.2"]
     var fallbackDnsEnabled = false
     var fallbackDns:String = "1.1.1.1"
@@ -69,17 +70,31 @@ class ProviderConfig : NSObject {
 #endif
     var logLevel:Int = Int(ZitiLog.LogLevel.INFO.rawValue)
     var interceptMatchedDns:Bool = true
-    var enableMfa:Bool = false
+   
+    // MFA no longer a beta feature on macOS - hardcode it to "enabled"
+#if os(macOS)
+    let enableMfa = true
+#else
+    let enableMfa = false
+#endif
+    
+    // If never stored, set default value to false
+#if os(macOS)
+    var lowPowerMode:Bool = false
+#else
+    var lowPowerMode:Bool = false
+#endif
     
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,
                 ProviderConfig.SUBNET_KEY: self.subnetMask,
                 ProviderConfig.MTU_KEY: String(self.mtu),
-                ProviderConfig.LOG_LEVEL: String(self.logLevel),
+                ProviderConfig.LOG_LEVEL_KEY: String(self.logLevel),
                 ProviderConfig.DNS_KEY: self.dnsAddresses.joined(separator: ","),
                 ProviderConfig.FALLBACK_DNS_ENABLED_KEY: self.fallbackDnsEnabled,
                 ProviderConfig.FALLBACK_DNS_KEY: self.fallbackDns,
                 ProviderConfig.ENABLE_MFA_KEY: self.enableMfa,
+                ProviderConfig.LOW_POWER_MODE_KEY: self.lowPowerMode,
                 ProviderConfig.INTERCEPT_MATCHED_DNS_KEY: self.interceptMatchedDns]
     }
     
@@ -133,8 +148,13 @@ class ProviderConfig : NSObject {
         }
         self.fallbackDnsEnabled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool ?? false
         self.interceptMatchedDns = conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] as? Bool ?? true
-        self.enableMfa = conf[ProviderConfig.ENABLE_MFA_KEY] as? Bool ?? false
-        self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL] as? String ?? "3") ?? 3
+        
+        // only update lowPowerMode if present in the stored config, otherwise leave it as the default value
+        // (which differs per operating system)
+        if let lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool {
+            self.lowPowerMode = lowPowerMode
+        }
+        self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL_KEY] as? String ?? "3") ?? 3
         return nil
     }
     
@@ -148,6 +168,7 @@ class ProviderConfig : NSObject {
             "fallbackDns: \(self.fallbackDns)\n" +
             "interceptMatchedDns: \(self.interceptMatchedDns)\n" +
             "enableMfa: \(self.enableMfa)\n" +
+            "lowPowerMode: \(self.lowPowerMode)\n" +
             "logLevel: \(self.logLevel)"
     }
 }
