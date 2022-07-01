@@ -274,4 +274,31 @@ class TunnelMgr: NSObject {
             }
         }
     }
+    
+    func sendEnabledMessage(_ zid:ZitiIdentity, _ completionHandler: @escaping (Int32) -> Void) {
+        guard self.status == .connected else {
+            completionHandler(0)
+            return
+        }
+        
+        let enabled = zid.isEnabled
+        zLog.info("Sending message to set enabled to \(enabled) for identity \(zid.name):\(zid.id), controller: \(zid.czid?.ztAPI ?? "--")")
+        let msg = IpcSetEnabledMessage(zid.id, enabled)
+        self.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message to set enabled to \(enabled) for identity \(zid.name):\(zid.id), \(zErr!.localizedDescription)")
+                return
+            }
+            guard let setEnabledRespMsg = respMsg as? IpcSetEnabledResponseMessage else {
+                let msgType = respMsg != nil ? "\(respMsg!.meta.msgType)" : "unknown"
+                zLog.error("Unexpected response message type \(msgType)")
+                return
+            }
+            guard let code = setEnabledRespMsg.code else {
+                zLog.error("Invalid code for IPC Set Enabled Response for \(zid.name):\(zid.id), controller: \(zid.czid?.ztAPI ?? "--")")
+                return
+            }
+            completionHandler(code)
+        }
+    }
 }
