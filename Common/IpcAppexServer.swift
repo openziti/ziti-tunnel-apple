@@ -22,6 +22,9 @@ class IpcAppexServer : NSObject {
     let decoder = JSONDecoder()
     let encoder = JSONEncoder()
     
+    typealias CompletionHandler = (Data?) -> Void
+    public static let CONTEXT_EVENT_ENABLED_CALLBACK_KEY = "IpcAppexServer.ContextEventEnabledCallback"
+    
     init(_ ptp:PacketTunnelProvider) {
         self.ptp = ptp
     }
@@ -30,7 +33,7 @@ class IpcAppexServer : NSObject {
         return try? encoder.encode(IpcErrorResponseMessage(errStr))
     }
     
-    func processMessage(_ messageData:Data, completionHandler: ((Data?) -> Void)?) {
+    func processMessage(_ messageData:Data, completionHandler: CompletionHandler?) {
         guard let polyMsg = try? decoder.decode(IpcPolyMessage.self, from: messageData) else {
             let errStr = "Unable to decode IpcMessage"
             zLog.error(errStr)
@@ -44,6 +47,7 @@ class IpcAppexServer : NSObject {
         switch baseMsg.meta.msgType {
         case .SetLogLevel: processSetLogLevel(baseMsg, completionHandler: completionHandler)
         case .Reassert: processReassert(baseMsg, completionHandler: completionHandler)
+        case .SetEnabled: processSetEnabled(baseMsg, completionHandler: completionHandler)
         case .DumpRequest: processDumpRequest(baseMsg, completionHandler: completionHandler)
         case .MfaEnrollRequest: processMfaEnrollRequest(baseMsg, completionHandler: completionHandler)
         case .MfaVerifyRequest: processMfaVerifyRequest(baseMsg, completionHandler: completionHandler)
@@ -58,7 +62,7 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processSetLogLevel(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processSetLogLevel(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         guard let msg = baseMsg as? IpcSetLogLevelMessage, let logLevel = msg.logLevel else {
             let errStr = "Unexpected message type"
             zLog.error(errStr)
@@ -73,7 +77,7 @@ class IpcAppexServer : NSObject {
         completionHandler?(nil)
     }
     
-    func processReassert(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processReassert(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         if let error = ptp.loadConfig() {
             zLog.error("Error loading tunnel config: \(error.localizedDescription)")
             // Don't return on error here - there are other reasons to reassert...
@@ -87,7 +91,40 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processDumpRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processSetEnabled(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
+        guard let msg = baseMsg as? IpcSetEnabledMessage, let enabled = msg.enabled else {
+            let errStr = "Unexpected message type"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
+            return
+        }
+        guard let ziti = ptp.zitiTunnelDelegate?.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
+            let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
+            return
+        }
+
+        ziti.perform {
+            zLog.info("Setting Enabled to \(enabled) for \(ziti.id.name ?? ""):\(ziti.id.id), controller: \(ziti.id.ztAPI)")
+            
+            if completionHandler != nil {
+                ziti.userData[IpcAppexServer.CONTEXT_EVENT_ENABLED_CALLBACK_KEY] = completionHandler
+            }
+            ziti.setEnabled(enabled)
+            
+            // if all DNS is going thru the TUN, reset network settings (which fixes DNS issues on re-enable, flushing DNS cache I believe)
+            if !self.ptp.providerConfig.interceptMatchedDns {
+                self.ptp.updateTunnelNetworkSettings { error in
+                    if let error = error {
+                        zLog.error("Error updating tunnel network settings: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
+    }
+    
+    func processDumpRequest(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         let dumpStr = ptp.dumpZitis()
         zLog.info(dumpStr)
         
@@ -100,7 +137,7 @@ class IpcAppexServer : NSObject {
         completionHandler?(data)
     }
     
-    func processMfaEnrollRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processMfaEnrollRequest(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         guard let msg = baseMsg as? IpcMfaEnrollRequestMessage else {
             let errStr = "Unexpected message type"
             zLog.error(errStr)
@@ -126,7 +163,7 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaVerifyRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processMfaVerifyRequest(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         guard let msg = baseMsg as? IpcMfaVerifyRequestMessage else {
             let errStr = "Unexpected message type"
             zLog.error(errStr)
@@ -158,7 +195,7 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaRemoveRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processMfaRemoveRequest(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         guard let msg = baseMsg as? IpcMfaRemoveRequestMessage else {
             let errStr = "Unexpected message type"
             zLog.error(errStr)
@@ -190,7 +227,7 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaAuthQueryResponse(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processMfaAuthQueryResponse(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         guard let msg = baseMsg as? IpcMfaAuthQueryResponseMessage else {
             let errStr = "Unexpected message type"
             zLog.error(errStr)
@@ -222,7 +259,7 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaGetRecoveryCodesRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processMfaGetRecoveryCodesRequest(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         guard let msg = baseMsg as? IpcMfaGetRecoveryCodesRequestMessage else {
             let errStr = "Unexpected message type"
             zLog.error(errStr)
@@ -254,7 +291,7 @@ class IpcAppexServer : NSObject {
         }
     }
     
-    func processMfaNewRecoveryCodesRequest(_ baseMsg:IpcMessage, completionHandler: ((Data?) -> Void)?) {
+    func processMfaNewRecoveryCodesRequest(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
         guard let msg = baseMsg as? IpcMfaNewRecoveryCodesRequestMessage else {
             let errStr = "Unexpected message type"
             zLog.error(errStr)
