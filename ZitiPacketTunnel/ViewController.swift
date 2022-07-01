@@ -59,6 +59,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     var enrollingIds:[ZitiIdentity] = []
+    var enableStatePendingIds:[ZitiIdentity] = []
     
     let notificationsPanel = NotificationsPanel()
     
@@ -147,7 +148,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             csStr += " (as of \(DateFormatter().timeSince(cs.lastContactAt)))"
             
             box.alphaValue = 1.0
-            idEnabledBtn.isEnabled = zId.isEnrolled
+            
+            if tunnelMgr.status != .connected { enableStatePendingIds = [] }
+            if enableStatePendingIds.contains(where: { $0.id == zId.id }) {
+                idEnabledBtn.isEnabled = false
+            } else {
+                idEnabledBtn.isEnabled = zId.isEnrolled
+            }
             idEnabledBtn.state = zId.isEnabled ? .on : .off
             mfaSwitch.isEnabled = zId.isEnabled && (tunnelMgr.status == .connected || tunnelMgr.status == .connecting)
             mfaSwitch.state = zId.isMfaEnabled ? .on : .off
@@ -517,8 +524,17 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             let zId = zids[indx]
             zId.enabled = sender.state == .on
             zids[indx] = zidStore.update(zId, [.Enabled])
-            updateServiceUI(zId:zId)
-            tunnelMgr.restartTunnel()
+            enableStatePendingIds.append(zId)
+            idEnabledBtn.isEnabled = false
+            tunnelMgr.sendEnabledMessage(zId) { code in
+                DispatchQueue.main.async {
+                    zLog.info("Completion response received for Set Enabled \(zId.isEnabled) for \(zId.name):\(zId.id), with code \(code)")
+                    self.enableStatePendingIds.removeAll { $0.id == zId.id }
+                    if let indx = self.representedObject as? Int, self.zids.count > 0 {
+                        self.updateServiceUI(zId: self.zids[indx])
+                    }
+                }
+            }
         }
     }
     
