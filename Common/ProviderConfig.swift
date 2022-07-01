@@ -78,11 +78,11 @@ class ProviderConfig : NSObject {
     let enableMfa = false
 #endif
     
-    // If never stored, set default value to false on macOS, otherwise true
+    // If never stored, set default value to false
 #if os(macOS)
     var lowPowerMode:Bool = false
 #else
-    var lowPowerMode:Bool = true
+    var lowPowerMode:Bool = false
 #endif
     
     func createDictionary() -> ProviderConfigDict {
