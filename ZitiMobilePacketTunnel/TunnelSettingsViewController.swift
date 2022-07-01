@@ -208,7 +208,8 @@ class TunnelSettingsViewController: UITableViewController {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 1 // 2 setting to 1 effectively disables lowPowerMode...
+        // TODO: lowPowerMode.  When re-enabled, also fix the logic that applies the settings (imm apply lowPowerMode, change Reset back to Save for others...)
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
