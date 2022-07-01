@@ -55,7 +55,9 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             zid.enabled = enabled
             self.zid = tvc?.zidStore.update(zid, [.Enabled])
             tableView.reloadData()
-            tvc?.tunnelMgr.restartTunnel()
+            tvc?.tunnelMgr.sendEnabledMessage(zid) { code in
+                zLog.info("Completion response for Set Enabled \(zid.isEnabled) for \(zid.name):\(zid.id), with code \(code)")
+            }
             tvc?.tableView.reloadData()
         }
     }
