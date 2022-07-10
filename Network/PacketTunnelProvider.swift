@@ -265,10 +265,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override func wake() {
         zLog.info("---Wake---")
-        if providerConfig.lowPowerMode {
-            zitiTunnel?.perform {
-                self.zitiTunnelDelegate?.onWake()
-            }
+        zitiTunnel?.perform {
+            self.zitiTunnelDelegate?.onWake()
         }
     }
     

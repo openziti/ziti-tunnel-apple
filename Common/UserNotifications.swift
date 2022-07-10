@@ -104,7 +104,7 @@ class UserNotifications {
             zLog.debug("Notification settings: \(settings.debugDescription)")
             
             guard settings.authorizationStatus == .authorized else {
-                zLog.warn("Not authorized to send nottifications")
+                zLog.warn("Not authorized to send notifications")
                 completionHandler?()
                 return
             }
