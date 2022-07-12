@@ -46,6 +46,7 @@ class IpcAppexServer : NSObject {
                 
         switch baseMsg.meta.msgType {
         case .SetLogLevel: processSetLogLevel(baseMsg, completionHandler: completionHandler)
+        case .UpdateLogRotateConfig: processUpdateLogRotateConfig(baseMsg, completionHandler: completionHandler)
         case .Reassert: processReassert(baseMsg, completionHandler: completionHandler)
         case .SetEnabled: processSetEnabled(baseMsg, completionHandler: completionHandler)
         case .DumpRequest: processDumpRequest(baseMsg, completionHandler: completionHandler)
@@ -74,6 +75,15 @@ class IpcAppexServer : NSObject {
         zLog.info("Updating LogLevel to \(lvl)")
         ZitiLog.setLogLevel(lvl)
         ptp.appLogLevel = lvl
+        completionHandler?(nil)
+    }
+    
+    func processUpdateLogRotateConfig(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
+        if let error = ptp.loadConfig() {
+            zLog.error("Error loading tunnel config: \(error.localizedDescription)")
+            return
+        }
+        Logger.updateRotateSettings(ptp.providerConfig.logRotateDaily, ptp.providerConfig.logRotateCount, ptp.providerConfig.logRotateSizeMB)
         completionHandler?(nil)
     }
     
