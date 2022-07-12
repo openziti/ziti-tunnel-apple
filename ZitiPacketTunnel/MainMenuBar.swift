@@ -53,6 +53,9 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         logMenu.addItem(newMenuItem(title: "Packet Tunnel...", action: #selector(MainMenuBar.showPacketTunnelLog(_:))))
         logMenu.addItem(newMenuItem(title: "Application...", action: #selector(MainMenuBar.showApplicationLog(_:))))
         logMenu.addItem(NSMenuItem.separator())
+        
+        logMenu.addItem(newMenuItem(title: "Log Rotation...", action: #selector(MainMenuBar.showLogRotationConfig(_:))))
+        logMenu.addItem(NSMenuItem.separator())
                 
         let logLevelMenuItem = newMenuItem(title: "Level", action: nil)
         logMenu.addItem(logLevelMenuItem)
@@ -224,6 +227,16 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     @objc func showApplicationLog(_ sender:Any?) {
         openConsole(Logger.APP_TAG)
+    }
+    
+    @objc func showLogRotationConfig(_ sender:Any?) {
+        let sb = NSStoryboard(name: "Main", bundle: nil)
+        if let wc = sb.instantiateController(withIdentifier: "LOG_ROTATION_WINDOW") as? NSWindowController {
+            if let w = wc.window {
+                NSApp.activate(ignoringOtherApps: true)
+                NSApp.runModal(for: w)
+            }
+        }
     }
     
     @objc func showSnapshot(_ sender:Any?) {
