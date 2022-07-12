@@ -40,7 +40,7 @@ class Logger {
     private var lastRotateTime:Date?
     let zitiLog:ZitiLog
     
-    var calendar = Calendar.current
+    var calendar = Calendar(identifier: .gregorian)
     
     private init(_ tag:String) {
         self.tag = tag
