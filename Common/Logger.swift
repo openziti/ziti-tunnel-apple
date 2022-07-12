@@ -164,7 +164,7 @@ class Logger {
             
             var dailyRotateNeeded = false
             if Logger.ROTATE_DAILY, let lrt = lastRotateTime {
-                if !Calendar.current.isDate(lrt, inSameDayAs:Date()) {
+                if !calendar.isDate(lrt, inSameDayAs:Date()) {
                     dailyRotateNeeded = true
                 }
             }
