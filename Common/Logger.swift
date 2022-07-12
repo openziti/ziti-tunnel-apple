@@ -33,7 +33,7 @@ class Logger {
     static var FILE_SIZE_THRESHOLD = 5_000_000 // "minsize" bytes
     static var MAX_NUM_LOGS = 3
     
-    static let PROCESS_LOGS_INTERVAL = TimeInterval(60*15) // secs
+    static let PROCESS_LOGS_INTERVAL = TimeInterval(60*5) // secs
     
     private let tag:String
     private var timer:Timer? = nil
