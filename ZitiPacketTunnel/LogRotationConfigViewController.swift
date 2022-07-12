@@ -35,7 +35,7 @@ class LogRotationConfigViewController: NSViewController {
         self.sizeTextField.integerValue = defaults.logRotateSizeMB
         self.countStepper.intValue = self.countTextField.intValue
         self.dailyCheckbox.state = defaults.logRotateDaily ? .on : .off
-        
+                
         guard
             let pp = TunnelMgr.shared.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
             let conf = pp.providerConfiguration else {
@@ -82,8 +82,28 @@ class LogRotationConfigViewController: NSViewController {
         let count = countTextField.integerValue
         let sizeMB = sizeTextField.integerValue
         
-        conf[ProviderConfig.LOG_ROTATE_COUNT_KEY] = countTextField.stringValue
-        conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] = sizeTextField.stringValue
+        if Int(countTextField.stringValue) == nil || (count+1) < Logger.MIN_MAX_NUM_LOGS || (count+1) > Logger.MAX_MAX_NUM_LOGS {
+            let alert = NSAlert()
+            alert.messageText = "Invalid Count"
+            alert.informativeText = "Expecting integer in range \(Logger.MIN_MAX_NUM_LOGS-1)..\(Logger.MAX_MAX_NUM_LOGS-1)"
+            alert.alertStyle = NSAlert.Style.warning
+            alert.runModal()
+            return
+        }
+        
+        let minMB = Int(Logger.MIN_FILE_SIZE_THRESHOLD / (1024*1024))
+        let maxMB = Int(Logger.MAX_FILE_SIZE_THRESHOLD / (1024*1024))
+        if Int(sizeTextField.stringValue) == nil || sizeMB < minMB || sizeMB > maxMB {
+            let alert = NSAlert()
+            alert.messageText = "Invalid Size"
+            alert.informativeText = "Expecting integer in range \(minMB)..\(maxMB)"
+            alert.alertStyle = NSAlert.Style.warning
+            alert.runModal()
+            return
+        }
+        
+        conf[ProviderConfig.LOG_ROTATE_COUNT_KEY] = String(count)
+        conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] = String(sizeMB)
         conf[ProviderConfig.LOG_ROTATE_DAILY_KEY] = daily
         
         pp.providerConfiguration = conf

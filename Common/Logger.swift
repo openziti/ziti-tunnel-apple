@@ -30,8 +30,14 @@ class Logger {
     
     // Allow these to be set before initializing the shared logger
     static var ROTATE_DAILY = true
-    static var FILE_SIZE_THRESHOLD = 5_000_000 // "minsize" bytes
+    static var FILE_SIZE_THRESHOLD = (5 *  1024 * 1024) // "minsize" bytes
     static var MAX_NUM_LOGS = 3
+    
+    static let MIN_FILE_SIZE_THRESHOLD = (1024 * 1024)
+    static let MAX_FILE_SIZE_THRESHOLD = (1024 * 1024 * 1024)
+    
+    static let MIN_MAX_NUM_LOGS = 1
+    static let MAX_MAX_NUM_LOGS = 31
     
     static let PROCESS_LOGS_INTERVAL = TimeInterval(60*5) // secs
     
