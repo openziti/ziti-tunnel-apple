@@ -117,14 +117,18 @@ class TunnelMgr: NSObject {
                 
                     tmgr.tpm = tpm
                     
-                    // Get our logLevel from config
+                    // Get our logger config from provider
                     if let conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
-                        if let logLevel = conf[ProviderConfig.LOG_LEVEL_KEY] as? String {
-                            let li = Int32(logLevel) ?? ZitiLog.LogLevel.INFO.rawValue
-                            let ll = ZitiLog.LogLevel(rawValue: li) ?? ZitiLog.LogLevel.INFO
-                            zLog.info("Updating log level to \(logLevel) (\(ll))") 
+                        let pc = ProviderConfig()
+                        if let error = pc.parseDictionary(conf) {
+                            zLog.error("Unable to parse provider config to determine logger settings: \(error.localizedDescription)")
+                        } else {
+                            let ll = ZitiLog.LogLevel(rawValue: Int32(pc.logLevel)) ?? ZitiLog.LogLevel.INFO
+                            zLog.info("Updating log level to \(pc.logLevel) (\(ll))")
                             ZitiLog.setLogLevel(ll)
-                       }
+                            
+                            Logger.updateRotateSettings(pc.logRotateDaily, pc.logRotateCount, pc.logRotateSizeMB)
+                        }
                     } else {
                         zLog.info("No log level found.  Using default")
                     }

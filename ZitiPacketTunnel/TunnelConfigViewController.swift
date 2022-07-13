@@ -126,48 +126,44 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func onSaveButton(_ sender: Any) {
-        var dict = ProviderConfigDict()
-        dict[ProviderConfig.IP_KEY] = self.ipAddressText.stringValue
-        dict[ProviderConfig.SUBNET_KEY] = self.subnetMaskText.stringValue
-        dict[ProviderConfig.MTU_KEY] = self.mtuText.stringValue
-        dict[ProviderConfig.DNS_KEY] = self.dnsServersText.stringValue
-        dict[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] = self.fallbackDNSCheck.state == .on
-        dict[ProviderConfig.FALLBACK_DNS_KEY] = self.fallbackDNSText.stringValue
-        dict[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] = self.interceptMatchedDomainsSwitch.state == .on
-        dict[ProviderConfig.LOW_POWER_MODE_KEY] = self.lowPowerModeSwitch.state == .on
-        dict[ProviderConfig.LOG_LEVEL_KEY] = String(ZitiLog.getLogLevel().rawValue)
-        
-        let conf:ProviderConfig = ProviderConfig()
-        if let error = conf.parseDictionary(dict) {
-            // alert and get outta here
+        guard
+            let pp = TunnelMgr.shared.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
+            var conf = pp.providerConfiguration else {
+            zLog.error("Unable to access provider connfiguration")
             let alert = NSAlert()
-            alert.messageText = "Configuration Error"
-            alert.informativeText =  error.description
+            alert.messageText = "Access Error"
+            alert.informativeText = "Unable to access provider configuration"
             alert.alertStyle = NSAlert.Style.critical
             alert.runModal()
             return
         }
         
-        if let pc = self.vc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol {
-            pc.providerConfiguration = conf.createDictionary()
-            
-            self.vc?.tunnelMgr.tpm?.saveToPreferences { error in
-                if let error = error {
-                    NSAlert(error:error).runModal()
+        conf[ProviderConfig.IP_KEY] = self.ipAddressText.stringValue
+        conf[ProviderConfig.SUBNET_KEY] = self.subnetMaskText.stringValue
+        conf[ProviderConfig.MTU_KEY] = self.mtuText.stringValue
+        conf[ProviderConfig.DNS_KEY] = self.dnsServersText.stringValue
+        conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] = self.fallbackDNSCheck.state == .on
+        conf[ProviderConfig.FALLBACK_DNS_KEY] = self.fallbackDNSText.stringValue
+        conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] = self.interceptMatchedDomainsSwitch.state == .on
+        conf[ProviderConfig.LOW_POWER_MODE_KEY] = self.lowPowerModeSwitch.state == .on
+        
+        pp.providerConfiguration = conf
+        TunnelMgr.shared.tpm?.saveToPreferences { error in
+            if let error = error {
+                NSAlert(error:error).runModal()
+            } else {
+                if self.restartRequired {
+                    self.vc?.tunnelMgr.restartTunnel()
                 } else {
-                    if self.restartRequired {
-                        self.vc?.tunnelMgr.restartTunnel()
-                    } else {
-                        self.vc?.tunnelMgr.reassert()
-                    }
-                    self.restartRequired = false
-                    self.saveButton.isEnabled = false
-                    self.dismiss(self)
-                    
-                    DispatchQueue.main.async {
-                        guard let indx = self.vc?.representedObject as? Int else { return }
-                        self.vc?.updateServiceUI(zId: self.vc?.zids[indx])
-                    }
+                    self.vc?.tunnelMgr.reassert()
+                }
+                self.restartRequired = false
+                self.saveButton.isEnabled = false
+                self.dismiss(self)
+                
+                DispatchQueue.main.async {
+                    guard let indx = self.vc?.representedObject as? Int else { return }
+                    self.vc?.updateServiceUI(zId: self.vc?.zids[indx])
                 }
             }
         }

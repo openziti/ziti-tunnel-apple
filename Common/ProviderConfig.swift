@@ -24,6 +24,8 @@ enum ProviderConfigError : Error {
     case invalidMtu
     case invalidDnsAddresses
     case invalidFallbackDns
+    case invalidLogRotateCount
+    case invalidLogRotateSizeMB
 
     var description: String {
         switch self {
@@ -31,7 +33,9 @@ enum ProviderConfigError : Error {
         case .invalidSubnetMask: return "Invalid Subnet Mask (axpect valid IPv4 subnet mask)"
         case .invalidMtu: return "Invalid MTU"
         case .invalidDnsAddresses: return "Invalid DNS Addresses (expect comma-delimited list of IPv4 addresses)"
-        case .invalidFallbackDns: return "Invalid Fallback DNS (expect valid IPv4 address"
+        case .invalidFallbackDns: return "Invalid Fallback DNS (expect valid IPv4 address)"
+        case .invalidLogRotateCount: return "Invalid log rotation count"
+        case .invalidLogRotateSizeMB: return "Invalid log rotation size (MB)"
         }
     }
 }
@@ -50,6 +54,9 @@ class ProviderConfig : NSObject {
     static var ENABLE_MFA_KEY = "enableMfa"
     static var LOG_LEVEL_KEY = "logLevel"
     static var LOW_POWER_MODE_KEY = "lowPowerMode"
+    static var LOG_ROTATE_DAILY_KEY = "logRotateDaily"
+    static var LOG_ROTATE_COUNT_KEY = "logRotateCount"
+    static var LOG_ROTATE_SIZEMB_KEY = "logRotateSizeMB"
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "100.64.0.1"
@@ -85,6 +92,16 @@ class ProviderConfig : NSObject {
     var lowPowerMode:Bool = false
 #endif
     
+#if os(macOS)
+    var logRotateDaily:Bool = true
+    var logRotateCount:Int = 5
+    var logRotateSizeMB:Int = 50
+#else
+    var logRotateDaily:Bool = true
+    var logRotateCount:Int = 2
+    var logRotateSizeMB:Int = 5
+#endif
+    
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,
                 ProviderConfig.SUBNET_KEY: self.subnetMask,
@@ -95,7 +112,10 @@ class ProviderConfig : NSObject {
                 ProviderConfig.FALLBACK_DNS_KEY: self.fallbackDns,
                 ProviderConfig.ENABLE_MFA_KEY: self.enableMfa,
                 ProviderConfig.LOW_POWER_MODE_KEY: self.lowPowerMode,
-                ProviderConfig.INTERCEPT_MATCHED_DNS_KEY: self.interceptMatchedDns]
+                ProviderConfig.INTERCEPT_MATCHED_DNS_KEY: self.interceptMatchedDns,
+                ProviderConfig.LOG_ROTATE_DAILY_KEY: self.logRotateDaily,
+                ProviderConfig.LOG_ROTATE_COUNT_KEY: String(self.logRotateCount),
+                ProviderConfig.LOG_ROTATE_SIZEMB_KEY: String(self.logRotateSizeMB)]
     }
     
     private func isValidIpAddress(_ obj:Any?) -> Bool {
@@ -126,6 +146,18 @@ class ProviderConfig : NSObject {
         guard let mtuStr = conf[ProviderConfig.MTU_KEY] as? String, let _ = Int(mtuStr) else {
             return ProviderConfigError.invalidMtu
         }
+        
+        if let lrCount = conf[ProviderConfig.LOG_ROTATE_COUNT_KEY] as? String {
+            guard let _ = Int(lrCount) else {
+                return ProviderConfigError.invalidLogRotateCount
+            }
+        }
+        
+        if let lrSize = conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] as? String {
+            guard let _ = Int(lrSize) else {
+                return ProviderConfigError.invalidLogRotateSizeMB
+            }
+        }
         return nil
     }
     
@@ -155,6 +187,16 @@ class ProviderConfig : NSObject {
             self.lowPowerMode = lowPowerMode
         }
         self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL_KEY] as? String ?? "3") ?? 3
+        
+        if let logRotateDaily = conf[ProviderConfig.LOG_ROTATE_DAILY_KEY] as? Bool {
+            self.logRotateDaily = logRotateDaily
+        }
+        if let lrCountStr = conf[ProviderConfig.LOG_ROTATE_COUNT_KEY] as? String, let lrCountInt = Int(lrCountStr) {
+            self.logRotateCount = lrCountInt
+        }
+        if let lrSizeStr = conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] as? String, let lrSizeInt = Int(lrSizeStr) {
+            self.logRotateSizeMB = lrSizeInt
+        }
         return nil
     }
     
@@ -169,6 +211,9 @@ class ProviderConfig : NSObject {
             "interceptMatchedDns: \(self.interceptMatchedDns)\n" +
             "enableMfa: \(self.enableMfa)\n" +
             "lowPowerMode: \(self.lowPowerMode)\n" +
-            "logLevel: \(self.logLevel)"
+            "logLevel: \(self.logLevel)\n" +
+            "logRotateDaily: \(self.logRotateDaily)\n" +
+            "logRotateCount: \(self.logRotateCount)\n" +
+            "logRotateSizeMB: \(self.logRotateSizeMB)"
     }
 }

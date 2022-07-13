@@ -75,6 +75,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
         
+        // setup log rotation
+        Logger.updateRotateSettings(providerConfig.logRotateDaily, providerConfig.logRotateCount, providerConfig.logRotateSizeMB)
+        
         // setup logLevel
         if let appLogLevel = self.appLogLevel, appLogLevel.rawValue != Int32(providerConfig.logLevel) {
             zLog.info("Overriding providerConfig.logLevel to appLogLevel of \(appLogLevel)")

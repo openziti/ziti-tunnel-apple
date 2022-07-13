@@ -28,20 +28,28 @@ class Logger {
     static let TUN_TAG = "appex"
     static let APP_TAG = "app"
     
-    static let FILE_SIZE_THRESHOLD = 5_000_000 // "minsize" bytes
-    static let MAX_NUM_LOGS = 3
-    static let PROCESS_LOGS_INTERVAL = TimeInterval(60*15) // secs
+    // Allow these to be set before initializing the shared logger
+    static var ROTATE_DAILY = true
+    static var FILE_SIZE_THRESHOLD = (5 *  1024 * 1024) // "minsize" bytes
+    static var MAX_NUM_LOGS = 3
     
-    private let rotateDaily:Bool
-    private var lastRotateTime:Date?
+    static let MIN_FILE_SIZE_THRESHOLD = (1024 * 1024)
+    static let MAX_FILE_SIZE_THRESHOLD = (1024 * 1024 * 1024)
+    
+    static let MIN_MAX_NUM_LOGS = 1
+    static let MAX_MAX_NUM_LOGS = 31
+    
+    static let PROCESS_LOGS_INTERVAL = TimeInterval(60*5) // secs
     
     private let tag:String
     private var timer:Timer? = nil
+    private var lastRotateTime:Date?
     let zitiLog:ZitiLog
     
-    private init(_ tag:String, _ rotateDaily:Bool=true) {
+    var calendar = Calendar(identifier: .gregorian)
+    
+    private init(_ tag:String) {
         self.tag = tag
-        self.rotateDaily = rotateDaily
         self.zitiLog = ZitiLog(Bundle.main.displayName ?? tag)
     }
     
@@ -76,27 +84,6 @@ class Logger {
         } catch {
             zLog.error("Error creating log dir \(error.localizedDescription)")
             return
-        }
-        
-        // remove any logs > NLOGS
-        guard let list = try? fm.contentsOfDirectory(at: logDir, includingPropertiesForKeys: nil, options: []) else {
-            zLog.warn("Logger.cleanup Unable to search log dir for log files to clear")
-            return
-        }
-        list.forEach { url in
-            let fn = url.lastPathComponent
-            if fn.starts(with: tag) {
-                let comps = fn.components(separatedBy: ".")
-                if comps.count >= 3, let indxStr = comps.last, let indx = Int(indxStr) {
-                    if indx >= Logger.MAX_NUM_LOGS {
-                        do {
-                            try fm.removeItem(at: url)
-                        } catch {
-                            zLog.error("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)")
-                        }
-                    }
-                }
-            }
         }
         
         // remove "old style" logs from previous version that were stored in app group directory
@@ -163,6 +150,11 @@ class Logger {
     
     // note that if this method errors we just continue. zLog sill logs to stderr, which is picked up by the OS logging system
     func rotateLogs(_ force:Bool=false) {
+        guard let appGroupURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)  else {
+            zLog.error("Invalid app group URL")
+            return
+        }
         guard let currLog = currLog else {
             zLog.error("Invalid log URL")
             return
@@ -177,44 +169,86 @@ class Logger {
             let sz = attrs.fileSize()
             
             var dailyRotateNeeded = false
-            if rotateDaily, let lrt = lastRotateTime {
-                if !Calendar.current.isDate(lrt, inSameDayAs:Date()) {
+            if Logger.ROTATE_DAILY, let lrt = lastRotateTime {
+                if !calendar.isDate(lrt, inSameDayAs:Date()) {
                     dailyRotateNeeded = true
                 }
             }
             
             if force || dailyRotateNeeded || (sz >= Logger.FILE_SIZE_THRESHOLD) {
-                for i in (1...(Logger.MAX_NUM_LOGS-2)).reversed() {
-                    let from = currLog.appendingPathExtension("\(i)")
-                    let to = currLog.appendingPathExtension("\(i+1)")
-                    
-                    do {
-                        try? fm.removeItem(at: to)
-                        if fm.fileExists(atPath: from.path) {
-                            zLog.info("Rotating log: \(from.path) to \(to.path)")
-                            try fm.moveItem(at: from, to: to)
+                if Logger.MAX_NUM_LOGS > 2 {
+                    for i in (1...(Logger.MAX_NUM_LOGS-2)).reversed() {
+                        let from = currLog.appendingPathExtension("\(i)")
+                        let to = currLog.appendingPathExtension("\(i+1)")
+                        
+                        do {
+                            try? fm.removeItem(at: to)
+                            if fm.fileExists(atPath: from.path) {
+                                zLog.info("Rotating log: \(from.path) to \(to.path)")
+                                try fm.moveItem(at: from, to: to)
+                            }
+                        } catch {
+                            zLog.error("Error rotating \(from.path) to \(to.path): \(error.localizedDescription)")
                         }
-                    } catch {
-                        zLog.error("Error rotating \(from.path) to \(to.path): \(error.localizedDescription)")
                     }
                 }
                 
                 // roll out the current log
-                let to = currLog.appendingPathExtension("1")
-                do {
-                    zLog.info("Rotating logs: \(currLog.path) to \(to.path)")
-                    try? fm.removeItem(at: to)
-                    try fm.moveItem(at: currLog, to: to)
-                    setupCurrLog(currLog)
-                    
-                    // Start each log by logging app version
-                    zLog.info(Version.verboseStr)
-                } catch {
-                    zLog.error("Error rotating \(currLog.path) to \(to.path): \(error.localizedDescription)")
+                if Logger.MAX_NUM_LOGS > 1 {
+                    let to = currLog.appendingPathExtension("1")
+                    do {
+                        zLog.info("Rotating logs: \(currLog.path) to \(to.path)")
+                        try? fm.removeItem(at: to)
+                        try fm.moveItem(at: currLog, to: to)
+                        setupCurrLog(currLog)
+                        
+                        // Start each log by logging app version
+                        zLog.info(Version.verboseStr)
+                    } catch {
+                        zLog.error("Error rotating \(currLog.path) to \(to.path): \(error.localizedDescription)")
+                    }
                 }
                 
                 // update lastRotateTime
                 lastRotateTime = Date()
+            }
+        }
+        
+        // remove any logs > MAX_NUM_LOGS
+        let logDir = appGroupURL.appendingPathComponent("logs", isDirectory:true)
+        guard let list = try? fm.contentsOfDirectory(at: logDir, includingPropertiesForKeys: nil, options: []) else {
+            zLog.warn("Unable to search log dir for log files to clear")
+            return
+        }
+        list.forEach { url in
+            let fn = url.lastPathComponent
+            if fn.starts(with: tag) {
+                let comps = fn.components(separatedBy: ".")
+                if comps.count >= 3, let indxStr = comps.last, let indx = Int(indxStr) {
+                    if indx >= Logger.MAX_NUM_LOGS {
+                        do {
+                            try fm.removeItem(at: url)
+                        } catch {
+                            zLog.error("Unable to remove \(url.lastPathComponent). Error:\(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    static func updateRotateSettings(_ daily:Bool, _ count:Int, _ sizeMB:Int) {
+        DispatchQueue.main.async {
+            zLog.info("Updating log rotate config to daily:\(daily), count:\(count), sizeMB:\(sizeMB)")
+            
+            Logger.ROTATE_DAILY = daily
+            Logger.MAX_NUM_LOGS = count + 1
+            Logger.FILE_SIZE_THRESHOLD = sizeMB * 1024 * 1024
+            
+            Logger.shared?.timer?.invalidate()
+            Logger.shared?.rotateLogs(false)
+            Logger.shared?.timer = Timer.scheduledTimer(withTimeInterval: Logger.PROCESS_LOGS_INTERVAL, repeats: true) { _ in
+                Logger.shared?.rotateLogs(false)
             }
         }
     }
@@ -226,14 +260,10 @@ class Logger {
         zLog.info("Setting log level to \(ZitiLog.LogLevel.INFO)")
         ZitiLog.setLogLevel(.INFO)
         
-        // Process once at startup to make sure we have log dir, roll logs from previos runs if necessary
-        Logger.shared?.rotateLogs(false)
-        
-        // fire timer periodically for clean-up and rolling
-        DispatchQueue.main.async {
-            Logger.shared?.timer = Timer.scheduledTimer(withTimeInterval: Logger.PROCESS_LOGS_INTERVAL, repeats: true) { _ in
-                Logger.shared?.rotateLogs(false)
-            }
+        if let tz = TimeZone(identifier: "UTC") {
+            Logger.shared?.calendar.timeZone = tz
+        } else {
+            zLog.warn("Unable to set timezone to UTC")
         }
     }
 }
