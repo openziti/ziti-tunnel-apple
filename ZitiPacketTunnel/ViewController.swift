@@ -96,7 +96,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if let indx = self.representedObject as? Int, self.zids.count > 0 {
             // set mfaPending if disconnecting or re-connecting.  purely cosmetic for UI as appex will reset correctly when it starts
             for zid in zids {
-                if zid.isMfaEnabled && status == .disconnecting || status == .disconnected || status == .reasserting {
+                if zid.isMfaEnabled && status == .disconnecting || status == .disconnected {
                     zid.mfaPending = true
                 }
             }
