@@ -41,7 +41,7 @@ class EnrollIdentityCell: UITableViewCell {
     }
 }
 
-class MfaAuthNowdCell : UITableViewCell {
+class MfaAuthNowCell : UITableViewCell {
     weak var ivc:IdentityViewController?
     @IBAction func onButton(_ sender: Any) {
         ivc?.doMfaAuth()
@@ -51,12 +51,14 @@ class MfaAuthNowdCell : UITableViewCell {
 class MfaCodesCell : UITableViewCell {
     weak var ivc:IdentityViewController?
     @IBAction func onButton(_ sender: Any) {
+        // TODO
     }
 }
 
 class MfaNewCodesCell : UITableViewCell {
     weak var ivc:IdentityViewController?
     @IBAction func onButton(_ sender: Any) {
+        // TODO
     }
 }
 
@@ -418,7 +420,6 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                             }
                             guard status == Ziti.ZITI_OK else {
                                 self?.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
-                                //self?.doMfaAuth(zid)
                                 return
                             }
 
@@ -428,18 +429,15 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                             if let updatedZid = self?.tvc?.zidStore.update(zid, [.Mfa]) {
                                 self?.tvc?.zids.updateIdentity(updatedZid)
                             }
-                            DispatchQueue.main.async {
-                                self?.tableView.reloadData()
-                                vc.dismiss(animated: true)
-                            }
+                            self?.tableView.reloadData()
                         }
                     }
                 } else { // cancel
                     DispatchQueue.main.async {
                         self?.tableView.reloadData()
-                        vc.dismiss(animated: true)
                     }
                 }
+                vc.dismiss(animated: true)
             }
             self.present(vc, animated: true)
         }
@@ -452,7 +450,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
+        return 5
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -509,7 +507,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 }
             } else if indexPath.row == 1 {
                 cell = tableView.dequeueReusableCell(withIdentifier: "MFA_AUTH_NOW_CELL", for: indexPath)
-                if let mfaAuthNowCell = cell as? MfaAuthNowdCell {
+                if let mfaAuthNowCell = cell as? MfaAuthNowCell {
                     mfaAuthNowCell.ivc = self
                 }
             } else if indexPath.row == 2 {
@@ -587,7 +585,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let svcVc = segue.destination as? ServiceViewController {
-            if let ip = tableView.indexPathForSelectedRow, ip.section == 2 {
+            if let ip = tableView.indexPathForSelectedRow, ip.section == 3 {
                 svcVc.svc = zid?.services[ip.row]
             }
         }
