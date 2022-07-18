@@ -379,7 +379,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WIE-TY-mgc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2700" y="1074"/>
+            <point key="canvasLocation" x="3110" y="1266"/>
         </scene>
         <!--Identity-->
         <scene sceneID="49E-8f-NUH">
@@ -646,6 +646,7 @@
                     </tableView>
                     <connections>
                         <segue destination="X6X-Oj-z4n" kind="unwind" identifier="IDENTITY_UNWIND_SEGUE" unwindAction="unwindFromIdentity:" id="2oa-FK-1mf"/>
+                        <segue destination="Cyn-U1-nJP" kind="show" identifier="MFA_CODES_SEGUE" id="xVR-Y4-Kks"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="piO-ZK-d2s" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -696,7 +697,45 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kL2-AS-kFF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3514" y="-577"/>
+            <point key="canvasLocation" x="3556" y="-66"/>
+        </scene>
+        <!--Recovery Codes-->
+        <scene sceneID="4CP-8S-yp1">
+            <objects>
+                <tableViewController title="Recovery Codes" id="Cyn-U1-nJP" customClass="MfaCodesViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="iT7-uk-l6X">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MFA_CODE_CELL" textLabel="h7a-cG-tOh" style="IBUITableViewCellStyleDefault" id="QdV-1j-BmD">
+                                <rect key="frame" x="0.0" y="49.5" width="375" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="QdV-1j-BmD" id="XEL-Ea-d3B">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="h7a-cG-tOh">
+                                            <rect key="frame" x="16" y="0.0" width="343" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="0.0"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="Cyn-U1-nJP" id="EKG-VE-dj7"/>
+                            <outlet property="delegate" destination="Cyn-U1-nJP" id="BIE-HM-YJS"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Recovery Codes" id="M3h-DT-vJ5"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="evt-a1-YLu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3552" y="-728"/>
         </scene>
         <!--Setup MFA-->
         <scene sceneID="t0C-63-1dO">
@@ -790,7 +829,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Idb-I5-pbC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4248.8000000000002" y="-577.06146926536735"/>
+            <point key="canvasLocation" x="4236" y="-725"/>
         </scene>
         <!--Mfa Code View Controller-->
         <scene sceneID="xNj-ba-Lm7">
@@ -853,7 +892,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0fe-qh-qMv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4871" y="-577"/>
+            <point key="canvasLocation" x="4900" y="-724"/>
         </scene>
         <!--Tunnel Configuration-->
         <scene sceneID="E7s-lk-x1Q">
@@ -944,7 +983,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dO7-sD-iHC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3522.4000000000001" y="55.322338830584712"/>
+            <point key="canvasLocation" x="3556" y="601"/>
         </scene>
         <!--Logging-->
         <scene sceneID="Blo-l1-PVg">
@@ -1030,7 +1069,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cdO-HU-Xrg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3508" y="752"/>
+            <point key="canvasLocation" x="2434" y="1267"/>
         </scene>
         <!--Log Level View Controller-->
         <scene sceneID="XgC-wT-DF6">
@@ -1179,7 +1218,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RUP-SP-fbU" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4292" y="1110"/>
+            <point key="canvasLocation" x="2433" y="2006"/>
         </scene>
         <!--Log View Controller-->
         <scene sceneID="AEC-9b-RcY">
@@ -1211,7 +1250,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mbp-1v-F7P" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4292" y="441"/>
+            <point key="canvasLocation" x="3110" y="2006"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="yJD-qj-aH8">
