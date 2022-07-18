@@ -256,6 +256,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     override func sleep(completionHandler: @escaping () -> Void) {
+        // only sleep/wake on macOS for now. The happens way too often on mobile to be useful
+#if os(macOS)
         zLog.info("---Sleep---")
         if providerConfig.lowPowerMode {
             self.zitiTunnel?.perform {
@@ -264,13 +266,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         } else {
             completionHandler()
         }
+#else
+        completionHandler()
+#endif
     }
     
     override func wake() {
+#if os(macOS)
         zLog.info("---Wake---")
         zitiTunnel?.perform {
             self.zitiTunnelDelegate?.onWake()
         }
+#endif
     }
     
     func readPacketFlow() {
