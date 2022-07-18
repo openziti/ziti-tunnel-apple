@@ -51,14 +51,76 @@ class MfaAuthNowCell : UITableViewCell {
 class MfaCodesCell : UITableViewCell {
     weak var ivc:IdentityViewController?
     @IBAction func onButton(_ sender: Any) {
-        // TODO
+        guard let zid = ivc?.zid else { return }
+        
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        if let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController {
+            vc.completionHandler = { [weak self] code in
+                if let code = code {
+                    let msg = IpcMfaGetRecoveryCodesRequestMessage(zid.id, code)
+                    TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                        DispatchQueue.main.async {
+                            guard zErr == nil else {
+                                self?.ivc?.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                                return
+                            }
+                            guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                                  let status = codesMsg.status else {
+                                self?.ivc?.dialogAlert("IPC Error", "Unable to parse recovery codes response message")
+                                return
+                            }
+                            guard status == Ziti.ZITI_OK else {
+                                self?.ivc?.dialogAlert("MFA Error", Ziti.zitiErrorString(status: status))
+                                return
+                            }
+
+                            // Success!
+                            self?.ivc?.performSegue(withIdentifier: "MFA_CODES_SEGUE", sender: codesMsg.codes)
+                        }
+                    }
+                }
+                vc.dismiss(animated: true)
+            }
+            self.ivc?.present(vc, animated: true)
+        }
     }
 }
 
 class MfaNewCodesCell : UITableViewCell {
     weak var ivc:IdentityViewController?
     @IBAction func onButton(_ sender: Any) {
-        // TODO
+        guard let zid = ivc?.zid else { return }
+        
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        if let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController {
+            vc.completionHandler = { [weak self] code in
+                if let code = code {
+                    let msg = IpcMfaNewRecoveryCodesRequestMessage(zid.id, code)
+                    TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                        DispatchQueue.main.async {
+                            guard zErr == nil else {
+                                self?.ivc?.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                                return
+                            }
+                            guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                                  let status = codesMsg.status else {
+                                self?.ivc?.dialogAlert("IPC Error", "Unable to parse recovery codes response message")
+                                return
+                            }
+                            guard status == Ziti.ZITI_OK else {
+                                self?.ivc?.dialogAlert("MFA Error", Ziti.zitiErrorString(status: status))
+                                return
+                            }
+
+                            // Success!
+                            self?.ivc?.performSegue(withIdentifier: "MFA_CODES_SEGUE", sender: codesMsg.codes)
+                        }
+                    }
+                }
+                vc.dismiss(animated: true)
+            }
+            self.ivc?.present(vc, animated: true)
+        }
     }
 }
 
@@ -155,9 +217,7 @@ class MfaEnabledCell : UITableViewCell {
                             if let updatedZid = self?.ivc?.tvc?.zidStore.update(zid, [.Mfa]) {
                                 self?.ivc?.tvc?.zids.updateIdentity(updatedZid)
                             }
-
-                            let codes = mfaEnrollment.recoveryCodes?.joined(separator: ", ")
-                            self?.ivc?.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
+                            self?.ivc?.performSegue(withIdentifier: "MFA_CODES_SEGUE", sender: mfaEnrollment.recoveryCodes)
                         }
                     }
                 } else {
@@ -587,6 +647,11 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         if let svcVc = segue.destination as? ServiceViewController {
             if let ip = tableView.indexPathForSelectedRow, ip.section == 3 {
                 svcVc.svc = zid?.services[ip.row]
+            }
+        } else if let codeVc = segue.destination as? MfaCodesViewController {
+            codeVc.zid = self.zid
+            if let codes = sender as? [String] {
+                codeVc.codes = codes
             }
         }
     }
