@@ -133,7 +133,11 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             DispatchQueue.main.async { [self] in
                 let count = self.zids.count
                 self.zids.updateIdentity(zid)
-                ivc?.zid = zid
+                
+                // if user currently viewing this identity, make sure it's current
+                if let currId = ivc?.zid?.id, currId == zid.id {
+                    ivc?.zid = zid
+                }
                 
                 if count != self.zids.count { // inserted at 0
                     DispatchQueue.main.async {
