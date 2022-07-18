@@ -433,7 +433,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Multi Factor Auth" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RiX-Vz-sWd">
-                                            <rect key="frame" x="56" y="11.5" width="250" height="20.5"/>
+                                            <rect key="frame" x="48" y="11.5" width="258" height="20.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -445,21 +445,22 @@
                                             </connections>
                                         </switch>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8m2-3I-cwv">
-                                            <rect key="frame" x="16" y="9" width="32" height="25"/>
+                                            <rect key="frame" x="0.0" y="7" width="48" height="29"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="32" id="26t-xE-DNi"/>
+                                                <constraint firstAttribute="width" constant="48" id="dTe-jR-n92"/>
+                                                <constraint firstAttribute="height" constant="24" id="dVl-vd-y5Q"/>
                                             </constraints>
                                             <imageReference key="image" image="lock.fill" catalog="system" symbolScale="large"/>
                                         </imageView>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="7XE-l7-nUe" firstAttribute="leading" secondItem="RiX-Vz-sWd" secondAttribute="trailing" id="53c-5a-BCy"/>
-                                        <constraint firstItem="RiX-Vz-sWd" firstAttribute="leading" secondItem="8m2-3I-cwv" secondAttribute="trailing" constant="8" symbolic="YES" id="AO4-W1-eqU"/>
+                                        <constraint firstItem="RiX-Vz-sWd" firstAttribute="leading" secondItem="8m2-3I-cwv" secondAttribute="trailing" id="AO4-W1-eqU"/>
                                         <constraint firstItem="8m2-3I-cwv" firstAttribute="centerY" secondItem="i0D-Ai-QmE" secondAttribute="centerY" id="Avt-qe-cqL"/>
                                         <constraint firstItem="7XE-l7-nUe" firstAttribute="centerY" secondItem="i0D-Ai-QmE" secondAttribute="centerY" id="Irz-p4-lM8"/>
                                         <constraint firstAttribute="trailing" secondItem="7XE-l7-nUe" secondAttribute="trailing" constant="20" symbolic="YES" id="PAM-Dg-0j7"/>
                                         <constraint firstItem="RiX-Vz-sWd" firstAttribute="centerY" secondItem="i0D-Ai-QmE" secondAttribute="centerY" id="UTX-RH-MsZ"/>
-                                        <constraint firstItem="8m2-3I-cwv" firstAttribute="leading" secondItem="i0D-Ai-QmE" secondAttribute="leadingMargin" id="Yq6-tN-xb4"/>
+                                        <constraint firstItem="8m2-3I-cwv" firstAttribute="leading" secondItem="i0D-Ai-QmE" secondAttribute="leading" id="Yq6-tN-xb4"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
@@ -467,7 +468,7 @@
                                     <outlet property="mfaSwitch" destination="7XE-l7-nUe" id="Hbb-8D-Ata"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MFA_AUTH_NOW_CELL" id="b6g-3n-v3A">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MFA_AUTH_NOW_CELL" id="b6g-3n-v3A" customClass="MfaAuthNowCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="136.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="b6g-3n-v3A" id="h5C-47-fC3">
@@ -475,24 +476,24 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0AC-F7-6qy">
-                                            <rect key="frame" x="16" y="6.5" width="339" height="31"/>
+                                            <rect key="frame" x="0.0" y="6.5" width="355" height="31"/>
                                             <state key="normal" title="Button"/>
-                                            <buttonConfiguration key="configuration" style="plain" title="Auth Now" imagePadding="6">
+                                            <buttonConfiguration key="configuration" style="plain" title="Auth Now" imagePadding="10">
                                                 <imageReference key="image" image="lock.rotation.open" catalog="system" symbolScale="large"/>
                                             </buttonConfiguration>
                                             <connections>
-                                                <action selector="onButton:" destination="X6X-Oj-z4n" eventType="touchUpInside" id="kFt-MQ-c6x"/>
+                                                <action selector="onButton:" destination="b6g-3n-v3A" eventType="touchUpInside" id="DzP-oa-4Mx"/>
                                             </connections>
                                         </button>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="0AC-F7-6qy" firstAttribute="leading" secondItem="h5C-47-fC3" secondAttribute="leadingMargin" id="LqZ-Wh-2V3"/>
+                                        <constraint firstItem="0AC-F7-6qy" firstAttribute="leading" secondItem="h5C-47-fC3" secondAttribute="leading" id="LqZ-Wh-2V3"/>
                                         <constraint firstAttribute="trailing" secondItem="0AC-F7-6qy" secondAttribute="trailing" constant="20" symbolic="YES" id="pIP-BP-gOU"/>
                                         <constraint firstItem="0AC-F7-6qy" firstAttribute="centerY" secondItem="h5C-47-fC3" secondAttribute="centerY" id="pUQ-Ab-byb"/>
                                     </constraints>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MFA_RECOVERY_CODES_CELL" id="rC6-ER-6Je">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MFA_RECOVERY_CODES_CELL" id="rC6-ER-6Je" customClass="MfaCodesCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="180" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rC6-ER-6Je" id="lcO-1a-NFL">
@@ -500,24 +501,24 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f2D-I7-4rR">
-                                            <rect key="frame" x="16" y="6.5" width="342.5" height="31"/>
+                                            <rect key="frame" x="0.0" y="6.5" width="358.5" height="31"/>
                                             <state key="normal" title="Button"/>
-                                            <buttonConfiguration key="configuration" style="plain" title="Recovery Codes" imagePadding="6">
+                                            <buttonConfiguration key="configuration" style="plain" title="Recovery Codes" imagePadding="10">
                                                 <imageReference key="image" image="note.text" catalog="system" symbolScale="large"/>
                                             </buttonConfiguration>
                                             <connections>
-                                                <action selector="onButton:" destination="X6X-Oj-z4n" eventType="touchUpInside" id="rIE-QR-lLz"/>
+                                                <action selector="onButton:" destination="rC6-ER-6Je" eventType="touchUpInside" id="7vn-Lu-PoZ"/>
                                             </connections>
                                         </button>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="f2D-I7-4rR" firstAttribute="leading" secondItem="lcO-1a-NFL" secondAttribute="leadingMargin" id="Dr1-1I-dPl"/>
+                                        <constraint firstItem="f2D-I7-4rR" firstAttribute="leading" secondItem="lcO-1a-NFL" secondAttribute="leading" id="Dr1-1I-dPl"/>
                                         <constraint firstItem="f2D-I7-4rR" firstAttribute="centerY" secondItem="lcO-1a-NFL" secondAttribute="centerY" id="bri-yW-SeA"/>
                                         <constraint firstAttribute="trailing" secondItem="f2D-I7-4rR" secondAttribute="trailingMargin" id="hmX-S0-bl4"/>
                                     </constraints>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MFA_NEW_RECOVERY_CODES_CELL" id="wpa-kD-lSl">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MFA_NEW_RECOVERY_CODES_CELL" id="wpa-kD-lSl" customClass="MfaNewCodesCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="223.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="wpa-kD-lSl" id="cHg-BV-HH3">
@@ -525,17 +526,17 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rvJ-uf-7Xa">
-                                            <rect key="frame" x="16" y="6.5" width="334.5" height="31"/>
+                                            <rect key="frame" x="0.0" y="6.5" width="350.5" height="31"/>
                                             <state key="normal" title="Button"/>
-                                            <buttonConfiguration key="configuration" style="plain" image="note.text.badge.plus" catalog="system" title="New Recovery Codes" imagePadding="6"/>
+                                            <buttonConfiguration key="configuration" style="plain" image="note.text.badge.plus" catalog="system" title="New Recovery Codes" imagePadding="10"/>
                                             <connections>
-                                                <action selector="onButton:" destination="X6X-Oj-z4n" eventType="touchUpInside" id="QZm-dZ-hkE"/>
+                                                <action selector="onButton:" destination="wpa-kD-lSl" eventType="touchUpInside" id="qRY-Xm-RLz"/>
                                             </connections>
                                         </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="rvJ-uf-7Xa" firstAttribute="centerY" secondItem="cHg-BV-HH3" secondAttribute="centerY" id="8dc-Mo-FSe"/>
-                                        <constraint firstItem="rvJ-uf-7Xa" firstAttribute="leading" secondItem="cHg-BV-HH3" secondAttribute="leadingMargin" id="FZV-qb-BNa"/>
+                                        <constraint firstItem="rvJ-uf-7Xa" firstAttribute="leading" secondItem="cHg-BV-HH3" secondAttribute="leading" id="FZV-qb-BNa"/>
                                         <constraint firstAttribute="trailing" secondItem="rvJ-uf-7Xa" secondAttribute="trailingMargin" constant="8" id="zlg-mm-8pi"/>
                                     </constraints>
                                 </tableViewCellContentView>
