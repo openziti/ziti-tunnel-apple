@@ -621,9 +621,12 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = "[\(protoStr)]:\(zid.services[indexPath.row].addresses ?? ""):[\(zid.services[indexPath.row].portRanges ?? "-1")] "
                 
                 let tunnelStatus = tvc?.tunnelMgr.status ?? .disconnected
+                let edgeStatus = zid.edgeStatus?.status ?? .Unavailable
                 var imageName:String = "StatusNone"
                 
-                if tunnelStatus == .connected, zid.isEnrolled == true, zid.isEnabled == true, let svcStatus = zid.services[indexPath.row].status {
+                if tunnelStatus == .connected, edgeStatus != .Unavailable,
+                   zid.isEnrolled == true, zid.isEnabled == true, let svcStatus = zid.services[indexPath.row].status {
+                    
                     switch svcStatus.status {
                     case .Available: imageName = "StatusAvailable"
                     case .PartiallyAvailable: imageName = "StatusPartiallyAvailable"
