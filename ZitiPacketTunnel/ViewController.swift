@@ -798,7 +798,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     }
                     guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
                           let status = codesMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
+                        self.dialogAlert("IPC Error", "Unable to parse recovery codes response message")
                         return
                     }
                     guard status == Ziti.ZITI_OK else {
@@ -829,7 +829,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     }
                     guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
                           let status = codesMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
+                        self.dialogAlert("IPC Error", "Unable to parse recovery codes response message")
                         return
                     }
                     guard status == Ziti.ZITI_OK else {
