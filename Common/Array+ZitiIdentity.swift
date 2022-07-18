@@ -34,6 +34,21 @@ extension Array where Element == ZitiIdentity {
         }
     }
     
+    func getZidIndx(_ zidStr:String?) -> Int {
+        guard let zidStr = zidStr else {
+            return -1
+        }
+
+        var indx = -1
+        for i in 0..<self.count {
+            if self[i].id == zidStr {
+                indx = i
+                break
+            }
+        }
+        return indx
+    }
+    
     mutating func insertFromJWT(_ url:URL, _ zidStore:ZitiIdentityStore, at:Int) throws {
         let zid = ZitiIdentity()
         
