@@ -118,6 +118,7 @@
 		5ADAE980280F7F86007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */; };
 		5ADAE981280F7F8E007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */; };
 		5AF05FB22884445F006CD604 /* MfaCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF05FB12884445F006CD604 /* MfaCodeViewController.swift */; };
+		5AF05FB42884F692006CD604 /* MfaCodesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF05FB32884F692006CD604 /* MfaCodesViewController.swift */; };
 		5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF3DCAB24B52642005047BC /* ShareViewController.swift */; };
@@ -301,6 +302,7 @@
 		5ADAE974280F7837007D1DF4 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.9.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/usr/lib/libresolv.9.tbd; sourceTree = DEVELOPER_DIR; };
 		5AF05FB12884445F006CD604 /* MfaCodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaCodeViewController.swift; sourceTree = "<group>"; };
+		5AF05FB32884F692006CD604 /* MfaCodesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaCodesViewController.swift; sourceTree = "<group>"; };
 		5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PacketTunnelProvider-Bridging-Header.h"; sourceTree = "<group>"; };
 		5AF0C41C24951A9F00CD4DAE /* libziti_tunneler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler.a"; sourceTree = "<group>"; };
 		5AF0C41D24951A9F00CD4DAE /* libziti_tunneler_cbs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler_cbs.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler_cbs.a"; sourceTree = "<group>"; };
@@ -536,6 +538,7 @@
 				5AF9C2492268F84A009CFD71 /* IdentityViewController.swift */,
 				5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */,
 				5AF05FB12884445F006CD604 /* MfaCodeViewController.swift */,
+				5AF05FB32884F692006CD604 /* MfaCodesViewController.swift */,
 				5A0004922832C3DF00351FE2 /* ServiceViewController.swift */,
 				5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */,
 				5AFEB76C225D644A0048B2F6 /* TableViewController.swift */,
@@ -1175,6 +1178,7 @@
 				5A0004912832769800351FE2 /* UserNotifications.swift in Sources */,
 				5AF50FE6257D82770092DC47 /* LogLevelViewController.swift in Sources */,
 				5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */,
+				5AF05FB42884F692006CD604 /* MfaCodesViewController.swift in Sources */,
 				5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */,
 				5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */,
 				5A2D2FE124AA6CB900D154AA /* SpinnerViewController.swift in Sources */,
