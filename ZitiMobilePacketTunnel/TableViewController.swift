@@ -53,6 +53,7 @@ class StatusCell: UITableViewCell {
             connectSwitch.isOn = false
         }
         tvc?.tableView.reloadData()
+        tvc?.ivc?.tableView.reloadData()
     }
     
     @IBAction func connectSwitchChanged(_ sender: Any) {
@@ -132,6 +133,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             DispatchQueue.main.async { [self] in
                 let count = self.zids.count
                 self.zids.updateIdentity(zid)
+                ivc?.zid = zid
                 
                 if count != self.zids.count { // inserted at 0
                     DispatchQueue.main.async {
