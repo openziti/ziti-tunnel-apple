@@ -91,7 +91,7 @@
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="daU-uU-3oJ">
                                                     <rect key="frame" x="-2" y="0.0" width="261" height="14"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Rotate daily (UTC time) regardless of log file size" id="vU4-w4-BzX">
-                                                        <font key="font" metaFont="system" size="11"/>
+                                                        <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -178,7 +178,7 @@
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9BN-cI-9h3">
                                                     <rect key="frame" x="-2" y="0.0" width="209" height="14"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Rotate if log grows larger than this size" id="TZP-yG-tRx">
-                                                        <font key="font" metaFont="system" size="11"/>
+                                                        <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
@@ -255,7 +255,7 @@
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Tcc-sl-8dC">
                                                     <rect key="frame" x="-2" y="0.0" width="238" height="14"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Rotate logs this many times before removing" id="yC2-oY-8Bs">
-                                                        <font key="font" metaFont="system" size="11"/>
+                                                        <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>

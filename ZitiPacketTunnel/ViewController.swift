@@ -96,7 +96,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if let indx = self.representedObject as? Int, self.zids.count > 0 {
             // set mfaPending if disconnecting or re-connecting.  purely cosmetic for UI as appex will reset correctly when it starts
             for zid in zids {
-                if zid.isMfaEnabled && status == .disconnecting || status == .disconnected || status == .reasserting {
+                if zid.isMfaEnabled && status == .disconnecting || status == .disconnected {
                     zid.mfaPending = true
                 }
             }
@@ -798,7 +798,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     }
                     guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
                           let status = codesMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
+                        self.dialogAlert("IPC Error", "Unable to parse recovery codes response message")
                         return
                     }
                     guard status == Ziti.ZITI_OK else {
@@ -829,7 +829,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     }
                     guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
                           let status = codesMsg.status else {
-                        self.dialogAlert("IPC Error", "Unable to parse recovery codees response message")
+                        self.dialogAlert("IPC Error", "Unable to parse recovery codes response message")
                         return
                     }
                     guard status == Ziti.ZITI_OK else {

@@ -95,6 +95,7 @@
 		5A91B4CB2222E19E006C4277 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A91B4CC2222E19F006C4277 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A9417C8287B9D3100EEE6BD /* LogRotationConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9417C7287B9D3000EEE6BD /* LogRotationConfigViewController.swift */; };
+		5A9417CA2880975100EEE6BD /* MfaVerifyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */; };
 		5A94B33B283EF77F00C07599 /* InAppNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33A283EF77F00C07599 /* InAppNotification.swift */; };
 		5A94B3402843D10F00C07599 /* EditableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33F2843D10F00C07599 /* EditableTextField.swift */; };
 		5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
@@ -116,6 +117,8 @@
 		5ADAE97F280F7F7F007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */; };
 		5ADAE980280F7F86007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */; };
 		5ADAE981280F7F8E007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */; };
+		5AF05FB22884445F006CD604 /* MfaCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF05FB12884445F006CD604 /* MfaCodeViewController.swift */; };
+		5AF05FB42884F692006CD604 /* MfaCodesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF05FB32884F692006CD604 /* MfaCodesViewController.swift */; };
 		5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF3DCAB24B52642005047BC /* ShareViewController.swift */; };
@@ -281,6 +284,7 @@
 		5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+timeAgo.swift"; sourceTree = "<group>"; };
 		5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentityStore.swift; sourceTree = "<group>"; };
 		5A9417C7287B9D3000EEE6BD /* LogRotationConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogRotationConfigViewController.swift; sourceTree = "<group>"; };
+		5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaVerifyViewController.swift; sourceTree = "<group>"; };
 		5A94B33A283EF77F00C07599 /* InAppNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotification.swift; sourceTree = "<group>"; };
 		5A94B33F2843D10F00C07599 /* EditableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableTextField.swift; sourceTree = "<group>"; };
 		5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelMgr.swift; sourceTree = "<group>"; };
@@ -297,6 +301,8 @@
 		5ABF986A260C2DED00AA982F /* SnapshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotViewController.swift; sourceTree = "<group>"; };
 		5ADAE974280F7837007D1DF4 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		5ADAE97E280F7F7E007D1DF4 /* libresolv.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.9.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS15.4.sdk/usr/lib/libresolv.9.tbd; sourceTree = DEVELOPER_DIR; };
+		5AF05FB12884445F006CD604 /* MfaCodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaCodeViewController.swift; sourceTree = "<group>"; };
+		5AF05FB32884F692006CD604 /* MfaCodesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaCodesViewController.swift; sourceTree = "<group>"; };
 		5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PacketTunnelProvider-Bridging-Header.h"; sourceTree = "<group>"; };
 		5AF0C41C24951A9F00CD4DAE /* libziti_tunneler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler.a"; sourceTree = "<group>"; };
 		5AF0C41D24951A9F00CD4DAE /* libziti_tunneler_cbs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libziti_tunneler_cbs.a; path = "deps/ziti-tunneler-sdk-c/build-macos-x86_64/lib/libziti_tunneler_cbs.a"; sourceTree = "<group>"; };
@@ -530,6 +536,9 @@
 				5A6BA262226DF65C00224F09 /* NoticesViewController.swift */,
 				5A6BA25C226DE5FB00224F09 /* AboutViewController.swift */,
 				5AF9C2492268F84A009CFD71 /* IdentityViewController.swift */,
+				5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */,
+				5AF05FB12884445F006CD604 /* MfaCodeViewController.swift */,
+				5AF05FB32884F692006CD604 /* MfaCodesViewController.swift */,
 				5A0004922832C3DF00351FE2 /* ServiceViewController.swift */,
 				5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */,
 				5AFEB76C225D644A0048B2F6 /* TableViewController.swift */,
@@ -1145,8 +1154,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AF05FB22884445F006CD604 /* MfaCodeViewController.swift in Sources */,
 				5A2EA2F0209B75B700437608 /* ProviderConfig.swift in Sources */,
 				5A6BA263226DF65C00224F09 /* NoticesViewController.swift in Sources */,
+				5A9417CA2880975100EEE6BD /* MfaVerifyViewController.swift in Sources */,
 				5A34E96522791FCA00E221DD /* LogViewController.swift in Sources */,
 				5A91B4CB2222E19E006C4277 /* ZitiIdentity.swift in Sources */,
 				5AB0FDD8265B2E0700B41D58 /* IpcMessages.swift in Sources */,
@@ -1167,6 +1178,7 @@
 				5A0004912832769800351FE2 /* UserNotifications.swift in Sources */,
 				5AF50FE6257D82770092DC47 /* LogLevelViewController.swift in Sources */,
 				5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */,
+				5AF05FB42884F692006CD604 /* MfaCodesViewController.swift in Sources */,
 				5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */,
 				5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */,
 				5A2D2FE124AA6CB900D154AA /* SpinnerViewController.swift in Sources */,
@@ -1506,7 +1518,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 457;
+				CURRENT_PROJECT_VERSION = 458;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
@@ -1531,7 +1543,7 @@
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 457;
+				CURRENT_PROJECT_VERSION = 458;
 				ENABLE_BITCODE = "$(inherited)";
 				INFOPLIST_FILE = ZitiMobilePacketTunnel/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
@@ -1556,7 +1568,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 457;
+				CURRENT_PROJECT_VERSION = 458;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;
@@ -1585,7 +1597,7 @@
 				CODE_SIGN_ENTITLEMENTS = MobilePacketTunnelProvider/MobilePacketTunnelProvider.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 457;
+				CURRENT_PROJECT_VERSION = 458;
 				ENABLE_BITCODE = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobilePacketTunnelProvider/Info.plist;

@@ -41,6 +41,300 @@ class EnrollIdentityCell: UITableViewCell {
     }
 }
 
+class MfaAuthNowCell : UITableViewCell {
+    weak var ivc:IdentityViewController?
+    @IBAction func onButton(_ sender: Any) {
+        ivc?.doMfaAuth()
+    }
+}
+
+class MfaCodesCell : UITableViewCell {
+    weak var ivc:IdentityViewController?
+    @IBAction func onButton(_ sender: Any) {
+        guard let zid = ivc?.zid else { return }
+        
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        if let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController {
+            vc.completionHandler = { [weak self] code in
+                if let code = code {
+                    let msg = IpcMfaGetRecoveryCodesRequestMessage(zid.id, code)
+                    TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                        DispatchQueue.main.async {
+                            guard zErr == nil else {
+                                self?.ivc?.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                                return
+                            }
+                            guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                                  let status = codesMsg.status else {
+                                self?.ivc?.dialogAlert("IPC Error", "Unable to parse recovery codes response message")
+                                return
+                            }
+                            guard status == Ziti.ZITI_OK else {
+                                self?.ivc?.dialogAlert("MFA Error", Ziti.zitiErrorString(status: status))
+                                return
+                            }
+
+                            // Success!
+                            self?.ivc?.performSegue(withIdentifier: "MFA_CODES_SEGUE", sender: codesMsg.codes)
+                        }
+                    }
+                }
+                vc.dismiss(animated: true)
+            }
+            self.ivc?.present(vc, animated: true)
+        }
+    }
+}
+
+class MfaNewCodesCell : UITableViewCell {
+    weak var ivc:IdentityViewController?
+    @IBAction func onButton(_ sender: Any) {
+        guard let zid = ivc?.zid else { return }
+        
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        if let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController {
+            vc.completionHandler = { [weak self] code in
+                if let code = code {
+                    let msg = IpcMfaNewRecoveryCodesRequestMessage(zid.id, code)
+                    TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                        DispatchQueue.main.async {
+                            guard zErr == nil else {
+                                self?.ivc?.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                                return
+                            }
+                            guard let codesMsg = respMsg as? IpcMfaRecoveryCodesResponseMessage,
+                                  let status = codesMsg.status else {
+                                self?.ivc?.dialogAlert("IPC Error", "Unable to parse recovery codes response message")
+                                return
+                            }
+                            guard status == Ziti.ZITI_OK else {
+                                self?.ivc?.dialogAlert("MFA Error", Ziti.zitiErrorString(status: status))
+                                return
+                            }
+
+                            // Success!
+                            self?.ivc?.performSegue(withIdentifier: "MFA_CODES_SEGUE", sender: codesMsg.codes)
+                        }
+                    }
+                }
+                vc.dismiss(animated: true)
+            }
+            self.ivc?.present(vc, animated: true)
+        }
+    }
+}
+
+class MfaEnabledCell : UITableViewCell {
+    weak var ivc:IdentityViewController?
+    
+    @IBOutlet weak var mfaLockImageView: UIImageView!
+    @IBOutlet weak var mfaSwitch: UISwitch!
+    
+    func refresh() {
+        guard let zid = ivc?.zid else { return }
+        
+        let tStatus = TunnelMgr.shared.status
+        mfaSwitch.isEnabled = zid.isEnabled && (tStatus == .connected || tStatus == .connecting)
+        mfaSwitch.isOn = zid.isMfaEnabled
+        
+        mfaLockImageView.image = UIImage(systemName: "lock.slash")
+        mfaLockImageView.tintColor = .systemGray
+        let mfaPostureChecksFailing = zid.failingPostureChecks().filter({ $0 == "MFA"}).first != nil
+        
+        if zid.isEnabled && zid.isMfaEnabled && (tStatus == .connecting || tStatus == .connected) {
+            mfaLockImageView.image = UIImage(systemName: "lock.fill")
+            if zid.isMfaPending {
+                mfaLockImageView.tintColor = .systemRed
+            } else {
+                if !mfaPostureChecksFailing {
+                    mfaLockImageView.tintColor = .systemGreen
+                } else {
+                    mfaLockImageView.tintColor = .systemYellow
+                }
+            }
+        } 
+    }
+    
+    func toggleMfa(_ state:Bool) {
+        mfaSwitch.isOn = state
+        ivc?.tableView.reloadData()
+        ivc?.tvc?.tableView.reloadData()
+    }
+    
+    func mfaVerify(_ mfaEnrollment:ZitiMfaEnrollment) {
+        guard let provisioningUrl = mfaEnrollment.provisioningUrl else {
+            zLog.error("Invalid provisioning URL")
+            return
+        }
+        zLog.info("MFA provisioningUrl: \(provisioningUrl)")
+        
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        if let vc = sb.instantiateViewController(withIdentifier: "MFA_VERIFY_VC") as? MfaVerifyViewController {
+            vc.provisioningUrl = provisioningUrl
+            vc.completionHandler = { [weak self] code in
+                guard let zid = self?.ivc?.zid else { return }
+                
+                if let code = code {
+                    let msg = IpcMfaVerifyRequestMessage(zid.id, code)
+                    TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                        DispatchQueue.main.async {
+                            guard zErr == nil else {
+                                self?.ivc?.dialogAlert("Error sending provider message to verify MFA", zErr!.localizedDescription)
+                                zid.mfaEnabled = false
+                                zid.mfaVerified = false
+                                if let updatedZid = self?.ivc?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                    self?.ivc?.tvc?.zids.updateIdentity(updatedZid)
+                                }
+                                self?.toggleMfa(false)
+                                return
+                            }
+                            guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage,
+                                  let status = statusMsg.status else {
+                                self?.ivc?.dialogAlert("IPC Error", "Unable to parse verification response message")
+                                zid.mfaEnabled = false
+                                zid.mfaVerified = false
+                                if let updatedZid = self?.ivc?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                    self?.ivc?.tvc?.zids.updateIdentity(updatedZid)
+                                }
+                                self?.toggleMfa(false)
+                                return
+                            }
+                            guard status == Ziti.ZITI_OK else {
+                                self?.ivc?.dialogAlert("MFA Verification Error", Ziti.zitiErrorString(status: status))
+                                zid.mfaEnabled = false
+                                zid.mfaVerified = false
+                                if let updatedZid = self?.ivc?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                    self?.ivc?.tvc?.zids.updateIdentity(updatedZid)
+                                }
+                                self?.toggleMfa(false)
+                                return
+                            }
+
+                            // Success!
+                            zid.mfaVerified = true
+                            zid.mfaPending = false
+                            zid.lastMfaAuth = Date()
+                            if let updatedZid = self?.ivc?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                self?.ivc?.tvc?.zids.updateIdentity(updatedZid)
+                            }
+                            self?.ivc?.performSegue(withIdentifier: "MFA_CODES_SEGUE", sender: mfaEnrollment.recoveryCodes)
+                        }
+                    }
+                } else {
+                    zLog.info("Setup MFA cancelled")
+                    zid.mfaEnabled = false
+                    zid.mfaVerified = false
+                    if let updatedZid = self?.ivc?.tvc?.zidStore.update(zid, [.Mfa]) {
+                        self?.ivc?.tvc?.zids.updateIdentity(updatedZid)
+                    }
+                    self?.toggleMfa(false)
+                }
+                vc.dismiss(animated: true)
+            }
+            self.window?.rootViewController?.present(vc, animated: true)
+        }
+    }
+    
+    @IBAction func onMfaToggle(_ sender: Any) {
+        guard let zid = ivc?.zid else {
+            zLog.error("Invalid identity")
+            mfaSwitch.isOn = !mfaSwitch.isOn
+            return
+        }
+        
+        if mfaSwitch.isOn {
+            enableMfa(zid)
+        } else {
+            // only prompt for code if enrollment is verified, else just send empty string
+            if !zid.isMfaVerified {
+                disableMfa(zid, "")
+            } else {
+                let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+                if let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController {
+                    vc.completionHandler = { [weak self] code in
+                        if let code = code {
+                            self?.disableMfa(zid, code)
+                        } else { // cancel
+                            DispatchQueue.main.async {
+                                self?.ivc?.tableView.reloadData()
+                            }
+                        }
+                        vc.dismiss(animated: true)
+                    }
+                    self.window?.rootViewController?.present(vc, animated: true)
+                }
+            }
+        }
+    }
+    
+    func enableMfa(_ zid:ZitiIdentity) {
+        let msg = IpcMfaEnrollRequestMessage(zid.id)
+        TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    self.ivc?.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
+                    self.toggleMfa(false)
+                    return
+                }
+                guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage,
+                    let mfaEnrollment = enrollResp.mfaEnrollment else {
+                    self.ivc?.dialogAlert("IPC Error", "Unable to parse enrollment response message")
+                    self.toggleMfa(false)
+                    return
+                }
+
+                zid.mfaEnabled = true
+                zid.mfaPending = true
+                zid.mfaVerified = mfaEnrollment.isVerified
+                if let zidStore = self.ivc?.tvc?.zidStore {
+                    self.ivc?.zid = zidStore.update(zid, [.Mfa])
+                    self.ivc?.tvc?.zids.updateIdentity(zid)
+                }
+                self.ivc?.tableView.reloadData()
+                self.ivc?.tvc?.tableView.reloadData()
+
+                if !zid.isMfaVerified {
+                    self.mfaVerify(mfaEnrollment)
+                }
+            }
+        }
+    }
+    
+    func disableMfa(_ zid:ZitiIdentity, _ code:String) {
+        let msg = IpcMfaRemoveRequestMessage(zid.id, code)
+        TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    self.ivc?.dialogAlert("Error sending provider message to disable MFA", zErr!.localizedDescription)
+                    self.toggleMfa(true)
+                    return
+                }
+                guard let removeResp = respMsg as? IpcMfaStatusResponseMessage,
+                      let status = removeResp.status else {
+                    self.ivc?.dialogAlert("IPC Error", "Unable to parse MFA removal response message")
+                    self.toggleMfa(true)
+                    return
+                }
+
+                if status != Ziti.ZITI_OK {
+                    self.ivc?.dialogAlert("MFA Removal Error",
+                                     "Status code: \(status)\nDescription: \(Ziti.zitiErrorString(status: status))")
+                    self.toggleMfa(true)
+                } else {
+                    zLog.info("MFA removed for \(zid.name):\(zid.id)")
+                    zid.mfaEnabled = false
+                    if let zidStore = self.ivc?.tvc?.zidStore {
+                        self.ivc?.zid = zidStore.update(zid, [.Mfa])
+                        self.ivc?.tvc?.zids.updateIdentity(zid)
+                    }
+                    self.ivc?.tableView.reloadData()
+                    self.ivc?.tvc?.tableView.reloadData()
+                }
+            }
+        }
+    }
+}
+
 class IdentityViewController: UITableViewController, MFMailComposeViewControllerDelegate {
     
     weak var tvc:TableViewController?
@@ -48,6 +342,17 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
 
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    func dialogAlert(_ msg:String, _ text:String? = nil) {
+        let alert = UIAlertController(
+            title: msg,
+            message: text,
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("OK", comment: "Default action"),
+            style: .default))
+        self.present(alert, animated: true, completion: nil)
     }
     
     func onEnabledValueChanged(_ enabled:Bool) {
@@ -154,6 +459,50 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         }
     }
     
+    func doMfaAuth() {
+        guard let zid = self.zid else { return }
+        
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        if let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController {
+            vc.completionHandler = { [weak self] code in
+                if let code = code {
+                    let msg = IpcMfaAuthQueryResponseMessage(zid.id, code)
+                    TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                        DispatchQueue.main.async {
+                            guard zErr == nil else {
+                                self?.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                                return
+                            }
+                            guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage,
+                                  let status = statusMsg.status else {
+                                self?.dialogAlert("IPC Error", "Unable to parse auth response message")
+                                return
+                            }
+                            guard status == Ziti.ZITI_OK else {
+                                self?.dialogAlert("MFA Auth Error", Ziti.zitiErrorString(status: status))
+                                return
+                            }
+
+                            // Success!
+                            zid.lastMfaAuth = Date()
+                            zid.mfaPending = false
+                            if let updatedZid = self?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                self?.tvc?.zids.updateIdentity(updatedZid)
+                            }
+                            self?.tableView.reloadData()
+                        }
+                    }
+                } else { // cancel
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                }
+                vc.dismiss(animated: true)
+            }
+            self.present(vc, animated: true)
+        }
+    }
+    
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true)
     }
@@ -161,14 +510,27 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 4
+        return 5
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 1 {
-            nRows = 5
+            // authNow button
+            if let zid = self.zid {
+                let tStatus = TunnelMgr.shared.status
+                if zid.isEnabled && zid.isMfaEnabled && (tStatus == .connecting || tStatus == .connected) {
+                    nRows += 1
+                    
+                    // codes and newCode buttons
+                    if !zid.isMfaPending {
+                        nRows += 2
+                    }
+                }
+            }
         } else if section == 2 {
+            nRows = 5
+        } else if section == 3 {
             if zid?.isEnrolled ?? false {
                 nRows = zid?.services.count ?? 0
             } else {
@@ -179,7 +541,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 2 && zid?.services.count ?? 0 > 0 && zid?.isEnrolled ?? false {
+        if section == 3 && zid?.services.count ?? 0 > 0 && zid?.isEnrolled ?? false {
             return "Services"
         }
         return nil
@@ -197,6 +559,29 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 ivCell.label.isEnabled = ivCell.switch.isEnabled
             }
         } else if indexPath.section == 1 {
+            if indexPath.row == 0 {
+                cell = tableView.dequeueReusableCell(withIdentifier: "MFA_CELL", for: indexPath)
+                if let mfaEnabledCell = cell as? MfaEnabledCell {
+                    mfaEnabledCell.ivc = self
+                    mfaEnabledCell.refresh()
+                }
+            } else if indexPath.row == 1 {
+                cell = tableView.dequeueReusableCell(withIdentifier: "MFA_AUTH_NOW_CELL", for: indexPath)
+                if let mfaAuthNowCell = cell as? MfaAuthNowCell {
+                    mfaAuthNowCell.ivc = self
+                }
+            } else if indexPath.row == 2 {
+                cell = tableView.dequeueReusableCell(withIdentifier: "MFA_RECOVERY_CODES_CELL", for: indexPath)
+                if let mfaCodesCell = cell as? MfaCodesCell {
+                    mfaCodesCell.ivc = self
+                }
+            } else if indexPath.row == 3 {
+                cell = tableView.dequeueReusableCell(withIdentifier: "MFA_NEW_RECOVERY_CODES_CELL", for: indexPath)
+                if let mfaNewCodesCell = cell as? MfaNewCodesCell {
+                    mfaNewCodesCell.ivc = self
+                }
+            }
+        } else if indexPath.section == 2 {
             cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_VALUE_CELL", for: indexPath)
             if indexPath.row == 0 {
                 cell?.textLabel?.text = "Name"
@@ -224,7 +609,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.textLabel?.text = "Enrollment Status"
                 cell?.detailTextLabel?.text = zid?.enrollmentStatus.rawValue
             }
-        } else if indexPath.section == 2 {
+        } else if indexPath.section == 3 {
             if let zid = zid, zid.isEnrolled {
                 cell = tableView.dequeueReusableCell(withIdentifier: "IDENTITY_SERVICE_CELL", for: indexPath)
                 cell?.textLabel?.text = zid.services[indexPath.row].name
@@ -236,9 +621,12 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = "[\(protoStr)]:\(zid.services[indexPath.row].addresses ?? ""):[\(zid.services[indexPath.row].portRanges ?? "-1")] "
                 
                 let tunnelStatus = tvc?.tunnelMgr.status ?? .disconnected
+                let edgeStatus = zid.edgeStatus?.status ?? .Unavailable
                 var imageName:String = "StatusNone"
                 
-                if tunnelStatus == .connected, zid.isEnrolled == true, zid.isEnabled == true, let svcStatus = zid.services[indexPath.row].status {
+                if tunnelStatus == .connected, edgeStatus != .Unavailable,
+                   zid.isEnrolled == true, zid.isEnabled == true, let svcStatus = zid.services[indexPath.row].status {
+                    
                     switch svcStatus.status {
                     case .Available: imageName = "StatusAvailable"
                     case .PartiallyAvailable: imageName = "StatusPartiallyAvailable"
@@ -260,8 +648,13 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let svcVc = segue.destination as? ServiceViewController {
-            if let ip = tableView.indexPathForSelectedRow, ip.section == 2 {
+            if let ip = tableView.indexPathForSelectedRow, ip.section == 3 {
                 svcVc.svc = zid?.services[ip.row]
+            }
+        } else if let codeVc = segue.destination as? MfaCodesViewController {
+            codeVc.zid = self.zid
+            if let codes = sender as? [String] {
+                codeVc.codes = codes
             }
         }
     }

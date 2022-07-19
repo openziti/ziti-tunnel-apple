@@ -53,6 +53,7 @@ class StatusCell: UITableViewCell {
             connectSwitch.isOn = false
         }
         tvc?.tableView.reloadData()
+        tvc?.ivc?.tableView.reloadData()
     }
     
     @IBAction func connectSwitchChanged(_ sender: Any) {
@@ -133,6 +134,11 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 let count = self.zids.count
                 self.zids.updateIdentity(zid)
                 
+                // if user currently viewing this identity, make sure it's current
+                if let currId = ivc?.zid?.id, currId == zid.id {
+                    ivc?.zid = zid
+                }
+                
                 if count != self.zids.count { // inserted at 0
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
@@ -176,52 +182,39 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             }
             
             if msg.meta.msgType == .MfaAuthQuery {
-                self.notifiyMfaNotSupported()
+                let indx = self.zids.getZidIndx(msg.meta.zid)
+                if indx != -1 {
+                    self.tableView.reloadData()
+                    self.tableView.selectRow(at: IndexPath(row: indx, section: 1), animated: false, scrollPosition: .none)
+                    self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+                    self.ivc?.doMfaAuth()
+                }
             }
             
             // Process any specified action
-            if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationActionMessage {
+            if msg.meta.msgType == .AppexNotificationAction, let msg = msg as? IpcAppexNotificationActionMessage {
                 // Always select the zid (if specified)
                 DispatchQueue.main.async {
-                    if let zidStr = msg.meta.zid {
-                        var indx = -1
-                        for i in 0..<self.zids.count {
-                            if self.zids[i].id == zidStr {
-                                indx = i
-                                break
-                            }
-                        }
-                        if indx != -1 {
-                            self.tableView.reloadData()
-                            self.tableView.selectRow(at: IndexPath(row: indx, section: 1), animated: false, scrollPosition: .none)
-                            self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
-                        }
+                    let indx = self.zids.getZidIndx(msg.meta.zid)
+                    if indx != -1 {
+                        self.tableView.reloadData()
+                        self.tableView.selectRow(at: IndexPath(row: indx, section: 1), animated: false, scrollPosition: .none)
+                        self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
                     }
                 }
                 
                 // Process the action
                 if let action = msg.action {
                     if action == UserNotifications.Action.MfaAuth.rawValue {
-                        self.notifiyMfaNotSupported()
+                        // put this on dispatch queue so it happens after the seque above (else ivc will be stale).
+                        DispatchQueue.main.async {
+                            self.ivc?.doMfaAuth()
+                        }
                     } else if action == UserNotifications.Action.Restart.rawValue {
                         self.tunnelMgr.restartTunnel()
                     }
                 }
             }
-        }
-    }
-    
-    func notifiyMfaNotSupported() {
-        let alert = UIAlertController(
-            title:"MFA Auth Error",
-            message: "MFA not currently supported on this platform",
-            preferredStyle: .alert)
-        alert.addAction(UIAlertAction(
-            title: NSLocalizedString("Ok", comment: "Ok"),
-            style: .default,
-            handler: nil))
-        DispatchQueue.main.async {
-            self.present(alert, animated: true, completion: nil)
         }
     }
     
