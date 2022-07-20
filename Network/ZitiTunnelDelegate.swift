@@ -91,25 +91,25 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         identitiesLoaded = true
         
 #if os(macOS)
-            // notifiy Ziti on unlock
-            DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
-                zLog.debug("---screen unlock----")
-                self.ptp?.zitiTunnel?.perform {
-                    self.allZitis.forEach { z in
-                        z.endpointStateChange(false, true)
-                    }
-                }
-            }
-#endif
-            // set timer to check pending MFA posture timeouts
+        // notifiy Ziti on unlock
+        DistributedNotificationCenter.default.addObserver(forName: .init("com.apple.screenIsUnlocked"), object:nil, queue: OperationQueue.main) { _ in
+            zLog.debug("---screen unlock----")
             self.ptp?.zitiTunnel?.perform {
-                // TODO: once startTimeer expost by ZitiTunnel, use it rather than the first ZitiIdentity
-                self.allZitis.first?.startTimer(
-                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
-                    ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
-                    self.onMfaPostureTimer()
+                self.allZitis.forEach { z in
+                    z.endpointStateChange(false, true)
                 }
             }
+        }
+#endif
+        // set timer to check pending MFA posture timeouts
+        self.ptp?.zitiTunnel?.perform {
+            // TODO: once startTimeer expost by ZitiTunnel, use it rather than the first ZitiIdentity
+            self.allZitis.first?.startTimer(
+                ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000,
+                ZitiTunnelDelegate.MFA_POSTURE_CHECK_TIMER_INTERVAL * 1000) { _ in
+                self.onMfaPostureTimer()
+            }
+        }
     }
     
     func shuttingDown() {
