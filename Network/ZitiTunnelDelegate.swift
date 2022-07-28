@@ -33,6 +33,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     var dnsEntries = DNSUtils.DnsEntries()
     var interceptedRoutes:[NEIPv4Route] = []
     var excludedRoutes:[NEIPv4Route] = []
+    var routeUpdatesPending = false
     var tunnelShuttingDown = false
     var lastWakeTime:Date?
     
@@ -142,11 +143,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             interceptedRoutes.append(route)
             
             if !alreadyExists && identitiesLoaded {
-                self.ptp?.updateTunnelNetworkSettings { error in
-                    if let error = error {
-                        zLog.error("Error adding route \(destinationAddress): \(error.localizedDescription)")
-                    }
-                }
+                routeUpdatesPending = true
             }
         }
         return 0
@@ -175,13 +172,19 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
                             
             if identitiesLoaded {
-                self.ptp?.updateTunnelNetworkSettings { error in
-                    if let error = error {
-                        zLog.error("Error removing route \(destinationAddress): \(error.localizedDescription)")
-                    }
-                }
+                routeUpdatesPending = true
             }
         }
+        return 0
+    }
+    
+    func commitRoutes(_ loop: OpaquePointer?) -> Int32 {
+        ptp?.updateTunnelNetworkSettings { error in
+            if let error = error {
+                zLog.error("Error removing comiting routes \(error.localizedDescription)")
+            }
+        }
+        routeUpdatesPending = false
         return 0
     }
     
@@ -394,7 +397,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
         }
         
-        if reassert {
+        if reassert && !routeUpdatesPending {
             ptp?.updateTunnelNetworkSettings { error in
                 if let error = error {
                     zLog.error("Error updating tunnel network settings: \(error.localizedDescription)")
