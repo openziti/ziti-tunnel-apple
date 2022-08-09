@@ -78,11 +78,11 @@ class ProviderConfig : NSObject {
     var logLevel:Int = Int(ZitiLog.LogLevel.INFO.rawValue)
     var interceptMatchedDns:Bool = true
    
-    // MFA no longer a beta feature on macOS - hardcode it to "enabled"
+    // MFA no longer a beta feature - hardcode it to "enabled"
 #if os(macOS)
     let enableMfa = true
 #else
-    let enableMfa = false
+    let enableMfa = true
 #endif
     
     // If never stored, set default value to false
