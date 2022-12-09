@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="aQz-i1-P8C">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="aQz-i1-P8C">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Ziti Packet Tunnel-->
+        <!--Threatfend Packet Tunnel-->
         <scene sceneID="vuh-VM-vBG">
             <objects>
-                <tableViewController title="Ziti Packet Tunnel" id="vfh-An-ZaB" customClass="TableViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Threatfend Packet Tunnel" id="vfh-An-ZaB" customClass="TableViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="3VO-3W-NJb">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="STATUS_CELL" id="Uel-Gr-Ez3" customClass="StatusCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="49.5" width="375" height="43"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="STATUS_CELL" id="Uel-Gr-Ez3" customClass="StatusCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="55.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Uel-Gr-Ez3" id="9OX-pE-rMf">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jxg-Hj-xyb">
-                                            <rect key="frame" x="16" y="11" width="78" height="21"/>
+                                            <rect key="frame" x="16" y="11" width="78" height="21.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="ciB-WT-Xbd">
-                                            <rect key="frame" x="308" y="6" width="49" height="31"/>
+                                            <rect key="frame" x="308" y="6.5" width="49" height="31"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="47" id="Wgx-Qx-Ufd"/>
                                             </constraints>
@@ -41,7 +42,7 @@
                                             </connections>
                                         </switch>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Not Connected" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G5z-oo-UuE">
-                                            <rect key="frame" x="102" y="11" width="198" height="21"/>
+                                            <rect key="frame" x="102" y="11" width="198" height="21.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <nil key="highlightedColor"/>
@@ -66,10 +67,10 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="IDENTITY_CELL" textLabel="626-7g-jDM" detailTextLabel="a4V-TH-x73" style="IBUITableViewCellStyleSubtitle" id="GeQ-bg-def">
-                                <rect key="frame" x="0.0" y="92.5" width="375" height="55.5"/>
+                                <rect key="frame" x="0.0" y="99" width="375" height="55.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="GeQ-bg-def" id="8yq-3G-Yc0">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="55.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="55.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="626-7g-jDM">
@@ -93,7 +94,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ADD_IDENTITY_CELL" textLabel="xn9-rE-oYi" style="IBUITableViewCellStyleDefault" id="Sj2-Sj-DpB">
-                                <rect key="frame" x="0.0" y="148" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="154.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Sj2-Sj-DpB" id="fey-k1-axg">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -110,7 +111,7 @@
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="FEEDBACK_CELL" textLabel="c9a-1T-EwZ" style="IBUITableViewCellStyleDefault" id="ShJ-b7-yjc">
-                                <rect key="frame" x="0.0" y="191.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="198" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ShJ-b7-yjc" id="2Gj-Sb-dbc">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -127,14 +128,14 @@
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ADVANCED_CELL" textLabel="HC8-sr-XSk" style="IBUITableViewCellStyleDefault" id="ZUW-zc-fv8">
-                                <rect key="frame" x="0.0" y="235" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="241.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ZUW-zc-fv8" id="JxI-Oj-TWi">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Advanced" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="HC8-sr-XSk">
-                                            <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -147,14 +148,14 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="HELP_CELL" textLabel="1Jc-zh-cJd" style="IBUITableViewCellStyleDefault" id="AuG-1N-A0p">
-                                <rect key="frame" x="0.0" y="278.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="285" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="AuG-1N-A0p" id="eWQ-vc-Il6">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Help" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1Jc-zh-cJd">
-                                            <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -164,14 +165,14 @@
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ABOUT_CELL" textLabel="yyC-rk-aBp" style="IBUITableViewCellStyleDefault" id="zh4-31-IuY">
-                                <rect key="frame" x="0.0" y="322" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="328.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zh4-31-IuY" id="K4I-t9-Ssk">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="About" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="yyC-rk-aBp">
-                                            <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -190,7 +191,7 @@
                             <outlet property="delegate" destination="vfh-An-ZaB" id="Lpd-Ts-aaX"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Ziti Mobile Edge" id="YH1-Ih-2F5">
+                    <navigationItem key="navigationItem" title="Threatfend Mobile Edge" id="YH1-Ih-2F5">
                         <barButtonItem key="backBarButtonItem" title="Back" id="Qdl-Q1-fyC"/>
                     </navigationItem>
                 </tableViewController>
@@ -201,21 +202,21 @@
         <!--About-->
         <scene sceneID="9m4-Di-2Rs">
             <objects>
-                <tableViewController title="About" id="xyx-3R-jDG" customClass="AboutViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="About" id="xyx-3R-jDG" customClass="AboutViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="O35-1s-tjY">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ABOUT_CELL" textLabel="lrW-AE-9eS" style="IBUITableViewCellStyleDefault" id="xeO-mu-BHa">
-                                <rect key="frame" x="0.0" y="49.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="55.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="xeO-mu-BHa" id="OxY-2O-M7q">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="lrW-AE-9eS">
-                                            <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -238,7 +239,7 @@
         <!--Third Party Licenses-->
         <scene sceneID="U5B-al-AWf">
             <objects>
-                <viewController storyboardIdentifier="NOTICES_VC" title="Third Party Licenses" id="95V-86-Dno" customClass="NoticesViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NOTICES_VC" title="Third Party Licenses" id="95V-86-Dno" customClass="NoticesViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="IrU-VE-s1q">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -270,21 +271,21 @@
         <!--Advanced-->
         <scene sceneID="RcF-9h-Unx">
             <objects>
-                <tableViewController title="Advanced" id="ynr-DO-Usg" customClass="AdvancedViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Advanced" id="ynr-DO-Usg" customClass="AdvancedViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="kTx-dO-DeZ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="TUNNEL_CONFIG_CELL" textLabel="RQp-fW-iNR" style="IBUITableViewCellStyleDefault" id="8Q6-YA-NGe">
-                                <rect key="frame" x="0.0" y="49.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="55.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="8Q6-YA-NGe" id="icR-aH-2fo">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Tunnel Configuration" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="RQp-fW-iNR">
-                                            <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -297,14 +298,14 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="LOGS_CELL" textLabel="9uh-tM-4DA" style="IBUITableViewCellStyleDefault" id="E83-BP-uLr">
-                                <rect key="frame" x="0.0" y="93" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="99" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="E83-BP-uLr" id="QA2-Be-h20">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Logging" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9uh-tM-4DA">
-                                            <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -317,14 +318,14 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="SNAPSHOT_CELL" textLabel="Kxi-Vs-2US" style="IBUITableViewCellStyleDefault" id="Uzb-7g-BkO">
-                                <rect key="frame" x="0.0" y="136.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="142.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Uzb-7g-BkO" id="EfD-5Y-6oi">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Snapshot" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Kxi-Vs-2US">
-                                            <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -350,7 +351,7 @@
         <!--Snapshot-->
         <scene sceneID="49G-8q-u1h">
             <objects>
-                <viewController title="Snapshot" id="nqa-vx-FKF" customClass="SnapshotViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Snapshot" id="nqa-vx-FKF" customClass="SnapshotViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="jT3-qu-TLy">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -384,14 +385,14 @@
         <!--Identity-->
         <scene sceneID="49E-8f-NUH">
             <objects>
-                <tableViewController title="Identity" id="pCc-hL-rsJ" customClass="IdentityViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Identity" id="pCc-hL-rsJ" customClass="IdentityViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="Ehu-SQ-hmr">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="IDENTITY_ENABLED_CELL" id="iCi-1K-N52" customClass="IdentityEnabledCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="49.5" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="IDENTITY_ENABLED_CELL" id="iCi-1K-N52" customClass="IdentityEnabledCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="55.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="iCi-1K-N52" id="oQt-nn-MH1">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -425,8 +426,8 @@
                                     <outlet property="switch" destination="nfb-HR-QcV" id="TYu-Dj-ZC3"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="left" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MFA_CELL" id="RZx-7V-gHz" customClass="MfaEnabledCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="93" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="left" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MFA_CELL" id="RZx-7V-gHz" customClass="MfaEnabledCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="99" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="RZx-7V-gHz" id="i0D-Ai-QmE">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -468,15 +469,15 @@
                                     <outlet property="mfaSwitch" destination="7XE-l7-nUe" id="Hbb-8D-Ata"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MFA_AUTH_NOW_CELL" id="b6g-3n-v3A" customClass="MfaAuthNowCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="136.5" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="MFA_AUTH_NOW_CELL" id="b6g-3n-v3A" customClass="MfaAuthNowCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="142.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="b6g-3n-v3A" id="h5C-47-fC3">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0AC-F7-6qy">
-                                            <rect key="frame" x="0.0" y="6.5" width="355" height="31"/>
+                                            <rect key="frame" x="0.0" y="4.5" width="355" height="34.5"/>
                                             <state key="normal" title="Button"/>
                                             <buttonConfiguration key="configuration" style="plain" title="Auth Now" imagePadding="10">
                                                 <imageReference key="image" image="lock.rotation.open" catalog="system" symbolScale="large"/>
@@ -493,15 +494,15 @@
                                     </constraints>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MFA_RECOVERY_CODES_CELL" id="rC6-ER-6Je" customClass="MfaCodesCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="180" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MFA_RECOVERY_CODES_CELL" id="rC6-ER-6Je" customClass="MfaCodesCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="186" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rC6-ER-6Je" id="lcO-1a-NFL">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f2D-I7-4rR">
-                                            <rect key="frame" x="0.0" y="6.5" width="358.5" height="31"/>
+                                            <rect key="frame" x="0.0" y="4.5" width="356.5" height="34.5"/>
                                             <state key="normal" title="Button"/>
                                             <buttonConfiguration key="configuration" style="plain" title="Recovery Codes" imagePadding="10">
                                                 <imageReference key="image" image="note.text" catalog="system" symbolScale="large"/>
@@ -518,15 +519,15 @@
                                     </constraints>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MFA_NEW_RECOVERY_CODES_CELL" id="wpa-kD-lSl" customClass="MfaNewCodesCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="223.5" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MFA_NEW_RECOVERY_CODES_CELL" id="wpa-kD-lSl" customClass="MfaNewCodesCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="229.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="wpa-kD-lSl" id="cHg-BV-HH3">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rvJ-uf-7Xa">
-                                            <rect key="frame" x="0.0" y="6.5" width="350.5" height="31"/>
+                                            <rect key="frame" x="0.0" y="4.5" width="348.5" height="34.5"/>
                                             <state key="normal" title="Button"/>
                                             <buttonConfiguration key="configuration" style="plain" image="note.text.badge.plus" catalog="system" title="New Recovery Codes" imagePadding="10"/>
                                             <connections>
@@ -541,8 +542,8 @@
                                     </constraints>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="IDENTITY_FORGET_CELL" id="u4k-bC-gec" customClass="ForgetIdentityCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="267" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="IDENTITY_FORGET_CELL" id="u4k-bC-gec" customClass="ForgetIdentityCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="273" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="u4k-bC-gec" id="MJa-RP-ow0">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -565,7 +566,7 @@
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="IDENTITY_VALUE_CELL" textLabel="vOP-BG-eyS" detailTextLabel="V0S-fx-vWo" style="IBUITableViewCellStyleValue1" id="gVp-CX-5Le">
-                                <rect key="frame" x="0.0" y="310.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="316.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gVp-CX-5Le" id="uNH-jV-Esk">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -588,8 +589,8 @@
                                     </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="IDENTITY_ENROLL_CELL" id="sD6-ei-8jM" customClass="EnrollIdentityCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="354" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="IDENTITY_ENROLL_CELL" id="sD6-ei-8jM" customClass="EnrollIdentityCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="360" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="sD6-ei-8jM" id="3RF-Kt-OcG">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -612,10 +613,10 @@
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="IDENTITY_SERVICE_CELL" textLabel="FDB-PX-0mS" detailTextLabel="c0A-RF-6Nm" style="IBUITableViewCellStyleSubtitle" id="6gy-KC-brK">
-                                <rect key="frame" x="0.0" y="397.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="403.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6gy-KC-brK" id="6YQ-gf-oZt">
-                                    <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="FDB-PX-0mS">
@@ -657,14 +658,14 @@
         <!--Service-->
         <scene sceneID="6WC-3c-U6V">
             <objects>
-                <tableViewController title="Service" id="3bu-kB-osn" customClass="ServiceViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Service" id="3bu-kB-osn" customClass="ServiceViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="qFZ-vZ-ZNQ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemGray6Color"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="SERVICE_TABLE_CELL" textLabel="41d-Ki-1Cu" detailTextLabel="gxy-2o-Dt3" style="IBUITableViewCellStyleValue1" id="ghb-qY-XVJ">
-                                <rect key="frame" x="0.0" y="49.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="55.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ghb-qY-XVJ" id="oYG-sS-vSZ">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -702,14 +703,14 @@
         <!--Recovery Codes-->
         <scene sceneID="4CP-8S-yp1">
             <objects>
-                <tableViewController title="Recovery Codes" id="Cyn-U1-nJP" customClass="MfaCodesViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Recovery Codes" id="Cyn-U1-nJP" customClass="MfaCodesViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="iT7-uk-l6X">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="MFA_CODE_CELL" textLabel="h7a-cG-tOh" style="IBUITableViewCellStyleDefault" id="QdV-1j-BmD">
-                                <rect key="frame" x="0.0" y="49.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="55.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="QdV-1j-BmD" id="XEL-Ea-d3B">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -740,7 +741,7 @@
         <!--Setup MFA-->
         <scene sceneID="t0C-63-1dO">
             <objects>
-                <viewController storyboardIdentifier="MFA_VERIFY_VC" title="Setup MFA" id="IFf-fH-LGL" customClass="MfaVerifyViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MFA_VERIFY_VC" title="Setup MFA" id="IFf-fH-LGL" customClass="MfaVerifyViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="wiS-Mg-Sts">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -764,10 +765,10 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="22" translatesAutoresizingMaskIntoConstraints="NO" id="x97-aQ-7Qn">
-                                <rect key="frame" x="20" y="347" width="335" height="31"/>
+                                <rect key="frame" x="20" y="347" width="335" height="34.5"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="weO-IM-Mk1">
-                                        <rect key="frame" x="0.0" y="0.0" width="156.5" height="31"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="156.5" height="34.5"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="gray" title="Cancel"/>
                                         <connections>
@@ -775,7 +776,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lJs-yh-4eM">
-                                        <rect key="frame" x="178.5" y="0.0" width="156.5" height="31"/>
+                                        <rect key="frame" x="178.5" y="0.0" width="156.5" height="34.5"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="gray" title="OK"/>
                                         <connections>
@@ -834,7 +835,7 @@
         <!--Mfa Code View Controller-->
         <scene sceneID="xNj-ba-Lm7">
             <objects>
-                <viewController storyboardIdentifier="MFA_CODE_VC" id="3Nc-tc-gxP" customClass="MfaCodeViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MFA_CODE_VC" id="3Nc-tc-gxP" customClass="MfaCodeViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="6zi-sx-Knu">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -851,10 +852,10 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="7" translatesAutoresizingMaskIntoConstraints="NO" id="PyB-xB-l3V">
-                                <rect key="frame" x="20" y="118" width="335" height="31"/>
+                                <rect key="frame" x="20" y="118" width="335" height="34.5"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XbO-BA-ssc">
-                                        <rect key="frame" x="0.0" y="0.0" width="164" height="31"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="164" height="34.5"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="gray" title="Cancel"/>
                                         <connections>
@@ -862,7 +863,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N9n-tG-Xf5">
-                                        <rect key="frame" x="171" y="0.0" width="164" height="31"/>
+                                        <rect key="frame" x="171" y="0.0" width="164" height="34.5"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="gray" title="OK"/>
                                         <connections>
@@ -897,14 +898,14 @@
         <!--Tunnel Configuration-->
         <scene sceneID="E7s-lk-x1Q">
             <objects>
-                <tableViewController title="Tunnel Configuration" id="LJo-yi-Vtt" customClass="TunnelSettingsViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Tunnel Configuration" id="LJo-yi-Vtt" customClass="TunnelSettingsViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="1wX-0O-xZG">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="TUNNEL_SETTING_CELL" id="cG6-G7-40L" customClass="TunnelSettingsCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="49.5" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="TUNNEL_SETTING_CELL" id="cG6-G7-40L" customClass="TunnelSettingsCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="55.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="cG6-G7-40L" id="t38-BF-a35">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -942,8 +943,8 @@
                                     <outlet property="value" destination="84W-Ec-uAg" id="utM-gY-2dl"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="LOW_POWER_MODE_CELL" id="DzQ-gs-oi9" customClass="LowPowerModeCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="93" width="375" height="43.5"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="LOW_POWER_MODE_CELL" id="DzQ-gs-oi9" customClass="LowPowerModeCell" customModule="Threatfend_Mobile_Edge" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="99" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="DzQ-gs-oi9" id="eJY-xG-Zcm">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -988,7 +989,7 @@
         <!--Logging-->
         <scene sceneID="Blo-l1-PVg">
             <objects>
-                <tableViewController title="Logging" id="f8K-2M-T8j" customClass="LogsTableViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController title="Logging" id="f8K-2M-T8j" customClass="LogsTableViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="cvx-SL-EzW">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1000,11 +1001,11 @@
                                         <rect key="frame" x="0.0" y="18" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="R1e-2U-QI2" id="2JX-3I-pvs">
-                                            <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Packet Tunnel" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="hTE-Q6-New">
-                                                    <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                                    <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
@@ -1018,14 +1019,14 @@
                             <tableViewSection footerTitle="Log messages for this application" id="YDf-88-9DF">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="APP_LOGS_CELL" textLabel="52o-1y-Df7" style="IBUITableViewCellStyleDefault" id="Qga-7D-Cgb">
-                                        <rect key="frame" x="0.0" y="106" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="109.5" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Qga-7D-Cgb" id="imZ-DX-2rX">
-                                            <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Application" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="52o-1y-Df7">
-                                                    <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                                    <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
@@ -1039,14 +1040,14 @@
                             <tableViewSection footerTitle="Logging level for app and extension" id="hB7-DZ-Dux">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="LOG_LEVEL_CELL" textLabel="ON0-7A-od4" style="IBUITableViewCellStyleDefault" id="7nE-e4-L6X">
-                                        <rect key="frame" x="0.0" y="194" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="201" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="7nE-e4-L6X" id="5bg-Lc-oi5">
-                                            <rect key="frame" x="0.0" y="0.0" width="350.5" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="348.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Level" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ON0-7A-od4">
-                                                    <rect key="frame" x="16" y="0.0" width="326.5" height="43.5"/>
+                                                    <rect key="frame" x="16" y="0.0" width="324.5" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
@@ -1074,13 +1075,13 @@
         <!--Log Level View Controller-->
         <scene sceneID="XgC-wT-DF6">
             <objects>
-                <tableViewController id="aaZ-SM-87r" customClass="LogLevelViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="aaZ-SM-87r" customClass="LogLevelViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="ofn-Pz-MzV">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <view key="tableFooterView" contentMode="scaleToFill" id="p37-4w-Zxq">
-                            <rect key="frame" x="0.0" y="371.5" width="375" height="44"/>
+                            <rect key="frame" x="0.0" y="382.5" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         </view>
@@ -1088,7 +1089,7 @@
                             <tableViewSection id="abh-Bo-aa6">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="EbA-7v-QQE" style="IBUITableViewCellStyleDefault" id="hsy-4w-luc">
-                                        <rect key="frame" x="0.0" y="44.5" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="50" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hsy-4w-luc" id="vVY-hd-TsI">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1105,7 +1106,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="4ev-1W-7he" style="IBUITableViewCellStyleDefault" id="hXh-Of-NyA">
-                                        <rect key="frame" x="0.0" y="88" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="93.5" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hXh-Of-NyA" id="dHi-Q2-wW1">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1122,7 +1123,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="Eoh-tq-6ez" style="IBUITableViewCellStyleDefault" id="P3S-7g-SJm">
-                                        <rect key="frame" x="0.0" y="131.5" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="137" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="P3S-7g-SJm" id="s7W-zd-Kmv">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1139,7 +1140,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="fjM-iL-R5s" style="IBUITableViewCellStyleDefault" id="MH1-L5-Omv">
-                                        <rect key="frame" x="0.0" y="175" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="180.5" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="MH1-L5-Omv" id="pnI-XX-2yd">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1156,7 +1157,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="E0J-lf-0F0" style="IBUITableViewCellStyleDefault" id="c1i-xy-DZE">
-                                        <rect key="frame" x="0.0" y="218.5" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="224" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="c1i-xy-DZE" id="gKB-el-Xr2">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1173,7 +1174,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="REt-IB-8jt" style="IBUITableViewCellStyleDefault" id="IvO-FT-hgZ">
-                                        <rect key="frame" x="0.0" y="262" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="267.5" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="IvO-FT-hgZ" id="SnH-jO-qG8">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1190,7 +1191,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="eIv-xj-iNs" style="IBUITableViewCellStyleDefault" id="tDb-oT-Wrf">
-                                        <rect key="frame" x="0.0" y="305.5" width="375" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="311" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tDb-oT-Wrf" id="euJ-to-mnR">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1223,7 +1224,7 @@
         <!--Log View Controller-->
         <scene sceneID="AEC-9b-RcY">
             <objects>
-                <viewController storyboardIdentifier="LOG_VC" id="JgN-jO-XZ4" customClass="LogViewController" customModule="Ziti_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LOG_VC" id="JgN-jO-XZ4" customClass="LogViewController" customModule="Threatfend_Mobile_Edge" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="pNc-9a-YZz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1272,15 +1273,15 @@
         </scene>
     </scenes>
     <resources>
-        <image name="lock.fill" catalog="system" width="128" height="128"/>
-        <image name="lock.rotation.open" catalog="system" width="128" height="110"/>
-        <image name="note.text" catalog="system" width="128" height="106"/>
+        <image name="lock.fill" catalog="system" width="125" height="128"/>
+        <image name="lock.rotation.open" catalog="system" width="128" height="112"/>
+        <image name="note.text" catalog="system" width="128" height="107"/>
         <image name="note.text.badge.plus" catalog="system" width="128" height="108"/>
         <systemColor name="groupTableViewBackgroundColor">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="linkColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

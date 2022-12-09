@@ -49,7 +49,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.dataSource = self
         tableView.delegate = self
         
-        let alertTitle = "Unable to import to Ziti"
+        let alertTitle = "Unable to import to Threatfend"
         self.fileLabel.text = ""
         
         let attachments = (self.extensionContext?.inputItems.first as? NSExtensionItem)?.attachments ?? []
@@ -190,7 +190,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @IBAction func onCancelButton(_ sender: Any) {
-        let error = NSError(domain: "Ziti Mobile Edge Share", code: 0, userInfo: [NSLocalizedDescriptionKey: "User canceled request"])
+        let error = NSError(domain: "Threatfend Mobile Edge Share", code: 0, userInfo: [NSLocalizedDescriptionKey: "User canceled request"])
         extensionContext?.cancelRequest(withError: error)
     }
     

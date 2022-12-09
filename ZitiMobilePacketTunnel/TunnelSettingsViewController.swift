@@ -259,7 +259,7 @@ class TunnelSettingsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         if section == 1 {
-            return "Disable all Ziti communications and traffic targeted for the tunnel (including DNS) when device not in use"
+            return "Disable all Threatfend communications and traffic targeted for the tunnel (including DNS) when device not in use"
         }
         return nil
     }

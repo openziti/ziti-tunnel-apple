@@ -257,7 +257,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
                 return
             }
             
-            wc.window?.title = "Ziti Snapshot \(Date())"
+            wc.window?.title = "Threatfend Snapshot \(Date())"
             if let vc = wc.contentViewController as? SnapshotViewController {
                 vc.textView.textStorage?.mutableString.setString(str)
             }

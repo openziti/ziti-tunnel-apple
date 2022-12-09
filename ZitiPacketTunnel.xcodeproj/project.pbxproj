@@ -246,7 +246,7 @@
 		5A2D2FE224AB899E00D154AA /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
 		5A2E11B324B6A5BD002856F3 /* MobileShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MobileShare.entitlements; sourceTree = "<group>"; };
 		5A2EA2A52097890400437608 /* ProviderConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderConfig.swift; sourceTree = "<group>"; };
-		5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Mobile Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A2EA2C9209B750A00437608 /* Threatfend Mobile Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Threatfend Mobile Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A2EA2CB209B750A00437608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5A2EA2D0209B750A00437608 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5A2EA2D2209B750C00437608 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -433,7 +433,7 @@
 			children = (
 				5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */,
 				5A02AACB206EBDD5006261C6 /* PacketTunnelProvider.appex */,
-				5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */,
+				5A2EA2C9209B750A00437608 /* Threatfend Mobile Edge.app */,
 				5A2EA2DF209B754400437608 /* MobilePacketTunnelProvider.appex */,
 				5AF3DCA924B52642005047BC /* MobileShare.appex */,
 			);
@@ -731,7 +731,7 @@
 			);
 			name = "Ziti Mobile Edge";
 			productName = ZitiMobilePacketTunnel;
-			productReference = 5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */;
+			productReference = 5A2EA2C9209B750A00437608 /* Threatfend Mobile Edge.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */ = {
@@ -1525,7 +1525,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_APP_IDENTIFIER)";
-				PRODUCT_NAME = "Ziti Mobile Edge";
+				PRODUCT_NAME = "Threatfend Mobile Edge";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1550,7 +1550,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_APP_IDENTIFIER)";
-				PRODUCT_NAME = "Ziti Mobile Edge";
+				PRODUCT_NAME = "Threatfend Mobile Edge";
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

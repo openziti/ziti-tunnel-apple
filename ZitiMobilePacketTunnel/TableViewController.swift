@@ -65,7 +65,7 @@ class StatusCell: UITableViewCell {
                 try tvc?.tunnelMgr.startTunnel()
             } catch {
                 let alert = UIAlertController(
-                    title:"Ziti Connect Error",
+                    title:"Threatfend Connect Error",
                     message: error.localizedDescription,
                     preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))

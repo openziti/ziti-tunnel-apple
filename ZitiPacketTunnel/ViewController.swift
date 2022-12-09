@@ -68,18 +68,18 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         switch status {
         case .connecting:
             connectStatus.stringValue = "Connecting..."
-            connectButton.title = "Turn Ziti Off"
+            connectButton.title = "Turn Threatfend Off"
             break
         case .connected:
             connectStatus.stringValue = "Connected"
-            connectButton.title = "Turn Ziti Off"
+            connectButton.title = "Turn Threatfend Off"
             break
         case .disconnecting:
             connectStatus.stringValue = "Disconnecting..."
             break
         case .disconnected:
             connectStatus.stringValue = "Not Connected"
-            connectButton.title = "Turn Ziti On"
+            connectButton.title = "Turn Threatfend On"
             break
         case .invalid:
             connectStatus.stringValue = "Invalid"
@@ -508,7 +508,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
 
     @IBAction func onConnectButton(_ sender: NSButton) {
-        if (sender.title == "Turn Ziti On") {
+        if (sender.title == "Turn Threatfend On") {
             do {
                 try tunnelMgr.startTunnel()
             } catch {
