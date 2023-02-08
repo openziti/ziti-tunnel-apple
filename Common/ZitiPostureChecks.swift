@@ -57,7 +57,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     }
     
     // NSWorkspace runningApplications need main runloop to be active or list of processes doesn't get updated...
-    @objc func keepAlive() {
+    @objc public func keepAlive() {
         let t = Timer(fire: Date(), interval: 10, repeats: true) {_ in }
         RunLoop.main.add(t, forMode: .common)
         RunLoop.main.run()
