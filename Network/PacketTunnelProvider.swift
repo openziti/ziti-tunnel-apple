@@ -282,6 +282,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func readPacketFlow() {
         packetFlow.readPacketObjects { (packets:[NEPacket]) in
+            zLog.trace("read \(packets.count) packets")
             for packet in packets {
                 if packet.data.count > 0 {
                     self.zitiTunnel?.queuePacket(packet.data)
