@@ -19,10 +19,10 @@ jobs:
 
         - name: build
           run: |
-            xcodebuild build -configuration Release -scheme ZitiPacketTunnel -arch x86_64 -arch arm64 ONLY_ACTIVE_ARCH=NO -sdk macosx
-            xcodebuild build -configuration Release -scheme ZitiMobilePacketTunnel -arch arm64 -sdk iphoneos
+            xcodebuild build -allowProvisioningUpdates -configuration Release -scheme ZitiPacketTunnel -arch x86_64 -arch arm64 ONLY_ACTIVE_ARCH=NO -sdk macosx
+            xcodebuild build -allowProvisioningUpdates -configuration Release -scheme ZitiMobilePacketTunnel -arch arm64 -sdk iphoneos
 
         - name: archive
           run: |
-            xcodebuild archive -configuration Release -scheme ZitiPacketTunnel -arch x86_64 -arch arm64 ONLY_ACTIVE_ARCH=NO -sdk macosx -archivePath ./ZitiPacketTunnel.xarchive
-            xcodebuild archive -configuration Release -scheme ZitiMobilePacketTunnel -arch arm64 -sdk iphoneos -archivePath ./ZitiMobilePacketTunnel.xarchive
+            xcodebuild archive -allowProvisioningUpdates -configuration Release -scheme ZitiPacketTunnel -arch x86_64 -arch arm64 ONLY_ACTIVE_ARCH=NO -sdk macosx -archivePath ./ZitiPacketTunnel.xarchive
+            xcodebuild archive -allowProvisioningUpdates -configuration Release -scheme ZitiMobilePacketTunnel -arch arm64 -sdk iphoneos -archivePath ./ZitiMobilePacketTunnel.xarchive
