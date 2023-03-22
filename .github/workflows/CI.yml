@@ -4,7 +4,7 @@ on:
   push:
 
 jobs:
-  build-and-archive::
+  build-and-archive:
     runs-on: macos-latest
 
     steps:
