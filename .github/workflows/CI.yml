@@ -15,7 +15,7 @@ jobs:
             xcode-version: '14.2'
 
         - name: workspace-settings-overrides
-          run: cat ${{ secrets.XCCONFIG }} > ./Configs/workspace-settings-overrides.xcconfig
+          run: echo ${{ secrets.XCCONFIG }} > ./Configs/workspace-settings-overrides.xcconfig
 
         - name: build
           run: |
