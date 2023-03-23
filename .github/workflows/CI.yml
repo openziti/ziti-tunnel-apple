@@ -10,8 +10,8 @@ jobs:
     strategy:
       matrix:
         spec:
-        - { scheme: 'ZitiPacketTunnel', sdk: 'macosx', destination: "'generic/platform=macOS'"}
-        - { scheme: 'ZitiMobilePacketTunnel', sdk: 'iphoneos', destination: "'generic/platform=iOS'" }
+        - { scheme: 'ZitiPacketTunnel', sdk: 'macosx', destination: '"generic/platform=macOS"'}
+        - { scheme: 'ZitiMobilePacketTunnel', sdk: 'iphoneos', destination: '"generic/platform=iOS"' }
 
     steps:
         - uses: actions/checkout@v3
