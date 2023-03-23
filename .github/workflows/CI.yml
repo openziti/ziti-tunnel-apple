@@ -4,14 +4,14 @@ on:
   push:
 
 jobs:
-  build-and-archive:
+  build:
     runs-on: macos-latest
 
     strategy:
       matrix:
         spec:
-        - { scheme: 'ZitiPacketTunnel', destination: 'generic/platform=macOS' }
-        - { scheme: 'ZitiMobilePacketTunnel', destination: 'generic/platform=iOS' }
+        - { scheme: 'ZitiPacketTunnel', sdk: 'macosx', destination: 'generic/platform=macOS' }
+        - { scheme: 'ZitiMobilePacketTunnel', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
 
     steps:
         - uses: actions/checkout@v3
@@ -26,10 +26,11 @@ jobs:
         - name: ${{ matrix.spec.scheme }} XArchive
           env:
             SCHEME: ${{ matrix.spec.scheme }}
+            SDK: ${{ matrix.spec.sdk }}
             DESTINATION: ${{ matrix.spec.destination }}
             AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             echo ${AUTH_KEY} | base64 --decode > ./auth.p8
-            xcodebuild archive -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration Release -scheme ${SCHEME} -destination ${DESTINATION} -archivePath ./${SCHEME}.xarchive
+            xcodebuild archive -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration Release -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} -archivePath ./${SCHEME}.xarchive
