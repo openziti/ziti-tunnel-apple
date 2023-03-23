@@ -32,4 +32,4 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             echo ${AUTH_KEY} | base64 --decode > ./auth.p8
-            xcodebuild archive -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration Release -scheme ${SCHEME} ${ARCH_FLAGS} -sdk ${SDK} -destination 'generic/platform=macOS' -archivePath ${ARCHIVE_PATH}
+            xcodebuild archive -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration Release -scheme ${SCHEME} ${ARCH_FLAGS} -sdk ${SDK} -destination 'generic/platform=macOS' -archivePath ./ZitiPacketTunnel.xarchive
