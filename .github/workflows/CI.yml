@@ -7,6 +7,12 @@ jobs:
   build-and-archive:
     runs-on: macos-latest
 
+    strategy:
+      matrix:
+        spec:
+        - { scheme: 'ZitiPacketTunnel', destination: 'generic/platform=macOS'
+        - { scheme: 'ZitiMobilePacketTunnel', destination: 'generic/platform=iOS'
+
     steps:
         - uses: actions/checkout@v3
 
@@ -17,15 +23,13 @@ jobs:
         - name: workspace-settings-overrides
           run: echo ${{ secrets.XCCONFIG }} | base64 --decode > ./Configs/workspace-settings-overrides.xcconfig
 
-        - name: Create XArchive
+        - name: ${{ matrix.spec.scheme }} XArchive
           env:
-            SCHEME: 'ZitiPacketTunnel'
-            ARCH_FLAGS: ''
-            SDK: 'macosx'
-            ARCHIVE_PATH: './ZitiPacketTunnel.xarchive'
+            SCHEME: ${{ matrix.spec.scheme }}
+            DESTINATION: ${{ matrix.spec.destination }}
             AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             echo ${AUTH_KEY} | base64 --decode > ./auth.p8
-            xcodebuild archive -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration Release -scheme ${SCHEME} ${ARCH_FLAGS} -sdk ${SDK} -destination 'generic/platform=macOS' -archivePath ${ARCHIVE_PATH}
+            xcodebuild archive -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration Release -scheme ${SCHEME} -destination ${DESTINATION} -archivePath ./${SCHEME}.xarchive
