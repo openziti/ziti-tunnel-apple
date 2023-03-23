@@ -22,7 +22,7 @@ jobs:
         - name: workspace-settings-overrides
           run: echo ${{ secrets.XCCONFIG }} | base64 --decode > ./Configs/workspace-settings-overrides.xcconfig
 
-        - name: ${{ matrix.spec.scheme }} XArchive
+        - name: ${{ matrix.spec.scheme }} Build
           env:
             SCHEME: ${{ matrix.spec.scheme }}
             CONFIG: ${{ matrix.spec.config }}
@@ -33,4 +33,4 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             echo ${AUTH_KEY} | base64 --decode > ./auth.p8
-            xcodebuild archive -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration ${CONFIG} -scheme ${SCHEME} ${ARCH_FLAGS} -sdk ${SDK} -destination ${DESTINATION} -archivePath ./${SCHEME}.xarchive
+            xcodebuild -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration ${CONFIG} -scheme ${SCHEME} ${ARCH_FLAGS} -sdk ${SDK} -destination ${DESTINATION} 
