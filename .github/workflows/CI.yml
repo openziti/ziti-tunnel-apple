@@ -20,7 +20,7 @@ jobs:
         - name: Create XArchive
           env:
             SCHEME: 'ZitiPacketTunnel'
-            ARCH_FLAGS: '-arch x86_64 -arch arm64 ONLY_ACTIVE_ARCH=NO'
+            ARCH_FLAGS: ''
             SDK: 'macosx'
             ARCHIVE_PATH: './ZitiPacketTunnel.xarchive'
             AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
