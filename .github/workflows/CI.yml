@@ -34,7 +34,7 @@ jobs:
             security import ./development.p12 -k build.keychain -P ${PASS} -A -t cert -f pkcs12
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k paswsword build.keychain
 
-        - name: ${{ matrix.spec.scheme }} ${{ matrix.spec.config }} ${{ matrix.spec.destination }}
+        - name: ${{ matrix.spec.scheme }}-${{ matrix.spec.config }}-${{ matrix.spec.destination }}
           env:
             SCHEME: ${{ matrix.spec.scheme }}
             CONFIG: ${{ matrix.spec.config }}
@@ -45,7 +45,11 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             echo ${AUTH_KEY} | base64 --decode > ./auth.p8
-            xcodebuild build -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} 
+            xcodebuild archive -allowProvisioningUpdates \
+              -authenticationKeyPath ${PWD}/auth.p8 \
+              -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
+              -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
+              -archivePath ./${SCHEME}.xarchive 
 
         - name: Cleanup Keychain
           if: always()
