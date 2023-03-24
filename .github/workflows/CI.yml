@@ -33,8 +33,6 @@ jobs:
             security unlock-keychain -p paswsword build.keychain
             security import ./development.p12 -k build.keychain -P ${PASS} -A -t cert -f pkcs12
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k paswsword build.keychain
-            rm  ./development.p12
-            rm ./development.pass
 
         - name: ${{ matrix.spec.scheme }} ${{ matrix.spec.config }} ${{ matrix.spec.destination }}
           env:
@@ -42,11 +40,18 @@ jobs:
             CONFIG: ${{ matrix.spec.config }}
             SDK: ${{ matrix.spec.sdk }}
             DESTINATION: ${{ matrix.spec.destination }}
+            AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
+            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
-            xcodebuild build -allowProvisioningUpdates -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} 
+            echo ${AUTH_KEY} | base64 --decode > ./auth.p8
+            xcodebuild build -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} 
 
         - name: Cleanup Keychain
           if: always()
           run: |
+            rm -f ./auth.p8
+            rm -f ./development.p12
+            rm -f ./development.pass
             security default-keychain -s "login.keychain"
             security delete-keychain build.keychain
