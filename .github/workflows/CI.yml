@@ -10,7 +10,8 @@ jobs:
     strategy:
       matrix:
         spec:
-        - { scheme: 'ZitiPacketTunnel', config: 'Debug', sdk: 'macosx', destination: 'generic/platform=macOS'}
+        - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS'}
+        - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS'}
 
     steps:
         - uses: actions/checkout@v3
@@ -22,15 +23,28 @@ jobs:
         - name: workspace-settings-overrides
           run: echo ${{ secrets.XCCONFIG }} | base64 --decode > ./Configs/workspace-settings-overrides.xcconfig
 
+        - name: Setup Keychain
+          run: |
+            echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | base64 --decode > ./development.p12
+            echo "${{ secrets.APPLE_DEVELOPMENT_P12_PASSWORD }}" > ./development.pass
+            PASS=$(cat ./development.pass | base64 --decode)
+            security create-keychain -p password build.keychain
+            security default-keychain -s build.keychain
+            security unlock-keychain -p password build.keychain
+            security import ./development.p12 -k build.keychain -P ${PASS} -T "/usr/bin/codesign"
+            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k password build.keychain
+
         - name: ${{ matrix.spec.scheme }} Build
           env:
             SCHEME: ${{ matrix.spec.scheme }}
             CONFIG: ${{ matrix.spec.config }}
             SDK: ${{ matrix.spec.sdk }}
             DESTINATION: ${{ matrix.spec.destination }}
-            AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
-            echo ${AUTH_KEY} | base64 --decode > ./auth.p8
-            xcodebuild -allowProvisioningUpdates -authenticationKeyPath ${PWD}/auth.p8 -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} -configuration ${CONFIG} -scheme ${SCHEME} ${ARCH_FLAGS} -sdk ${SDK} -destination ${DESTINATION} 
+            xcodebuild build -configuration ${CONFIG} -scheme ${SCHEME} ${ARCH_FLAGS} -sdk ${SDK} -destination ${DESTINATION}
+
+        - name: Remove Keychain
+          if: always()
+          run: |
+            security default-keychain -s "login.keychain"
+            security delete-keychain build.keychain
