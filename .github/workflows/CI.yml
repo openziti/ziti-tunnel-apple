@@ -1,0 +1,61 @@
+name: CI
+on:
+  pull_request:
+  push:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        spec:
+        - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS'}
+        - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS'}
+
+    steps:
+        - uses: actions/checkout@v3
+
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: '14.2'
+
+        - name: workspace-settings-overrides
+          run: echo ${{ secrets.XCCONFIG }} | base64 --decode > ./Configs/workspace-settings-overrides.xcconfig
+
+        - name: Setup Keychain
+          run: |
+            echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | base64 --decode > ./development.p12
+            echo "${{ secrets.APPLE_DEVELOPMENT_P12_PASSWORD }}" > ./development.pass
+            PASS=$(cat ./development.pass | base64 --decode)
+            security create-keychain -p paswsword build.keychain
+            security default-keychain -s build.keychain
+            security unlock-keychain -p paswsword build.keychain
+            security import ./development.p12 -k build.keychain -P ${PASS} -A -t cert -f pkcs12
+            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k paswsword build.keychain
+
+        - name: ${{ matrix.spec.scheme }}-${{ matrix.spec.config }}-${{ matrix.spec.destination }}
+          env:
+            SCHEME: ${{ matrix.spec.scheme }}
+            CONFIG: ${{ matrix.spec.config }}
+            SDK: ${{ matrix.spec.sdk }}
+            DESTINATION: ${{ matrix.spec.destination }}
+            AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
+            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+          run: |
+            echo ${AUTH_KEY} | base64 --decode > ./auth.p8
+            xcodebuild archive -allowProvisioningUpdates \
+              -authenticationKeyPath ${PWD}/auth.p8 \
+              -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
+              -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
+              -archivePath ./${SCHEME}.xarchive 
+
+        - name: Cleanup Keychain
+          if: always()
+          run: |
+            rm -f ./auth.p8
+            rm -f ./development.p12
+            rm -f ./development.pass
+            security default-keychain -s "login.keychain"
+            security delete-keychain build.keychain
