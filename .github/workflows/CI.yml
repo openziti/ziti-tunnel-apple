@@ -68,7 +68,7 @@ jobs:
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
               -exportArchive -exportPath ./artifacts/${SCHEME}.${EXT} \
               -exportOptionsPlist ./etc/exportOptionsRelease.plist \
-              -archivePath ./artifacts/${SCHEME}.xarchive 
+              -archivePath ./artifacts/${SCHEME}.xcarchive 
             ls -la ./artifacts
 
         - name: Cleanup Keychain
