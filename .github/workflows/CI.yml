@@ -56,6 +56,7 @@ jobs:
             ls -la ./artifacts
 
         - name: Export ${{ matrix.spec.scheme }}
+          env:
             SCHEME: ${{ matrix.spec.scheme }}
             EXT: ${{ matrix.spec.ext }}
             AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
