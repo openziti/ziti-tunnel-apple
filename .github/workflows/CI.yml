@@ -1,6 +1,5 @@
 name: CI
 on:
-  pull_request:
   push:
 
 jobs:
@@ -10,8 +9,8 @@ jobs:
     strategy:
       matrix:
         spec:
-        - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS'}
-        - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS'}
+        - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS', ext: 'app'}
+        - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS', ext: 'ipa'}
 
     steps:
         - uses: actions/checkout@v3
@@ -34,7 +33,11 @@ jobs:
             security import ./development.p12 -k build.keychain -P ${PASS} -A -t cert -f pkcs12
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k paswsword build.keychain
 
-        - name: ${{ matrix.spec.scheme }}-${{ matrix.spec.config }}-${{ matrix.spec.destination }}
+        - run: |
+            mkdir ./artifacts
+            echo ${GITHUB_RUN_NUMBER}
+
+        - name: Archive ${{ matrix.spec.scheme }}
           env:
             SCHEME: ${{ matrix.spec.scheme }}
             CONFIG: ${{ matrix.spec.config }}
@@ -49,7 +52,23 @@ jobs:
               -authenticationKeyPath ${PWD}/auth.p8 \
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
               -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
-              -archivePath ./${SCHEME}.xarchive 
+              -archivePath ./artifacts/${SCHEME}
+            ls -la ./artifacts
+
+        - name: Export ${{ matrix.spec.scheme }}
+            SCHEME: ${{ matrix.spec.scheme }}
+            EXT: ${{ matrix.spec.ext }}
+            AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
+            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+          run: |
+            xcodebuild -allowProvisioningUpdates \
+              -authenticationKeyPath ${PWD}/auth.p8 \
+              -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
+              -exportArchive -exportPath ./artifacts/${SCHEME}.${EXT} \
+              -exportOptionsPlist ./ect/exportOptionsRelease.plist \
+              -archivePath ./artifacts/${SCHEME}.xarchive 
+            ls -la ./artifacts
 
         - name: Cleanup Keychain
           if: always()
