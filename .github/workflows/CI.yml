@@ -71,11 +71,11 @@ jobs:
 
         - name: Set Bundle Version
           run: |
-            curr=${{ steps.get_app_info.version_number }}
+            curr=${{ steps.get_app_info.outputs.version_number }}
             echo "Curr: ${curr}"
             next=$((${curr}+1))
             echo "Bumping version from ${curr} to ${next}"
-            agvool new-version -all ${next}
+            agvtool new-version -all ${next}
 
         - name: Archive ${{ matrix.spec.scheme }}
           env:
