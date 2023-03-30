@@ -27,7 +27,7 @@ jobs:
             id_var=${{ matrix.spec.id_var }}
             line=$(cat ${xcconfig_fn} | grep ${id_var}) && app_identifier=$(echo ${line##* })
             echo "id_var: ${id_var}; app_identiier: ${app_identifier}"
-            echo "app_identifier=${app_identifier}" >> GITHUB_OUTPUT
+            echo "app_identifier=${app_identifier}" >> $GITHUB_OUTPUT
 
         - name: Setup Keychain
           run: |
