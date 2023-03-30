@@ -64,9 +64,11 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             echo "steps.store_xcconfig.outputs.app_identifier = ${{ steps.store_xcconfig.outputs.app_identifier }}"
-            xcrun altool --list-apps --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json | jq .
             all_app_info=$(xcrun altool --list-apps --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
-            app_info=$(echo ${all_app_info} | jq ".applications[] | select(.ReservedBundleIdentifier | contains(${{ steps.store_xcconfig.outputs.app_identifier }}))")
+            echo "all_app_info: ${all_app_info}"
+            app_id="${{ steps.store_xcconfig.outputs.app_identifier }}"
+            echo "app_id=${app_id}"
+            app_info=$(echo ${all_app_info} | jq ".applications[] | select(.ReservedBundleIdentifier | contains(${app_id}))")
             echo "APP INFO for ${{ steps.store_xcconfig.outputs.app_identifier }}: ${app_info}"
             echo "app_info=${app_info}" >> $GITHUB_OUTPUT
 
