@@ -71,7 +71,7 @@ jobs:
 
         - name: Set Bundle Version
           run: |
-            app_info=${{ steps.get_app_info.outputs.app_info }}
+            app_info=\'${{ steps.get_app_info.outputs.app_info }}\'
             echo "app_info = ${app_info}"
             echo ${app_info} | jq .
             curr=$(echo ${app_info} | jq '."Version Number"')
