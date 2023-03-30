@@ -67,17 +67,11 @@ jobs:
             app_id="${{ steps.store_xcconfig.outputs.app_identifier }}"
             app_info=$(echo ${all_app_info} | jq -r --arg APPID ${app_id} '.applications[] | select(.ReservedBundleIdentifier | contains($APPID))')
             version_number=$(echo ${app_info} | jq '."Version Number"')
-            echo "version_number: ${version_number}"
-            app_info=$(echo ${app_info} | tr '\n' ' ')
             echo "version_number=${version_number}" >> $GITHUB_OUTPUT
-            echo "app_info=${app_info}" >> $GITHUB_OUTPUT
 
         - name: Set Bundle Version
           run: |
-            app_info=${{ steps.get_app_info.outputs.app_info }}
-            echo "app_info = ${app_info}"
-            echo ${app_info} | jq .
-            curr=$(echo ${app_info} | jq '."Version Number"')
+            curr=${{ steps.get_app_info.version_number }}
             echo "Curr: ${curr}"
             next=$((${curr}+1))
             echo "Bumping version from ${curr} to ${next}"
