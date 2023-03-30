@@ -26,6 +26,7 @@ jobs:
             echo ${{ secrets.XCCONFIG }} | base64 --decode > ${xcconfig_fn}
             id_var=${{ matrix.spec.id_var }}
             line=$(cat ${xcconfig_fn} | grep ${id_var}) && app_identifier=$(echo ${line##* })
+            echo "id_var: ${id_var}; app_identiier: ${app_identifier}"
             echo "app_identifier=${app_identifier}" >> GITHUB_OUTPUT
 
         - name: Setup Keychain
@@ -63,6 +64,7 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             all_app_info=$(xcrun altool --list-apps --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
+            echo "steps.store_xcconfig.outputs.app_identifier = ${{ steps.store_xcconfig.outputs.app_identifier }}"
             app_info=$(echo ${all_app_info} | jq ".applications[] | select(.ReservedBundleIdentifier | contains(${{ steps.store_xcconfig.outputs.app_identifier }}))")
             echo "APP INFO for ${{ steps.store_xcconfig.outputs.app_identifier }}: ${app_info}"
             echo "app_info=${app_info}" >> $GITHUB_OUTPUT
