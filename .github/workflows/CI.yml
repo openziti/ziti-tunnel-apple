@@ -71,8 +71,10 @@ jobs:
 
         - name: Set Bundle Version
           run: |
-            echo ${{ steps.get_app_info.outputs.app_info }} | jq .
-            curr=$(echo ${{ steps.get_app_info.outputs.app_info }} | jq '."Version Number"')
+            app_info=${{ steps.get_app_info.outputs.app_info }}
+            echo "app_info = ${app_info}"
+            echo ${app_info} | jq .
+            curr=$(echo ${app_info} | jq '."Version Number"')
             echo "Curr: ${curr}"
             next=$((${curr}+1))
             echo "Bumping version from ${curr} to ${next}"
