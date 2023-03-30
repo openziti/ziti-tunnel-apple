@@ -117,7 +117,7 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
-            ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "app" || echo "ipa")
+            ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "pkg" || echo "ipa")
             app=${{ steps.get_app_info.outputs.application }}
             echo "app = ${app}"
             fn="./artifacts/${SCHEME}/${app}.${ext}"
