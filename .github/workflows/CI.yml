@@ -50,7 +50,7 @@ jobs:
             AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
           run: |
-            key_dir="${PWD}/.appstoreconnect/private_keys"
+            key_dir="${HOME}/.appstoreconnect/private_keys"
             mkdir -p ${key_dir}
             key_fn="${key_dir}/AuthKey_${AUTH_KEY_ID}.p8"
             echo "Storing ${key_fn}"
