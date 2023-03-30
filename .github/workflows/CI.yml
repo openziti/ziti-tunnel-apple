@@ -99,13 +99,15 @@ jobs:
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
+            ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "app" || echo "ipa")
             xcodebuild -allowProvisioningUpdates \
               -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
-              -exportArchive -exportPath ./artifacts/${SCHEME} \
+              -exportArchive -exportPath ./artifacts/${SCHEME}.${ext} \
               -exportOptionsPlist ./etc/exportOptionsRelease.plist \
               -archivePath ./artifacts/${SCHEME}.xcarchive 
             ls -la ./artifacts
+            ls -la ./artifacts/*
 
         - name: Validate ${{ matrix.spec.scheme }}
           env:
@@ -114,7 +116,8 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
-            xcrun altool --validate-app --file ./artifacts/${SCHEME} --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
+            ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "app" || echo "ipa")
+            xcrun altool --validate-app --file ./artifacts/${SCHEME}.${ext} --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
 
         - name: Cleanup Keychain
           if: always()
