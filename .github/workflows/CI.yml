@@ -118,9 +118,11 @@ jobs:
           run: |
             type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
             ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "app" || echo "ipa")
-            app="./artifacts/${SCHEME}/${{ steps.get_app_info.outputs.application }}.${ext}"
+            app=${{ steps.get_app_info.outputs.application }}
             echo "app = ${app}"
-            xcrun altool --validate-app --file "${app}" --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
+            fn="./artifacts/${SCHEME}/${app}.${ext}"
+            echo "fn = ${fn}"
+            xcrun altool --validate-app --file "${fn}" --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
 
         - name: Cleanup Keychain
           if: always()
