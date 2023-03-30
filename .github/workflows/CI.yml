@@ -9,8 +9,8 @@ jobs:
     strategy:
       matrix:
         spec:
-        - { scheme: 'ZitiPacketTunnel', id_var: 'MAC_APP_IDENTIFIER', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS', ext: 'app'}
-        - { scheme: 'ZitiMobilePacketTunnel', id_var: 'IOS_APP_IDENTIFIER', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS', ext: 'ipa'}
+        - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS' }
+        - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
 
     steps:
         - uses: actions/checkout@v3
@@ -24,7 +24,7 @@ jobs:
           run: |
             xcconfig_fn="./Configs/workspace-settings-overrides.xcconfig"
             echo ${{ secrets.XCCONFIG }} | base64 --decode > ${xcconfig_fn}
-            id_var=${{ matrix.spec.id_var }}
+            id_var=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "MAC_APP_IDENTIFIER" || echo "IOS_APP_IDENTIFIER")
             line=$(cat ${xcconfig_fn} | grep ${id_var}) && app_identifier=$(echo ${line##* })
             echo "id_var: ${id_var}; app_identiier: ${app_identifier}"
             echo "app_identifier=${app_identifier}" >> $GITHUB_OUTPUT
@@ -69,6 +69,13 @@ jobs:
             app_info=$(echo ${app_info} | tr '\n' ' ')
             echo "app_info=${app_info}" >> $GITHUB_OUTPUT
 
+        - name: Set Bundle Version
+          run: |
+            curr=$(echo ${{ steps.get_app_info.outputs.app_info }} | jq '."Version Number"')
+            next=$((${curr}+1))
+            echo "Bumping version from ${curr} to ${next}"
+            agvool new-version -all ${next}
+
         - name: Archive ${{ matrix.spec.scheme }}
           env:
             SCHEME: ${{ matrix.spec.scheme }}
@@ -88,17 +95,25 @@ jobs:
         - name: Export ${{ matrix.spec.scheme }}
           env:
             SCHEME: ${{ matrix.spec.scheme }}
-            EXT: ${{ matrix.spec.ext }}
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             xcodebuild -allowProvisioningUpdates \
               -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
-              -exportArchive -exportPath ./artifacts/${SCHEME}.${EXT} \
+              -exportArchive -exportPath ./artifacts/${SCHEME} \
               -exportOptionsPlist ./etc/exportOptionsRelease.plist \
               -archivePath ./artifacts/${SCHEME}.xcarchive 
             ls -la ./artifacts
+
+        - name: Validate ${{ matrix.spec.scheme }}
+          env:
+            SCHEME: ${{ matrix.spec.scheme }}
+            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+          run: |
+            type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
+            xcrun altool --validate-app --file ./artifacts/${SCHEME} --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
 
         - name: Cleanup Keychain
           if: always()
