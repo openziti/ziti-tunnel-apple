@@ -66,7 +66,7 @@ jobs:
             all_app_info=$(xcrun altool --list-apps --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
             app_id="${{ steps.store_xcconfig.outputs.app_identifier }}"
             app_info=$(echo ${all_app_info} | jq -r --arg APPID ${app_id} '.applications[] | select(.ReservedBundleIdentifier | contains($APPID))')
-            echo "APP INFO for ${{ steps.store_xcconfig.outputs.app_identifier }}: ${app_info}"
+            app_info=$(echo ${app_info} | tr '\n' ' ')
             echo "app_info=${app_info}" >> $GITHUB_OUTPUT
 
         - name: Archive ${{ matrix.spec.scheme }}
