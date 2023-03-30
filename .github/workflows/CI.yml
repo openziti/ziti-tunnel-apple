@@ -79,7 +79,7 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             xcodebuild archive -allowProvisioningUpdates \
-              -authenticationKeyPath ${{ steps.store_api_key.api_key_fn }} \
+              -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
               -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
               -archivePath ./artifacts/${SCHEME}
@@ -93,7 +93,7 @@ jobs:
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
             xcodebuild -allowProvisioningUpdates \
-              -authenticationKeyPath ${{ steps.store_api_key.api_key_fn }} \
+              -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
               -exportArchive -exportPath ./artifacts/${SCHEME}.${EXT} \
               -exportOptionsPlist ./etc/exportOptionsRelease.plist \
@@ -103,7 +103,7 @@ jobs:
         - name: Cleanup Keychain
           if: always()
           run: |
-            rm -f ${{ steps.store_api_key.api_key_fn }}
+            rm -f ${{ steps.store_api_key.outputs.api_key_fn }}
             rm -f ./development.p12
             rm -f ./development.pass
             security default-keychain -s "login.keychain"
