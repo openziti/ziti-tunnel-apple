@@ -10,6 +10,7 @@ jobs:
       matrix:
         spec:
         - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS' }
+        - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
 
     steps:
         - uses: actions/checkout@v3
@@ -66,7 +67,9 @@ jobs:
             app_id="${{ steps.store_xcconfig.outputs.app_identifier }}"
             app_info=$(echo ${all_app_info} | jq -r --arg APPID ${app_id} '.applications[] | select(.ReservedBundleIdentifier | contains($APPID))')
             version_number=$(echo ${app_info} | jq '."Version Number"')
+            application=$(echo ${app_info} | jq '.Application')
             echo "version_number=${version_number}" >> $GITHUB_OUTPUT
+            echo "application=${application}" >> $GITHUB_OUTPUT
 
         - name: Set Bundle Version
           run: |
@@ -98,11 +101,10 @@ jobs:
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
-            ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "app" || echo "ipa")
             xcodebuild -allowProvisioningUpdates \
               -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
-              -exportArchive -exportPath ./artifacts/${SCHEME}.${ext} \
+              -exportArchive -exportPath ./artifacts/${SCHEME} \
               -exportOptionsPlist ./etc/exportOptionsRelease.plist \
               -archivePath ./artifacts/${SCHEME}.xcarchive 
             ls -la ./artifacts
@@ -116,7 +118,9 @@ jobs:
           run: |
             type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
             ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "app" || echo "ipa")
-            xcrun altool --validate-app --file ./artifacts/${SCHEME}.${ext} --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
+            app="./artifacts/${SCHEME}/${{ steps.get_app_info.outputs.application }}.${ext}"
+            echo "app = ${app}"
+            xcrun altool --validate-app --file "${app}" --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
 
         - name: Cleanup Keychain
           if: always()
