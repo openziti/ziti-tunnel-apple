@@ -67,12 +67,12 @@ jobs:
             app_id="${{ steps.store_xcconfig.outputs.app_identifier }}"
             app_info=$(echo ${all_app_info} | jq -r --arg APPID ${app_id} '.applications[] | select(.ReservedBundleIdentifier | contains($APPID))')
             version_number=$(echo ${app_info} | jq '."Version Number"')
-            short_version_number=$(echo ${app_info} | jq '.ShortVersion')
+            short_version=$(echo ${app_info} | jq '.ShortVersion')
             application=$(echo ${app_info} | jq '.Application')
             apple_id=$(echo ${app_info} | jq '.AppleID')
             team_id=$(echo ${app_info} | jq '.WWDRIdentifier')
             echo "version_number=${version_number}" >> $GITHUB_OUTPUT
-            echo "short_version_number=${short_version_number}" >> $GITHUB_OUTPUT
+            echo "short_version=${short_version}" >> $GITHUB_OUTPUT
             echo "application=${application}" >> $GITHUB_OUTPUT
             echo "apple_id=${apple_id}" >> $GITHUB_OUTPUT
             echo "team_id=${team_id}" >> $GITHUB_OUTPUT
@@ -86,16 +86,17 @@ jobs:
             all_provider_info=$(xcrun altool --list-providers --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
             team_id="${{ steps.get_app_info.outputs.team_id }}"
             public_id=$(echo ${all_provider_info} | jq -r --arg TEAMID ${team_id} '.providers[] | select(.WWDRTeamID | contains($TEAMID)).PublicID')
-            echo "public_id = ${public_id}"
             echo "public_id=${public_id}" >> $GITHUB_OUTPUT
 
         - name: Set Bundle Version
+          id: get_bundle_version
           run: |
             curr=${{ steps.get_app_info.outputs.version_number }}
             echo "Curr: ${curr}"
             next=$((${curr}+1))
             echo "Bumping version from ${curr} to ${next}"
             agvtool new-version -all ${next}
+            echo "bundle_version=${next}" >> $GITHUB_OUTPUT
 
         - name: Archive ${{ matrix.spec.scheme }}
           env:
@@ -129,6 +130,7 @@ jobs:
             ls -la ./artifacts/*
 
         - name: Validate ${{ matrix.spec.scheme }}
+          id: validate_app
           env:
             SCHEME: ${{ matrix.spec.scheme }}
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
@@ -141,6 +143,26 @@ jobs:
             fn="./artifacts/${SCHEME}/${app}.${ext}"
             echo "fn = ${fn}"
             xcrun altool --validate-app --file "${fn}" --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
+            echo "package_path=${fn}" >> $GITHUB_OUTPUT
+
+        - name: Upload ${{ matrix.spec.scheme }}
+          env:
+            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+          run: |
+            file_path=${{ steps.validate_app.outputs.package_path }}
+            public_id=${{ steps.get_public_id.outputs.public_id }}
+            apple_id=${{ steps.get_app_info.outputs.apple_id }}
+            bundle_version=${{ steps.get_bundle_version.outputs.bundle_version }}
+            bundle_short_version=${{ steps.get_app_info.outputs.short_version }}
+            bundle_id=${{ steps.store_xcconfig.outputs.app_identifier }}
+            xcrun altool --upload-package --file "${file_path}" \
+              --asc-public-id ${public_id} \
+              --apple-id ${apple_id} \
+              --bundle-version ${bundle_version} \
+              --bundle-short-version-string ${bundle_short_version} \
+              --bundle-id ${bundle_id} \
+              --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
 
         - name: Cleanup Keychain
           if: always()
