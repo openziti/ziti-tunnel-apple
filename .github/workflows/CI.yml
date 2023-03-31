@@ -150,7 +150,9 @@ jobs:
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
+            ls -la ./artifacts/*
             file_path="${{ steps.validate_app.outputs.package_path }}"
+            echo "file_path = ${file_path}"
             public_id=${{ steps.get_public_id.outputs.public_id }}
             apple_id=${{ steps.get_app_info.outputs.apple_id }}
             bundle_version=${{ steps.get_bundle_version.outputs.bundle_version }}
