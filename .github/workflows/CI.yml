@@ -67,9 +67,15 @@ jobs:
             app_id="${{ steps.store_xcconfig.outputs.app_identifier }}"
             app_info=$(echo ${all_app_info} | jq -r --arg APPID ${app_id} '.applications[] | select(.ReservedBundleIdentifier | contains($APPID))')
             version_number=$(echo ${app_info} | jq '."Version Number"')
+            short_version_number=$(echo ${app_info} | jq '.ShortVersion')
             application=$(echo ${app_info} | jq '.Application')
+            apple_id=$(echo ${app_info} | jq '.AppleID')
+            team_id=$(echo ${app_info} | jq '.WWDRIdentifier')
             echo "version_number=${version_number}" >> $GITHUB_OUTPUT
+            echo "short_version_number=${short_version_number}" >> $GITHUB_OUTPUT
             echo "application=${application}" >> $GITHUB_OUTPUT
+            echo "apple_id=${apple_id}" >> $GITHUB_OUTPUT
+            echo "team_id=${team_id}" >> $GITHUB_OUTPUT
 
         - name: Set Bundle Version
           run: |
