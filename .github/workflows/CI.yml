@@ -158,7 +158,6 @@ jobs:
             bundle_short_version=${{ steps.get_app_info.outputs.short_version }}
             bundle_id=${{ steps.store_xcconfig.outputs.app_identifier }}
             xcrun altool --upload-package "${file_path}" \
-              --type ${type} \
               --asc-public-id ${public_id} \
               --apple-id ${apple_id} \
               --bundle-version ${bundle_version} \
