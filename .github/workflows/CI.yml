@@ -150,13 +150,13 @@ jobs:
             AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
             AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
           run: |
-            file_path=${{ steps.validate_app.outputs.package_path }}
+            file_path="${{ steps.validate_app.outputs.package_path }}"
             public_id=${{ steps.get_public_id.outputs.public_id }}
             apple_id=${{ steps.get_app_info.outputs.apple_id }}
             bundle_version=${{ steps.get_bundle_version.outputs.bundle_version }}
             bundle_short_version=${{ steps.get_app_info.outputs.short_version }}
             bundle_id=${{ steps.store_xcconfig.outputs.app_identifier }}
-            xcrun altool --upload-package --file \"${file_path}\" \
+            xcrun altool --upload-package --file "${file_path}" \
               --asc-public-id ${public_id} \
               --apple-id ${apple_id} \
               --bundle-version ${bundle_version} \
