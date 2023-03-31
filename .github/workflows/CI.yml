@@ -77,6 +77,18 @@ jobs:
             echo "apple_id=${apple_id}" >> $GITHUB_OUTPUT
             echo "team_id=${team_id}" >> $GITHUB_OUTPUT
 
+        - name: Get Public ID
+          id: get_public_id
+          env:
+            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+          run: |
+            all_provider_info=$(xcrun altool --list-providers --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
+            team_id="${{ steps.get_app_info.outputs.team_id }}"
+            public_id=$(echo ${all_provider_info} | jq -r --arg TEAMID ${team_id} '.providers[] | select(.WWDRTeamID | contains($TEAMID)).PublicID')
+            echo "public_id = ${public_id}"
+            echo "public_id=${public_id}" >> $GITHUB_OUTPUT
+
         - name: Set Bundle Version
           run: |
             curr=${{ steps.get_app_info.outputs.version_number }}
