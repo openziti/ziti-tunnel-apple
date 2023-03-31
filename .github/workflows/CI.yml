@@ -96,7 +96,10 @@ jobs:
             next=$((${curr}+1))
             echo "Bumping version from ${curr} to ${next}"
             agvtool new-version -all ${next}
+            bundle_short_version=$(agvtool mvers -terse1)
+            echo "Bundle Short Version: ${bundle_short_version}"
             echo "bundle_version=${next}" >> $GITHUB_OUTPUT
+            echo "bundle_short_version=${bundle_short_version}" >> $GITHUB_OUTPUT
 
         - name: Archive ${{ matrix.spec.scheme }}
           env:
@@ -155,7 +158,7 @@ jobs:
             public_id=${{ steps.get_public_id.outputs.public_id }}
             apple_id=${{ steps.get_app_info.outputs.apple_id }}
             bundle_version=${{ steps.get_bundle_version.outputs.bundle_version }}
-            bundle_short_version=${{ steps.get_app_info.outputs.short_version }}
+            bundle_short_version=${{ steps.get_bundle_version.outputs.bundle_short_version }}
             bundle_id=${{ steps.store_xcconfig.outputs.app_identifier }}
             xcrun altool --upload-package "${file_path}" \
               --asc-public-id ${public_id} \
