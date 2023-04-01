@@ -1,201 +1,219 @@
 name: CI
 on:
+  pull_request:
+    branches: [ main ]
   push:
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: macos-latest
-
+    outputs:
+      bundle_version: ${{steps.configure_versions.bundle_version }}
+      bundle_short_version: ${{steps.configure_versions.bundle_short_version }}
     strategy:
       matrix:
         spec:
         - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS' }
         - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
-
     steps:
-        - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '14.2'
 
-        - uses: maxim-lobanov/setup-xcode@v1
-          with:
-            xcode-version: '14.2'
+    - name: Store XCConfig
+      id: store_xcconfig
+      run: |
+        xcconfig_fn="./Configs/workspace-settings-overrides.xcconfig"
+        echo ${{ secrets.XCCONFIG }} | base64 --decode > ${xcconfig_fn}
+        id_var=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "MAC_APP_IDENTIFIER" || echo "IOS_APP_IDENTIFIER")
+        line=$(cat ${xcconfig_fn} | grep ${id_var}) && app_identifier=$(echo ${line##* })
+        echo "id_var: ${id_var}; app_identiier: ${app_identifier}"
+        echo "app_identifier=${app_identifier}" >> $GITHUB_OUTPUT
 
-        - name: Store XCConfig
-          id: store_xcconfig
-          run: |
-            xcconfig_fn="./Configs/workspace-settings-overrides.xcconfig"
-            echo ${{ secrets.XCCONFIG }} | base64 --decode > ${xcconfig_fn}
-            id_var=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "MAC_APP_IDENTIFIER" || echo "IOS_APP_IDENTIFIER")
-            line=$(cat ${xcconfig_fn} | grep ${id_var}) && app_identifier=$(echo ${line##* })
-            echo "id_var: ${id_var}; app_identiier: ${app_identifier}"
-            echo "app_identifier=${app_identifier}" >> $GITHUB_OUTPUT
+    - name: Setup Keychain
+      run: |
+        echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | base64 --decode > ./development.p12
+        echo "${{ secrets.APPLE_DEVELOPMENT_P12_PASSWORD }}" > ./development.pass
+        PASS=$(cat ./development.pass | base64 --decode)
+        security create-keychain -p paswsword build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p paswsword build.keychain
+        security import ./development.p12 -k build.keychain -P ${PASS} -A -t cert -f pkcs12
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k paswsword build.keychain
 
-        - name: Setup Keychain
-          run: |
-            echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | base64 --decode > ./development.p12
-            echo "${{ secrets.APPLE_DEVELOPMENT_P12_PASSWORD }}" > ./development.pass
-            PASS=$(cat ./development.pass | base64 --decode)
-            security create-keychain -p paswsword build.keychain
-            security default-keychain -s build.keychain
-            security unlock-keychain -p paswsword build.keychain
-            security import ./development.p12 -k build.keychain -P ${PASS} -A -t cert -f pkcs12
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k paswsword build.keychain
+    - run: mkdir ./archives
 
-        - run: |
-            mkdir ./archives
-            echo ${GITHUB_RUN_NUMBER}
+    - name: Store API Key
+      id: store_api_key
+      env:
+        AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+      run: |
+        key_dir="${HOME}/.appstoreconnect/private_keys"
+        mkdir -p ${key_dir}
+        key_fn="${key_dir}/AuthKey_${AUTH_KEY_ID}.p8"
+        echo "Storing ${key_fn}"
+        echo ${AUTH_KEY} | base64 --decode > ${key_fn}
+        echo "api_key_fn=${key_fn}" >> $GITHUB_OUTPUT
 
-        - name: Store API Key
-          id: store_api_key
-          env:
-            AUTH_KEY: ${{ secrets.APPLE_DEVELOPER_KEY }}
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-          run: |
-            key_dir="${HOME}/.appstoreconnect/private_keys"
-            mkdir -p ${key_dir}
-            key_fn="${key_dir}/AuthKey_${AUTH_KEY_ID}.p8"
-            echo "Storing ${key_fn}"
-            echo ${AUTH_KEY} | base64 --decode > ${key_fn}
-            echo "api_key_fn=${key_fn}" >> $GITHUB_OUTPUT
+    - name: Create App Store Connect Token
+      id: create_acs_token
+      env:
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+        AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+        api_key_fn: ${{ steps.store_api_key.outputs.api_key_fn }}
+      run: |
+        gem install jwt
+        cat > jwt.rb <<EOF
+          require "base64"
+          require "jwt"
 
-        - name: Create App Store Connect Token
-          id: create_acs_token
-          env:
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
-            api_key_fn: ${{ steps.store_api_key.outputs.api_key_fn }}
-          run: |
-            gem install jwt
-            cat > jwt.rb <<EOF
-              require "base64"
-              require "jwt"
+          puts JWT.encode({ iss: ARGV[0], exp: Time.now.to_i + 2 * 60, aud: "appstoreconnect-v1" },
+            OpenSSL::PKey.read(File.read(ARGV[2])), "ES256", header_fields={ kid: ARGV[1] })
+        EOF
+        bearer=$(ruby jwt.rb ${AUTH_KEY_ISSUER_ID} ${AUTH_KEY_ID} ${api_key_fn})
+        echo "bearer=${bearer}" >> $GITHUB_OUTPUT
 
-              puts JWT.encode({ iss: ARGV[0], exp: Time.now.to_i + 2 * 60, aud: "appstoreconnect-v1" },
-                OpenSSL::PKey.read(File.read(ARGV[2])), "ES256", header_fields={ kid: ARGV[1] })
-            EOF
-            bearer=$(ruby jwt.rb ${AUTH_KEY_ISSUER_ID} ${AUTH_KEY_ID} ${api_key_fn})
-            echo "bearer=${bearer}" >> $GITHUB_OUTPUT
+    - name: Get App Info
+      id: get_app_info
+      env:
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+        AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+      run: |
+        all_app_info=$(xcrun altool --list-apps --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
+        app_id="${{ steps.store_xcconfig.outputs.app_identifier }}"
+        app_info=$(echo ${all_app_info} | jq -r --arg APPID ${app_id} '.applications[] | select(.ReservedBundleIdentifier | contains($APPID))')
+        version_number=$(echo ${app_info} | jq '."Version Number"')
+        short_version=$(echo ${app_info} | jq '.ShortVersion')
+        application=$(echo ${app_info} | jq '.Application')
+        apple_id=$(echo ${app_info} | jq '.AppleID')
+        team_id=$(echo ${app_info} | jq '.WWDRIdentifier')
+        echo "version_number=${version_number}" >> $GITHUB_OUTPUT
+        echo "short_version=${short_version}" >> $GITHUB_OUTPUT
+        echo "application=${application}" >> $GITHUB_OUTPUT
+        echo "apple_id=${apple_id}" >> $GITHUB_OUTPUT
+        echo "team_id=${team_id}" >> $GITHUB_OUTPUT
 
-        - name: Get App Info
-          id: get_app_info
-          env:
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
-          run: |
-            all_app_info=$(xcrun altool --list-apps --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
-            app_id="${{ steps.store_xcconfig.outputs.app_identifier }}"
-            app_info=$(echo ${all_app_info} | jq -r --arg APPID ${app_id} '.applications[] | select(.ReservedBundleIdentifier | contains($APPID))')
-            version_number=$(echo ${app_info} | jq '."Version Number"')
-            short_version=$(echo ${app_info} | jq '.ShortVersion')
-            application=$(echo ${app_info} | jq '.Application')
-            apple_id=$(echo ${app_info} | jq '.AppleID')
-            team_id=$(echo ${app_info} | jq '.WWDRIdentifier')
-            echo "version_number=${version_number}" >> $GITHUB_OUTPUT
-            echo "short_version=${short_version}" >> $GITHUB_OUTPUT
-            echo "application=${application}" >> $GITHUB_OUTPUT
-            echo "apple_id=${apple_id}" >> $GITHUB_OUTPUT
-            echo "team_id=${team_id}" >> $GITHUB_OUTPUT
+    - name: Configure Versions
+      id: configure_versions
+      env:
+        bearer: "${{ steps.create_acs_token.outputs.bearer }}"
+      run: |
+        mvers=$(agvtool mvers -terse1)
+        app="${{ steps.get_app_info.outputs.apple_id }}"
+        url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${mvers}&limit=1"
+        acs_vers=$(curl -g -s -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version|tonumber')
+        echo "ACS Vers: ${acs_vers}"
+        curr=$([[ -z "${acs_vers}" ]] && echo ${steps.get_app_info.outputs.version_number} || echo ${acs_vers})
+        echo "Curr: ${curr}"
+        next=$((${curr}+1))
+        echo "Bumping version from ${curr} to ${next}"
+        agvtool new-version -all ${next}
+        echo "bundle_version=${next}" >> $GITHUB_OUTPUT
+        echo "bundle_short_version=${mvers}" >> $GITHUB_OUTPUT
 
-        - name: Configure Versions
-          id: configure_versions
-          env:
-            bearer: "${{ steps.create_acs_token.outputs.bearer }}"
-          run: |
-            mvers=$(agvtool mvers -terse1)
-            app="${{ steps.get_app_info.outputs.apple_id }}"
-            url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${mvers}&limit=1"
-            acs_vers=$(curl -g -s -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version|tonumber')
-            echo "ACS Vers: ${acs_vers}"
-            curr=$([[ -z "${acs_vers}" ]] && echo ${steps.get_app_info.outputs.version_number} || echo ${acs_vers})
-            echo "Curr: ${curr}"
-            next=$((${curr}+1))
-            echo "Bumping version from ${curr} to ${next}"
-            agvtool new-version -all ${next}
-            echo "bundle_version=${next}" >> $GITHUB_OUTPUT
-            echo "bundle_short_version=${mvers}" >> $GITHUB_OUTPUT
+    - name: Get Public ID
+      id: get_public_id
+      env:
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+        AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+      run: |
+        all_provider_info=$(xcrun altool --list-providers --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
+        team_id="${{ steps.get_app_info.outputs.team_id }}"
+        public_id=$(echo ${all_provider_info} | jq -r --arg TEAMID ${team_id} '.providers[] | select(.WWDRTeamID | contains($TEAMID)).PublicID')
+        echo "public_id=${public_id}" >> $GITHUB_OUTPUT
 
-        - name: Get Public ID
-          id: get_public_id
-          env:
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
-          run: |
-            all_provider_info=$(xcrun altool --list-providers --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
-            team_id="${{ steps.get_app_info.outputs.team_id }}"
-            public_id=$(echo ${all_provider_info} | jq -r --arg TEAMID ${team_id} '.providers[] | select(.WWDRTeamID | contains($TEAMID)).PublicID')
-            echo "public_id=${public_id}" >> $GITHUB_OUTPUT
+    - name: Archive ${{ matrix.spec.scheme }}
+      env:
+        SCHEME: ${{ matrix.spec.scheme }}
+        CONFIG: ${{ matrix.spec.config }}
+        SDK: ${{ matrix.spec.sdk }}
+        DESTINATION: ${{ matrix.spec.destination }}
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+        AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+      run: |
+        xcodebuild archive -allowProvisioningUpdates \
+          -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
+          -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
+          -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
+          -archivePath ./archives/${SCHEME}
 
-        - name: Archive ${{ matrix.spec.scheme }}
-          env:
-            SCHEME: ${{ matrix.spec.scheme }}
-            CONFIG: ${{ matrix.spec.config }}
-            SDK: ${{ matrix.spec.sdk }}
-            DESTINATION: ${{ matrix.spec.destination }}
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
-          run: |
-            xcodebuild archive -allowProvisioningUpdates \
-              -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
-              -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
-              -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
-              -archivePath ./archives/${SCHEME}
-            ls -la ./archives
+    - name: Export ${{ matrix.spec.scheme }}
+      env:
+        SCHEME: ${{ matrix.spec.scheme }}
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+        AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+      run: |
+        xcodebuild -allowProvisioningUpdates \
+          -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
+          -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
+          -exportArchive -exportPath ./archives/${SCHEME} \
+          -exportOptionsPlist ./etc/exportOptionsRelease.plist \
+          -archivePath ./archives/${SCHEME}.xcarchive 
 
-        - name: Export ${{ matrix.spec.scheme }}
-          env:
-            SCHEME: ${{ matrix.spec.scheme }}
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
-          run: |
-            xcodebuild -allowProvisioningUpdates \
-              -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
-              -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
-              -exportArchive -exportPath ./archives/${SCHEME} \
-              -exportOptionsPlist ./etc/exportOptionsRelease.plist \
-              -archivePath ./archives/${SCHEME}.xcarchive 
-            ls -la ./archives
-            ls -la ./archives/*
+    - name: Validate ${{ matrix.spec.scheme }}
+      id: validate_app
+      env:
+        SCHEME: ${{ matrix.spec.scheme }}
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+        AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+      run: |
+        type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
+        ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "pkg" || echo "ipa")
+        app=${{ steps.get_app_info.outputs.application }}
+        fn="./archives/${SCHEME}/${app}.${ext}"
+        xcrun altool --validate-app --file "${fn}" --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
+        echo "package_path=${fn}" >> $GITHUB_OUTPUT
 
-        - name: Validate ${{ matrix.spec.scheme }}
-          id: validate_app
-          env:
-            SCHEME: ${{ matrix.spec.scheme }}
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
-          run: |
-            type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
-            ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "pkg" || echo "ipa")
-            app=${{ steps.get_app_info.outputs.application }}
-            echo "app = ${app}"
-            fn="./archives/${SCHEME}/${app}.${ext}"
-            echo "fn = ${fn}"
-            xcrun altool --validate-app --file "${fn}" --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
-            echo "package_path=${fn}" >> $GITHUB_OUTPUT
+    - name: Upload ${{ matrix.spec.scheme }}
+      if: github.event_name == 'pull_request'
+      env:
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+        AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+      run: |
+        type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
+        file_path="${{ steps.validate_app.outputs.package_path }}"
+        public_id=${{ steps.get_public_id.outputs.public_id }}
+        apple_id=${{ steps.get_app_info.outputs.apple_id }}
+        bundle_version=${{ steps.configure_versions.outputs.bundle_version }}
+        bundle_short_version=${{ steps.configure_versions.outputs.bundle_short_version }}
+        bundle_id=${{ steps.store_xcconfig.outputs.app_identifier }}
+        xcrun altool --upload-package "${file_path}" \
+          --asc-public-id ${public_id} \
+          --apple-id ${apple_id} \
+          --bundle-version ${bundle_version} \
+          --bundle-short-version-string ${bundle_short_version} \
+          --bundle-id ${bundle_id} \
+          --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
 
-        - name: Upload ${{ matrix.spec.scheme }}
-          env:
-            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
-            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
-          run: |
-            type=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "macos" || echo "ios")
-            file_path="${{ steps.validate_app.outputs.package_path }}"
-            public_id=${{ steps.get_public_id.outputs.public_id }}
-            apple_id=${{ steps.get_app_info.outputs.apple_id }}
-            bundle_version=${{ steps.configure_versions.outputs.bundle_version }}
-            bundle_short_version=${{ steps.configure_versions.outputs.bundle_short_version }}
-            bundle_id=${{ steps.store_xcconfig.outputs.app_identifier }}
-            xcrun altool --upload-package "${file_path}" \
-              --asc-public-id ${public_id} \
-              --apple-id ${apple_id} \
-              --bundle-version ${bundle_version} \
-              --bundle-short-version-string ${bundle_short_version} \
-              --bundle-id ${bundle_id} \
-              --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
+    - name: Cleanup Keychain
+      if: always()
+      run: |
+        rm -f ${{ steps.store_api_key.outputs.api_key_fn }}
+        rm -f ./development.p12
+        rm -f ./development.pass
+        security default-keychain -s "login.keychain"
+        security delete-keychain build.keychain
 
-        - name: Cleanup Keychain
-          if: always()
-          run: |
-            rm -f ${{ steps.store_api_key.outputs.api_key_fn }}
-            rm -f ./development.p12
-            rm -f ./development.pass
-            security default-keychain -s "login.keychain"
-            security delete-keychain build.keychain
+  draft-release:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    if: github.event_name == 'push' && github.ref  == 'refs/heads/main'
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Draft Release
+      id: release_drafter
+      uses: release-drafter/release-drafter@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag: "${{ steps.configure_versions.bundle_short_version }}.${{ steps.configure_versions.bundle_version }}"
+        name: "v${{ steps.configure_versions.bundle_short_version }}.${{ steps.configure_versions.bundle_version }}"
+        version: "${{ steps.configure_versions.bundle_short_version }}.${{ steps.configure_versions.bundle_version }}"
