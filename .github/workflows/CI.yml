@@ -99,9 +99,9 @@ jobs:
           id: test_acs_call
           env:
             bearer: "${{ steps.create_acs_token.outputs.bearer }}"
-          run:
+          run: |
             vers=$(agvtool mvers -terse1)
-            app="${{ steps.get_app_info.outputs.apple_id }}""
+            app="${{ steps.get_app_info.outputs.apple_id }}"
             url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${vers}&limit=1"
             curl -g -v -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version'
 
