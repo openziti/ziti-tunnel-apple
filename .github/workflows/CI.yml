@@ -104,7 +104,8 @@ jobs:
             app="${{ steps.get_app_info.outputs.apple_id }}"
             url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${mvers}&limit=1"
             acs_vers=$(curl -g -s -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version')
-            curr=$([[ -z "${acs_vers}" ]] && echo ${acs_vers} || echo "${{ steps.get_app_info.outputs.version_number }}")
+            echo "ACS Vers: ${acs_vers}"
+            curr=$([[ -z "${acs_vers}" ]] && echo ${steps.get_app_info.outputs.version_number} || echo "${acs_vers}")
             echo "Curr: ${curr}"
             next=$((${curr}+1))
             echo "Bumping version from ${curr} to ${next}"
