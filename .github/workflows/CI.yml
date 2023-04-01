@@ -57,6 +57,24 @@ jobs:
             echo ${AUTH_KEY} | base64 --decode > ${key_fn}
             echo "api_key_fn=${key_fn}" >> $GITHUB_OUTPUT
 
+        - name: Create App Store Connect Token
+          id: create_acs_token
+          env:
+            AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+            AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+            api_key_fn: ${{ steps.store_api_key.outputs.api_key_fn }}
+          run: |
+            gem install jwt
+            cat > jwt.rb <<EOF
+              require "base64"
+              require "jwt"
+
+              puts JWT.encode({ iss: ARGV[0], exp: Time.now.to_i + 20 * 60, aud: "appstoreconnect-v1" },
+                OpenSSL::PKey.read(File.read(ARGV[2])), "ES256", header_fields={ kid: ARGV[1] })
+            EOF
+            bearer=$(ruby jwt.rb ${AUTH_KEY_ISSUER_ID} ${AUTH_KEY_ID} ${api_key_fn})
+            echo "bearer=${bearer}" >> $GITHUB_OUTPUT
+
         - name: Get App Info
           id: get_app_info
           env:
@@ -76,6 +94,16 @@ jobs:
             echo "application=${application}" >> $GITHUB_OUTPUT
             echo "apple_id=${apple_id}" >> $GITHUB_OUTPUT
             echo "team_id=${team_id}" >> $GITHUB_OUTPUT
+
+        - name: Test ACS Call
+          id: test_acs_call
+          env:
+            bearer: "${{ steps.create_acs_token.outputs.bearer }}""
+          run:
+            vers=$(agvtool mvers -terse1)
+            app="${{ steps.get_app_info.outputs.apple_id }}""
+            url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${vers}&limit=1"
+            curl -g -v -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version'
 
         - name: Get Public ID
           id: get_public_id
