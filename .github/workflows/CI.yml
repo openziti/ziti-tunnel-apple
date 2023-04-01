@@ -98,7 +98,7 @@ jobs:
         - name: Test ACS Call
           id: test_acs_call
           env:
-            bearer: "${{ steps.create_acs_token.outputs.bearer }}""
+            bearer: "${{ steps.create_acs_token.outputs.bearer }}"
           run:
             vers=$(agvtool mvers -terse1)
             app="${{ steps.get_app_info.outputs.apple_id }}""
