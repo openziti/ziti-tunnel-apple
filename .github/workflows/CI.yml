@@ -11,6 +11,7 @@ jobs:
     runs-on: macos-latest
     outputs:
       bundle_version: ${{steps.configure_versions.bundle_version }}
+      next_bundle_version: ${{steps.configure_versions.next_bundle_version }}
       bundle_short_version: ${{steps.configure_versions.bundle_short_version }}
     strategy:
       matrix:
@@ -112,7 +113,8 @@ jobs:
         next=$((${curr}+1))
         echo "Bumping version from ${curr} to ${next}"
         agvtool new-version -all ${next}
-        echo "bundle_version=${next}" >> $GITHUB_OUTPUT
+        echo "bundle_version=${curr}" >> $GITHUB_OUTPUT
+        echo "next_bundle_version=${next}" >> $GITHUB_OUTPUT
         echo "bundle_short_version=${mvers}" >> $GITHUB_OUTPUT
 
     - name: Get Public ID
@@ -178,7 +180,7 @@ jobs:
         file_path="${{ steps.validate_app.outputs.package_path }}"
         public_id=${{ steps.get_public_id.outputs.public_id }}
         apple_id=${{ steps.get_app_info.outputs.apple_id }}
-        bundle_version=${{ steps.configure_versions.outputs.bundle_version }}
+        bundle_version=${{ steps.configure_versions.outputs.next_bundle_version }}
         bundle_short_version=${{ steps.configure_versions.outputs.bundle_short_version }}
         bundle_id=${{ steps.store_xcconfig.outputs.app_identifier }}
         xcrun altool --upload-package "${file_path}" \
