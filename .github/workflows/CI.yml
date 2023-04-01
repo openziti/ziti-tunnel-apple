@@ -95,15 +95,22 @@ jobs:
             echo "apple_id=${apple_id}" >> $GITHUB_OUTPUT
             echo "team_id=${team_id}" >> $GITHUB_OUTPUT
 
-        - name: Test ACS Call
-          id: test_acs_call
+        - name: Configure Versions
+          id: configure_versions
           env:
             bearer: "${{ steps.create_acs_token.outputs.bearer }}"
           run: |
-            vers=$(agvtool mvers -terse1)
+            mvers=$(agvtool mvers -terse1)
             app="${{ steps.get_app_info.outputs.apple_id }}"
-            url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${vers}&limit=1"
-            curl -g -v -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version'
+            url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${mvers}&limit=1"
+            acs_vers=$(curl -g -s -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version')
+            curr=$([[ -z "${acs_vers}" ]] && echo ${acs_vers} || echo "${{ steps.get_app_info.outputs.version_number }}")
+            echo "Curr: ${curr}"
+            next=$((${curr}+1))
+            echo "Bumping version from ${curr} to ${next}"
+            agvtool new-version -all ${next}
+            echo "bundle_version=${next}" >> $GITHUB_OUTPUT
+            echo "bundle_short_version=${mvers}" >> $GITHUB_OUTPUT
 
         - name: Get Public ID
           id: get_public_id
@@ -115,19 +122,6 @@ jobs:
             team_id="${{ steps.get_app_info.outputs.team_id }}"
             public_id=$(echo ${all_provider_info} | jq -r --arg TEAMID ${team_id} '.providers[] | select(.WWDRTeamID | contains($TEAMID)).PublicID')
             echo "public_id=${public_id}" >> $GITHUB_OUTPUT
-
-        - name: Set Bundle Version
-          id: get_bundle_version
-          run: |
-            curr=${{ steps.get_app_info.outputs.version_number }}
-            echo "Curr: ${curr}"
-            next=$((${curr}+1))
-            echo "Bumping version from ${curr} to ${next}"
-            agvtool new-version -all ${next}
-            bundle_short_version=$(agvtool mvers -terse1)
-            echo "Bundle Short Version: ${bundle_short_version}"
-            echo "bundle_version=${next}" >> $GITHUB_OUTPUT
-            echo "bundle_short_version=${bundle_short_version}" >> $GITHUB_OUTPUT
 
         - name: Archive ${{ matrix.spec.scheme }}
           env:
@@ -185,8 +179,8 @@ jobs:
             file_path="${{ steps.validate_app.outputs.package_path }}"
             public_id=${{ steps.get_public_id.outputs.public_id }}
             apple_id=${{ steps.get_app_info.outputs.apple_id }}
-            bundle_version=${{ steps.get_bundle_version.outputs.bundle_version }}
-            bundle_short_version=${{ steps.get_bundle_version.outputs.bundle_short_version }}
+            bundle_version=${{ steps.configure_versions.outputs.bundle_version }}
+            bundle_short_version=${{ steps.configure_versions.outputs.bundle_short_version }}
             bundle_id=${{ steps.store_xcconfig.outputs.app_identifier }}
             xcrun altool --upload-package "${file_path}" \
               --asc-public-id ${public_id} \
