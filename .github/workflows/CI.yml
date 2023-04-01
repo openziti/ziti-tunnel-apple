@@ -41,7 +41,7 @@ jobs:
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k paswsword build.keychain
 
         - run: |
-            mkdir ./artifacts
+            mkdir ./archives
             echo ${GITHUB_RUN_NUMBER}
 
         - name: Store API Key
@@ -137,8 +137,8 @@ jobs:
               -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
               -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
-              -archivePath ./artifacts/${SCHEME}
-            ls -la ./artifacts
+              -archivePath ./archives/${SCHEME}
+            ls -la ./archives
 
         - name: Export ${{ matrix.spec.scheme }}
           env:
@@ -149,11 +149,11 @@ jobs:
             xcodebuild -allowProvisioningUpdates \
               -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
               -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
-              -exportArchive -exportPath ./artifacts/${SCHEME} \
+              -exportArchive -exportPath ./archives/${SCHEME} \
               -exportOptionsPlist ./etc/exportOptionsRelease.plist \
-              -archivePath ./artifacts/${SCHEME}.xcarchive 
-            ls -la ./artifacts
-            ls -la ./artifacts/*
+              -archivePath ./archives/${SCHEME}.xcarchive 
+            ls -la ./archives
+            ls -la ./archives/*
 
         - name: Validate ${{ matrix.spec.scheme }}
           id: validate_app
@@ -166,7 +166,7 @@ jobs:
             ext=$([[ ${{ matrix.spec.sdk }} == 'macosx' ]] && echo "pkg" || echo "ipa")
             app=${{ steps.get_app_info.outputs.application }}
             echo "app = ${app}"
-            fn="./artifacts/${SCHEME}/${app}.${ext}"
+            fn="./archives/${SCHEME}/${app}.${ext}"
             echo "fn = ${fn}"
             xcrun altool --validate-app --file "${fn}" --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
             echo "package_path=${fn}" >> $GITHUB_OUTPUT
