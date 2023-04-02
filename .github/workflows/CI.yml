@@ -196,10 +196,10 @@ jobs:
       if: github.event_name == 'pull_request'
       env:
         bearer: "${{ steps.create_acs_token.outputs.bearer }}"
-        app: "${{ steps.get_app_info.outputs.apple_id }}"
-        mvers: "${{ steps.configure_versions.outputs.bundle_short_version }}"
         uploaded_build: "${{ steps.configure_versions.outputs.next_bundle_version }}"
       run: |
+        mvers=$(agvtool mvers -terse1)
+        app="${{ steps.get_app_info.outputs.apple_id }}"
         url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${mvers}&limit=1"
         while [ 1 ] ; do
           echo "Waiting for build processing to complete for ${mvers}.${uploaded_build}..."
