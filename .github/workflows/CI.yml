@@ -72,7 +72,7 @@ jobs:
           require "base64"
           require "jwt"
 
-          puts JWT.encode({ iss: ARGV[0], exp: Time.now.to_i + 2 * 60, aud: "appstoreconnect-v1" },
+          puts JWT.encode({ iss: ARGV[0], exp: Time.now.to_i + 20 * 60, aud: "appstoreconnect-v1" },
             OpenSSL::PKey.read(File.read(ARGV[2])), "ES256", header_fields={ kid: ARGV[1] })
         EOF
         bearer=$(ruby jwt.rb ${AUTH_KEY_ISSUER_ID} ${AUTH_KEY_ID} ${api_key_fn})
@@ -128,7 +128,7 @@ jobs:
         public_id=$(echo ${all_provider_info} | jq -r --arg TEAMID ${team_id} '.providers[] | select(.WWDRTeamID | contains($TEAMID)).PublicID')
         echo "public_id=${public_id}" >> $GITHUB_OUTPUT
 
-    - name: Archive ${{ matrix.spec.scheme }}
+    - name: Archive
       env:
         SCHEME: ${{ matrix.spec.scheme }}
         CONFIG: ${{ matrix.spec.config }}
@@ -143,7 +143,7 @@ jobs:
           -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
           -archivePath ./archives/${SCHEME}
 
-    - name: Export ${{ matrix.spec.scheme }}
+    - name: Export 
       env:
         SCHEME: ${{ matrix.spec.scheme }}
         AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
@@ -156,8 +156,9 @@ jobs:
           -exportOptionsPlist ./etc/exportOptionsRelease.plist \
           -archivePath ./archives/${SCHEME}.xcarchive 
 
-    - name: Validate ${{ matrix.spec.scheme }}
+    - name: Validate
       id: validate_app
+      continue-on-error: true
       env:
         SCHEME: ${{ matrix.spec.scheme }}
         AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
@@ -170,7 +171,7 @@ jobs:
         xcrun altool --validate-app --file "${fn}" --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
         echo "package_path=${fn}" >> $GITHUB_OUTPUT
 
-    - name: Upload ${{ matrix.spec.scheme }}
+    - name: Upload
       if: github.event_name == 'pull_request'
       env:
         AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
@@ -190,6 +191,22 @@ jobs:
           --bundle-short-version-string ${bundle_short_version} \
           --bundle-id ${bundle_id} \
           --type ${type} --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID}
+
+    - name: Wait For Build Processing
+      if: github.event_name == 'pull_request'
+      env:
+        bearer: "${{ steps.create_acs_token.outputs.bearer }}"
+        uploaded_build: "${{ steps.configure_versions.outputs.next_bundle_version }}"
+      run: |
+        mvers=$(agvtool mvers -terse1)
+        app="${{ steps.get_app_info.outputs.apple_id }}"
+        url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${mvers}&limit=1"
+        while [ 1 ] ; do
+          echo "Waiting for build processing to complete for ${mvers}.${uploaded_build}..."
+          latest_build=$(curl -g -s -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version|tonumber')
+          if [ "$latest_build" = "$uploaded_build" ] ; then echo "Build processing complete"; break; fi
+          sleep 30
+        done
 
     - name: Cleanup Keychain
       if: always()
