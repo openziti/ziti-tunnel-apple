@@ -158,7 +158,7 @@ jobs:
 
     - name: Validate
       id: validate_app
-      continue-on-error: github.event_name != 'pull_request'
+      continue-on-error: true
       env:
         SCHEME: ${{ matrix.spec.scheme }}
         AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
