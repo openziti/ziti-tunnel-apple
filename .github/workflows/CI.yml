@@ -10,9 +10,9 @@ jobs:
   build:
     runs-on: macos-latest
     outputs:
-      bundle_version: ${{steps.configure_versions.bundle_version }}
-      next_bundle_version: ${{steps.configure_versions.next_bundle_version }}
-      bundle_short_version: ${{steps.configure_versions.bundle_short_version }}
+      bundle_version: ${{ steps.configure_versions.outputs.bundle_version }}
+      next_bundle_version: ${{ steps.configure_versions.outputs.next_bundle_version }}
+      bundle_short_version: ${{ steps.configure_versions.outputs.bundle_short_version }}
     strategy:
       matrix:
         spec:
