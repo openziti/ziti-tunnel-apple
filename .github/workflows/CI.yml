@@ -72,7 +72,7 @@ jobs:
           require "base64"
           require "jwt"
 
-          puts JWT.encode({ iss: ARGV[0], exp: Time.now.to_i + 2 * 60, aud: "appstoreconnect-v1" },
+          puts JWT.encode({ iss: ARGV[0], exp: Time.now.to_i + 20 * 60, aud: "appstoreconnect-v1" },
             OpenSSL::PKey.read(File.read(ARGV[2])), "ES256", header_fields={ kid: ARGV[1] })
         EOF
         bearer=$(ruby jwt.rb ${AUTH_KEY_ISSUER_ID} ${AUTH_KEY_ID} ${api_key_fn})
