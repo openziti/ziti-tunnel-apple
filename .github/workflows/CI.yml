@@ -216,6 +216,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag: "${{ needs.build.bundle_short_version }}.${{ needs.build.bundle_version }}"
-        name: "v${{ needs.build.bundle_short_version }}.${{ needs.build.bundle_version }}"
-        version: "${{ needs.build.bundle_short_version }}.${{ needs.build.bundle_version }}"
+        tag: "${{ needs.build.outputs.bundle_short_version }}.${{ needs.build.outputs.bundle_version }}"
+        name: "v${{ needs.build.outputs.bundle_short_version }}.${{ needs.build.outputs.bundle_version }}"
+        version: "${{ needs.build.outputs.bundle_short_version }}.${{ needs.build.outputs.bundle_version }}"
