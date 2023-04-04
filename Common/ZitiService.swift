@@ -28,6 +28,9 @@ class ZitiService : Codable {
             self.needsRestart = needsRestart
         }
     }
+    
+    enum ServiceType: String, Codable { case DIAL, BIND }
+    
     var name:String?
     var id:String?
     var protocols:String?
@@ -35,28 +38,61 @@ class ZitiService : Codable {
     var portRanges:String?
     var status:Status?
     var postureQuerySets:[CZiti.ZitiPostureQuerySet]?
+    var serviceType:ServiceType?
     
-    init(_ eSvc:CZiti.ZitiService) {
+    init(_ eSvc:CZiti.ZitiService, _ serviceType:ServiceType) {
         name = eSvc.name
         id = eSvc.id
         postureQuerySets = eSvc.postureQuerySets
+        self.serviceType = serviceType
         
-        if let cfg = eSvc.interceptConfigV1 {
-            protocols = cfg.protocols.joined(separator: ", ").uppercased()
-            addresses = cfg.addresses.sorted().joined(separator: ", ")
-            var prArr:[String] = []
-            cfg.portRanges.forEach { pr in
-                if pr.low == pr.high {
-                    prArr.append("\(pr.low)")
-                } else {
-                    prArr.append("\(pr.low)-\(pr.high)")
+        if serviceType == .DIAL {
+            if let cfg = eSvc.interceptConfigV1 {
+                protocols = cfg.protocols.joined(separator: ", ").uppercased()
+                addresses = cfg.addresses.sorted().joined(separator: ", ")
+                var prArr:[String] = []
+                cfg.portRanges.forEach { pr in
+                    if pr.low == pr.high {
+                        prArr.append("\(pr.low)")
+                    } else {
+                        prArr.append("\(pr.low)-\(pr.high)")
+                    }
                 }
+                portRanges = prArr.sorted().joined(separator: ", ")
+            } else if let cfg = eSvc.tunnelClientConfigV1 {
+                protocols = "TCP, UDP"
+                addresses = cfg.hostname
+                portRanges = "\(cfg.port)"
             }
-            portRanges = prArr.sorted().joined(separator: ", ")
-        } else if let cfg = eSvc.tunnelClientConfigV1 {
-            protocols = "TCP, UDP"
-            addresses = cfg.hostname
-            portRanges = "\(cfg.port)"
+        } else if serviceType == .BIND {
+            if let cfg = eSvc.hostConfigV1 {
+                protocols = cfg.proto?.uppercased()
+                if cfg.forwardProtocol ?? false {
+                    protocols = cfg.allowedProtocols?.joined(separator: ", ").uppercased()
+                }
+                
+                addresses = cfg.address
+                if cfg.forwardAddress ?? false {
+                    addresses = cfg.allowedAddresses?.sorted().joined(separator: ", ")
+                }
+                
+                portRanges = "\(cfg.port ?? 0)"
+                if cfg.forwardPort ?? false {
+                    var prArr:[String] = []
+                    cfg.allowedPortRanges?.forEach { pr in
+                        if pr.low == pr.high {
+                            prArr.append("\(pr.low)")
+                        } else {
+                            prArr.append("\(pr.low)-\(pr.high)")
+                        }
+                    }
+                    portRanges = prArr.sorted().joined(separator: ", ")
+                }
+            } else if let cfg = eSvc.tunnelServerConfigV1 {
+                protocols = cfg.proto.uppercased()
+                addresses = cfg.hostname
+                portRanges = "\(cfg.port)"
+            }
         }
         status = ZitiService.Status(Date().timeIntervalSince1970, status: .Available, needsRestart: false)
     }
