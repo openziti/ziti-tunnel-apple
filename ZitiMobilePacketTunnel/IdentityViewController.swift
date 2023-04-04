@@ -618,7 +618,8 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 if let protos = zid.services[indexPath.row].protocols {
                     protoStr = "\(protos)"
                 }
-                cell?.detailTextLabel?.text = "[\(protoStr)]:\(zid.services[indexPath.row].addresses ?? ""):[\(zid.services[indexPath.row].portRanges ?? "-1")] "
+                var typeStr = zid.services[indexPath.row].serviceType?.rawValue ?? ZitiService.ServiceType.DIAL.rawValue
+                cell?.detailTextLabel?.text = "[\(typeStr)][\(protoStr)]:\(zid.services[indexPath.row].addresses ?? ""):[\(zid.services[indexPath.row].portRanges ?? "-1")] "
                 
                 let tunnelStatus = tvc?.tunnelMgr.status ?? .disconnected
                 let edgeStatus = zid.edgeStatus?.status ?? .Unavailable

@@ -43,7 +43,7 @@ class ServiceViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 0 {
-            nRows = 5
+            nRows = 6
         }
         return nRows
     }
@@ -56,15 +56,18 @@ class ServiceViewController: UITableViewController {
                 cell.textLabel?.text = "Name"
                 cell.detailTextLabel?.text = svc?.name
             } else if indexPath.row == 1 {
+                cell.textLabel?.text = "Service Type"
+                cell.detailTextLabel?.text = svc?.serviceType?.rawValue ?? ZitiService.ServiceType.DIAL.rawValue
+            } else if indexPath.row == 2 {
                 cell.textLabel?.text = "Protocols"
                 cell.detailTextLabel?.text = svc?.protocols
-            } else if indexPath.row == 2 {
+            } else if indexPath.row == 3 {
                 cell.textLabel?.text = "Addresses"
                 cell.detailTextLabel?.text = svc?.addresses
-            } else if indexPath.row == 3 {
+            } else if indexPath.row == 4 {
                 cell.textLabel?.text = "Ports"
                 cell.detailTextLabel?.text = svc?.portRanges
-            } else if indexPath.row == 4 {
+            } else if indexPath.row == 5 {
                 cell.textLabel?.text = "Posture Checks"
                 
                 var details = ""
