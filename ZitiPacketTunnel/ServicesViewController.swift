@@ -21,6 +21,7 @@ class ServicesViewController: NSViewController {
     
     fileprivate enum ColumnNames {
         static let Name = "Name"
+        static let ServiceType = "Type"
         static let Proto = "Protocols"
         static let Hostname = "Addresses"
         static let Port = "Ports"
@@ -51,13 +52,15 @@ class ServicesViewController: NSViewController {
         
         tableView.tableColumns[0].title = ColumnNames.Name
         tableView.tableColumns[0].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Name, ascending: true)
-        tableView.tableColumns[1].title = ColumnNames.Proto
-        tableView.tableColumns[1].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Proto, ascending: true)
-        tableView.tableColumns[2].title = ColumnNames.Hostname
-        tableView.tableColumns[2].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Hostname, ascending: true)
-        tableView.tableColumns[3].title = ColumnNames.Port
-        tableView.tableColumns[3].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Port, ascending: true)
-        tableView.tableColumns[4].title = ColumnNames.Posture
+        tableView.tableColumns[1].title = ColumnNames.ServiceType
+        tableView.tableColumns[1].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.ServiceType, ascending: true)
+        tableView.tableColumns[2].title = ColumnNames.Proto
+        tableView.tableColumns[2].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Proto, ascending: true)
+        tableView.tableColumns[3].title = ColumnNames.Hostname
+        tableView.tableColumns[3].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Hostname, ascending: true)
+        tableView.tableColumns[4].title = ColumnNames.Port
+        tableView.tableColumns[4].sortDescriptorPrototype = NSSortDescriptor(key: ColumnNames.Port, ascending: true)
+        tableView.tableColumns[5].title = ColumnNames.Posture
         
         tableView.isEnabled = zid == nil ? false : true
         self.reloadData()
@@ -78,6 +81,12 @@ class ServicesViewController: NSViewController {
             zid?.services.sort(by: {
                 let a = $0.name ?? ""
                 let b = $1.name ?? ""
+                return ascending ? a < b : a > b
+            })
+        } else if sortKey == ColumnNames.ServiceType {
+            zid?.services.sort(by: {
+                let a = $0.serviceType?.rawValue ?? ""
+                let b = $1.serviceType?.rawValue ?? ""
                 return ascending ? a < b : a > b
             })
         } else if sortKey == ColumnNames.Hostname {
@@ -151,6 +160,7 @@ extension ServicesViewController: NSTableViewDataSource {
 extension ServicesViewController: NSTableViewDelegate {
     fileprivate enum CellIdentifiers {
         static let NameCell = "NameCellID"
+        static let TypeCell = "TypeCellID"
         static let ProtocolCell = "ProtocolCellID"
         static let HostnameCell = "HostnameCellID"
         static let PortCell = "PortCellID"
@@ -198,15 +208,18 @@ extension ServicesViewController: NSTableViewDelegate {
                 tooltip = "Connection reset may be required to access service"
             }
         } else if tableColumn == tableView.tableColumns[1] {
+            text = svc.serviceType?.rawValue ?? ZitiService.ServiceType.DIAL.rawValue
+            cellIdentifier = CellIdentifiers.TypeCell
+        } else if tableColumn == tableView.tableColumns[2] {
             text = svc.protocols ?? ""
             cellIdentifier = CellIdentifiers.ProtocolCell
-        } else if tableColumn == tableView.tableColumns[2] {
+        } else if tableColumn == tableView.tableColumns[3] {
             text = svc.addresses ?? "-"
             cellIdentifier = CellIdentifiers.HostnameCell
-        } else if tableColumn == tableView.tableColumns[3] {
+        } else if tableColumn == tableView.tableColumns[4] {
             text = String(svc.portRanges ?? "")
             cellIdentifier = CellIdentifiers.PortCell
-        } else if tableColumn == tableView.tableColumns[4] {            
+        } else if tableColumn == tableView.tableColumns[5] {
             if svc.postureChecksPassing() {
                 text = "PASS"
             } else {

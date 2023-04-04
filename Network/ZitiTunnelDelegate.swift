@@ -301,6 +301,23 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         return (Int(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
     }
     
+    private func canBind(_ eSvc:CZiti.ZitiService) -> Bool {
+        return (Int(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_BIND != 0) && (eSvc.hostConfigV1 != nil || eSvc.tunnelServerConfigV1 != nil)
+    }
+    
+    private func evalPostureCheckStatus(_ tzid:ZitiIdentity, _ zSvc:ZitiService) {
+        // check for failed posture checks
+        if !zSvc.postureChecksPassing() {
+            let msg = "Failed posture check(s) for service \"\(zSvc.name ?? "")\""
+            zLog.warn(msg)
+            userNotifications.post(.Posture, tzid.name, msg, tzid)
+            
+            let needsRestart = zSvc.status?.needsRestart ?? false
+            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
+            zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: needsRestart)
+        }
+    }
+    
     private func containsNewRoute(_ zSvc:ZitiService) -> Bool {
         guard let addresses = zSvc.addresses else {
             return false
@@ -346,8 +363,11 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
         
         if add {
+            // if services are being added, MFA isn't pending...
+            tzid.mfaPending = false
+            
             if canDial(eSvc) {
-                let zSvc = ZitiService(eSvc)
+                let zSvc = ZitiService(eSvc, .DIAL)
                 let hasNewDnsEntry = containsNewDnsEntry(zSvc)
                 zSvc.addresses?.components(separatedBy: ",").forEach { addr in
                     let (ip, _) = cidrToDestAndMask(addr)
@@ -363,19 +383,18 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                     }
                 }
                 
-                // check for failed posture checks
-                if !zSvc.postureChecksPassing() {
-                    let msg = "Failed posture check(s) for service \"\(zSvc.name ?? "")\""
-                    zLog.warn(msg)
-                    userNotifications.post(.Posture, tzid.name, msg, tzid)
-                    
-                    let needsRestart = zSvc.status?.needsRestart ?? false
-                    tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
-                    zSvc.status = ZitiService.Status(Date().timeIntervalSince1970, status: .Unavailable, needsRestart: needsRestart)
-                }
+                // notify if posture checks are failing
+                evalPostureCheckStatus(tzid, zSvc)
                 
-                // if services are being added, MFA isn't pending...
-                tzid.mfaPending = false
+                // add the service
+                tzid.services.append(zSvc)
+            }
+            
+            if canBind(eSvc) {
+                let zSvc = ZitiService(eSvc, .BIND)
+                
+                // notify if posture checks are failing
+                evalPostureCheckStatus(tzid, zSvc)
                 
                 // add the service
                 tzid.services.append(zSvc)
