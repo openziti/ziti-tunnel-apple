@@ -51,7 +51,6 @@ class ProviderConfig : NSObject {
     static var FALLBACK_DNS_ENABLED_KEY = "fallbackDnsEnabled"
     static var FALLBACK_DNS_KEY = "fallbackDns"
     static var INTERCEPT_MATCHED_DNS_KEY = "interceptMatchedDns"
-    static var ENABLE_MFA_KEY = "enableMfa"
     static var LOG_LEVEL_KEY = "logLevel"
     static var LOW_POWER_MODE_KEY = "lowPowerMode"
     static var LOG_ROTATE_DAILY_KEY = "logRotateDaily"
@@ -77,13 +76,6 @@ class ProviderConfig : NSObject {
 #endif
     var logLevel:Int = Int(ZitiLog.LogLevel.INFO.rawValue)
     var interceptMatchedDns:Bool = true
-   
-    // MFA no longer a beta feature - hardcode it to "enabled"
-#if os(macOS)
-    let enableMfa = true
-#else
-    let enableMfa = true
-#endif
     
     // If never stored, set default value to false
 #if os(macOS)
@@ -110,7 +102,6 @@ class ProviderConfig : NSObject {
                 ProviderConfig.DNS_KEY: self.dnsAddresses.joined(separator: ","),
                 ProviderConfig.FALLBACK_DNS_ENABLED_KEY: self.fallbackDnsEnabled,
                 ProviderConfig.FALLBACK_DNS_KEY: self.fallbackDns,
-                ProviderConfig.ENABLE_MFA_KEY: self.enableMfa,
                 ProviderConfig.LOW_POWER_MODE_KEY: self.lowPowerMode,
                 ProviderConfig.INTERCEPT_MATCHED_DNS_KEY: self.interceptMatchedDns,
                 ProviderConfig.LOG_ROTATE_DAILY_KEY: self.logRotateDaily,
@@ -209,7 +200,6 @@ class ProviderConfig : NSObject {
             "fallbackDnsEnabled: \(self.fallbackDnsEnabled)\n" +
             "fallbackDns: \(self.fallbackDns)\n" +
             "interceptMatchedDns: \(self.interceptMatchedDns)\n" +
-            "enableMfa: \(self.enableMfa)\n" +
             "lowPowerMode: \(self.lowPowerMode)\n" +
             "logLevel: \(self.logLevel)\n" +
             "logRotateDaily: \(self.logRotateDaily)\n" +
