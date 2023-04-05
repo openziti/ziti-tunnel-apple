@@ -53,7 +53,9 @@ class MfaVerifyViewController: UIViewController {
             }
             let attributedString = NSMutableAttributedString(string: secret)
             let font = UIFont.systemFont(ofSize: 20.0)
-            attributedString.setAttributes([.link: url, .font: font], range: NSMakeRange(0, secret.count))
+            
+            // Set the link to the secret instead of the URL per user feedback
+            attributedString.setAttributes([.link: secret, .font: font], range: NSMakeRange(0, secret.count))
             urlTextView.attributedText = attributedString
         } else {
             urlTextView.text = provisioningUrl
