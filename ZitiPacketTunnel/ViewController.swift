@@ -406,6 +406,63 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         return alert.runModal() == .alertFirstButtonReturn
     }
     
+    // simple dialog for showing recovery codes
+    func showRecoveryCodes(_ zid:ZitiIdentity, _ codes:[String]?) {
+        guard let codesStr = codes?.joined(separator: ", ") else {
+            self.dialogAlert("Recovery Codes", "no recovery codes available")
+            return
+        }
+        
+        let alert = NSAlert()
+        alert.messageText = "Recovery Codes"
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "Save")
+        alert.addButton(withTitle: "Dismiss")
+        
+        let scrollView = NSScrollView(frame: NSRect(x:0, y:0, width: 200, height: 100))
+        scrollView.hasVerticalScroller = true
+        
+        let clipView = NSClipView(frame: scrollView.bounds)
+        clipView.autoresizingMask = [.width, .height]
+        
+        let textView = EditableNSTextView(frame: clipView.bounds)
+        textView.autoresizingMask = [.width, .height]
+        textView.isEditable = false
+        textView.string = codesStr
+        
+        clipView.documentView = textView
+        scrollView.contentView = clipView
+        
+        alert.accessoryView = scrollView
+        
+        let response = alert.runModal()
+        switch response {
+        case .alertFirstButtonReturn:
+            if textView.string.isEmpty {
+                return
+            }
+            let savePanel = NSSavePanel()
+            savePanel.title = "Save MFA Recovery Codes"
+            savePanel.nameFieldStringValue = "RecoveryCodes-\(zid.name).txt"
+            savePanel.prompt = "Save"
+            savePanel.allowedContentTypes = [UTType.text]
+            
+            savePanel.begin { (result: NSApplication.ModalResponse) -> Void in
+                if result == NSApplication.ModalResponse.OK {
+                    if let panelURL = savePanel.url {
+                        do {
+                            try codesStr.write(to: panelURL, atomically: true, encoding: .utf8)
+                        } catch {
+                            self.dialogAlert("Unable to store file", error.localizedDescription)
+                        }
+                    }
+                }
+            }
+            
+        default: return
+        }
+    }
+    
     // brute force a QR code to setup MFA for now...
     func setupMfaDialog(_ provisioningUrl:String) -> String? {
         let alert = NSAlert()
@@ -640,8 +697,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     let updatedZid = self.zidStore.update(zId, [.Mfa])
                     self.updateServiceUI(zId:updatedZid)
                     
-                    let codes = mfaEnrollment.recoveryCodes?.joined(separator: ", ")
-                    self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
+                    self.showRecoveryCodes(zId, mfaEnrollment.recoveryCodes)
                 }
             }
         } else {
@@ -803,8 +859,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     }
                     
                     // Success!
-                    let codes = codesMsg.codes?.joined(separator: ", ")
-                    self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
+                    self.showRecoveryCodes(zid, codesMsg.codes)
                 }
             }
         }
@@ -834,8 +889,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     }
                     
                     // Success!
-                    let codes = codesMsg.codes?.joined(separator: ", ")
-                    self.dialogAlert("Recovery Codes", codes ?? "no recovery codes available")
+                    self.showRecoveryCodes(zid, codesMsg.codes)
                 }
             }
         }
