@@ -129,12 +129,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     func updateServiceUI(zId:ZitiIdentity?=nil) {
-        var mfaEnabled = false
-        if let pp = tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol, let conf = pp.providerConfiguration, let mfaEnabledCfg = conf[ProviderConfig.ENABLE_MFA_KEY] as? Bool {
-            mfaEnabled = mfaEnabledCfg
-        }
-        mfaControls.isHidden = !mfaEnabled
-                
+                        
         if let zId = zId {
             let cs = zId.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
             var csStr = ""
