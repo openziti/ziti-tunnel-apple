@@ -30,7 +30,7 @@
 		<string>$(PRODUCT_MODULE_NAME).PacketTunnelProvider</string>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2020 NetFoundry. All rights reserved.</string>
+	<string>Copyright NetFoundry. All rights reserved.</string>
     <key>TeamIdentifierPrefix</key>
     <string>$(TeamIdentifierPrefix)</string>
     <key>MAC_APP_IDENTIFIER</key>
