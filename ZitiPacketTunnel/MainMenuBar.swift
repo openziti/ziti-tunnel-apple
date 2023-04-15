@@ -23,17 +23,20 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     let appName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? "Ziti"
     let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
+    private var menu:NSMenu!
     private var tunStatusItem:NSMenuItem!
     private var tunConnectItem:NSMenuItem!
     private var snapshotItem:NSMenuItem!
     private var showDocItem:NSMenuItem!
     private var logLevelMenu:NSMenu!
     
+    private var identityItems:[NSMenuItem] = []
+    
     private override init() {
         statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
         super.init()
                 
-        let menu = NSMenu()
+        menu = NSMenu()
         tunStatusItem = newMenuItem(title:"Status:", action:#selector(MainMenuBar.noop(_:)))
         menu.addItem(tunStatusItem)
         tunConnectItem = newMenuItem(title:"Connect", action:#selector(MainMenuBar.connect(_:)))
@@ -99,6 +102,9 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         NotificationCenter.default.addObserver(
                 forName: NSMenu.didBeginTrackingNotification,
                 object: nil, queue: .main, using: menuDidBeginTracking)
+        NotificationCenter.default.addObserver(
+                forName: NSMenu.didEndTrackingNotification,
+                object: nil, queue: .main, using: menuDidEndTracking)
         
         getMainWindow()?.delegate = self
         TunnelMgr.shared.tsChangedCallbacks.append(self.tunnelStatusDidChange)
@@ -119,6 +125,57 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     func menuDidBeginTracking(n: Notification) {
         updateLogLevelMenu()
+        
+        let count = TunnelMgr.shared.zids.count
+        if count > 0 {
+            var idIndx = 2
+            let sepItem = NSMenuItem.separator()
+            menu.insertItem(sepItem, at: idIndx)
+            identityItems.append(sepItem)
+            idIndx += 1
+            
+            for i in 0...(count-1) {
+                let zid = TunnelMgr.shared.zids[i]
+                let tunnelStatus = TunnelMgr.shared.status
+                var imageName:String = "NSStatusNone"
+                var tooltip:String = ""
+                
+                if zid.isEnabled && zid.isMfaEnabled && zid.isMfaPending {
+                    tooltip = " (MFA Pending)"
+                } else if !zid.allServicePostureChecksPassing() {
+                    tooltip = " (Posture check failing)"
+                }
+                
+                if zid.isEnrolled == true, zid.isEnabled == true, let edgeStatus = zid.edgeStatus {
+                    switch edgeStatus.status {
+                    case .Available:
+                        imageName = (tunnelStatus == .connected) ? "NSStatusAvailable" : "NSStatusPartiallyAvailable"
+                    case .PartiallyAvailable:
+                        imageName = "NSStatusPartiallyAvailable"
+                    case .Unavailable:
+                        imageName = "NSStatusUnavailable"
+                    default:
+                        imageName = "NSStatusNone"
+                    }
+                    
+                    if tunnelStatus != .connected {
+                        tooltip = ""
+                    }
+                }
+                let idItem = newMenuItem(title: "\(zid.name)\(tooltip)", action: #selector(MainMenuBar.onIdentity(_:)), tag:i)
+                idItem.image = NSImage(named:imageName)
+                menu.insertItem(idItem, at: idIndx)
+                identityItems.append(idItem)
+                idIndx += 1
+            }
+        }
+    }
+    
+    func menuDidEndTracking(n: Notification) {
+        identityItems.forEach { item in
+            menu.removeItem(item)
+        }
+        identityItems = []
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
@@ -183,6 +240,30 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         NSApp.hide(self)
         return false
+    }
+    
+    @objc func onIdentity(_ sender: NSMenuItem?) {
+        guard let indx = sender?.tag else {
+            zLog.wtf("Unable to retrieve index for selected identity")
+            return
+        }
+        
+        let zidCount = TunnelMgr.shared.zids.count
+        guard indx >= 0 && indx < zidCount else {
+            zLog.wtf("invalid zid indx \(indx), zidCount=\(zidCount)")
+            return
+        }
+        
+        let zid = TunnelMgr.shared.zids[indx]
+        
+        var category = ""
+        var action = ""
+        if TunnelMgr.shared.status == .connected && zid.isEnabled && zid.isMfaPending {
+            category = UserNotifications.Category.Mfa.rawValue
+            action = UserNotifications.Action.MfaAuth.rawValue
+        }
+        let msg = IpcAppexNotificationActionMessage(zid.id, category, action)
+        NotificationCenter.default.post(name: .onAppexNotification, object: self, userInfo: ["ipcMessage":msg])
     }
     
     @objc func showInDock(_ sender: Any?) {
