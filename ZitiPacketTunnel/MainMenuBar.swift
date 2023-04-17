@@ -95,16 +95,13 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
-        menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))
+        //menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))
         statusItem.menu = menu
         
         // Track the menu, update items as necessary
         NotificationCenter.default.addObserver(
                 forName: NSMenu.didBeginTrackingNotification,
                 object: nil, queue: .main, using: menuDidBeginTracking)
-        NotificationCenter.default.addObserver(
-                forName: NSMenu.didEndTrackingNotification,
-                object: nil, queue: .main, using: menuDidEndTracking)
         
         getMainWindow()?.delegate = self
         TunnelMgr.shared.tsChangedCallbacks.append(self.tunnelStatusDidChange)
@@ -123,8 +120,17 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         }
     }
     
+    func clearIdentities() {
+        identityItems.forEach { item in
+            menu.removeItem(item)
+        }
+        identityItems = []
+    }
+    
     func menuDidBeginTracking(n: Notification) {
         updateLogLevelMenu()
+        
+        clearIdentities()
         
         let count = TunnelMgr.shared.zids.count
         if count > 0 {
@@ -169,13 +175,6 @@ class MainMenuBar : NSObject, NSWindowDelegate {
                 idIndx += 1
             }
         }
-    }
-    
-    func menuDidEndTracking(n: Notification) {
-        identityItems.forEach { item in
-            menu.removeItem(item)
-        }
-        identityItems = []
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
