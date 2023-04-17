@@ -27,6 +27,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         zLog.info(Version.verboseStr)
     }
     
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        // hack to similate menuBar being opened
+        menuBar?.menuDidBeginTracking(n: Notification(name: Notification.Name(rawValue: "DockMenuOpened")))
+        return menuBar?.statusItem.menu
+    }
+    
     func applicationWillFinishLaunching(_ notification: Notification) {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
