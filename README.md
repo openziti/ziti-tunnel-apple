@@ -1,5 +1,5 @@
 # Ziti Packet Tunnelers for macOS and iOS 
-Apple Network Extention (PacketTunnelProvider) for routing traffic over an [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) network.
+Apple Network Extension (PacketTunnelProvider) for routing traffic over an [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) network.
 
 Released versions are vailable from the respective Apple App Stores:
 - [Ziti Desktop Edge for macOS](https://apps.apple.com/app/ziti-desktop-edge/id1460484572)
