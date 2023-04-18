@@ -161,15 +161,17 @@ class IpcAppexServer : NSObject {
             return
         }
         
-        ziti.mfaEnroll { _, status, mfaEnrollment in
-            let respMsg = IpcMfaEnrollResponseMessage(status, mfaEnrollment: mfaEnrollment)
-            guard let data = try? self.encoder.encode(respMsg) else {
-                let errStr = "Unable to encode response message"
-                zLog.error(errStr)
-                completionHandler?(self.errData(errStr))
-                return
+        ziti.perform {
+            ziti.mfaEnroll { _, status, mfaEnrollment in
+                let respMsg = IpcMfaEnrollResponseMessage(status, mfaEnrollment: mfaEnrollment)
+                guard let data = try? self.encoder.encode(respMsg) else {
+                    let errStr = "Unable to encode response message"
+                    zLog.error(errStr)
+                    completionHandler?(self.errData(errStr))
+                    return
+                }
+                completionHandler?(data)
             }
-            completionHandler?(data)
         }
     }
     
@@ -193,15 +195,17 @@ class IpcAppexServer : NSObject {
             return
         }
         
-        ziti.mfaVerify(code) { _, status in
-            let respMsg = IpcMfaStatusResponseMessage(status)
-            guard let data = try? self.encoder.encode(respMsg) else {
-                let errStr = "Unable to encode response message"
-                zLog.error(errStr)
-                completionHandler?(self.errData(errStr))
-                return
+        ziti.perform {
+            ziti.mfaVerify(code) { _, status in
+                let respMsg = IpcMfaStatusResponseMessage(status)
+                guard let data = try? self.encoder.encode(respMsg) else {
+                    let errStr = "Unable to encode response message"
+                    zLog.error(errStr)
+                    completionHandler?(self.errData(errStr))
+                    return
+                }
+                completionHandler?(data)
             }
-            completionHandler?(data)
         }
     }
     
@@ -225,15 +229,17 @@ class IpcAppexServer : NSObject {
             return
         }
         
-        ziti.mfaRemove(code) { _, status in
-            let respMsg = IpcMfaStatusResponseMessage(status)
-            guard let data = try? self.encoder.encode(respMsg) else {
-                let errStr = "Unable to encode response message"
-                zLog.error(errStr)
-                completionHandler?(self.errData(errStr))
-                return
+        ziti.perform {
+            ziti.mfaRemove(code) { _, status in
+                let respMsg = IpcMfaStatusResponseMessage(status)
+                guard let data = try? self.encoder.encode(respMsg) else {
+                    let errStr = "Unable to encode response message"
+                    zLog.error(errStr)
+                    completionHandler?(self.errData(errStr))
+                    return
+                }
+                completionHandler?(data)
             }
-            completionHandler?(data)
         }
     }
     
@@ -257,15 +263,17 @@ class IpcAppexServer : NSObject {
             return
         }
         
-        ziti.mfaAuth(code) { _, status in
-            let respMsg = IpcMfaStatusResponseMessage(status)
-            guard let data = try? self.encoder.encode(respMsg) else {
-                let errStr = "Unable to encode response message"
-                zLog.error(errStr)
-                completionHandler?(self.errData(errStr))
-                return
+        ziti.perform {
+            ziti.mfaAuth(code) { _, status in
+                let respMsg = IpcMfaStatusResponseMessage(status)
+                guard let data = try? self.encoder.encode(respMsg) else {
+                    let errStr = "Unable to encode response message"
+                    zLog.error(errStr)
+                    completionHandler?(self.errData(errStr))
+                    return
+                }
+                completionHandler?(data)
             }
-            completionHandler?(data)
         }
     }
     
@@ -289,15 +297,17 @@ class IpcAppexServer : NSObject {
             return
         }
         
-        ziti.mfaGetRecoveryCodes(code) { _, status, codes in
-            let respMsg = IpcMfaRecoveryCodesResponseMessage(status, codes)
-            guard let data = try? self.encoder.encode(respMsg) else {
-                let errStr = "Unable to encode response message"
-                zLog.error(errStr)
-                completionHandler?(self.errData(errStr))
-                return
+        ziti.perform {
+            ziti.mfaGetRecoveryCodes(code) { _, status, codes in
+                let respMsg = IpcMfaRecoveryCodesResponseMessage(status, codes)
+                guard let data = try? self.encoder.encode(respMsg) else {
+                    let errStr = "Unable to encode response message"
+                    zLog.error(errStr)
+                    completionHandler?(self.errData(errStr))
+                    return
+                }
+                completionHandler?(data)
             }
-            completionHandler?(data)
         }
     }
     
@@ -321,15 +331,17 @@ class IpcAppexServer : NSObject {
             return
         }
         
-        ziti.mfaNewRecoveryCodes(code) { _, status, codes in
-            let respMsg = IpcMfaRecoveryCodesResponseMessage(status, codes)
-            guard let data = try? self.encoder.encode(respMsg) else {
-                let errStr = "Unable to encode response message"
-                zLog.error(errStr)
-                completionHandler?(self.errData(errStr))
-                return
+        ziti.perform {
+            ziti.mfaNewRecoveryCodes(code) { _, status, codes in
+                let respMsg = IpcMfaRecoveryCodesResponseMessage(status, codes)
+                guard let data = try? self.encoder.encode(respMsg) else {
+                    let errStr = "Unable to encode response message"
+                    zLog.error(errStr)
+                    completionHandler?(self.errData(errStr))
+                    return
+                }
+                completionHandler?(data)
             }
-            completionHandler?(data)
         }
     }
 }
