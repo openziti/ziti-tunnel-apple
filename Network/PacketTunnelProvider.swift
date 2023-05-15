@@ -212,7 +212,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         tunnelNetworkSettings.ipv4Settings?.includedRoutes = self.zitiTunnelDelegate?.interceptedRoutes
         tunnelNetworkSettings.ipv4Settings?.excludedRoutes = self.zitiTunnelDelegate?.excludedRoutes
         tunnelNetworkSettings.mtu = self.providerConfig.mtu as NSNumber
-        
+
+        zLog.debug(tunnelNetworkSettings.debugDescription)
         self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
             completionHandler(error)
         }
