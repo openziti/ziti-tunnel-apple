@@ -117,7 +117,6 @@
 		5AF3DCAF24B52642005047BC /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5AF3DCAD24B52642005047BC /* MainInterface.storyboard */; };
 		5AF3DCB324B52642005047BC /* MobileShare.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5AF3DCA924B52642005047BC /* MobileShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5AF4625029CA4D8800A06DFA /* CZiti in Frameworks */ = {isa = PBXBuildFile; productRef = 5AF4624F29CA4D8800A06DFA /* CZiti */; };
-		5AF4625D29CA545000A06DFA /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		5AF4625E29CA545000A06DFA /* CZiti in Frameworks */ = {isa = PBXBuildFile; productRef = 5AF4624F29CA4D8800A06DFA /* CZiti */; };
 		5AF4625F29CA545000A06DFA /* CZiti in Frameworks */ = {isa = PBXBuildFile; productRef = 5AF4624F29CA4D8800A06DFA /* CZiti */; };
 		5AF4626029CA545000A06DFA /* CZiti in Frameworks */ = {isa = PBXBuildFile; productRef = 5AF4624F29CA4D8800A06DFA /* CZiti */; };
@@ -306,7 +305,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AF4625E29CA545000A06DFA /* CZiti in Frameworks */,
-				5AF4625D29CA545000A06DFA /* (null) in Frameworks */,
 				5ADAE97D280F7F6F007D1DF4 /* libresolv.9.tbd in Frameworks */,
 				5A02AAE420703167006261C6 /* NetworkExtension.framework in Frameworks */,
 			);
