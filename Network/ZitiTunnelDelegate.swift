@@ -298,11 +298,11 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     }
     
     private func canDial(_ eSvc:CZiti.ZitiService) -> Bool {
-        return (Int(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
+        return (UInt32(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_DIAL != 0) && (eSvc.interceptConfigV1 != nil || eSvc.tunnelClientConfigV1 != nil)
     }
     
     private func canBind(_ eSvc:CZiti.ZitiService) -> Bool {
-        return (Int(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_BIND != 0) && (eSvc.hostConfigV1 != nil || eSvc.tunnelServerConfigV1 != nil)
+        return (UInt32(eSvc.permFlags ?? 0x0) & Ziti.ZITI_CAN_BIND != 0) && (eSvc.hostConfigV1 != nil || eSvc.tunnelServerConfigV1 != nil)
     }
     
     private func evalPostureCheckStatus(_ tzid:ZitiIdentity, _ zSvc:ZitiService) {
