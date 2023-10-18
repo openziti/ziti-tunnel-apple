@@ -431,8 +431,15 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     }
     
     private func handleApiEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelApiEvent) {
-        zLog.info("Saving zid file, newControllerAddress=\(event.newControllerAddress).")
-        tzid.czid?.ztAPI = event.newControllerAddress
+        zLog.info("Saving zid file\n" +
+                  "   newControllerAddress=\(event.newControllerAddress)\n" +
+                  "   newCaBundle=\(event.newCaBundle).")
+        if !event.newControllerAddress.isEmpty {
+            tzid.czid?.ztAPI = event.newControllerAddress
+        }
+        if !event.newCaBundle.isEmpty {
+            tzid.czid?.ca = event.newCaBundle
+        }
         _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
     }
     
