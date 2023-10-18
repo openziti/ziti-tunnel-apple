@@ -434,12 +434,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         zLog.info("Saving zid file\n" +
                   "   newControllerAddress=\(event.newControllerAddress)\n" +
                   "   newCaBundle=\(event.newCaBundle).")
-        if !event.newControllerAddress.isEmpty {
-            tzid.czid?.ztAPI = event.newControllerAddress
-        }
-        if !event.newCaBundle.isEmpty {
-            tzid.czid?.ca = event.newCaBundle
-        }
+        // tunnel provider has already updated tzid with event data before calling us, so just save the zid
         _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
     }
     
