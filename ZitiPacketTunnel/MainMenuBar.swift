@@ -95,7 +95,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
-        //menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))
+        menu.addItem(newMenuItem(title: "Quit \(appName)", action: #selector(MainMenuBar.quit(_:)), keyEquivalent: "q"))
         statusItem.menu = menu
         
         // Track the menu, update items as necessary
