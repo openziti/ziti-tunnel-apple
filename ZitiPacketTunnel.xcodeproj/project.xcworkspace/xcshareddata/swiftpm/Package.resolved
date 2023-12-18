@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/openziti/ziti-sdk-swift-dist.git",
       "state" : {
-        "revision" : "f78571c502ce6853428718673c649f188b329fef",
-        "version" : "0.30.26"
+        "revision" : "99c79fab09d16a51ae4b6abfc170688bef3e42ca",
+        "version" : "0.30.27"
       }
     }
   ],
