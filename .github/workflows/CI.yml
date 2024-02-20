@@ -19,10 +19,10 @@ jobs:
         - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS' }
         - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0'
+        xcode-version: '15.2'
 
     - name: Store XCConfig
       id: store_xcconfig
@@ -223,7 +223,7 @@ jobs:
     if: github.event_name == 'push' && github.ref  == 'refs/heads/main'
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
