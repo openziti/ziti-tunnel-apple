@@ -1,5 +1,4 @@
 {
-  "originHash" : "733c24ff39fcde696026d38467522771f852a707fc493ffc52802bee970b6153",
   "pins" : [
     {
       "identity" : "ziti-sdk-swift-dist",
@@ -11,5 +10,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
