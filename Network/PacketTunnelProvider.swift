@@ -168,7 +168,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     func updateTunnelNetworkSettings(_ completionHandler: @escaping (Error?) -> Void) {
         let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: self.protocolConfiguration.serverAddress!)
         let dnsSettings = NEDNSSettings(servers: self.providerConfig.dnsAddresses)
-        
+        dnsSettings.matchDomainsNoSearch = true
+
         if self.providerConfig.interceptMatchedDns {
             // Add in all the hostnames we want to intercept as 'matchDomains'. We might get some extras, but that's ok...
             var matchDomains = self.zitiTunnelDelegate?.dnsEntries.hostnames.map { // trim of "*." for wildcard domains
