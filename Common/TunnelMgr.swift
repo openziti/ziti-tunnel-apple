@@ -297,7 +297,7 @@ class TunnelMgr: NSObject {
         }
     }
     
-    func sendEnabledMessage(_ zid:ZitiIdentity, _ completionHandler: @escaping (Int32) -> Void) {
+    func sendEnabledMessage(_ zid:ZitiIdentity, _ completionHandler: @escaping (Int64) -> Void) {
         guard self.status == .connected else {
             completionHandler(0)
             return

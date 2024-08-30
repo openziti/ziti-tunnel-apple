@@ -516,14 +516,14 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
             
             // find the lowest MFA timeout set for this identity (if any)
-            var lowestTimeRemaining:Int32 = Int32.max
+            var lowestTimeRemaining:Int64 = Int64.max
             tzid.services.forEach { svc in
                 svc.postureQuerySets?.forEach{ pqs in
                     if pqs.isPassing ?? true {
                         pqs.postureQueries?.forEach{ pq in
                             if let qt = pq.queryType, qt == "MFA", let tr = pq.timeoutRemaining, tr > 0, let lua = svc.status?.lastUpdatedAt {
                                 let lastUpdatedAt = Date(timeIntervalSince1970: lua)
-                                let timeSinceLastUpdate = Int32(now.timeIntervalSince(lastUpdatedAt))
+                                let timeSinceLastUpdate = Int64(now.timeIntervalSince(lastUpdatedAt))
                                 let actualTimeRemaining = tr - timeSinceLastUpdate
                                 if actualTimeRemaining < lowestTimeRemaining {
                                     lowestTimeRemaining = actualTimeRemaining
