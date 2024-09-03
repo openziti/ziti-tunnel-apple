@@ -1,7 +1,9 @@
 name: CI
 on:
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - alpha
   push:
 permissions:
   contents: write
@@ -220,7 +222,7 @@ jobs:
   draft-release:
     runs-on: ubuntu-latest
     needs: [ build ]
-    if: github.event_name == 'push' && github.ref  == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref  == ('refs/heads/main' || github.ref == 'refs/heads/alpha')
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
@@ -236,3 +238,4 @@ jobs:
         tag: "${{ needs.build.outputs.bundle_short_version }}.${{ needs.build.outputs.bundle_version }}"
         name: "v${{ needs.build.outputs.bundle_short_version }}.${{ needs.build.outputs.bundle_version }}"
         version: "${{ needs.build.outputs.bundle_short_version }}.${{ needs.build.outputs.bundle_version }}"
+        prerelease: "${{ github.ref  != 'refs/heads/main' }}"
