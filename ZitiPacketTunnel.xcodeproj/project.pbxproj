@@ -353,6 +353,7 @@
 		5A02AAAB206EBD7E006261C6 = {
 			isa = PBXGroup;
 			children = (
+				AA2098A62C57CC8800BCD073 /* Packages */,
 				5AF51049258246E60092DC47 /* Configs */,
 				5AF9C24B226B6FAC009CFD71 /* Default-568h@2x.png */,
 				5A8702D722372E7800314199 /* Common */,
@@ -542,6 +543,13 @@
 				5AF5113625842EDE0092DC47 /* W5hxDMTMg.zid */,
 			);
 			path = simdata;
+			sourceTree = "<group>";
+		};
+		AA2098A62C57CC8800BCD073 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1494,7 +1502,7 @@
 			repositoryURL = "https://github.com/openziti/ziti-sdk-swift-dist.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.30.9;
+				minimumVersion = "2.0.0-alpha1";
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
