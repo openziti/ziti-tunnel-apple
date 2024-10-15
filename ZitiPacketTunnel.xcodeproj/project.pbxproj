@@ -1502,7 +1502,7 @@
 			repositoryURL = "https://github.com/openziti/ziti-sdk-swift-dist.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = "2.0.0-alpha1";
+				minimumVersion = "0.40.1";
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
