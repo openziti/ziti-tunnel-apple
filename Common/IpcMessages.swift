@@ -264,9 +264,9 @@ class IpcSetEnabledMessage : IpcMessage {
 
 class IpcSetEnabledResponseMessage : IpcMessage {
     enum CodingKeys: String, CodingKey { case code }
-    var code:Int32?
+    var code:Int64?
     
-    init(_ zid:String, _ code:Int32) {
+    init(_ zid:String, _ code:Int64) {
         let m = Meta(zid, .SetEnabledResponse)
         self.code = code
         super.init(m)
@@ -274,7 +274,7 @@ class IpcSetEnabledResponseMessage : IpcMessage {
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        code = try? c.decode(Int32.self, forKey: .code)
+        code = try? c.decode(Int64.self, forKey: .code)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
