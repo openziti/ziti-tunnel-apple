@@ -276,6 +276,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             DispatchQueue.main.async {
                 self.zids.updateIdentity(zid)
+                self.enableStatePendingIds.removeAll { $0.id == zid.id }
                 if let indx = self.representedObject as? Int {
                     self.updateServiceUI(zId: self.zids[indx])
                 }
