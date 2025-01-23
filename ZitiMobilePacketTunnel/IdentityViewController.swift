@@ -441,7 +441,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     }
                     
                     if zid.czid == nil {
-                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPI: zidResp.ztAPI)
+                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
                     }
                     zid.czid?.ca = zidResp.ca
                     if zidResp.name != nil {
@@ -588,7 +588,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = zid?.name
             } else if indexPath.row == 1 {
                 cell?.textLabel?.text = "Network"
-                cell?.detailTextLabel?.text = zid?.czid?.ztAPI
+                cell?.detailTextLabel?.text = zid?.czid?.ztAPIs?.joined(separator: ", ") ?? zid?.czid?.ztAPI
             } else if indexPath.row == 2 {
                 cell?.textLabel?.text = "Version"
                 cell?.detailTextLabel?.text = zid?.controllerVersion ?? "unknown"

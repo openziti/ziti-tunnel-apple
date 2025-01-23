@@ -169,7 +169,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     }
                     
                     if zid.czid == nil {
-                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPI: zidResp.ztAPI)
+                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
                     }
                     zid.czid?.ca = zidResp.ca
                     if zidResp.name != nil {

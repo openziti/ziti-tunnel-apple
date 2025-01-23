@@ -186,7 +186,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
-            idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
+            idNetworkLabel.stringValue = zId.czid?.ztAPIs?.joined(separator: ", ") ?? zId.czid?.ztAPI ?? ""
             idControllerStatusLabel.stringValue = zId.controllerVersion ?? "" //csStr
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
             idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.expDate))"
@@ -923,7 +923,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     }
                     
                     if zid.czid == nil {
-                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPI: zidResp.ztAPI)
+                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
                     }
                     zid.czid?.ca = zidResp.ca
                     if zidResp.name != nil {

@@ -387,7 +387,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     var versionString:String {
         get {
-            let z = Ziti(withId: CZiti.ZitiIdentity(id: "", ztAPI: ""))
+            let z = Ziti(withId: CZiti.ZitiIdentity(id: "", ztAPIs: [""]))
             let (vers, rev, buildDate) = z.getCSDKVersion()
             return "\(Version.verboseStr); ziti-sdk-c version \(vers)-\(rev)(\(buildDate))"
         }
