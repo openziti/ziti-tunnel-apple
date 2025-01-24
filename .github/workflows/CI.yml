@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15
     outputs:
       bundle_version: ${{ steps.configure_versions.outputs.bundle_version }}
       next_bundle_version: ${{ steps.configure_versions.outputs.next_bundle_version }}
