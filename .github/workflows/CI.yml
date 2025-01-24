@@ -57,7 +57,7 @@ jobs:
       run: |
         key_dir="${HOME}/.appstoreconnect/private_keys"
         mkdir -p ${key_dir}
-<        key_fn="${key_dir}/AuthKey_${AUTH_KEY_ID}.p8"
+        key_fn="${key_dir}/AuthKey_${AUTH_KEY_ID}.p8"
         echo "Storing ${key_fn}"
         echo ${AUTH_KEY} | base64 --decode > ${key_fn}
         echo "api_key_fn=${key_fn}" >> $GITHUB_OUTPUT
