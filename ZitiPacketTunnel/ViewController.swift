@@ -186,7 +186,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
-            idNetworkLabel.stringValue = zId.czid?.ztAPIs?.joined(separator: ", ") ?? zId.czid?.ztAPI ?? ""
+            idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
             idControllerStatusLabel.stringValue = zId.controllerVersion ?? "" //csStr
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
             idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.expDate))"
