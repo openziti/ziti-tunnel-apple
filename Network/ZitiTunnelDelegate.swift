@@ -432,7 +432,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     
     private func handleConfigEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelConfigEvent) {
         zLog.info("Saving zid file\n" +
-                  "   controllerAddress=\(event.controller_url)\n" +
+                  "   controllerAddress=\(event.controllerUrl)\n" +
                   "   controllers=\(event.controllers)\n" +
                   "   caBundle=\(event.caBundle).")
         // tunnel provider has already updated tzid with event data before calling us, so just save the zid

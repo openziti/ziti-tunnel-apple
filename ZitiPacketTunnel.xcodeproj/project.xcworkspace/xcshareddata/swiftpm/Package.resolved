@@ -1,4 +1,5 @@
 {
+  "originHash" : "733c24ff39fcde696026d38467522771f852a707fc493ffc52802bee970b6153",
   "pins" : [
     {
       "identity" : "ziti-sdk-swift-dist",
@@ -6,9 +7,9 @@
       "location" : "https://github.com/openziti/ziti-sdk-swift-dist.git",
       "state" : {
         "branch" : "alpha",
-        "revision" : "7a46f0d19f9be8f7caf8ef06130ae16b1f901eb9"
+        "revision" : "acf3667437a06d9eafe722bdd1d79aa2ad95151d"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
