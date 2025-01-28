@@ -181,16 +181,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 return
             }
             
-            if msg.meta.msgType == .MfaAuthQuery {
-                let indx = self.zids.getZidIndx(msg.meta.zid)
-                if indx != -1 {
-                    self.tableView.reloadData()
-                    self.tableView.selectRow(at: IndexPath(row: indx, section: 1), animated: false, scrollPosition: .none)
-                    self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
-                    self.ivc?.doMfaAuth()
-                }
-            }
-            
             // Process any specified action
             if msg.meta.msgType == .AppexNotificationAction, let msg = msg as? IpcAppexNotificationActionMessage {
                 // Always select the zid (if specified)

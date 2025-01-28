@@ -306,15 +306,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 return
             }
             
-            if msg.meta.msgType == .MfaAuthQuery {
-                if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr })  {
-                    DispatchQueue.main.async { self.doMfaAuth(zid) }
-                } else {
-                    zLog.error("Unsupported IPC message type \(msg.meta.msgType) for id \(msg.meta.zid as Any)")
-                    return
-                }
-            }
-            
             // Process any notifications
             if msg.meta.msgType == .AppexNotification, let msg = msg as? IpcAppexNotificationMessage {
                 self.notificationsPanel.add(msg)
