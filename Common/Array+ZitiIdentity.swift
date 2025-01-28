@@ -58,7 +58,7 @@ extension Array where Element == ZitiIdentity {
         guard let subj = zid.claims?.sub, let ztAPI =  zid.claims?.iss else {
             throw ZitiError("Invalid JWT claims")
         }
-        zid.czid = CZiti.ZitiIdentity(id: subj, ztAPI: ztAPI, name: url.lastPathComponent)
+        zid.czid = CZiti.ZitiIdentity(id: subj, ztAPIs: [ztAPI], name: url.lastPathComponent)
         
         // only support OTT
         guard zid.getEnrollmentMethod() == .ott else {

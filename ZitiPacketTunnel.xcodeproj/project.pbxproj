@@ -140,6 +140,11 @@
 		5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76C225D644A0048B2F6 /* TableViewController.swift */; };
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
+		AABF06A52D38347600238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A32D38338300238DAE /* libz.1.tbd */; };
+		AABF06A62D3834B700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A32D38338300238DAE /* libz.1.tbd */; };
+		AABF06A72D42BD3700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
+		AABF06A82D42BD4E00238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
+		AABF06A92D42BDA700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -297,6 +302,8 @@
 		5AFEB76C225D644A0048B2F6 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewController.swift; sourceTree = "<group>"; };
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
+		AABF06A32D38338300238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
+		AABF06A42D3833A200238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.2.sdk/usr/lib/libz.1.tbd; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -306,6 +313,7 @@
 			files = (
 				5AF4625E29CA545000A06DFA /* CZiti in Frameworks */,
 				5ADAE97D280F7F6F007D1DF4 /* libresolv.9.tbd in Frameworks */,
+				AABF06A62D3834B700238DAE /* libz.1.tbd in Frameworks */,
 				5A02AAE420703167006261C6 /* NetworkExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -316,6 +324,7 @@
 			files = (
 				5AF4625029CA4D8800A06DFA /* CZiti in Frameworks */,
 				5ADAE97C280F7F66007D1DF4 /* libresolv.9.tbd in Frameworks */,
+				AABF06A52D38347600238DAE /* libz.1.tbd in Frameworks */,
 				5A02AADC206EBE85006261C6 /* NetworkExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -324,6 +333,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AABF06A72D42BD3700238DAE /* libz.1.tbd in Frameworks */,
 				5AF4625F29CA545000A06DFA /* CZiti in Frameworks */,
 				5AF4626629CA557B00A06DFA /* libresolv.9.tbd in Frameworks */,
 			);
@@ -333,6 +343,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AABF06A82D42BD4E00238DAE /* libz.1.tbd in Frameworks */,
 				5AF4626029CA545000A06DFA /* CZiti in Frameworks */,
 				5AF4626329CA54A900A06DFA /* libresolv.9.tbd in Frameworks */,
 			);
@@ -342,6 +353,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AABF06A92D42BDA700238DAE /* libz.1.tbd in Frameworks */,
 				5AF4626529CA553900A06DFA /* libresolv.9.tbd in Frameworks */,
 				5AF4626429CA551600A06DFA /* CZiti in Frameworks */,
 			);
@@ -415,6 +427,8 @@
 		5A02AAD8206EBE3C006261C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AABF06A32D38338300238DAE /* libz.1.tbd */,
+				AABF06A42D3833A200238DAE /* libz.1.tbd */,
 				5AFE864527E3C6AA00D47A47 /* libresolv.9.tbd */,
 				5AF4626129CA547500A06DFA /* libresolv.9.tbd */,
 				5A02AADB206EBE85006261C6 /* NetworkExtension.framework */,
@@ -1501,8 +1515,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/openziti/ziti-sdk-swift-dist.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.40.1;
+				branch = alpha;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

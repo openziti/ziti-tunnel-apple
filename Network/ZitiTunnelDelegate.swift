@@ -239,8 +239,8 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             
             if let contextEvent = event as? ZitiTunnelContextEvent {
                 handleContextEvent(ziti, tzid, contextEvent)
-            } else if let apiEvent = event as? ZitiTunnelApiEvent {
-                handleApiEvent(ziti, tzid, apiEvent)
+            } else if let configEvent = event as? ZitiTunnelConfigEvent {
+                handleConfigEvent(ziti, tzid, configEvent)
             } else if let serviceEvent = event as? ZitiTunnelServiceEvent {
                 handleServiceEvent(ziti, tzid, serviceEvent)
             } else if let _ = event as? ZitiTunnelMfaEvent {
@@ -430,10 +430,11 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         _ = zidStore.update(tzid, [.Services, .EdgeStatus, .Mfa, .ControllerVersion])
     }
     
-    private func handleApiEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelApiEvent) {
+    private func handleConfigEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelConfigEvent) {
         zLog.info("Saving zid file\n" +
-                  "   newControllerAddress=\(event.newControllerAddress)\n" +
-                  "   newCaBundle=\(event.newCaBundle).")
+                  "   controllerAddress=\(event.controllerUrl)\n" +
+                  "   controllers=\(event.controllers)\n" +
+                  "   caBundle=\(event.caBundle).")
         // tunnel provider has already updated tzid with event data before calling us, so just save the zid
         _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
     }
