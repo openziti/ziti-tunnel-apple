@@ -32,7 +32,6 @@ enum IpcMessageType : Int32, Codable {
     case MfaEnrollResponse
     case MfaVerifyRequest
     case MfaRemoveRequest
-    case MfaAuthQuery
     case MfaAuthQueryResponse
     case MfaStatusResponse
     case MfaGetRecoveryCodesRequest
@@ -55,7 +54,6 @@ enum IpcMessageType : Int32, Codable {
         case .MfaEnrollResponse: return IpcMfaEnrollResponseMessage.self
         case .MfaVerifyRequest: return IpcMfaVerifyRequestMessage.self
         case .MfaRemoveRequest: return IpcMfaRemoveRequestMessage.self
-        case .MfaAuthQuery: return IpcMfaAuthQueryMessage.self
         case .MfaAuthQueryResponse: return IpcMfaAuthQueryResponseMessage.self
         case .MfaStatusResponse: return IpcMfaStatusResponseMessage.self
         case .MfaGetRecoveryCodesRequest: return IpcMfaGetRecoveryCodesRequestMessage.self
@@ -412,27 +410,6 @@ class IpcMfaRemoveRequestMessage : IpcMessage {
         try super.encode(to: encoder)
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encodeIfPresent(code, forKey: .code)
-    }
-}
-
-class IpcMfaAuthQueryMessage : IpcMessage {
-    enum CodingKeys: String, CodingKey { case query }
-    var query:ZitiMfaAuthQuery?
-    
-    init(_ zid:String, _ query:ZitiMfaAuthQuery?) {
-        let m = Meta(zid, .MfaAuthQuery, nil) //IpcMfaAuthQueryResponseMessage.self)
-        self.query = query
-        super.init(m)
-    }
-    required init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        query = try? c.decode(ZitiMfaAuthQuery.self, forKey: .query)
-    }
-    override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encodeIfPresent(query, forKey: .query)
     }
 }
 
