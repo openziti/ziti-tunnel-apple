@@ -42,6 +42,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var mfaAuthNowBtn: NSButton!
     @IBOutlet weak var mfaCodesBtn: NSButton!
     @IBOutlet weak var mfaNewCodesBtn: NSButton!
+    @IBOutlet weak var extAuthNowBtn: NSButton!
     
     static var providerBundleIdentifier:String {
         guard let bid = Bundle.main.object(forInfoDictionaryKey: "MAC_EXT_IDENTIFIER") else {
@@ -156,6 +157,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             mfaAuthNowBtn.isHidden = !(zId.isEnabled && zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected))
             mfaCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
             mfaNewCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
+            extAuthNowBtn.isHidden = zId.jwtProviders?.isEmpty ?? true
+            if !extAuthNowBtn.isHidden {
+                extAuthNowBtn.bezelColor = NSColor.red
+            }
             
             mfaLockImageView.image = NSImage(systemSymbolName: "lock.slash", accessibilityDescription: "MFA: N/A")
             mfaLockImageView.contentTintColor = nil
@@ -189,8 +194,12 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
             idControllerStatusLabel.stringValue = zId.controllerVersion ?? "" //csStr
             idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
-            idExpiresAtLabel.stringValue = "(expiration: \(dateToString(zId.expDate))"
-            idExpiresAtLabel.isHidden = zId.enrollmentStatus == .Enrolled
+            if let expDate = zId.expDate {
+                idExpiresAtLabel.stringValue = "(expiration: \(dateToString(expDate))"
+                idExpiresAtLabel.isHidden = zId.enrollmentStatus == .Enrolled
+            } else {
+                idExpiresAtLabel.isHidden = true
+            }
             idEnrollBtn.isHidden = zId.enrollmentStatus == .Pending ? false : true
             
             if enrollingIds.contains(zId) {
@@ -213,6 +222,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             mfaAuthNowBtn.isEnabled = false
             mfaCodesBtn.isEnabled = false
             mfaNewCodesBtn.isEnabled = false
+            extAuthNowBtn.isEnabled = false
             idLabel.stringValue = "-"
             idNameLabel.stringValue = "-"
             idNetworkLabel.stringValue = "-"
@@ -582,7 +592,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
-    @IBAction func addIdentityButton(_ sender: Any) {
+    @IBAction func addIdentityJwt(_ sender: Any) {
         guard let window = view.window else { return }
         
         let panel = NSOpenPanel()
@@ -596,23 +606,53 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         panel.beginSheetModal(for: window) { (result) in
             //DispatchQueue(label: "JwtLoader").async {
-                if result == NSApplication.ModalResponse.OK {
-                    do {
-                        try self.zids.insertFromJWT(panel.urls[0], self.zidStore, at: 0)
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                            self.representedObject = 0
-                            self.tableView.selectRowIndexes([0], byExtendingSelection: false)
-                        }
-                    } catch {
-                        DispatchQueue.main.async {
-                            panel.orderOut(nil)
-                            self.dialogAlert("Unable to add identity", error.localizedDescription)
-                        }
+            if result == NSApplication.ModalResponse.OK {
+                do {
+                    try self.zids.insertFromJWT(panel.urls[0], self.zidStore, at: 0)
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                        self.representedObject = 0
+                        self.tableView.selectRowIndexes([0], byExtendingSelection: false)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        panel.orderOut(nil)
+                        self.dialogAlert("Unable to add identity", error.localizedDescription)
                     }
                 }
+            }
             //}
         }
+    }
+    
+    @IBAction func addIdentityUrl(_ sender: Any) {
+        guard view.window != nil else { return }
+        
+        let urlStr = dialogForString(question: "Controller URL", text: "Enter the controller URL")
+        if (urlStr == nil) { return }
+        let ctrlUrl = URL(string: urlStr!)
+        zLog.info("url is \(ctrlUrl)")
+        
+        do {
+            try self.zids.insertFromURL(ctrlUrl!, self.zidStore, at: 0)
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+                self.representedObject = 0
+                self.tableView.selectRowIndexes([0], byExtendingSelection: false)
+            }
+        } catch {
+            self.dialogAlert("Unable to add identity", error.localizedDescription)
+        }
+    }
+    
+    @IBAction func addIdentityButton(_ sender: NSButton) {
+        guard view.window != nil else { return }
+        
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: "With JWT ...", action: #selector(addIdentityJwt(_:)), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "With URL ...", action: #selector(addIdentityUrl(_:)), keyEquivalent: ""))
+        let location = NSPoint(x: 0, y: menu.size.height * -1) // Magic number to adjust the height.
+        menu.popUp(positioning: nil, at: location, in: sender)
     }
     
     @IBAction func removeIdentityButton(_ sender: Any) {
@@ -887,6 +927,59 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    func doExternalAuth(_ zid: ZitiIdentity, _ provider: JWTProvider) {
+        let msg = IpcExternalAuthRequestMessage(zid.id, provider.issuer)
+        self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
+                    return
+                }
+                guard let statusMsg = respMsg as? IpcExternalAuthResponseMessage,
+                      let url = statusMsg.url else {
+                    self.dialogAlert("IPC Error", "Unable to parse auth response message")
+                    return
+                }
+                
+                // Success!
+                
+                //zid.lastMfaAuth = Date()
+                //zid.mfaPending = false
+                let updatedZid = self.zidStore.update(zid, [.Mfa])
+                self.updateServiceUI(zId:updatedZid)
+            }
+        }
+    }
+
+//    @Environment(\.openURL) private var openURL
+    @IBAction func externalAuthProviderSelected(_ sender: Any) {
+        guard let indx = representedObject as? Int else { return }
+        let zid = zids[indx]
+        zLog.info("zid: \(zid.debugDescription)")
+
+        guard let mi = sender as? NSMenuItem else { return }
+        guard let provider = mi.representedObject as? JWTProvider else { return }
+
+        doExternalAuth(zid, provider)
+    }
+
+    @IBAction func onExternalAuth(_ sender: NSButton) {
+        guard let indx = representedObject as? Int else { return }
+        let zid = zids[indx]
+        if let providers = zid.jwtProviders {
+            guard view.window != nil else { return }
+            
+            let menu = NSMenu()
+            for case let provider? in providers {
+                let mi = NSMenuItem(title: provider.name, action: #selector(externalAuthProviderSelected(_:)), keyEquivalent: "")
+                mi.representedObject = provider
+                menu.addItem(mi)
+            }
+            let location = NSPoint(x: 0, y: menu.size.height) // Magic number to adjust the height.
+            menu.popUp(positioning: nil, at: location, in: sender)
+        }
+    }
+
     @IBAction func onEnrollButton(_ sender: Any) {
         guard let indx = representedObject as? Int else { return }
         var zid = zids[indx]
@@ -900,36 +993,68 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         let url = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false)
         let jwtFile = url.path
-        
-        // Ziti.enroll takes too long, needs to be done in background
-        DispatchQueue.global().async {
-            Ziti.enroll(jwtFile) { zidResp, zErr in
-                DispatchQueue.main.async {
-                    self.enrollingIds.removeAll { $0.id == zid.id }
-                    guard zErr == nil, let zidResp = zidResp else {
-                        _ = self.zidStore.store(zid)
+        if FileManager.default.fileExists(atPath: jwtFile) {
+            // Ziti.enroll takes too long, needs to be done in background
+            DispatchQueue.global().async {
+                Ziti.enroll(jwtFile) { zidResp, zErr in
+                    DispatchQueue.main.async {
+                        self.enrollingIds.removeAll { $0.id == zid.id }
+                        guard zErr == nil, let zidResp = zidResp else {
+                            _ = self.zidStore.store(zid)
+                            self.updateServiceUI(zId:zid)
+                            self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
+                            return
+                        }
+                        
+                        if zid.czid == nil {
+                            zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: zidResp.ztAPIs ?? [zidResp.ztAPI])
+                        }
+                        zid.czid?.ca = zidResp.ca
+                        if zidResp.name != nil {
+                            zid.czid?.name = zidResp.name
+                        }
+                        
+                        zid.enabled = true
+                        zid.enrolled = true
+                        zid = self.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
+                        self.zids[indx] = zid
                         self.updateServiceUI(zId:zid)
-                        self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
-                        return
+                        self.tunnelMgr.restartTunnel()
                     }
-                    
-                    if zid.czid == nil {
-                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
-                    }
-                    zid.czid?.ca = zidResp.ca
-                    zid.czid?.certs = zidResp.certs
-                    if zidResp.name != nil {
-                        zid.czid?.name = zidResp.name
-                    }
-                                        
-                    zid.enabled = true
-                    zid.enrolled = true
-                    zid = self.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
-                    self.zids[indx] = zid
-                    self.updateServiceUI(zId:zid)
-                    self.tunnelMgr.restartTunnel()
                 }
             }
+        } else if let ztAPI = zid.czid?.ztAPI {
+            DispatchQueue.global().async {
+                Ziti.enroll(controllerURL: ztAPI) { zidResp, zErr in
+                    DispatchQueue.main.async {
+                        self.enrollingIds.removeAll { $0.id == zid.id }
+                        guard zErr == nil, let zidResp = zidResp else {
+                            _ = self.zidStore.store(zid)
+                            self.updateServiceUI(zId:zid)
+                            self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
+                            return
+                        }
+                        
+                        if zid.czid == nil {
+                            zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: zidResp.ztAPIs ?? [zidResp.ztAPI])
+                        }
+                        zid.czid?.ca = zidResp.ca
+                        zid.czid?.ztAPI = zidResp.ztAPI
+                        zid.czid?.ztAPIs = zidResp.ztAPIs
+                        if zidResp.name != nil {
+                            zid.czid?.name = zidResp.name
+                        }
+                        
+                        zid.enabled = true
+                        zid.enrolled = true
+                        zid = self.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
+                        self.zids[indx] = zid
+                        self.updateServiceUI(zId:zid)
+                        //self.tunnelMgr.restartTunnel()
+                    }
+                }
+            }
+
         }
     }
 }

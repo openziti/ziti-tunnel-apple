@@ -20,11 +20,12 @@ import CZiti
 class ZitiIdentity : NSObject, Codable {
     
     enum EnrollmentMethod : String, Codable {
-        case ott, ottCa, unrecognized
+        case ott, ottCa, url, unrecognized
         init(_ str:String) {
             switch str {
             case "ott": self = .ott
             case "ottCa": self = .ottCa
+            case "url": self = .url
             default: self = .unrecognized
             }
         }
@@ -66,6 +67,7 @@ class ZitiIdentity : NSObject, Codable {
     
     var czid:CZiti.ZitiIdentity?
     var claims:CZiti.ZitiClaims?
+    var jwtProviders:[JWTProvider]?
     
     var name:String { return czid?.name ?? "--" }
     var id:String { return czid?.id ?? "--invalid_id--" }
@@ -73,18 +75,26 @@ class ZitiIdentity : NSObject, Codable {
     // returned from /version, retrieved when validating JWT, polled periodically
     var controllerVersion:String?
 
-    var expDate:Date { return Date(timeIntervalSince1970: TimeInterval(claims?.exp ?? 0)) }
+    var expDate:Date? {
+        if let exp = claims?.exp {
+            return Date(timeIntervalSince1970: TimeInterval(exp))
+        }
+        return nil
+    }
     
     var mfaEnabled:Bool? = false
     var mfaVerified:Bool? = false
     var lastMfaAuth:Date?
     var mfaPending:Bool? = false
+    //var needsExternalAuth:Bool? = false
     var enabled:Bool? = false
     var enrolled:Bool? = false
     var enrollmentStatus:EnrollmentStatus {
         let enrolled = self.enrolled ?? false
         if (enrolled) { return .Enrolled }
-        if (Date() > expDate) { return .Expired }
+        if let expDate = expDate {
+            if (Date() > expDate) { return .Expired }
+        }
         return .Pending
     }
     

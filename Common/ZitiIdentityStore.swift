@@ -32,6 +32,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         case ControllerVersion
         case CZitiIdentity
         case Mfa
+        case JwtProviders
         case Services
         case AppexNotifications
     }
@@ -195,6 +196,9 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
             }
             if options.contains(.Services) {
                 zidOnDisk?.services = zid.services
+            }
+            if options.contains(.JwtProviders) {
+                zidOnDisk?.jwtProviders = zid.jwtProviders
             }
             
             // store to disk

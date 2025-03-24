@@ -252,6 +252,8 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
                 //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
                 _ = zidStore.update(tzid, [.Mfa, .EdgeStatus, .ControllerVersion])
+            } else if let extJWTEvent = event as? ZitiTunnelExtJWTEvent {
+                handleExtJWTEvent(ziti, tzid, extJWTEvent)
             }
         }
     }
@@ -438,6 +440,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                   "   caBundle=\(event.caBundle).")
         // tunnel provider has already updated tzid with event data before calling us, so just save the zid
         _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
+    }
+    
+    private func handleExtJWTEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelExtJWTEvent) {
+        tzid.jwtProviders = event.providers
+        userNotifications.post(.Ext, "External Auth Required", tzid.name, tzid)
+        _ = zidStore.update(tzid, [.JwtProviders, .EdgeStatus, .ControllerVersion])
     }
     
     func dumpZitis() -> String {
