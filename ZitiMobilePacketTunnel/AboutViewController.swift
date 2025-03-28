@@ -28,7 +28,7 @@ class AboutViewController: UITableViewController {
     }
     
     static var termsUrl:String {
-        guard let str = Bundle.main.object(forInfoDictionaryKey: "TERMS_EARL") else {
+        guard let str = Bundle.main.object(forInfoDictionaryKey: "TERMS_URL") else {
             zLog.error("Invalid TERMS_URL")
             return ""
         }

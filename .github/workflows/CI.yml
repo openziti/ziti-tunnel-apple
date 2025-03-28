@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         spec:
-#        - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS' }
+        - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS' }
         - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
     steps:
     - uses: actions/checkout@v4
