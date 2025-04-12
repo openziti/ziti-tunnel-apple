@@ -444,6 +444,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                         zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
                     }
                     zid.czid?.ca = zidResp.ca
+                    zid.czid?.certs = zidResp.certs
                     if zidResp.name != nil {
                         zid.czid?.name = zidResp.name
                     }
