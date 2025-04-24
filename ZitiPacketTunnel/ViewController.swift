@@ -917,7 +917,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
                     }
                     zid.czid?.ca = zidResp.ca
-                    zid.czid?.certCNs = zidResp.certCNs
+                    zid.czid?.certs = zidResp.certs
                     if zidResp.name != nil {
                         zid.czid?.name = zidResp.name
                     }
