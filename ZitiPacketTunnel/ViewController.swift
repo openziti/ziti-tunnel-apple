@@ -157,9 +157,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             mfaAuthNowBtn.isHidden = !(zId.isEnabled && zId.isMfaEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected))
             mfaCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
             mfaNewCodesBtn.isHidden = mfaAuthNowBtn.isHidden || zId.isMfaPending
-            extAuthNowBtn.isHidden = zId.jwtProviders?.isEmpty ?? true
+            extAuthNowBtn.isHidden = !(zId.isEnabled && zId.isExtAuthEnabled && (tunnelMgr.status == .connecting || tunnelMgr.status == .connected))
+            extAuthNowBtn.image?.accessibilityDescription = "Extended Authentication: N/A"
+            
             if !extAuthNowBtn.isHidden {
-                extAuthNowBtn.bezelColor = NSColor.red
+                extAuthNowBtn.contentTintColor = !zId.isExtAuthPending ? .systemGreen : .systemYellow
             }
             
             mfaLockImageView.image = NSImage(systemSymbolName: "lock.slash", accessibilityDescription: "MFA: N/A")
@@ -347,11 +349,15 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     // Process the action
                     if let action = msg.action {
                         if action == UserNotifications.Action.MfaAuth.rawValue {
-                            if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr })  {
+                            if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr }) {
                                 self.doMfaAuth(zid)
                             }
                         } else if action == UserNotifications.Action.Restart.rawValue {
                             self.tunnelMgr.restartTunnel()
+                        } else if action == UserNotifications.Action.ExtAuth.rawValue {
+                            if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr }) {
+                                self.doExtAuth(zid)
+                            }
                         }
                     }
                 }
@@ -561,6 +567,27 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         return nil // Cancel
     }
 
+    func dialogForListSelect(question: String, text: String, options: [String]) -> String? {
+        let alert = NSAlert()
+        alert.messageText = question
+        alert.informativeText = text
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        
+        let listView = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200, height: 60))
+        listView.addItems(withTitles: options)
+        alert.accessoryView = listView
+        alert.window.initialFirstResponder = listView
+        
+        let response = alert.runModal()
+
+        if (response == .alertFirstButtonReturn) {
+            return listView.titleOfSelectedItem
+        }
+        return nil // Cancel
+    }
+    
     @IBAction func onConnectButton(_ sender: NSButton) {
         if (sender.title == "Turn Ziti On") {
             do {
@@ -631,7 +658,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         let urlStr = dialogForString(question: "Controller URL", text: "Enter the controller URL")
         if (urlStr == nil) { return }
         let ctrlUrl = URL(string: urlStr!)
-        zLog.info("url is \(ctrlUrl)")
         
         do {
             try self.zids.insertFromURL(ctrlUrl!, self.zidStore, at: 0)
@@ -927,31 +953,49 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
-    func doExternalAuth(_ zid: ZitiIdentity, _ provider: JWTProvider) {
-        let msg = IpcExternalAuthRequestMessage(zid.id, provider.issuer)
-        self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-            DispatchQueue.main.async {
-                guard zErr == nil else {
-                    self.dialogAlert("Error sending provider message to auth MFA", zErr!.localizedDescription)
-                    return
-                }
-                guard let statusMsg = respMsg as? IpcExternalAuthResponseMessage,
-                      let url = statusMsg.url else {
-                    self.dialogAlert("IPC Error", "Unable to parse auth response message")
-                    return
-                }
-                
-                // Success!
-                
-                //zid.lastMfaAuth = Date()
-                //zid.mfaPending = false
-                let updatedZid = self.zidStore.update(zid, [.Mfa])
-                self.updateServiceUI(zId:updatedZid)
+    /// called when handling notification. initiate ext auth immediately if only one provider exists, otherwise display combobox
+    func doExtAuth(_ zid: ZitiIdentity) {
+        if let providers = zid.jwtProviders {
+            // save some clicking if there's only one provider
+            if providers.count == 1, let provider = providers.first {
+                doExternalAuth(zid, provider)
+                return
+            }
+            let providerNames = providers.map(\.name)
+            let providerName = dialogForListSelect(question: "External Authentication Required",
+                                                   text: "Select authentication provider for '\(zid.name)'",
+                                                   options: providerNames)
+            if let provider = providers.first(where: { $0.name == providerName }) {
+                doExternalAuth(zid, provider)
             }
         }
     }
 
-//    @Environment(\.openURL) private var openURL
+    func doExternalAuth(_ zid: ZitiIdentity, _ provider: JWTProvider) {
+        let msg = IpcExternalAuthRequestMessage(zid.id, provider.name)
+        self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    self.dialogAlert("Error sending provider message to authentiate externally", zErr!.localizedDescription)
+                    return
+                }
+                guard let statusMsg = respMsg as? IpcExternalAuthResponseMessage,
+                      let urlString = statusMsg.url,
+                      let url = URL(string: urlString) else {
+                    self.dialogAlert("IPC Error", "Unable to parse auth response message")
+                    return
+                }
+                
+                let opened = NSWorkspace.shared.open(url)
+                if !opened {
+                    self.dialogAlert("Unable to open autentication URL \(urlString). Please copy and paste into your browser.")
+                }
+                //let updatedZid = self.zidStore.update(zid, [.ExtAuth])
+                //self.updateServiceUI(zId:updatedZid)
+            }
+        }
+    }
+
     @IBAction func externalAuthProviderSelected(_ sender: Any) {
         guard let indx = representedObject as? Int else { return }
         let zid = zids[indx]
@@ -969,13 +1013,19 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if let providers = zid.jwtProviders {
             guard view.window != nil else { return }
             
+            // save some clicking if there's only one provider
+            if providers.count == 1, let provider = providers.first {
+                doExternalAuth(zid, provider)
+                return
+            }
+            
             let menu = NSMenu()
             for case let provider? in providers {
                 let mi = NSMenuItem(title: provider.name, action: #selector(externalAuthProviderSelected(_:)), keyEquivalent: "")
                 mi.representedObject = provider
                 menu.addItem(mi)
             }
-            let location = NSPoint(x: 0, y: menu.size.height) // Magic number to adjust the height.
+            let location = NSPoint(x: 0, y: menu.size.height - 20)
             menu.popUp(positioning: nil, at: location, in: sender)
         }
     }
@@ -1054,7 +1104,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     }
                 }
             }
-
         }
     }
 }

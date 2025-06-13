@@ -266,6 +266,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
         
         if event.code == Ziti.ZITI_OK {
+            tzid.extAuthPending = false
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
             
             // Notifiy when controller comes (back) online after inital startup. Don't notify during startup or right after weke to reduce noise
@@ -278,6 +279,10 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                                        "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
             }
         } else if event.code == Ziti.ZITI_CONTROLLER_UNAVAILABLE {
+            if tzid.isExtAuthEnabled {
+                // this shouldn't be necessary, but we don't always get an auth event when re-auth is needed.
+                tzid.extAuthPending = true
+            }
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
             
             // Only raise notifications if not shutting down to reduce noise
@@ -287,7 +292,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         } else {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)
         }
-        _ = zidStore.update(tzid, [.ControllerVersion, .CZitiIdentity, .EdgeStatus])
+        _ = zidStore.update(tzid, [.ControllerVersion, .CZitiIdentity, .EdgeStatus, .ExtAuth])
         
         if let ipcCompletionHandler = ziti.userData.removeValue(forKey: IpcAppexServer.CONTEXT_EVENT_ENABLED_CALLBACK_KEY) as? IpcAppexServer.CompletionHandler {
             zLog.debug("Completion handler found fo IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI)")
@@ -365,8 +370,9 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
         
         if add {
-            // if services are being added, MFA isn't pending...
+            // if services are being added, MFA/ext isn't pending...
             tzid.mfaPending = false
+            tzid.extAuthPending = false
             
             if canDial(eSvc) {
                 let zSvc = ZitiService(eSvc, .DIAL)
@@ -443,9 +449,14 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     }
     
     private func handleExtJWTEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelExtJWTEvent) {
-        tzid.jwtProviders = event.providers
-        userNotifications.post(.Ext, "External Auth Required", tzid.name, tzid)
-        _ = zidStore.update(tzid, [.JwtProviders, .EdgeStatus, .ControllerVersion])
+        if !event.providers.isEmpty {
+            tzid.extAuthPending = true
+            tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+            tzid.jwtProviders = event.providers
+            // should notification be posted if no providers were in the event?
+            userNotifications.post(.Ext, "External Auth Required", tzid.name, tzid)
+            _ = zidStore.update(tzid, [.ExtAuth, .EdgeStatus])
+        }
     }
     
     func dumpZitis() -> String {

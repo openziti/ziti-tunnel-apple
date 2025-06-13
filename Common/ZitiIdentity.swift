@@ -67,7 +67,8 @@ class ZitiIdentity : NSObject, Codable {
     
     var czid:CZiti.ZitiIdentity?
     var claims:CZiti.ZitiClaims?
-    var jwtProviders:[JWTProvider]?
+    var jwtProviders:[CZiti.JWTProvider]?
+    var extAuthPending:Bool? = false
     
     var name:String { return czid?.name ?? "--" }
     var id:String { return czid?.id ?? "--invalid_id--" }
@@ -86,7 +87,6 @@ class ZitiIdentity : NSObject, Codable {
     var mfaVerified:Bool? = false
     var lastMfaAuth:Date?
     var mfaPending:Bool? = false
-    //var needsExternalAuth:Bool? = false
     var enabled:Bool? = false
     var enrolled:Bool? = false
     var enrollmentStatus:EnrollmentStatus {
@@ -122,6 +122,8 @@ class ZitiIdentity : NSObject, Codable {
     var isMfaEnabled:Bool { return mfaEnabled ?? false }
     var isMfaVerified:Bool { return isMfaEnabled && (mfaVerified ?? false) }
     var isMfaPending:Bool { return mfaPending ?? false }
+    var isExtAuthEnabled:Bool { return jwtProviders != nil && !jwtProviders!.isEmpty }
+    var isExtAuthPending:Bool { return extAuthPending ?? false }
     var isEnabled:Bool { return enabled ?? false }
     var isEnrolled:Bool { return enrolled ?? false }
     var edgeStatus:EdgeStatus?
