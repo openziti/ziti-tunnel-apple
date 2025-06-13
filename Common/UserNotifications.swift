@@ -26,7 +26,7 @@ class UserNotifications {
             case .Open:    return "Open"
             case .MfaAuth: return "Auth Now"
             case .Restart: return "Restart"
-            case .ExtAuth: return "Auth Now "
+            case .ExtAuth: return "Auth Now " // trailing space intentional to distinguish from `MfaAuth` action
             }
         }
         

@@ -82,12 +82,6 @@ extension Array where Element == ZitiIdentity {
     
     mutating func insertFromURL(_ url:URL, _ zidStore:ZitiIdentityStore, at:Int) throws {
         guard let host = url.host else { return }
-        //Ziti.enroll(controllerURL: url.absoluteString) { zidResp, zErr in
-        //    guard zErr == nil, let zidResp = zidResp else {
-        //        return
-        //    }
-        //    zLog.info("\(zidResp.debugDescription)")
-        //}
         let zid = ZitiIdentity()
         zid.czid = CZiti.ZitiIdentity(id: host, ztAPIs: [url.absoluteString], name: url.host)
 
