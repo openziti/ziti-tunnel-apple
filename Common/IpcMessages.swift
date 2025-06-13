@@ -37,6 +37,8 @@ enum IpcMessageType : Int32, Codable {
     case MfaGetRecoveryCodesRequest
     case MfaNewRecoveryCodesRequest
     case MfaRecoveryCodesResponse
+    case ExternalAuthRequest
+    case ExternalAuthResponse
     
     var type:IpcMessage.Type {
         switch self {
@@ -59,6 +61,8 @@ enum IpcMessageType : Int32, Codable {
         case .MfaGetRecoveryCodesRequest: return IpcMfaGetRecoveryCodesRequestMessage.self
         case .MfaNewRecoveryCodesRequest: return IpcMfaNewRecoveryCodesRequestMessage.self
         case .MfaRecoveryCodesResponse: return IpcMfaRecoveryCodesResponseMessage.self
+        case .ExternalAuthRequest: return IpcExternalAuthRequestMessage.self
+        case .ExternalAuthResponse: return IpcExternalAuthRequestMessage.self
         }
     }
 }
@@ -498,5 +502,47 @@ class IpcMfaRecoveryCodesResponseMessage : IpcMessage {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encodeIfPresent(status, forKey: .status)
         try c.encodeIfPresent(codes, forKey: .codes)
+    }
+}
+
+class IpcExternalAuthRequestMessage : IpcMessage {
+    enum CodingKeys: String, CodingKey { case provider }
+    var provider:String?
+    
+    init(_ zid:String, _ provider:String) {
+        let m = Meta(zid, .ExternalAuthRequest, IpcExternalAuthResponseMessage.self)
+        self.provider = provider
+        super.init(m)
+    }
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try? c.decode(String.self, forKey: .provider)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(provider, forKey: .provider)
+    }
+}
+
+class IpcExternalAuthResponseMessage : IpcMessage {
+    enum CodingKeys: String, CodingKey { case url }
+    var url:String?
+    
+    init(_ url:String) {
+        let m = Meta(nil, .ExternalAuthResponse)
+        self.url = url
+        super.init(m)
+    }
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        url = try? c.decode(String.self, forKey: .url)
+    }
+    override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(url, forKey: .url)
     }
 }

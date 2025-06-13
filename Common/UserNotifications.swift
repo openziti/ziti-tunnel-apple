@@ -19,13 +19,14 @@ import UserNotifications
 
 class UserNotifications {
     enum Action : String {
-        case Open = "Open", MfaAuth = "MfaAuth", Restart = "Restart"
+        case Open = "Open", MfaAuth = "MfaAuth", Restart = "Restart", ExtAuth = "ExtAuth"
         
         var title:String {
             switch self {
             case .Open:    return "Open"
             case .MfaAuth: return "Auth Now"
             case .Restart: return "Restart"
+            case .ExtAuth: return "Auth Now " // trailing space intentional to distinguish from `MfaAuth` action
             }
         }
         
@@ -34,6 +35,7 @@ class UserNotifications {
             case Action.Open.title: return Action.Open
             case Action.MfaAuth.title: return Action.MfaAuth
             case Action.Restart.title: return Action.Restart
+            case Action.ExtAuth.title: return Action.ExtAuth
             default: return nil
             }
         }
@@ -43,12 +45,13 @@ class UserNotifications {
             case .Open:    return UNNotificationAction(identifier: Action.Open.rawValue, title: Action.Open.title, options: [.foreground])
             case .MfaAuth: return UNNotificationAction(identifier: Action.MfaAuth.rawValue, title: Action.MfaAuth.title, options: [.foreground])
             case .Restart: return UNNotificationAction(identifier: Action.Restart.rawValue, title: Action.Restart.title, options: [.foreground])
+            case .ExtAuth: return UNNotificationAction(identifier: Action.ExtAuth.rawValue, title: Action.ExtAuth.title, options: [.foreground])
             }
         }
     }
     
     enum Category : String {
-        case Info = "INFO", Error = "ERROR", Posture = "POSTURE", Restart = "RESTART", Mfa = "MFA"
+        case Info = "INFO", Error = "ERROR", Posture = "POSTURE", Restart = "RESTART", Mfa = "MFA", Ext = "EXT"
         
         var actions:[UNNotificationAction] {
             switch self {
@@ -57,6 +60,7 @@ class UserNotifications {
             case .Posture: return []
             case .Restart: return [ Action.Restart.action ]
             case .Mfa:     return [ Action.MfaAuth.action ]
+            case .Ext:     return [ Action.ExtAuth.action ]
             }
         }
         
@@ -77,11 +81,14 @@ class UserNotifications {
             case .Mfa:     return UNNotificationCategory.init(identifier: Category.Mfa.rawValue,
                                                               actions: Category.Mfa.actions,
                                                               intentIdentifiers: [], options: [])
+            case .Ext:     return UNNotificationCategory.init(identifier: Category.Ext.rawValue,
+                                                              actions: Category.Ext.actions,
+                                                              intentIdentifiers: [], options: [])
             }
         }
         
         static var allCategories:Set<UNNotificationCategory> {
-            return [ Category.Info.category, Category.Error.category, Category.Posture.category, Category.Restart.category, Category.Mfa.category ]
+            return [ Category.Info.category, Category.Error.category, Category.Posture.category, Category.Restart.category, Category.Mfa.category, Category.Ext.category]
         }
     }
     

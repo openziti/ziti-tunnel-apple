@@ -56,6 +56,7 @@ class IpcAppexServer : NSObject {
         case .MfaAuthQueryResponse: processMfaAuthQueryResponse(baseMsg, completionHandler: completionHandler)
         case .MfaGetRecoveryCodesRequest: processMfaGetRecoveryCodesRequest(baseMsg, completionHandler: completionHandler)
         case .MfaNewRecoveryCodesRequest: processMfaNewRecoveryCodesRequest(baseMsg, completionHandler: completionHandler)
+        case .ExternalAuthRequest: processExternalAuthRequest(baseMsg, completionHandler: completionHandler)
         default:
             let errStr = "Unsupported IpcMessageType \(baseMsg.meta.msgType)"
             zLog.error(errStr)
@@ -334,6 +335,40 @@ class IpcAppexServer : NSObject {
         ziti.perform {
             ziti.mfaNewRecoveryCodes(code) { _, status, codes in
                 let respMsg = IpcMfaRecoveryCodesResponseMessage(status, codes)
+                guard let data = try? self.encoder.encode(respMsg) else {
+                    let errStr = "Unable to encode response message"
+                    zLog.error(errStr)
+                    completionHandler?(self.errData(errStr))
+                    return
+                }
+                completionHandler?(data)
+            }
+        }
+    }
+    
+    func processExternalAuthRequest(_ baseMsg:IpcMessage, completionHandler: CompletionHandler?) {
+        guard let msg = baseMsg as? IpcExternalAuthRequestMessage else {
+            let errStr = "Unexpected message type"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
+            return
+        }
+        guard let ziti = ptp.zitiTunnelDelegate?.allZitis.first(where: { $0.id.id == msg.meta.zid }) else {
+            let errStr = "Unable to find connected identity for id \(msg.meta.zid ?? "nil")"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
+            return
+        }
+        guard let provider = msg.provider else {
+            let errStr = "Invalid (nil) provider"
+            zLog.error(errStr)
+            completionHandler?(errData(errStr))
+            return
+        }
+        
+        ziti.perform {
+            ziti.extAuth(provider) { _, url, ctx in
+                let respMsg = IpcExternalAuthResponseMessage(url)
                 guard let data = try? self.encoder.encode(respMsg) else {
                     let errStr = "Unable to encode response message"
                     zLog.error(errStr)

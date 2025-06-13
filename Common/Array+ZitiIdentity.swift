@@ -79,4 +79,16 @@ extension Array where Element == ZitiIdentity {
         // add it
         self.insert(zid, at:at)
     }
+    
+    mutating func insertFromURL(_ url:URL, _ zidStore:ZitiIdentityStore, at:Int) throws {
+        guard let host = url.host else { return }
+        let zid = ZitiIdentity()
+        zid.czid = CZiti.ZitiIdentity(id: host, ztAPIs: [url.absoluteString], name: url.host)
+
+        // store zid
+        if let error = zidStore.store(zid) { throw error }
+        
+        // add it
+        self.insert(zid, at:at)
+    }
 }

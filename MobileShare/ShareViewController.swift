@@ -194,10 +194,10 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         extensionContext?.cancelRequest(withError: error)
     }
     
-    private func dateToString(_ date:Date) -> String {
-        guard date != Date(timeIntervalSince1970: 0) else { return "unknown" }
+    private func dateToString(_ date:Date?) -> String {
+        guard date != nil && date != Date(timeIntervalSince1970: 0) else { return "unknown" }
         return DateFormatter.localizedString(
-            from: date,
+            from: date!,
             dateStyle: .long, timeStyle: .long)
     }
 }

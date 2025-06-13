@@ -20,11 +20,12 @@ import CZiti
 class ZitiIdentity : NSObject, Codable {
     
     enum EnrollmentMethod : String, Codable {
-        case ott, ottCa, unrecognized
+        case ott, ottCa, url, unrecognized
         init(_ str:String) {
             switch str {
             case "ott": self = .ott
             case "ottCa": self = .ottCa
+            case "url": self = .url
             default: self = .unrecognized
             }
         }
@@ -66,6 +67,8 @@ class ZitiIdentity : NSObject, Codable {
     
     var czid:CZiti.ZitiIdentity?
     var claims:CZiti.ZitiClaims?
+    var jwtProviders:[CZiti.JWTProvider]?
+    var extAuthPending:Bool? = false
     
     var name:String { return czid?.name ?? "--" }
     var id:String { return czid?.id ?? "--invalid_id--" }
@@ -73,7 +76,12 @@ class ZitiIdentity : NSObject, Codable {
     // returned from /version, retrieved when validating JWT, polled periodically
     var controllerVersion:String?
 
-    var expDate:Date { return Date(timeIntervalSince1970: TimeInterval(claims?.exp ?? 0)) }
+    var expDate:Date? {
+        if let exp = claims?.exp {
+            return Date(timeIntervalSince1970: TimeInterval(exp))
+        }
+        return nil
+    }
     
     var mfaEnabled:Bool? = false
     var mfaVerified:Bool? = false
@@ -84,7 +92,9 @@ class ZitiIdentity : NSObject, Codable {
     var enrollmentStatus:EnrollmentStatus {
         let enrolled = self.enrolled ?? false
         if (enrolled) { return .Enrolled }
-        if (Date() > expDate) { return .Expired }
+        if let expDate = expDate {
+            if (Date() > expDate) { return .Expired }
+        }
         return .Pending
     }
     
@@ -112,6 +122,8 @@ class ZitiIdentity : NSObject, Codable {
     var isMfaEnabled:Bool { return mfaEnabled ?? false }
     var isMfaVerified:Bool { return isMfaEnabled && (mfaVerified ?? false) }
     var isMfaPending:Bool { return mfaPending ?? false }
+    var isExtAuthEnabled:Bool { return jwtProviders != nil && !jwtProviders!.isEmpty }
+    var isExtAuthPending:Bool { return extAuthPending ?? false }
     var isEnabled:Bool { return enabled ?? false }
     var isEnrolled:Bool { return enrolled ?? false }
     var edgeStatus:EdgeStatus?
