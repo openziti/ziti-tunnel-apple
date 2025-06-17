@@ -566,7 +566,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
         return nil // Cancel
     }
-
+    
     func dialogForListSelect(question: String, text: String, options: [String]) -> String? {
         let alert = NSAlert()
         alert.messageText = question
@@ -656,11 +656,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         guard view.window != nil else { return }
         
         let urlStr = dialogForString(question: "Controller URL", text: "Enter the controller URL", width: 400)
-        if (urlStr == nil) { return }
-        let ctrlUrl = URL(string: urlStr!)
+        if urlStr == nil { return }
+        guard let ctrlUrl = URL(string: urlStr!) else {
+            self.dialogAlert("\(urlStr!) is not a valid URL")
+            return
+        }
         
         do {
-            try self.zids.insertFromURL(ctrlUrl!, self.zidStore, at: 0)
+            try self.zids.insertFromURL(ctrlUrl, self.zidStore, at: 0)
             DispatchQueue.main.async {
                 self.tableView.reloadData()
                 self.representedObject = 0
