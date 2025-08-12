@@ -356,7 +356,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             self.tunnelMgr.restartTunnel()
                         } else if action == UserNotifications.Action.ExtAuth.rawValue {
                             if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr }) {
-                                self.doExtAuth(zid)
+                                self.doExtAuth(zid) // crash here after removing identity .0
                             }
                         }
                     }
@@ -580,7 +580,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         alert.accessoryView = listView
         alert.window.initialFirstResponder = listView
         
-        let response = alert.runModal()
+        let response = alert.runModal() // crashed here after removing an identity .2
 
         if (response == .alertFirstButtonReturn) {
             return listView.titleOfSelectedItem
@@ -967,7 +967,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             let providerNames = providers.map(\.name)
             let providerName = dialogForListSelect(question: "External Authentication Required",
                                                    text: "Select authentication provider for '\(zid.name)'",
-                                                   options: providerNames)
+                                                   options: providerNames) // todo crash here after removing identity? .1
             if let provider = providers.first(where: { $0.name == providerName }) {
                 doExternalAuth(zid, provider)
             }
@@ -993,8 +993,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 if !opened {
                     self.dialogAlert("Unable to open autentication URL \(urlString). Please copy and paste into your browser.")
                 }
-                //let updatedZid = self.zidStore.update(zid, [.ExtAuth])
-                //self.updateServiceUI(zId:updatedZid)
             }
         }
     }
@@ -1063,6 +1061,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: zidResp.ztAPIs ?? [zidResp.ztAPI])
                         }
                         zid.czid?.ca = zidResp.ca
+                        zid.czid?.certs = zidResp.certs
+                        zid.czid?.ztAPI = zidResp.ztAPI
+                        zid.czid?.ztAPIs = zidResp.ztAPIs
                         if zidResp.name != nil {
                             zid.czid?.name = zidResp.name
                         }

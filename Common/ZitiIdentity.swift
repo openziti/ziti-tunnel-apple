@@ -68,6 +68,7 @@ class ZitiIdentity : NSObject, Codable {
     var czid:CZiti.ZitiIdentity?
     var claims:CZiti.ZitiClaims?
     var jwtProviders:[CZiti.JWTProvider]?
+    var selectedJWTProvider:CZiti.JWTProvider?
     var extAuthPending:Bool? = false
     
     var name:String { return czid?.name ?? "--" }

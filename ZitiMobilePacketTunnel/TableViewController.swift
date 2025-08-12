@@ -329,6 +329,24 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         present(sc, animated: true)
     }
     
+    func addViaURL() {
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        if let vc = sb.instantiateViewController(withIdentifier: "ENROLL_URL_VC") as? EnrollURLViewController {
+            vc.completionHandler = { [weak self] urlStr in
+                if let urlStr = urlStr {
+                    zLog.info("enroll url: \(urlStr)")
+                    if let ctrlUrl = URL(string: urlStr) {
+                        self!.onNewUrl(ctrlUrl)
+                    } else {
+                        // oh no!
+                    }
+                }
+                vc.dismiss(animated: true)
+            }
+            self.present(vc, animated: true)
+        }
+    }
+    
     func found(code: String?) {
         sc.dismiss(animated: true) {
             guard let code = code else { return }
@@ -386,6 +404,12 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 style: .default,
                 handler: { _ in
                     self.addViaQRCode()
+            }))
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("URL", comment: "URL"),
+                style: .default,
+                handler: { _ in
+                    self.addViaURL()
             }))
             alert.addAction(UIAlertAction(
                 title: NSLocalizedString("Cancel", comment: "Cancel"),
@@ -461,7 +485,11 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     func onNewUrl(_ url:URL) {
         DispatchQueue(label: "JwtLoader").async {
             do {
-                try self.zids.insertFromJWT(url, self.zidStore, at: 0)
+                if url.isFileURL {
+                    try self.zids.insertFromJWT(url, self.zidStore, at: 0)
+                } else {
+                    try self.zids.insertFromURL(url, self.zidStore, at: 0)
+                }
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                     self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
