@@ -145,6 +145,7 @@
 		AABF06A72D42BD3700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
 		AABF06A82D42BD4E00238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
 		AABF06A92D42BDA700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
+		AAF3F22C2E03305100590422 /* EnrollURLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -304,6 +305,7 @@
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
 		AABF06A32D38338300238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
 		AABF06A42D3833A200238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.2.sdk/usr/lib/libz.1.tbd; sourceTree = DEVELOPER_DIR; };
+		AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollURLViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -452,6 +454,7 @@
 		5A2EA2CA209B750A00437608 /* ZitiMobilePacketTunnel */ = {
 			isa = PBXGroup;
 			children = (
+				AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */,
 				5AF5113525842EB50092DC47 /* simdata */,
 				5A6BA25E226DF25A00224F09 /* bundle */,
 				5A2EA2EF209B758800437608 /* ZitiMobilePacketTunnel.entitlements */,
@@ -935,6 +938,7 @@
 				5A0004912832769800351FE2 /* UserNotifications.swift in Sources */,
 				5AF50FE6257D82770092DC47 /* LogLevelViewController.swift in Sources */,
 				5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */,
+				AAF3F22C2E03305100590422 /* EnrollURLViewController.swift in Sources */,
 				5AF05FB42884F692006CD604 /* MfaCodesViewController.swift in Sources */,
 				5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */,
 				5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */,
@@ -1098,6 +1102,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1151,6 +1156,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
