@@ -488,7 +488,7 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" showsMenuAsPrimaryAction="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" changesSelectionAsPrimaryAction="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Erh-9M-O2U" userLabel="Auth Provider Btn">
-                                            <rect key="frame" x="167" y="6" width="41" height="30"/>
+                                            <rect key="frame" x="167" y="6" width="120" height="30"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <menu key="menu" title="Auth Provider" id="e7H-IQ-yAq" userLabel="Auth Provider Menu">
                                                 <menuOptions key="menuOptions" singleSelection="YES"/>
