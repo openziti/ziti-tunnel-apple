@@ -547,7 +547,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         return nil // Cancel
     }
     
-    func dialogForString(question: String, text: String) -> String? {
+    func dialogForString(question: String, text: String, width: Int = 200, height: Int = 24) -> String? {
         let alert = NSAlert()
         alert.messageText = question
         alert.informativeText = text
@@ -555,7 +555,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: "Cancel")
         
-        let txtView = EditableNSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        let txtView = EditableNSTextField(frame: NSRect(x: 0, y: 0, width: width, height: height))
         alert.accessoryView = txtView
         alert.window.initialFirstResponder = txtView
         
@@ -566,7 +566,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
         return nil // Cancel
     }
-
+    
     func dialogForListSelect(question: String, text: String, options: [String]) -> String? {
         let alert = NSAlert()
         alert.messageText = question
@@ -655,12 +655,15 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBAction func addIdentityUrl(_ sender: Any) {
         guard view.window != nil else { return }
         
-        let urlStr = dialogForString(question: "Controller URL", text: "Enter the controller URL")
-        if (urlStr == nil) { return }
-        let ctrlUrl = URL(string: urlStr!)
+        let urlStr = dialogForString(question: "Controller URL", text: "Enter the controller URL", width: 400)
+        if urlStr == nil { return }
+        guard let ctrlUrl = URL(string: urlStr!) else {
+            self.dialogAlert("\(urlStr!) is not a valid URL")
+            return
+        }
         
         do {
-            try self.zids.insertFromURL(ctrlUrl!, self.zidStore, at: 0)
+            try self.zids.insertFromURL(ctrlUrl, self.zidStore, at: 0)
             DispatchQueue.main.async {
                 self.tableView.reloadData()
                 self.representedObject = 0
@@ -1100,7 +1103,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                         zid = self.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
                         self.zids[indx] = zid
                         self.updateServiceUI(zId:zid)
-                        //self.tunnelMgr.restartTunnel()
+                        self.tunnelMgr.restartTunnel()
                     }
                 }
             }
