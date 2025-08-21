@@ -356,7 +356,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             self.tunnelMgr.restartTunnel()
                         } else if action == UserNotifications.Action.ExtAuth.rawValue {
                             if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr }) {
-                                self.doExtAuth(zid) // crash here after removing identity .0
+                                self.doExtAuth(zid)
                             }
                         }
                     }
@@ -580,7 +580,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         alert.accessoryView = listView
         alert.window.initialFirstResponder = listView
         
-        let response = alert.runModal() // crashed here after removing an identity .2
+        let response = alert.runModal()
 
         if (response == .alertFirstButtonReturn) {
             return listView.titleOfSelectedItem
@@ -967,7 +967,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             let providerNames = providers.map(\.name)
             let providerName = dialogForListSelect(question: "External Authentication Required",
                                                    text: "Select authentication provider for '\(zid.name)'",
-                                                   options: providerNames) // todo crash here after removing identity? .1
+                                                   options: providerNames)
             if let provider = providers.first(where: { $0.name == providerName }) {
                 doExternalAuth(zid, provider)
             }
