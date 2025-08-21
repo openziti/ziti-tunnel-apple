@@ -45,31 +45,35 @@ class MfaAuthNowCell : UITableViewCell {
     weak var ivc:IdentityViewController?
     @IBOutlet weak var authNowBtn: UIButton!
     @IBOutlet weak var authProviderBtn: UIButton!
+    
     @IBAction func onButton(_ sender: Any) {
         guard let zid = ivc?.zid else { return }
-        if zid.isMfaPending {
-            ivc?.doMfaAuth()
-        }
         if zid.isExtAuthPending {
             ivc?.doExtAuth()
+            return
+        }
+        if zid.isMfaPending {
+            ivc?.doMfaAuth()
+            return
         }
     }
+    
     func updateFor(_ zid:ZitiIdentity) {
         var authNeed: String?
-        if zid.isMfaPending {
-            authNeed = "mfa"
-        } else if zid.isExtAuthPending {
+        if zid.isExtAuthPending {
             authNeed = "idp"
             self.authProviderBtn.isHidden = false
             var selectedFound: Bool = false
             if let providers = zid.jwtProviders, !providers.isEmpty {
                 var elements: [UIMenuElement] = []
                 for provider in providers {
-                    if provider.name == zid.selectedJWTProvider?.name {
-                        selectedFound = true
-                    }
                     let e = UIAction(title: provider.name, identifier: nil) { _ in
                         zid.selectedJWTProvider = provider
+                        _ = ZitiIdentityStore().update(zid, [.ExtAuth])
+                    }
+                    if provider.name == zid.selectedJWTProvider?.name {
+                        selectedFound = true
+                        e.state = .on
                     }
                     elements.append(e)
                 }
@@ -78,11 +82,16 @@ class MfaAuthNowCell : UITableViewCell {
                     self.authProviderBtn.setTitle(zid.selectedJWTProvider?.name, for: UIControl.State.normal)
                 }
             }
+        } else if zid.isMfaPending {
+            authNeed = "mfa"
+            self.authProviderBtn.isHidden = true
         }
+
         if let authNeed = authNeed {
             self.authNowBtn.setTitle(NSLocalizedString("Auth Now (\(authNeed))", comment: ""), for: .normal)
         } else {
             self.authNowBtn.setTitle(NSLocalizedString("Authenticated", comment: ""), for: .normal)
+            self.authProviderBtn.isHidden = true
         }
     }
 }
@@ -616,12 +625,15 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     
                     UIApplication.shared.open(url) { (success) in
                         if !success {
-                            self.dialogAlert("Unable to open autentication URL \(urlString). Please copy and paste into your browser.")
+                            self.dialogAlert("Unable to open authentication URL \(urlString). Please copy and paste into your browser.")
                             return
                         }
                     }
                 }
             }
+        } else {
+            self.dialogAlert("Authentication provider not selected", "Please select an authentication provider from the list")
+            return
         }
     }
 
