@@ -993,8 +993,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 if !opened {
                     self.dialogAlert("Unable to open autentication URL \(urlString). Please copy and paste into your browser.")
                 }
-                //let updatedZid = self.zidStore.update(zid, [.ExtAuth])
-                //self.updateServiceUI(zId:updatedZid)
             }
         }
     }
@@ -1063,6 +1061,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: zidResp.ztAPIs ?? [zidResp.ztAPI])
                         }
                         zid.czid?.ca = zidResp.ca
+                        zid.czid?.certs = zidResp.certs
+                        zid.czid?.ztAPI = zidResp.ztAPI
+                        zid.czid?.ztAPIs = zidResp.ztAPIs
                         if zidResp.name != nil {
                             zid.czid?.name = zidResp.name
                         }

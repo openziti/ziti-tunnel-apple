@@ -199,6 +199,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
             }
             if options.contains(.ExtAuth) {
                 zidOnDisk?.jwtProviders = zid.jwtProviders
+                zidOnDisk?.selectedJWTProvider = zid.selectedJWTProvider
                 zidOnDisk?.extAuthPending = zid.extAuthPending
             }
             

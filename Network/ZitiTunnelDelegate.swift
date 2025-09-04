@@ -244,14 +244,19 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             } else if let serviceEvent = event as? ZitiTunnelServiceEvent {
                 handleServiceEvent(ziti, tzid, serviceEvent)
             } else if let _ = event as? ZitiTunnelMfaEvent {
+                var updateOpts:[ZitiIdentityStore.UpdateOptions] = [.Mfa, .EdgeStatus, .ControllerVersion]
                 tzid.mfaPending = true
+                if tzid.isExtAuthEnabled {
+                    tzid.extAuthPending = false
+                    updateOpts.append(.ExtAuth)
+                }
                 tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 
                 userNotifications.post(.Mfa, "MFA Auth Requested", tzid.name, tzid)
                 
                 // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
                 //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
-                _ = zidStore.update(tzid, [.Mfa, .EdgeStatus, .ControllerVersion])
+                _ = zidStore.update(tzid, updateOpts)
             } else if let extJWTEvent = event as? ZitiTunnelExtJWTEvent {
                 handleExtJWTEvent(ziti, tzid, extJWTEvent)
             }

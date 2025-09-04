@@ -43,8 +43,56 @@ class EnrollIdentityCell: UITableViewCell {
 
 class MfaAuthNowCell : UITableViewCell {
     weak var ivc:IdentityViewController?
+    @IBOutlet weak var authNowBtn: UIButton!
+    @IBOutlet weak var authProviderBtn: UIButton!
+    
     @IBAction func onButton(_ sender: Any) {
-        ivc?.doMfaAuth()
+        guard let zid = ivc?.zid else { return }
+        if zid.isExtAuthPending {
+            ivc?.doExtAuth()
+            return
+        }
+        if zid.isMfaPending {
+            ivc?.doMfaAuth()
+            return
+        }
+    }
+    
+    func updateFor(_ zid:ZitiIdentity) {
+        var authNeed: String?
+        if zid.isExtAuthPending {
+            authNeed = "idp"
+            self.authProviderBtn.isHidden = false
+            var selectedFound: Bool = false
+            if let providers = zid.jwtProviders, !providers.isEmpty {
+                var elements: [UIMenuElement] = []
+                for provider in providers {
+                    let e = UIAction(title: provider.name, identifier: nil) { _ in
+                        zid.selectedJWTProvider = provider
+                        _ = ZitiIdentityStore().update(zid, [.ExtAuth])
+                    }
+                    if provider.name == zid.selectedJWTProvider?.name {
+                        selectedFound = true
+                        e.state = .on
+                    }
+                    elements.append(e)
+                }
+                self.authProviderBtn.menu = self.authProviderBtn.menu?.replacingChildren(elements)
+                if selectedFound {
+                    self.authProviderBtn.setTitle(zid.selectedJWTProvider?.name, for: UIControl.State.normal)
+                }
+            }
+        } else if zid.isMfaPending {
+            authNeed = "mfa"
+            self.authProviderBtn.isHidden = true
+        }
+
+        if let authNeed = authNeed {
+            self.authNowBtn.setTitle(NSLocalizedString("Auth Now (\(authNeed))", comment: ""), for: .normal)
+        } else {
+            self.authNowBtn.setTitle(NSLocalizedString("Authenticated", comment: ""), for: .normal)
+            self.authProviderBtn.isHidden = true
+        }
     }
 }
 
@@ -415,46 +463,95 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         view.addSubview(spinner.view)
         spinner.didMove(toParent: self)
         
-        DispatchQueue.global().async {
-            Ziti.enroll(jwtFile) { zidResp, zErr in
-                DispatchQueue.main.async {
-                    // lose the spinner
-                    spinner.willMove(toParent: nil)
-                    spinner.view.removeFromSuperview()
-                    spinner.removeFromParent()
-                    
-                    guard zErr == nil, let zidResp = zidResp else {
-                        _ = self.tvc?.zidStore.store(zid)
+        if FileManager.default.fileExists(atPath: jwtFile) {
+            DispatchQueue.global().async {
+                Ziti.enroll(jwtFile) { zidResp, zErr in
+                    DispatchQueue.main.async {
+                        // lose the spinner
+                        spinner.willMove(toParent: nil)
+                        spinner.view.removeFromSuperview()
+                        spinner.removeFromParent()
+                        
+                        guard zErr == nil, let zidResp = zidResp else {
+                            _ = self.tvc?.zidStore.store(zid)
+                            self.tableView.reloadData()
+                            self.tvc?.tableView.reloadData()
+                            
+                            let alert = UIAlertController(
+                                title:"Unable to enroll \(zid.name)",
+                                message: zErr != nil ? zErr!.localizedDescription : "",
+                                preferredStyle: .alert)
+                            
+                            alert.addAction(UIAlertAction(
+                                title: NSLocalizedString("OK", comment: "Default action"),
+                                style: .default))
+                            self.present(alert, animated: true, completion: nil)
+                            return
+                        }
+                        
+                        if zid.czid == nil {
+                            zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: zidResp.ztAPIs ?? [zidResp.ztAPI])
+                        }
+                        zid.czid?.ca = zidResp.ca
+                        zid.czid?.certs = zidResp.certs
+                        zid.czid?.ztAPI = zidResp.ztAPI
+                        zid.czid?.ztAPIs = zidResp.ztAPIs
+                        if zidResp.name != nil {
+                            zid.czid?.name = zidResp.name
+                        }
+                        
+                        zid.enabled = true
+                        zid.enrolled = true
+                        self.zid = self.tvc?.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
                         self.tableView.reloadData()
                         self.tvc?.tableView.reloadData()
+                        self.tvc?.tunnelMgr.restartTunnel()
+                    }
+                }
+            }
+        } else if let ztAPI = zid.czid?.ztAPI {
+            DispatchQueue.global().async {
+                Ziti.enroll(controllerURL: ztAPI) { zidResp, zErr in
+                    DispatchQueue.main.async {
+                        // lose the spinner
+                        spinner.willMove(toParent: nil)
+                        spinner.view.removeFromSuperview()
+                        spinner.removeFromParent()
                         
-                        let alert = UIAlertController(
-                            title:"Unable to enroll \(zid.name)",
-                            message: zErr != nil ? zErr!.localizedDescription : "",
-                            preferredStyle: .alert)
+                        guard zErr == nil, let zidResp = zidResp else {
+                            _ = self.tvc?.zidStore.store(zid)
+                            self.tableView.reloadData()
+                            self.tvc?.tableView.reloadData()
+                            
+                            let alert = UIAlertController(
+                                title:"Unable to enroll \(zid.name)",
+                                message: zErr != nil ? zErr!.localizedDescription : "",
+                                preferredStyle: .alert)
+                            
+                            alert.addAction(UIAlertAction(
+                                title: NSLocalizedString("OK", comment: "Default action"),
+                                style: .default))
+                            self.present(alert, animated: true, completion: nil)
+                            return
+                        }
                         
-                        alert.addAction(UIAlertAction(
-                            title: NSLocalizedString("OK", comment: "Default action"),
-                            style: .default))
-                        self.present(alert, animated: true, completion: nil)
-                        return
+                        if zid.czid == nil {
+                            zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: zidResp.ztAPIs ?? [zidResp.ztAPI])
+                        }
+                        zid.czid?.ca = zidResp.ca
+                        zid.czid?.ztAPI = zidResp.ztAPI
+                        zid.czid?.ztAPIs = zidResp.ztAPIs
+                        if zidResp.name != nil {
+                            zid.czid?.name = zidResp.name
+                        }
+                        
+                        zid.enabled = true
+                        zid.enrolled = true
+                        self.zid = self.tvc?.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
+                        self.tableView.reloadData()
+                        self.tvc?.tableView.reloadData()
+                        self.tvc?.tunnelMgr.restartTunnel()
                     }
-                    
-                    if zid.czid == nil {
-                        zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
-                    }
-                    zid.czid?.ca = zidResp.ca
-                    zid.czid?.certs = zidResp.certs
-                    if zidResp.name != nil {
-                        zid.czid?.name = zidResp.name
-                    }
-                    
-                    zid.enabled = true
-                    zid.enrolled = true
-                    self.zid = self.tvc?.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
-                    self.tableView.reloadData()
-                    self.tvc?.tableView.reloadData()
-                    self.tvc?.tunnelMgr.restartTunnel()
                 }
             }
         }
@@ -504,6 +601,42 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         }
     }
     
+    func doExtAuth() {
+        guard let zid = self.zid else { return }
+        guard let providers = zid.jwtProviders, !providers.isEmpty else {
+            self.dialogAlert("No JWT Providers", "The identity \(zid.name) has no associated JWT providers")
+            return
+        }
+        
+        if let pn = zid.selectedJWTProvider?.name {
+            let msg = IpcExternalAuthRequestMessage(zid.id, pn)
+            TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                DispatchQueue.main.async {
+                    guard zErr == nil else {
+                        self.dialogAlert("Error sending provider message to auth idp", zErr!.localizedDescription)
+                        return
+                    }
+                    guard let statusMsg = respMsg as? IpcExternalAuthResponseMessage,
+                          let urlString = statusMsg.url,
+                          let url = URL(string: urlString) else {
+                        self.dialogAlert("IPC Error", "Unable to parse auth response message")
+                        return
+                    }
+                    
+                    UIApplication.shared.open(url) { (success) in
+                        if !success {
+                            self.dialogAlert("Unable to open authentication URL \(urlString). Please copy and paste into your browser.")
+                            return
+                        }
+                    }
+                }
+            }
+        } else {
+            self.dialogAlert("Authentication provider not selected", "Please select an authentication provider from the list")
+            return
+        }
+    }
+
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true)
     }
@@ -520,11 +653,11 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             // authNow button
             if let zid = self.zid {
                 let tStatus = TunnelMgr.shared.status
-                if zid.isEnabled && zid.isMfaEnabled && (tStatus == .connecting || tStatus == .connected) {
+                if zid.isEnabled && (zid.isMfaEnabled || zid.isExtAuthEnabled) && (tStatus == .connecting || tStatus == .connected) {
                     nRows += 1
                     
                     // codes and newCode buttons
-                    if !zid.isMfaPending {
+                    if zid.isMfaEnabled && !zid.isMfaPending {
                         nRows += 2
                     }
                 }
@@ -569,6 +702,9 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             } else if indexPath.row == 1 {
                 cell = tableView.dequeueReusableCell(withIdentifier: "MFA_AUTH_NOW_CELL", for: indexPath)
                 if let mfaAuthNowCell = cell as? MfaAuthNowCell {
+                    if let zid = zid {
+                        mfaAuthNowCell.updateFor(zid)
+                    }
                     mfaAuthNowCell.ivc = self
                 }
             } else if indexPath.row == 2 {

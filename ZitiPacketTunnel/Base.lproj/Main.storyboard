@@ -1234,11 +1234,11 @@ Gw
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="TypeCellID" id="GVZ-e5-1IA">
-                                                            <rect key="frame" x="125.5" y="1" width="0.0" height="17"/>
+                                                            <rect key="frame" x="126" y="1" width="55" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5fY-YX-K7m">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="4" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="59" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="4eD-FU-2Qi">
                                                                         <font key="font" metaFont="system"/>
