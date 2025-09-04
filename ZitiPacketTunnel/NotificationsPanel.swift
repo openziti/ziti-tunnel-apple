@@ -52,6 +52,17 @@ class NotificationsPanel: NSView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        if #available(macOS 26.0, *) {
+            // subviews seem to obscure events from the parent in macOS 26. make sure the main view gets
+            // events (for e.g. the connect button) when there are no notifications.
+            if notifications.isEmpty {
+                return nil
+            }
+        }
+        return super.hitTest(point)
+    }
     
     func remove(_ notification:InAppNotification) {
         if self.animationInProgress {
