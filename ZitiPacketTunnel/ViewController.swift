@@ -15,6 +15,7 @@
 //
 
 import Cocoa
+import SwiftUI
 import NetworkExtension
 import CZiti
 import UniformTypeIdentifiers
@@ -251,6 +252,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         view.addSubview(notificationsPanel)
         
+        let setupMfaDialogView = NSHostingView(rootView: SetupMfaDialogView(alertModel: mfaDialogModel))
+        view.addSubview(setupMfaDialogView)
+        
         tableView.delegate = self
         tableView.dataSource = self
 
@@ -471,8 +475,42 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    class SwiftUIAlertModel: ObservableObject {
+        @Published var isPresented: Bool = false
+        func doPresent() {
+            isPresented = true
+        }
+        //@Published var title: String = ""
+        //@Published var message: String = ""
+        //@Published var primaryButtonText: String = "OK"
+        //@Published var secondaryButtonText: String?
+    }
+    
+    struct SetupMfaDialogView: View {
+        @ObservedObject var alertModel: SwiftUIAlertModel
+        @State private var showAlert = false
+
+        var body: some View {
+            Button("Show Alert") {
+                alertModel.isPresented = true
+            }
+            .alert("Attention Needed", isPresented: $alertModel.isPresented) {
+                Button("OK") {
+                    print("OK tapped")
+                }
+                Button("Cancel", role: .cancel) {
+                    print("Cancel tapped")
+                }
+            } message: {
+                Text("This is a simple alert in SwiftUI.")
+            }
+        }
+    }
+    var mfaDialogModel = SwiftUIAlertModel()
+    
     // brute force a QR code to setup MFA for now...
     func setupMfaDialog(_ provisioningUrl:String) -> String? {
+        mfaDialogModel.doPresent()
         let alert = NSAlert()
         alert.messageText = "Setup MFA"
         //alert.informativeText = "Scan QR code and enter valid MFA"
