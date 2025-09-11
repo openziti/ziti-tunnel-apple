@@ -475,11 +475,15 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    // lets us influence the swiftui view from appkit.
+    // thanks https://samwize.com/2022/03/24/how-to-communicate-between-swiftui-and-uikit/
+    // maybe could to it like https://developer.apple.com/tutorials/swiftui-concepts/driving-changes-in-your-ui-with-state-and-bindings
     class SwiftUIAlertModel: ObservableObject {
         @Published var isPresented: Bool = false
         func doPresent() {
             isPresented = true
         }
+        @Published var mfaCode: String = ""
         //@Published var title: String = ""
         //@Published var message: String = ""
         //@Published var primaryButtonText: String = "OK"
@@ -489,6 +493,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     struct SetupMfaDialogView: View {
         @ObservedObject var alertModel: SwiftUIAlertModel
         @State private var showAlert = false
+        let characterLimit = 6
 
         var body: some View {
             Button("Show Alert") {
@@ -501,6 +506,34 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 Button("Cancel", role: .cancel) {
                     print("Cancel tapped")
                 }
+                TextField("Enter MFA code", text: $alertModel.mfaCode)
+                    .lineLimit(1)
+                    .textContentType(.oneTimeCode)
+                    .onAppear {
+                        if let read = NSPasteboard.general.string(forType: .string) {
+                            alertModel.mfaCode = read
+                        }
+                    }
+                    .onChange(of: alertModel.mfaCode) { newValue in
+                        // Enforce character limit while typing
+                        if newValue.count > characterLimit {
+                            alertModel.mfaCode = String(newValue.prefix(characterLimit))
+                        }
+                    }
+                    .onPasteCommand(of: [.plainText]) { items in
+                        // Handle paste event and enforce character limit
+                        /*
+                        if let pastedText = items.first?.loadItem(forTypeIdentifier: .plainText) {
+                            let newText = alertModel.mfaCode + pastedText
+                            if newText.count > characterLimit {
+                                // Limit the pasted content to fit within the character limit
+                                alertModel.mfaCode = String(newText.prefix(characterLimit))
+                            } else {
+                                alertModel.mfaCode = newText
+                            }
+                        }
+                         */
+                    }
             } message: {
                 Text("This is a simple alert in SwiftUI.")
             }
@@ -510,7 +543,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     // brute force a QR code to setup MFA for now...
     func setupMfaDialog(_ provisioningUrl:String) -> String? {
-        mfaDialogModel.doPresent()
+        //mfaDialogModel.doPresent()
+        //mfaDialogModel.$isPresented.sink { (value) in
+        //    zLog.info("isPresented is \(value)")
+        //}
         let alert = NSAlert()
         alert.messageText = "Setup MFA"
         //alert.informativeText = "Scan QR code and enter valid MFA"
