@@ -73,8 +73,12 @@ class IpcAppexServer : NSObject {
         }
 
         let lvl:ZitiLog.LogLevel = ZitiLog.LogLevel(rawValue: logLevel) ?? ZitiLog.LogLevel.INFO
-        zLog.info("Updating LogLevel to \(lvl)")
-        ZitiLog.setLogLevel(lvl)
+        var moduleLog:String = ""
+        if msg.module != nil {
+            moduleLog = " (module=" + msg.module! + ")"
+        }
+        zLog.info("Updating LogLevel to \(lvl)\(moduleLog)")
+        ZitiLog.setLogLevel(lvl, module: msg.module)
         ptp.appLogLevel = lvl
         completionHandler?(nil)
     }

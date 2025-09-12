@@ -28,6 +28,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     private var tunConnectItem:NSMenuItem!
     private var snapshotItem:NSMenuItem!
     private var showDocItem:NSMenuItem!
+    private var tlsuvLogging:NSMenuItem!
     private var logLevelMenu:NSMenu!
     
     private var identityItems:[NSMenuItem] = []
@@ -85,6 +86,8 @@ class MainMenuBar : NSObject, NSWindowDelegate {
                                          action: #selector(MainMenuBar.selectLogLevel(_:)),
                                          tag: Int(ZitiLog.LogLevel.TRACE.rawValue)))
         logMenu.setSubmenu(logLevelMenu, for: logLevelMenuItem)
+        tlsuvLogging = newMenuItem(title: "Log tlsuv Messages", action: #selector(MainMenuBar.selectTlsuvLogging(_:)))
+        logMenu.addItem(tlsuvLogging)
         updateLogLevelMenu()
         
         menu.setSubmenu(logMenu, for: logMenuItem)
@@ -351,11 +354,24 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         logLevelMenu.items.forEach { i in
             i.state = Int32(i.tag) == level.rawValue ? .on : .off
         }
+        tlsuvLogging.state = TunnelMgr.shared.tlsuvLoggingEnabled ? .on : .off
     }
     
     @objc func selectLogLevel(_ sender: NSMenuItem?) {
         let raw  = sender != nil ? Int32(sender!.tag) : ZitiLog.LogLevel.INFO.rawValue
         let lvl = ZitiLog.LogLevel(rawValue: raw) ?? ZitiLog.LogLevel.INFO
+        TunnelMgr.shared.updateLogLevel(lvl)
+        updateLogLevelMenu()
+    }
+    
+    @objc func selectTlsuvLogging(_ sender: Any?) {
+        if tlsuvLogging.state == .on {
+            tlsuvLogging.state = .off
+        } else {
+            tlsuvLogging.state = .on
+        }
+        let lvl = ZitiLog.getLogLevel()
+        TunnelMgr.shared.tlsuvLoggingEnabled = tlsuvLogging.state == .on
         TunnelMgr.shared.updateLogLevel(lvl)
         updateLogLevelMenu()
     }

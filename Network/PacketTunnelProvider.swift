@@ -86,6 +86,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             let lvl = ZitiLog.LogLevel(rawValue: Int32(providerConfig.logLevel)) ?? ZitiLog.LogLevel.INFO
             zLog.info("Setting log level to \(lvl)")
             ZitiLog.setLogLevel(lvl)
+            var tlsuvLvl = ZitiLog.LogLevel.ERROR
+            if providerConfig.logTlsuv { tlsuvLvl = lvl }
+            ZitiLog.setLogLevel(tlsuvLvl, module: "tlsuv")
         }
                         
         // setup ZitiTunnel
