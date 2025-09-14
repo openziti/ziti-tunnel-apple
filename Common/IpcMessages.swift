@@ -197,23 +197,27 @@ class IpcErrorResponseMessage : IpcMessage {
 }
 
 class IpcSetLogLevelMessage : IpcMessage {
-    enum CodingKeys: String, CodingKey { case logLevel }
+    enum CodingKeys: String, CodingKey { case logLevel, module }
     var logLevel:Int32?
+    var module:String?
     
-    init(_ logLevel:Int32) {
+    init(_ logLevel:Int32, module:String?=nil) {
         let m = Meta(nil, .SetLogLevel)
         self.logLevel = logLevel
+        self.module = module
         super.init(m)
     }
     required init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let c = try decoder.container(keyedBy: CodingKeys.self)
         logLevel = try? c.decode(Int32.self, forKey: .logLevel)
+        module = try? c.decode(String.self, forKey: .module)
     }
     override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encodeIfPresent(logLevel, forKey: .logLevel)
+        try c.encodeIfPresent(module, forKey: .module)
     }
 }
 

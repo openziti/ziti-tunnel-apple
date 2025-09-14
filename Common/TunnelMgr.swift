@@ -21,6 +21,7 @@ import CZiti
 class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager?
     var tunnelRestarting = false
+    var tlsuvLoggingEnabled = false
     let ipcClient = IpcAppClient()
     
     var zids:[ZitiIdentity] = []
@@ -127,6 +128,10 @@ class TunnelMgr: NSObject {
                             zLog.info("Updating log level to \(pc.logLevel) (\(ll))")
                             ZitiLog.setLogLevel(ll)
                             
+                            TunnelMgr.shared.tlsuvLoggingEnabled = Bool(pc.logTlsuv)
+                            var tlsuvLl = ZitiLog.LogLevel.ERROR
+                            if TunnelMgr.shared.tlsuvLoggingEnabled { tlsuvLl = ll }
+                            ZitiLog.setLogLevel(tlsuvLl, module: "tlsuv")
                             Logger.updateRotateSettings(pc.logRotateDaily, pc.logRotateCount, pc.logRotateSizeMB)
                         }
                     } else {
@@ -250,6 +255,9 @@ class TunnelMgr: NSObject {
     func updateLogLevel(_ level:ZitiLog.LogLevel) {
         zLog.info("Updating log level to \(level)")
         ZitiLog.setLogLevel(level)
+        var tlsuvLevel = ZitiLog.LogLevel.ERROR
+        if self.tlsuvLoggingEnabled { tlsuvLevel = level }
+        ZitiLog.setLogLevel(tlsuvLevel, module: "tlsuv")
         guard let tpm = tpm else {
             zLog.error("Invalid tunnel provider. Tunnel logging level not updated")
             return
@@ -258,6 +266,7 @@ class TunnelMgr: NSObject {
         if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
             // update logLevel
             conf[ProviderConfig.LOG_LEVEL_KEY] = String(level.rawValue)
+            conf[ProviderConfig.LOG_TLSUV_KEY] = self.tlsuvLoggingEnabled
             (tpm.protocolConfiguration as! NETunnelProviderProtocol).providerConfiguration = conf
             
             zLog.info("Updated providerConfiguration: \(conf)")
@@ -271,7 +280,14 @@ class TunnelMgr: NSObject {
                     let msg = IpcSetLogLevelMessage(level.rawValue)
                     self.ipcClient.sendToAppex(msg) { _, zErr in
                         guard zErr == nil else {
-                            zLog.error("Unable to send provider message to update logLevel to \(level): \(zErr!.localizedDescription)")
+                            zLog.error("Unable to send provider message to update global logLevel to \(level): \(zErr!.localizedDescription)")
+                            return
+                        }
+                    }
+                    let tlsuvMsg = IpcSetLogLevelMessage(tlsuvLevel.rawValue, module: "tlsuv")
+                    self.ipcClient.sendToAppex(tlsuvMsg) { _, zErr in
+                        guard zErr == nil else {
+                            zLog.error("Unable to send provider message to update tlsuv logLevel to \(level): \(zErr!.localizedDescription)")
                             return
                         }
                     }

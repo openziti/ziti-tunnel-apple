@@ -52,6 +52,7 @@ class ProviderConfig : NSObject {
     static var FALLBACK_DNS_KEY = "fallbackDns"
     static var INTERCEPT_MATCHED_DNS_KEY = "interceptMatchedDns"
     static var LOG_LEVEL_KEY = "logLevel"
+    static var LOG_TLSUV_KEY = "logTlsuv"
     static var LOW_POWER_MODE_KEY = "lowPowerMode"
     static var LOG_ROTATE_DAILY_KEY = "logRotateDaily"
     static var LOG_ROTATE_COUNT_KEY = "logRotateCount"
@@ -75,6 +76,7 @@ class ProviderConfig : NSObject {
     var localizedDescription = "Ziti Mobile Edge"
 #endif
     var logLevel:Int = Int(ZitiLog.LogLevel.INFO.rawValue)
+    var logTlsuv:Bool = false
     var interceptMatchedDns:Bool = true
     
     // If never stored, set default value to false
@@ -99,6 +101,7 @@ class ProviderConfig : NSObject {
                 ProviderConfig.SUBNET_KEY: self.subnetMask,
                 ProviderConfig.MTU_KEY: String(self.mtu),
                 ProviderConfig.LOG_LEVEL_KEY: String(self.logLevel),
+                ProviderConfig.LOG_TLSUV_KEY: Bool(self.logTlsuv),
                 ProviderConfig.DNS_KEY: self.dnsAddresses.joined(separator: ","),
                 ProviderConfig.FALLBACK_DNS_ENABLED_KEY: self.fallbackDnsEnabled,
                 ProviderConfig.FALLBACK_DNS_KEY: self.fallbackDns,
@@ -178,6 +181,7 @@ class ProviderConfig : NSObject {
             self.lowPowerMode = lowPowerMode
         }
         self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL_KEY] as? String ?? "3") ?? 3
+        self.logTlsuv = conf[ProviderConfig.LOG_TLSUV_KEY] as? Bool ?? false
         
         if let logRotateDaily = conf[ProviderConfig.LOG_ROTATE_DAILY_KEY] as? Bool {
             self.logRotateDaily = logRotateDaily
@@ -202,6 +206,7 @@ class ProviderConfig : NSObject {
             "interceptMatchedDns: \(self.interceptMatchedDns)\n" +
             "lowPowerMode: \(self.lowPowerMode)\n" +
             "logLevel: \(self.logLevel)\n" +
+            "logTlsuv: \(self.logTlsuv)\n" +
             "logRotateDaily: \(self.logRotateDaily)\n" +
             "logRotateCount: \(self.logRotateCount)\n" +
             "logRotateSizeMB: \(self.logRotateSizeMB)"
