@@ -1078,12 +1078,48 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection footerTitle="Include tlsuv messages in logs" id="GRs-sM-GuR">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="LOG_TLSUV_CELL" id="lBD-b5-QDL" userLabel="LOG_TLSUV_CELL" customClass="LowPowerModeCell" customModule="Ziti_Mobile_Edge" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="292.5" width="375" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="lBD-b5-QDL" id="3Dh-eN-HLU">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3oB-dV-QvM" userLabel="Log tlsuv Switch">
+                                                    <rect key="frame" x="16" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="logTlsuvSwitchChanged:" destination="f8K-2M-T8j" eventType="valueChanged" id="csF-iF-T7I"/>
+                                                    </connections>
+                                                </switch>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Log tlsuv Messages" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pYQ-cT-d9j" userLabel="Log tlsuv Messages">
+                                                    <rect key="frame" x="73" y="11.5" width="286" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="3oB-dV-QvM" firstAttribute="centerY" secondItem="3Dh-eN-HLU" secondAttribute="centerY" id="FdQ-2e-tKQ"/>
+                                                <constraint firstItem="pYQ-cT-d9j" firstAttribute="centerY" secondItem="3Dh-eN-HLU" secondAttribute="centerY" id="gF8-01-34u"/>
+                                                <constraint firstItem="3oB-dV-QvM" firstAttribute="leading" secondItem="3Dh-eN-HLU" secondAttribute="leading" constant="16" id="gpU-cV-mW2"/>
+                                                <constraint firstAttribute="trailing" secondItem="pYQ-cT-d9j" secondAttribute="trailing" constant="16" id="r4W-oH-E2b"/>
+                                                <constraint firstItem="pYQ-cT-d9j" firstAttribute="leading" secondItem="3oB-dV-QvM" secondAttribute="trailing" constant="8" id="uID-lq-FIq"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="f8K-2M-T8j" id="buL-FK-F5C"/>
                             <outlet property="delegate" destination="f8K-2M-T8j" id="tmd-RL-OjK"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <outlet property="logTlsuvSwitch" destination="3oB-dV-QvM" id="E5k-lz-etS"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cdO-HU-Xrg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

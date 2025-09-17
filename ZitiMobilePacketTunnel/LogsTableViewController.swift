@@ -15,15 +15,26 @@
 //
 
 import UIKit
+import CZiti
 
 class LogsTableViewController: UITableViewController {
 
+    @IBOutlet weak var logTlsuvSwitch: UISwitch!
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
     }
     
+    @IBAction func logTlsuvSwitchChanged(_ sender: Any) {
+        TunnelMgr.shared.tlsuvLoggingEnabled = logTlsuvSwitch.isOn
+        TunnelMgr.shared.updateLogLevel(ZitiLog.getLogLevel())
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        logTlsuvSwitch.isOn = TunnelMgr.shared.tlsuvLoggingEnabled
+    }
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
             if let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "LOG_VC") as? LogViewController {
