@@ -89,7 +89,6 @@ class TunnelSettingsViewController: UITableViewController {
     var mtu:String = "0"
     var dns:String = "0.0.0.0"
     var lowPowerMode = true
-    var tlsuvLoggingEnabled = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -106,7 +105,6 @@ class TunnelSettingsViewController: UITableViewController {
                 self.mtu = mtu
                 self.dns = dns
                 self.lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool ?? defaults.lowPowerMode
-                self.tlsuvLoggingEnabled = conf[ProviderConfig.LOG_TLSUV_KEY] as? Bool ?? defaults.logTlsuv
             }
         }
         
@@ -130,7 +128,6 @@ class TunnelSettingsViewController: UITableViewController {
         dict[ProviderConfig.MTU_KEY] = mtu
         dict[ProviderConfig.DNS_KEY] = dns
         dict[ProviderConfig.LOG_LEVEL_KEY] = String(ZitiLog.getLogLevel().rawValue)
-        dict[ProviderConfig.LOG_TLSUV_KEY] = Bool(tlsuvLoggingEnabled)
         dict[ProviderConfig.LOW_POWER_MODE_KEY] = lowPowerMode
         
         let conf:ProviderConfig = ProviderConfig()
