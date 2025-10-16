@@ -608,7 +608,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
         
         // Enter Code
-        let codeTextView = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        let codeTextView = EditableNSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
         stack.addArrangedSubview(codeTextView)
         
         alert.accessoryView = stack
