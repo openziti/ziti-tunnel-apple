@@ -19,8 +19,8 @@ jobs:
     strategy:
       matrix:
         spec:
-        - { scheme: 'ZitiPacketTunnel', config: 'Release', sdk: 'macosx', destination: 'generic/platform=macOS' }
-        - { scheme: 'ZitiMobilePacketTunnel', config: 'Release', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
+        - { scheme: 'ZitiPacketTunnel', config: 'Debug', sdk: 'macosx', destination: 'generic/platform=macOS' }
+        - { scheme: 'ZitiMobilePacketTunnel', config: 'Debug', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
     steps:
     - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
