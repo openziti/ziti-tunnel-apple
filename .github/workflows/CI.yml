@@ -144,7 +144,7 @@ jobs:
           -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
           -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
           -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
-          -archivePath ./archives/${SCHEME}
+          -enableAddressSanitizer YES -archivePath ./archives/${SCHEME}
 
     - name: Export 
       env:
