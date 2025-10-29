@@ -19,8 +19,8 @@ jobs:
     strategy:
       matrix:
         spec:
-        - { scheme: 'ZitiPacketTunnel', config: 'Debug', sdk: 'macosx', destination: 'generic/platform=macOS' }
-        - { scheme: 'ZitiMobilePacketTunnel', config: 'Debug', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
+        - { scheme: 'ZitiPacketTunnel', config: 'Debug', asan_archive_opts: '-enableAddressSanitizer YES', sdk: 'macosx', destination: 'generic/platform=macOS' }
+        - { scheme: 'ZitiMobilePacketTunnel', config: 'Debug', asan_archive_opts: '', sdk: 'iphoneos', destination: 'generic/platform=iOS' }
     steps:
     - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
@@ -135,6 +135,7 @@ jobs:
       env:
         SCHEME: ${{ matrix.spec.scheme }}
         CONFIG: ${{ matrix.spec.config }}
+        ASAN_OPTS: ${{ matrix.spec.asan_archive_opts }}
         SDK: ${{ matrix.spec.sdk }}
         DESTINATION: ${{ matrix.spec.destination }}
         AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
@@ -144,7 +145,7 @@ jobs:
           -authenticationKeyPath ${{ steps.store_api_key.outputs.api_key_fn }} \
           -authenticationKeyID ${AUTH_KEY_ID} -authenticationKeyIssuerID ${AUTH_KEY_ISSUER_ID} \
           -configuration ${CONFIG} -scheme ${SCHEME} -sdk ${SDK} -destination ${DESTINATION} \
-          -enableAddressSanitizer YES -archivePath ./archives/${SCHEME}
+          ${ASAN_OPTS} -archivePath ./archives/${SCHEME}
 
     - name: Export 
       env:
