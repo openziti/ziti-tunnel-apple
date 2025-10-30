@@ -373,6 +373,7 @@
 				AA2098A62C57CC8800BCD073 /* Packages */,
 				5AF51049258246E60092DC47 /* Configs */,
 				5AF9C24B226B6FAC009CFD71 /* Default-568h@2x.png */,
+				AA1D472E2EB4041400C339EE /* ziti-v2.icon */,
 				5A8702D722372E7800314199 /* Common */,
 				5A2EA2C4209B317200437608 /* Network */,
 				5A02AACC206EBDD5006261C6 /* PacketTunnelProvider */,
@@ -402,7 +403,6 @@
 			children = (
 				5A76B936226FB9CC00204A46 /* bundle */,
 				5A02AABB206EBD7E006261C6 /* Assets.xcassets */,
-				AA1D472E2EB4041400C339EE /* ziti-v2.icon */,
 				5A02AAC0206EBD7E006261C6 /* Info.plist */,
 				5A02AAC1206EBD7E006261C6 /* ZitiPacketTunnel.entitlements */,
 				5A02AABD206EBD7E006261C6 /* Main.storyboard */,
