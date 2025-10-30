@@ -1521,7 +1521,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/openziti/ziti-sdk-swift-dist.git";
 			requirement = {
-				branch = main;
+				branch = alpha;
 				kind = branch;
 			};
 		};
