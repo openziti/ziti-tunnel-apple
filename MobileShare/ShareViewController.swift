@@ -18,7 +18,7 @@ import UIKit
 import Social
 import CZiti
 
-@objc (ShareViewController)
+@objc(ShareViewController)
 class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var fileLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
