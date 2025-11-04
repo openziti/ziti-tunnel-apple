@@ -979,7 +979,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
             DispatchQueue.main.async {
                 guard zErr == nil else {
-                    self.dialogAlert("Error sending provider message to authentiate externally", zErr!.localizedDescription)
+                    self.dialogAlert("Error sending provider message to authenticate externally", zErr!.localizedDescription)
                     return
                 }
                 guard let statusMsg = respMsg as? IpcExternalAuthResponseMessage,
