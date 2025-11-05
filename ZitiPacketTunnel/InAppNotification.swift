@@ -102,7 +102,7 @@ class InAppNotification: NSView {
         
         // Logo image
         var logoView:NSView?
-        if let logoImg = NSImage(named: "ZitiLogo64") {
+        if let logoImg = NSImage(named: "ziti-v2") {
             logoView = NSImageView(image: logoImg)
             logoView?.frame = NSRect(x: 0, y: 0, width: logoSize, height: logoSize)
             if let lv = logoView { self.addSubview(lv) }
