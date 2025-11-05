@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"
+     viewBox="0 0 512 512" xml:space="preserve">
+
+  <style><![CDATA[
+    .bg {fill:#ffffff;fill-opacity:0.75;stroke:none}
+    .logo {fill:#010101;stroke:none}
+  ]]></style>
+
+  <!-- Z logo, centered -->
+  <g transform="translate(115,-105) scale(1.4)">
+    <path class="logo" d="M102.95 91.36 L0 252 L59.97 290.28 L69.63 275.11 
+      L102.39 422.96 L203.73 261.41 L145.48 224.19 L135.77 239.51
+      L102.95 91.36 ZM151.8 250.79 L177.38 267.68 L110.79 372.45 
+      L77.97 224.29 L53.09 263.23 L27.91 247.2 L94.91 142.17 
+      L127.42 289.07 L151.8 250.79 Z"/>
+  </g>
+</svg>

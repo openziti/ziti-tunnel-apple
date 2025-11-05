@@ -140,6 +140,8 @@
 		5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76C225D644A0048B2F6 /* TableViewController.swift */; };
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
+		AA9471B02EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
+		AA9471B12EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AABF06A52D38347600238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A32D38338300238DAE /* libz.1.tbd */; };
 		AABF06A62D3834B700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A32D38338300238DAE /* libz.1.tbd */; };
 		AABF06A72D42BD3700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
@@ -303,6 +305,7 @@
 		5AFEB76C225D644A0048B2F6 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewController.swift; sourceTree = "<group>"; };
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
+		AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "ziti-v2.icon"; sourceTree = "<group>"; };
 		AABF06A32D38338300238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
 		AABF06A42D3833A200238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.2.sdk/usr/lib/libz.1.tbd; sourceTree = DEVELOPER_DIR; };
 		AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollURLViewController.swift; sourceTree = "<group>"; };
@@ -379,6 +382,7 @@
 				5AF3DCAA24B52642005047BC /* MobileShare */,
 				5A02AAB5206EBD7E006261C6 /* Products */,
 				5A02AAD8206EBE3C006261C6 /* Frameworks */,
+				AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -804,6 +808,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA9471B02EBB8CCB00305DE8 /* ziti-v2.icon in Resources */,
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
 				5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */,
@@ -826,6 +831,7 @@
 				5A2EA2D6209B750C00437608 /* LaunchScreen.storyboard in Resources */,
 				5AF5113F25842EDE0092DC47 /* sPxn6MJGR.zid in Resources */,
 				5AF5113D25842EDE0092DC47 /* DT87L-oGR.zid in Resources */,
+				AA9471B12EBB8CCB00305DE8 /* ziti-v2.icon in Resources */,
 				5AF5113B25842EDE0092DC47 /* W5hxDMTMg.zid in Resources */,
 				5AF9C24C226B6FAC009CFD71 /* Default-568h@2x.png in Resources */,
 				5A2EA2D3209B750C00437608 /* Assets.xcassets in Resources */,
@@ -1168,7 +1174,7 @@
 			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "ziti-v2";
 				CODE_SIGN_ENTITLEMENTS = ZitiPacketTunnel/ZitiPacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -1195,7 +1201,7 @@
 			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "ziti-v2";
 				CODE_SIGN_ENTITLEMENTS = ZitiPacketTunnel/ZitiPacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -1285,7 +1291,7 @@
 			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "ziti-v2";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1313,7 +1319,7 @@
 			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "ziti-v2";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = ZitiMobilePacketTunnel/ZitiMobilePacketTunnel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";

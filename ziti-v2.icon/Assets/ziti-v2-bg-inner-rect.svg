@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"
+     viewBox="0 0 512 512" xml:space="preserve">
+
+  <style><![CDATA[
+    .bg {fill:#ffffff;fill-opacity:0.75;stroke:none}
+    .logo {fill:#010101;stroke:none}
+  ]]></style>
+
+  <!-- Inner background -->
+  <rect x="0" y="0" width="512" height="512"
+        rx="115" ry="115" class="bg"/>
+
+</svg>
