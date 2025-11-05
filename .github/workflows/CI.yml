@@ -126,7 +126,7 @@ jobs:
         AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
         AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
       run: |
-        all_provider_info=$(xcrun altool --list-providers --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
+        all_provider_info=$(xcrun altool --list-providers --legacy --apiKey ${AUTH_KEY_ID} --apiIssuer ${AUTH_KEY_ISSUER_ID} --output-format json)
         team_id="${{ steps.get_app_info.outputs.team_id }}"
         public_id=$(echo ${all_provider_info} | jq -r --arg TEAMID ${team_id} '.providers[] | select(.WWDRTeamID | contains($TEAMID)).PublicID')
         echo "public_id=${public_id}" >> $GITHUB_OUTPUT
