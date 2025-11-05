@@ -52,13 +52,18 @@
         {
           "blend-mode-specializations" : [
             {
+              "value" : "normal"
+            },
+            {
               "appearance" : "dark",
               "value" : "normal"
             }
           ],
           "fill-specializations" : [
             {
-              "value" : "none"
+              "value" : {
+                "solid" : "extended-gray:1.00000,1.00000"
+              }
             },
             {
               "appearance" : "dark",
@@ -105,6 +110,9 @@
           ]
         },
         {
+          "fill" : {
+            "solid" : "extended-gray:1.00000,1.00000"
+          },
           "glass" : false,
           "hidden-specializations" : [
             {
@@ -145,6 +153,7 @@
             }
           ],
           "glass" : false,
+          "hidden" : false,
           "image-name" : "ziti-v2-bg.svg",
           "name" : "ziti-v2-bg",
           "opacity-specializations" : [
