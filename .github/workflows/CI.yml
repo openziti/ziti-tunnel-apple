@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   build:
+    # using intel runner for now to avoid flakey toolchain crashes seen on arm runner.
+    # todo try using standard (arm64) runner again when updating xcode version and/or image
     runs-on: macos-15-intel
     outputs:
       bundle_version: ${{ steps.configure_versions.outputs.bundle_version }}
