@@ -7,7 +7,7 @@
       "location" : "https://github.com/openziti/ziti-sdk-swift-dist.git",
       "state" : {
         "branch" : "alpha",
-        "revision" : "64ef43304c6689f9105d00429577f538c7a45166"
+        "revision" : "581cff521c1b5cca1835be162017f3ce3913b790"
       }
     }
   ],
