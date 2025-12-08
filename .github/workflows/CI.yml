@@ -41,6 +41,7 @@ jobs:
 
     - name: Setup Keychain
       run: |
+        echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | wc -c
         echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | base64 --decode > ./development.p12
         echo "${{ secrets.APPLE_DEVELOPMENT_P12_PASSWORD }}" > ./development.pass
         PASS=$(cat ./development.pass | base64 --decode)
