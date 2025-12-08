@@ -41,15 +41,8 @@ jobs:
 
     - name: Setup Keychain
       run: |
-        which base64
-        base64 --version
-        echo -n "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | wc -c
-        echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" > c.p12.b64
-        ls -l c.p12.b64
-        cksum c.p12.b64
-        base64 --input c.p12.b64 --decode > ./development.p12
+        echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | base64 --decode > ./development.p12
         echo "${{ secrets.APPLE_DEVELOPMENT_P12_PASSWORD }}" > ./development.pass
-        echo sanity check now
         PASS=$(cat ./development.pass | base64 --decode)
         security create-keychain -p paswsword build.keychain
         security default-keychain -s build.keychain
