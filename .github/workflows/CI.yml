@@ -47,7 +47,7 @@ jobs:
         echo "${{ secrets.APPLE_DEVELOPMENT_P12 }}" > c.p12.b64
         ls -l c.p12.b64
         cksum c.p12.b64
-        echo -n "${{ secrets.APPLE_DEVELOPMENT_P12 }}" | base64 --decode > ./development.p12
+        base64 -input c.p12.b64 --decode > ./development.p12
         echo "${{ secrets.APPLE_DEVELOPMENT_P12_PASSWORD }}" > ./development.pass
         PASS=$(cat ./development.pass | base64 --decode)
         security create-keychain -p paswsword build.keychain
