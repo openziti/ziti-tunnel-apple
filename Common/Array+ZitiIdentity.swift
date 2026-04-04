@@ -58,13 +58,16 @@ extension Array where Element == ZitiIdentity {
         guard let subj = zid.claims?.sub, let ztAPI =  zid.claims?.iss else {
             throw ZitiError("Invalid JWT claims")
         }
-        zid.czid = CZiti.ZitiIdentity(id: subj, ztAPIs: [ztAPI], name: url.lastPathComponent)
-        
-        // only support OTT
-        guard zid.getEnrollmentMethod() == .ott else {
-            throw ZitiError("Only OTT Enrollment is supported by this application")
+
+        let em = zid.getEnrollmentMethod()
+        guard em == .ott || em == .unrecognized || em == .url else {
+            throw ZitiError("Unsupported enrollment method: \(zid.claims?.em ?? "unknown")")
         }
-        
+
+        // OTT uses subject as identity ID; network JWTs use a temp UUID
+        let idStr = (em == .ott) ? subj : UUID().uuidString
+        zid.czid = CZiti.ZitiIdentity(id: idStr, ztAPIs: [ztAPI], name: url.lastPathComponent)
+
         // alread have this one?
         guard self.first(where:{$0.id == zid.id}) == nil else {
             throw ZitiError("Duplicate Identity Not Allowed. Identy \(zid.name) is already present with id \(zid.id)")

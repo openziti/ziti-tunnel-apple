@@ -19,6 +19,10 @@ import CZiti
 
 class ZitiIdentity : NSObject, Codable {
     
+    enum EnrollTo : String, Codable {
+        case none, cert, token
+    }
+
     enum EnrollmentMethod : String, Codable {
         case ott, ottCa, url, unrecognized
         init(_ str:String) {
@@ -67,6 +71,7 @@ class ZitiIdentity : NSObject, Codable {
     
     var czid:CZiti.ZitiIdentity?
     var claims:CZiti.ZitiClaims?
+    var enrollTo:EnrollTo?
     var jwtProviders:[CZiti.JWTProvider]?
     var selectedJWTProvider:CZiti.JWTProvider?
     var extAuthPending:Bool? = false
@@ -123,6 +128,7 @@ class ZitiIdentity : NSObject, Codable {
     var isMfaEnabled:Bool { return mfaEnabled ?? false }
     var isMfaVerified:Bool { return isMfaEnabled && (mfaVerified ?? false) }
     var isMfaPending:Bool { return mfaPending ?? false }
+    var effectiveEnrollTo:EnrollTo { return enrollTo ?? .none }
     var isExtAuthEnabled:Bool { return jwtProviders != nil && !jwtProviders!.isEmpty }
     var isExtAuthPending:Bool { return extAuthPending ?? false }
     var isEnabled:Bool { return enabled ?? false }
