@@ -1408,7 +1408,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         radioMatrix.cellSize = NSSize(width: 340, height: 42)
 
         if let certCell = radioMatrix.cell(atRow: 0, column: 0) as? NSButtonCell {
-            certCell.title = "Device Certificate\n    Permanent, no re-auth, tied to this machine"
+            certCell.title = "Device Certificate\n    Permanent, tied to this machine"
             certCell.setButtonType(.radio)
             certCell.font = NSFont.systemFont(ofSize: 13)
         }
