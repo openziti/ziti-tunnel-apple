@@ -161,7 +161,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             extAuthNowBtn.image?.accessibilityDescription = "Extended Authentication: N/A"
             
             if !extAuthNowBtn.isHidden {
-                extAuthNowBtn.contentTintColor = !zId.isExtAuthPending ? .systemGreen : .systemYellow
+                let badgeColor: NSColor = !zId.isExtAuthPending ? .systemGreen : .systemOrange
+                let desc = zId.isExtAuthPending ? "Authentication Required" : "Authenticated"
+                if #available(macOS 12.0, *) {
+                    let config = NSImage.SymbolConfiguration(paletteColors: [.labelColor, badgeColor])
+                    let img = NSImage(systemSymbolName: "person.badge.key", accessibilityDescription: desc)
+                    extAuthNowBtn.image = img?.withSymbolConfiguration(config)
+                } else {
+                    extAuthNowBtn.contentTintColor = badgeColor
+                    extAuthNowBtn.image = NSImage(systemSymbolName: "person.badge.key", accessibilityDescription: desc)
+                }
             }
             
             mfaLockImageView.image = NSImage(systemSymbolName: "lock.slash", accessibilityDescription: "MFA: N/A")

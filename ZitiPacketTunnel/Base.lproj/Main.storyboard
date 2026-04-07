@@ -570,12 +570,12 @@ Gw
                                                     <action selector="onMfaNewCodes:" target="XfG-lQ-9wD" id="htT-wc-6PU"/>
                                                 </connections>
                                             </button>
-                                            <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lUH-Nh-T0a">
-                                                <rect key="frame" x="216" y="2.5" width="24.5" height="17"/>
-                                                <buttonCell key="cell" type="bevel" alternateTitle="Auth Now" bezelStyle="rounded" imagePosition="overlaps" alignment="center" inset="2" id="zPp-4z-gJY">
+                                            <button toolTip="External Auth" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lUH-Nh-T0a">
+                                                <rect key="frame" x="216" y="-7" width="50" height="32"/>
+                                                <buttonCell key="cell" type="push" alternateTitle="Auth Now" bezelStyle="rounded" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zPp-4z-gJY">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
-                                                    <imageReference key="image" image="key.icloud" catalog="system" symbolScale="large"/>
+                                                    <imageReference key="image" image="person.badge.key" catalog="system" symbolScale="large"/>
                                                 </buttonCell>
                                                 <connections>
                                                     <action selector="onExternalAuth:" target="XfG-lQ-9wD" id="QBn-f8-eED"/>
@@ -1424,7 +1424,7 @@ Gw
         <image name="NSShareTemplate" width="19" height="23"/>
         <image name="NSStatusAvailable" width="16" height="16"/>
         <image name="gearshape" catalog="system" width="16" height="16"/>
-        <image name="key.icloud" catalog="system" width="24" height="17"/>
+        <image name="person.badge.key" catalog="system" width="22" height="19"/>
         <image name="lock.fill" catalog="system" width="17" height="19"/>
         <image name="lock.rotation.open" catalog="system" width="20" height="20"/>
         <image name="note.text" catalog="system" width="21" height="18"/>
