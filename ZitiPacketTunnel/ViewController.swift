@@ -1181,6 +1181,9 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             DispatchQueue.main.async {
                 guard !handled else { return }
                 handled = true
+                NSApp.requestUserAttention(.informationalRequest)
+                NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
+                self.view.window?.makeKeyAndOrderFront(nil)
                 self.enrollingIds.removeAll { $0.id == zid.id }
                 if let zErr = zErr {
                     if zErr.isAlreadyEnrolled {
