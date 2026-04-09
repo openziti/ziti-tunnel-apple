@@ -202,7 +202,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
-            idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
+            idNetworkLabel.stringValue = zId.networkDisplay
             idControllerStatusLabel.stringValue = zId.controllerVersion ?? "" //csStr
             let enrollStatusStr = zId.enrollmentStatusDisplay
             idEnrollStatusLabel.stringValue = enrollStatusStr

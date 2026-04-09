@@ -281,7 +281,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
             if identitiesLoaded && !justWokeUp {
                 userNotifications.post(.Info, "Controller: \(ZitiIdentity.ConnectivityStatus.Available.rawValue)",
-                                       "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
+                                       "\(tzid.name)\n\(tzid.networkDisplay)", tzid)
             }
         } else if event.code == Ziti.ZITI_CONTROLLER_UNAVAILABLE {
             if tzid.isExtAuthEnabled {
@@ -292,7 +292,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             
             // Only raise notifications if not shutting down to reduce noise
             if !tunnelShuttingDown {
-                userNotifications.post(.Error, "Controller: \(ZitiIdentity.ConnectivityStatus.Unavailable.rawValue)", "\(tzid.name)\n\(tzid.czid?.ztAPI ?? "")", tzid)
+                userNotifications.post(.Error, "Controller: \(ZitiIdentity.ConnectivityStatus.Unavailable.rawValue)", "\(tzid.name)\n\(tzid.networkDisplay)", tzid)
             }
         } else {
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .PartiallyAvailable)

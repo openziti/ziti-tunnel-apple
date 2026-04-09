@@ -931,7 +931,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = zid?.name
             } else if indexPath.row == 1 {
                 cell?.textLabel?.text = "Network"
-                cell?.detailTextLabel?.text = zid?.czid?.ztAPI
+                cell?.detailTextLabel?.text = zid?.networkDisplay
             } else if indexPath.row == 2 {
                 cell?.textLabel?.text = "Version"
                 cell?.detailTextLabel?.text = zid?.controllerVersion ?? "unknown"

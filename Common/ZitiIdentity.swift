@@ -78,7 +78,18 @@ class ZitiIdentity : NSObject, Codable {
     
     var name:String { return czid?.name ?? "--" }
     var id:String { return czid?.id ?? "--invalid_id--" }
-    
+
+    var networkDisplay:String {
+        guard var url = czid?.ztAPI else { return "" }
+        for suffix in ["/edge/client/v1", "/edge/client/v1/"] {
+            if url.hasSuffix(suffix) {
+                url = String(url.dropLast(suffix.count))
+                break
+            }
+        }
+        return url
+    }
+
     // returned from /version, retrieved when validating JWT, polled periodically
     var controllerVersion:String?
 
