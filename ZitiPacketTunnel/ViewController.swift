@@ -161,7 +161,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             extAuthNowBtn.image?.accessibilityDescription = "Extended Authentication: N/A"
             
             if !extAuthNowBtn.isHidden {
-                extAuthNowBtn.contentTintColor = !zId.isExtAuthPending ? .systemGreen : .systemYellow
+                let badgeColor: NSColor = !zId.isExtAuthPending ? .systemGreen : .systemOrange
+                let desc = zId.isExtAuthPending ? "Authentication Required" : "Authenticated"
+                if #available(macOS 12.0, *) {
+                    let config = NSImage.SymbolConfiguration(paletteColors: [.labelColor, badgeColor])
+                    let img = NSImage(systemSymbolName: "person.badge.key", accessibilityDescription: desc)
+                    extAuthNowBtn.image = img?.withSymbolConfiguration(config)
+                } else {
+                    extAuthNowBtn.contentTintColor = badgeColor
+                    extAuthNowBtn.image = NSImage(systemSymbolName: "person.badge.key", accessibilityDescription: desc)
+                }
             }
             
             mfaLockImageView.image = NSImage(systemSymbolName: "lock.slash", accessibilityDescription: "MFA: N/A")
@@ -193,9 +202,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             idLabel.stringValue = zId.id
             idNameLabel.stringValue = zId.name
-            idNetworkLabel.stringValue = zId.czid?.ztAPI ?? ""
+            idNetworkLabel.stringValue = zId.networkDisplay
             idControllerStatusLabel.stringValue = zId.controllerVersion ?? "" //csStr
-            idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
+            let enrollStatusStr = zId.enrollmentStatusDisplay
+            idEnrollStatusLabel.stringValue = enrollStatusStr
             if let expDate = zId.expDate {
                 idExpiresAtLabel.stringValue = "(expiration: \(dateToString(expDate))"
                 idExpiresAtLabel.isHidden = zId.enrollmentStatus == .Enrolled
@@ -212,7 +222,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             } else {
                 idSpinner.stopAnimation(nil)
                 idSpinner.isHidden = true
-                idEnrollStatusLabel.stringValue = zId.enrollmentStatus.rawValue
+                idEnrollStatusLabel.stringValue = enrollStatusStr
                 idEnrollBtn.isEnabled = zId.enrollmentStatus == .Pending
             }
         } else {
@@ -1036,79 +1046,321 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         var zid = zids[indx]
         enrollingIds.append(zid)
         updateServiceUI(zId: zid)
-        
+
         guard let presentedItemURL = zidStore.presentedItemURL else {
             self.dialogAlert("Unable to enroll \(zid.name)", "Unable to access group container")
             return
         }
-        
-        let url = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false)
-        let jwtFile = url.path
-        if FileManager.default.fileExists(atPath: jwtFile) {
-            // Ziti.enroll takes too long, needs to be done in background
-            DispatchQueue.global().async {
-                Ziti.enroll(jwtFile) { zidResp, zErr in
-                    DispatchQueue.main.async {
-                        self.enrollingIds.removeAll { $0.id == zid.id }
-                        guard zErr == nil, let zidResp = zidResp else {
-                            _ = self.zidStore.store(zid)
-                            self.updateServiceUI(zId:zid)
-                            self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
-                            return
-                        }
-                        
-                        if zid.czid == nil {
-                            zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: zidResp.ztAPIs ?? [zidResp.ztAPI])
-                        }
-                        zid.czid?.ca = zidResp.ca
-                        zid.czid?.certs = zidResp.certs
-                        zid.czid?.ztAPI = zidResp.ztAPI
-                        zid.czid?.ztAPIs = zidResp.ztAPIs
-                        if zidResp.name != nil {
-                            zid.czid?.name = zidResp.name
-                        }
-                        
-                        zid.enabled = true
-                        zid.enrolled = true
-                        zid = self.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
-                        self.zids[indx] = zid
-                        self.updateServiceUI(zId:zid)
-                        self.tunnelMgr.restartTunnel()
-                    }
+
+        let jwtUrl = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false)
+        let jwtFile = jwtUrl.path
+        let hasJwt = FileManager.default.fileExists(atPath: jwtFile)
+
+        // OTT JWT: direct enrollment (existing flow)
+        if hasJwt && zid.getEnrollmentMethod() == .ott {
+            performOttEnroll(zid: &zid, jwtFile: jwtFile, indx: indx)
+            return
+        }
+
+        // Non-OTT (URL or network JWT): query providers then show enrollment options
+        let source: String? = hasJwt ? jwtFile : zid.czid?.ztAPI
+        guard let enrollSource = source else {
+            enrollingIds.removeAll { $0.id == zid.id }
+            updateServiceUI(zId: zid)
+            dialogAlert("Unable to enroll \(zid.name)", "No JWT file or controller URL available")
+            return
+        }
+
+        let queryCallback: ([ZitiEvent.JwtSigner]?, CZiti.ZitiError?) -> Void = { providers, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil, let providers = providers else {
+                    // Provider query failed - fall back to basic enrollment
+                    self.performBasicEnroll(zid: &zid, jwtFile: hasJwt ? jwtFile : nil,
+                                           controllerURL: zid.czid?.ztAPI, indx: indx)
+                    return
                 }
-            }
-        } else if let ztAPI = zid.czid?.ztAPI {
-            DispatchQueue.global().async {
-                Ziti.enroll(controllerURL: ztAPI) { zidResp, zErr in
-                    DispatchQueue.main.async {
+
+                let hasCert = providers.contains { $0.canCertEnroll }
+                let hasToken = providers.contains { $0.canTokenEnroll }
+
+                if !hasCert && !hasToken {
+                    // No cert/token providers available - basic enrollment
+                    self.performBasicEnroll(zid: &zid, jwtFile: hasJwt ? jwtFile : nil,
+                                           controllerURL: zid.czid?.ztAPI, indx: indx)
+                    return
+                }
+
+                self.showEnrollmentOptions(hasCert: hasCert, hasToken: hasToken,
+                                           providers: providers, zid: zid) { enrollTo, providerName in
+                    guard let enrollTo = enrollTo else {
+                        // User cancelled
                         self.enrollingIds.removeAll { $0.id == zid.id }
-                        guard zErr == nil, let zidResp = zidResp else {
-                            _ = self.zidStore.store(zid)
-                            self.updateServiceUI(zId:zid)
-                            self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
-                            return
-                        }
-                        
-                        if zid.czid == nil {
-                            zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: zidResp.ztAPIs ?? [zidResp.ztAPI])
-                        }
-                        zid.czid?.ca = zidResp.ca
-                        zid.czid?.ztAPI = zidResp.ztAPI
-                        zid.czid?.ztAPIs = zidResp.ztAPIs
-                        if zidResp.name != nil {
-                            zid.czid?.name = zidResp.name
-                        }
-                        
-                        zid.enabled = true
-                        zid.enrolled = true
-                        zid = self.zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity])
-                        self.zids[indx] = zid
-                        self.updateServiceUI(zId:zid)
-                        self.tunnelMgr.restartTunnel()
+                        self.updateServiceUI(zId: zid)
+                        return
+                    }
+
+                    switch enrollTo {
+                    case .cert, .token:
+                        self.performEnrollTo(mode: enrollTo, zid: &zid, provider: providerName,
+                                             jwtFile: hasJwt ? jwtFile : nil,
+                                             controllerURL: hasJwt ? nil : zid.czid?.ztAPI, indx: indx)
+                    case .none:
+                        self.performBasicEnroll(zid: &zid, jwtFile: hasJwt ? jwtFile : nil,
+                                               controllerURL: zid.czid?.ztAPI, indx: indx)
                     }
                 }
             }
         }
+
+        DispatchQueue.global().async {
+            if hasJwt {
+                Ziti.queryProviders(jwtFile: enrollSource, cb: queryCallback)
+            } else {
+                Ziti.queryProviders(controllerURL: enrollSource, cb: queryCallback)
+            }
+        }
+    }
+
+    // MARK: - Enrollment Helpers
+
+    func performOttEnroll(zid: inout ZitiIdentity, jwtFile: String, indx: Int) {
+        var zid = zid
+        DispatchQueue.global().async {
+            Ziti.enroll(jwtFile) { zidResp, zErr in
+                DispatchQueue.main.async {
+                    self.enrollingIds.removeAll { $0.id == zid.id }
+                    guard zErr == nil, let zidResp = zidResp else {
+                        _ = self.zidStore.store(zid)
+                        self.updateServiceUI(zId: zid)
+                        self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
+                        return
+                    }
+                    self.handleEnrollmentSuccess(zid: &zid, zidResp: zidResp, enrollTo: .none, indx: indx)
+                }
+            }
+        }
+    }
+
+    func performBasicEnroll(zid: inout ZitiIdentity, jwtFile: String?, controllerURL: String?, indx: Int) {
+        var zid = zid
+        var handled = false
+        DispatchQueue.global().async {
+            let enrollCallback: (CZiti.ZitiIdentity?, CZiti.ZitiError?) -> Void = { zidResp, zErr in
+                DispatchQueue.main.async {
+                    guard !handled else { return }
+                    handled = true
+                    self.enrollingIds.removeAll { $0.id == zid.id }
+                    guard zErr == nil, let zidResp = zidResp else {
+                        _ = self.zidStore.store(zid)
+                        self.updateServiceUI(zId: zid)
+                        self.dialogAlert("Unable to enroll \(zid.name)", zErr != nil ? zErr!.localizedDescription : "invalid response")
+                        return
+                    }
+                    self.handleEnrollmentSuccess(zid: &zid, zidResp: zidResp, enrollTo: .none, indx: indx)
+                }
+            }
+
+            if let jwtFile = jwtFile {
+                Ziti.enroll(jwtFile, enrollCallback)
+            } else if let controllerURL = controllerURL {
+                Ziti.enroll(controllerURL: controllerURL, enrollCallback)
+            }
+        }
+    }
+
+    func performEnrollTo(mode: ZitiIdentity.EnrollTo, zid: inout ZitiIdentity, provider: String?,
+                          jwtFile: String?, controllerURL: String?, indx: Int) {
+        var zid = zid
+        var handled = false
+        let requestedType = (mode == .cert) ? "Device Certificate" : "User Session"
+
+        let onAuth: (String) -> Void = { urlString in
+            DispatchQueue.main.async {
+                guard let url = URL(string: urlString) else {
+                    self.dialogAlert("Invalid authentication URL: \(urlString)")
+                    return
+                }
+                if !NSWorkspace.shared.open(url) {
+                    self.dialogAlert("Unable to open authentication URL. Please copy and paste into your browser: \(urlString)")
+                }
+            }
+        }
+
+        let enrollCallback: (CZiti.ZitiIdentity?, CZiti.ZitiError?) -> Void = { zidResp, zErr in
+            DispatchQueue.main.async {
+                guard !handled else { return }
+                handled = true
+                NSApp.requestUserAttention(.informationalRequest)
+                NSRunningApplication.current.activate(options: .activateIgnoringOtherApps)
+                self.view.window?.makeKeyAndOrderFront(nil)
+                self.enrollingIds.removeAll { $0.id == zid.id }
+                if let zErr = zErr {
+                    if zErr.isAlreadyEnrolled {
+                        self.handleAlreadyEnrolled(zid: &zid, jwtFile: jwtFile,
+                                                   controllerURL: controllerURL, indx: indx,
+                                                   requestedType: requestedType)
+                        return
+                    }
+                    self.updateServiceUI(zId: zid)
+                    self.dialogAlert("Unable to enroll \(zid.name)", zErr.localizedDescription)
+                    return
+                }
+                guard let zidResp = zidResp else {
+                    self.updateServiceUI(zId: zid)
+                    self.dialogAlert("Unable to enroll \(zid.name)", "invalid response")
+                    return
+                }
+                self.handleEnrollmentSuccess(zid: &zid, zidResp: zidResp, enrollTo: mode, indx: indx)
+            }
+        }
+
+        DispatchQueue.global().async {
+            if let jwtFile = jwtFile {
+                if mode == .cert {
+                    Ziti.enrollToCert(jwtFile: jwtFile, provider: provider, onAuth: onAuth, enrollCallback)
+                } else {
+                    Ziti.enrollToToken(jwtFile: jwtFile, provider: provider, onAuth: onAuth, enrollCallback)
+                }
+            } else if let controllerURL = controllerURL {
+                if mode == .cert {
+                    Ziti.enrollToCert(controllerURL: controllerURL, provider: provider, onAuth: onAuth, enrollCallback)
+                } else {
+                    Ziti.enrollToToken(controllerURL: controllerURL, provider: provider, onAuth: onAuth, enrollCallback)
+                }
+            }
+        }
+    }
+
+    func handleAlreadyEnrolled(zid: inout ZitiIdentity, jwtFile: String?,
+                               controllerURL: String?, indx: Int, requestedType: String) {
+        let info = ZitiIdentity.alreadyEnrolledInfo(requestedType: requestedType)
+        let alert = NSAlert()
+        alert.messageText = info.title
+        alert.informativeText = info.detail
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: info.action)
+        alert.addButton(withTitle: "Cancel")
+
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            self.performBasicEnroll(zid: &zid, jwtFile: jwtFile,
+                                   controllerURL: controllerURL, indx: indx)
+        } else {
+            self.enrollingIds.removeAll { $0.id == zid.id }
+            self.updateServiceUI(zId: zid)
+        }
+    }
+
+    func handleEnrollmentSuccess(zid: inout ZitiIdentity, zidResp: CZiti.ZitiIdentity,
+                                 enrollTo: ZitiIdentity.EnrollTo, indx: Int) {
+        let idChanged = zid.applyEnrollmentResponse(zidResp, enrollTo: enrollTo, zidStore: zidStore)
+
+        if !idChanged {
+            zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo])
+        }
+        if indx < zids.count {
+            zids[indx] = zid
+        }
+        if idChanged {
+            tableView.reloadData()
+        }
+        updateServiceUI(zId: zid)
+        tunnelMgr.restartTunnel()
+    }
+
+    // MARK: - Enrollment Options Dialog
+
+    func showEnrollmentOptions(hasCert: Bool, hasToken: Bool,
+                               providers: [ZitiEvent.JwtSigner],
+                               zid: ZitiIdentity,
+                               completion: @escaping (ZitiIdentity.EnrollTo?, String?) -> Void) {
+        // If only one type is available, auto-select it
+        if hasCert && !hasToken {
+            let certProviders = providers.filter { $0.canCertEnroll }
+            selectProvider(from: certProviders, title: "Device Certificate Enrollment",
+                          text: "Select authentication provider for '\(zid.name)'") { providerName in
+                completion(providerName != nil ? .cert : nil, providerName)
+            }
+            return
+        }
+        if hasToken && !hasCert {
+            let tokenProviders = providers.filter { $0.canTokenEnroll }
+            selectProvider(from: tokenProviders, title: "User Session Enrollment",
+                          text: "Select authentication provider for '\(zid.name)'") { providerName in
+                completion(providerName != nil ? .token : nil, providerName)
+            }
+            return
+        }
+
+        // Both cert and token available - ask the user
+        let alert = NSAlert()
+        alert.messageText = "Select Enrollment Type"
+        alert.informativeText = "Choose how to enroll '\(zid.name)'"
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+
+        let container = NSView(frame: NSRect(x: 0, y: 0, width: 340, height: 100))
+
+        // Use NSMatrix for proper radio button grouping
+        let radioMatrix = NSMatrix(frame: NSRect(x: 0, y: 8, width: 340, height: 84),
+                                   mode: .radioModeMatrix,
+                                   cellClass: NSButtonCell.self,
+                                   numberOfRows: 2, numberOfColumns: 1)
+        radioMatrix.autorecalculatesCellSize = true
+        radioMatrix.cellSize = NSSize(width: 340, height: 42)
+
+        if let certCell = radioMatrix.cell(atRow: 0, column: 0) as? NSButtonCell {
+            certCell.title = "Device Certificate\n    Permanent, tied to this machine"
+            certCell.setButtonType(.radio)
+            certCell.font = NSFont.systemFont(ofSize: 13)
+        }
+        if let tokenCell = radioMatrix.cell(atRow: 1, column: 0) as? NSButtonCell {
+            tokenCell.title = "User Session\n    Requires periodic login, tied to user account"
+            tokenCell.setButtonType(.radio)
+            tokenCell.font = NSFont.systemFont(ofSize: 13)
+        }
+
+        // Default to User Session
+        radioMatrix.selectCell(atRow: 1, column: 0)
+
+        container.addSubview(radioMatrix)
+        alert.accessoryView = container
+
+        let response = alert.runModal()
+        guard response == .alertFirstButtonReturn else {
+            completion(nil, nil)
+            return
+        }
+
+        let enrollTo: ZitiIdentity.EnrollTo = (radioMatrix.selectedRow == 0) ? .cert : .token
+        let matchingProviders = providers.filter {
+            enrollTo == .cert ? $0.canCertEnroll : $0.canTokenEnroll
+        }
+
+        selectProvider(from: matchingProviders, title: "Select Provider",
+                      text: "Select authentication provider for '\(zid.name)'") { providerName in
+            completion(providerName != nil ? enrollTo : nil, providerName)
+        }
+    }
+
+    func selectProvider(from providers: [ZitiEvent.JwtSigner], title: String, text: String,
+                        completion: @escaping (String?) -> Void) {
+        guard !providers.isEmpty else {
+            completion(nil)
+            return
+        }
+
+        // Single provider - auto-select
+        if providers.count == 1 {
+            completion(providers[0].name)
+            return
+        }
+
+        // Multiple providers - show picker
+        let providerNames = providers.map(\.name)
+        let selected = dialogForListSelect(question: title, text: text, options: providerNames)
+        completion(selected)
     }
 }
 

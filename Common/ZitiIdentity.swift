@@ -19,6 +19,10 @@ import CZiti
 
 class ZitiIdentity : NSObject, Codable {
     
+    enum EnrollTo : String, Codable {
+        case none, cert, token
+    }
+
     enum EnrollmentMethod : String, Codable {
         case ott, ottCa, url, unrecognized
         init(_ str:String) {
@@ -67,13 +71,25 @@ class ZitiIdentity : NSObject, Codable {
     
     var czid:CZiti.ZitiIdentity?
     var claims:CZiti.ZitiClaims?
+    var enrollTo:EnrollTo?
     var jwtProviders:[CZiti.JWTProvider]?
     var selectedJWTProvider:CZiti.JWTProvider?
     var extAuthPending:Bool? = false
     
     var name:String { return czid?.name ?? "--" }
     var id:String { return czid?.id ?? "--invalid_id--" }
-    
+
+    var networkDisplay:String {
+        guard var url = czid?.ztAPI else { return "" }
+        for suffix in ["/edge/client/v1", "/edge/client/v1/"] {
+            if url.hasSuffix(suffix) {
+                url = String(url.dropLast(suffix.count))
+                break
+            }
+        }
+        return url
+    }
+
     // returned from /version, retrieved when validating JWT, polled periodically
     var controllerVersion:String?
 
@@ -123,6 +139,7 @@ class ZitiIdentity : NSObject, Codable {
     var isMfaEnabled:Bool { return mfaEnabled ?? false }
     var isMfaVerified:Bool { return isMfaEnabled && (mfaVerified ?? false) }
     var isMfaPending:Bool { return mfaPending ?? false }
+    var effectiveEnrollTo:EnrollTo { return enrollTo ?? .none }
     var isExtAuthEnabled:Bool { return jwtProviders != nil && !jwtProviders!.isEmpty }
     var isExtAuthPending:Bool { return extAuthPending ?? false }
     var isEnabled:Bool { return enabled ?? false }
@@ -168,5 +185,92 @@ class ZitiIdentity : NSObject, Codable {
             return str
         }
         return("Unable to json encode \(name)")
-    }    
+    }
+
+    // MARK: - Enrollment Support
+
+    /// Apply enrollment response to this identity. Returns whether the identity ID changed.
+    func applyEnrollmentResponse(_ zidResp: CZiti.ZitiIdentity, enrollTo: EnrollTo,
+                                 zidStore: ZitiIdentityStore) -> Bool {
+        let tempId = self.id
+        let realId = zidResp.id
+        let originalName = self.name
+
+        // Validate ztAPIs - SDK sometimes returns controller IDs instead of URLs
+        let validZtAPIs: [String]
+        if let apis = zidResp.ztAPIs, apis.allSatisfy({ $0.contains("://") }) {
+            validZtAPIs = apis
+        } else {
+            validZtAPIs = [zidResp.ztAPI]
+        }
+
+        let idChanged = realId != tempId
+        if idChanged {
+            _ = zidStore.remove(self)
+            self.czid = CZiti.ZitiIdentity(id: realId, ztAPIs: validZtAPIs)
+        }
+        if self.czid == nil {
+            self.czid = CZiti.ZitiIdentity(id: realId, ztAPIs: validZtAPIs)
+        }
+
+        self.czid?.ca = zidResp.ca
+        self.czid?.certs = zidResp.certs
+        self.czid?.ztAPI = zidResp.ztAPI
+        self.czid?.ztAPIs = validZtAPIs
+        self.czid?.name = zidResp.name ?? originalName
+
+        self.enrollTo = enrollTo
+        self.enabled = true
+        self.enrolled = true
+
+        if idChanged {
+            _ = zidStore.store(self)
+        }
+        return idChanged
+    }
+
+    /// Text for the "already enrolled" fallback dialog.
+    static func alreadyEnrolledInfo(requestedType: String) -> (title: String, detail: String, action: String) {
+        let title = "\(requestedType) Enrollment Failed"
+        let action = "Connect as User Session"
+        let detail: String
+        if requestedType == "User Session" {
+            detail = "An identity already exists on this network for your account.\n\n" +
+                "You can connect using the existing identity with periodic login required."
+        } else {
+            detail = "An identity already exists on this network for your account.\n\n" +
+                "You can connect using the existing identity, but it will use session-based " +
+                "authentication (periodic login required) instead of \(requestedType.lowercased())."
+        }
+        return (title, detail, action)
+    }
+
+    /// Enrollment status display string including type suffix.
+    var enrollmentStatusDisplay: String {
+        var str = enrollmentStatus.rawValue
+        if isEnrolled {
+            switch effectiveEnrollTo {
+            case .cert: str += " (Device Certificate)"
+            case .token: str += " (User Session)"
+            case .none:
+                if isExtAuthEnabled || isExtAuthPending {
+                    str += isExtAuthPending ? " (Authentication Required)" : " (User Session)"
+                }
+            }
+        }
+        return str
+    }
+}
+
+// MARK: - Enrollment Error Detection
+
+extension CZiti.ZitiError {
+    var isAlreadyEnrolled: Bool {
+        if let code = errorCodeString {
+            return code == "ENROLLMENT_IDENTITY_ALREADY_ENROLLED"
+        }
+        let desc = localizedDescription
+        return desc.contains("ENROLLMENT_IDENTITY_ALREADY_ENROLLED") ||
+               desc.contains("already has a matching identity")
+    }
 }
