@@ -10,6 +10,23 @@ permissions:
   contents: write
 
 jobs:
+  test:
+    runs-on: macos-26
+    steps:
+    - uses: actions/checkout@v4
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '26.2'
+    - name: Run Tests
+      run: |
+        xcodebuild test \
+          -project ZitiPacketTunnel.xcodeproj \
+          -scheme ZitiTests \
+          -destination "platform=macOS" \
+          CODE_SIGN_IDENTITY="-" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
   build:
     runs-on: macos-26
     outputs:

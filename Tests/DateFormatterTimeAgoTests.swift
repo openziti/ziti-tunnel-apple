@@ -15,6 +15,7 @@
 //
 
 import XCTest
+@testable import Ziti_Desktop_Edge
 
 class DateFormatterTimeAgoTests: XCTestCase {
 

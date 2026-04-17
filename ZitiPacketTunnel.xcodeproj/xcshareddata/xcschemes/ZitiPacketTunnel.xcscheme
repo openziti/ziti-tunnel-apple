@@ -37,6 +37,16 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "34B2C8BE987D38829A769A31"
+               BuildableName = "ZitiTests.xctest"
+               BlueprintName = "ZitiTests"
+               ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

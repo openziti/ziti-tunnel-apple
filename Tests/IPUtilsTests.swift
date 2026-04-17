@@ -16,6 +16,7 @@
 
 import XCTest
 import NetworkExtension
+@testable import Ziti_Desktop_Edge
 
 class IPUtilsTests: XCTestCase {
 
