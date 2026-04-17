@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		028220E3B920F4D1AAD6FD74 /* DateFormatterTimeAgoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BADD51AD3FBD497F079F1862 /* DateFormatterTimeAgoTests.swift */; };
+		49F5A6C4420D7A34C677CD3C /* DateFormatter+timeAgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */; };
+		54E2F9470CCE41CEFE77E691 /* DNSUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSUtils.swift */; };
 		5A00048E2830724000351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004912832769800351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004932832C3DF00351FE2 /* ServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0004922832C3DF00351FE2 /* ServiceViewController.swift */; };
@@ -140,6 +143,9 @@
 		5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76C225D644A0048B2F6 /* TableViewController.swift */; };
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
+		65C6760B8C133197BF7734E9 /* DNSUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734D2747781DCBB07884EAF1 /* DNSUtilsTests.swift */; };
+		74B58C685700A4A478C8362B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17E2F9557142DAFCEC6BBACE /* Cocoa.framework */; };
+		970A82133BEF23A824A2CBB3 /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
 		AA9471B02EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AA9471B12EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AABF06A52D38347600238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A32D38338300238DAE /* libz.1.tbd */; };
@@ -148,6 +154,9 @@
 		AABF06A82D42BD4E00238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
 		AABF06A92D42BDA700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
 		AAF3F22C2E03305100590422 /* EnrollURLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */; };
+		B4F0E1AEC3ECB17A87922999 /* IPUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2C30D110DCFF3CFF1BA2EE /* IPUtilsTests.swift */; };
+		BA1DAE0428CC23D044857C04 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25733FFCD66F11E7B4186458 /* NetworkExtension.framework */; };
+		FBD00F047207F37D2FD623EC /* TestStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 779D050046DA8D14D80B46E0 /* TestStubs.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -221,6 +230,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		17E2F9557142DAFCEC6BBACE /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		1C2C30D110DCFF3CFF1BA2EE /* IPUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/IPUtilsTests.swift; sourceTree = SOURCE_ROOT; };
+		25733FFCD66F11E7B4186458 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		5A0004922832C3DF00351FE2 /* ServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceViewController.swift; sourceTree = "<group>"; };
 		5A00FB9E2849731D00479380 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Desktop Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -305,13 +317,26 @@
 		5AFEB76C225D644A0048B2F6 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewController.swift; sourceTree = "<group>"; };
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
+		734D2747781DCBB07884EAF1 /* DNSUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DNSUtilsTests.swift; sourceTree = SOURCE_ROOT; };
+		779D050046DA8D14D80B46E0 /* TestStubs.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/TestStubs.swift; sourceTree = SOURCE_ROOT; };
 		AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "ziti-v2.icon"; sourceTree = "<group>"; };
 		AABF06A32D38338300238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
 		AABF06A42D3833A200238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.2.sdk/usr/lib/libz.1.tbd; sourceTree = DEVELOPER_DIR; };
 		AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollURLViewController.swift; sourceTree = "<group>"; };
+		BADD51AD3FBD497F079F1862 /* DateFormatterTimeAgoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DateFormatterTimeAgoTests.swift; sourceTree = SOURCE_ROOT; };
+		BE4DC486CB7F144C74B5590F /* ZitiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZitiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4A162710AF9D427A8D8877DC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				74B58C685700A4A478C8362B /* Cocoa.framework in Frameworks */,
+				BA1DAE0428CC23D044857C04 /* NetworkExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A02AAB1206EBD7E006261C6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -367,6 +392,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		085AAFAB2DA0F5732F68F1EC /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				17E2F9557142DAFCEC6BBACE /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
 		5A02AAAB206EBD7E006261C6 = {
 			isa = PBXGroup;
 			children = (
@@ -383,6 +416,7 @@
 				5A02AAB5206EBD7E006261C6 /* Products */,
 				5A02AAD8206EBE3C006261C6 /* Frameworks */,
 				AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */,
+				69D1F95241BFE281F8BC4E6B /* Tests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -394,6 +428,7 @@
 				5A2EA2C9209B750A00437608 /* Ziti Mobile Edge.app */,
 				5A2EA2DF209B754400437608 /* MobilePacketTunnelProvider.appex */,
 				5AF3DCA924B52642005047BC /* MobileShare.appex */,
+				BE4DC486CB7F144C74B5590F /* ZitiTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -438,6 +473,8 @@
 				5AFE864527E3C6AA00D47A47 /* libresolv.9.tbd */,
 				5AF4626129CA547500A06DFA /* libresolv.9.tbd */,
 				5A02AADB206EBE85006261C6 /* NetworkExtension.framework */,
+				085AAFAB2DA0F5732F68F1EC /* OS X */,
+				25733FFCD66F11E7B4186458 /* NetworkExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -566,6 +603,18 @@
 			path = simdata;
 			sourceTree = "<group>";
 		};
+		69D1F95241BFE281F8BC4E6B /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				779D050046DA8D14D80B46E0 /* TestStubs.swift */,
+				1C2C30D110DCFF3CFF1BA2EE /* IPUtilsTests.swift */,
+				734D2747781DCBB07884EAF1 /* DNSUtilsTests.swift */,
+				BADD51AD3FBD497F079F1862 /* DateFormatterTimeAgoTests.swift */,
+			);
+			name = Tests;
+			path = Tests;
+			sourceTree = SOURCE_ROOT;
+		};
 		AA2098A62C57CC8800BCD073 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -576,6 +625,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		34B2C8BE987D38829A769A31 /* ZitiTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 921A34B49353FA6664867A73 /* Build configuration list for PBXNativeTarget "ZitiTests" */;
+			buildPhases = (
+				B3CA7B5B48B6F3615FCDAC24 /* Sources */,
+				4A162710AF9D427A8D8877DC /* Frameworks */,
+				8FA1FBFCC1311CFE2A414C51 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ZitiTests;
+			productName = ZitiTests;
+			productReference = BE4DC486CB7F144C74B5590F /* ZitiTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		5A02AAB3206EBD7E006261C6 /* Ziti Desktop Edge */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A02AAC4206EBD7E006261C6 /* Build configuration list for PBXNativeTarget "Ziti Desktop Edge" */;
@@ -788,7 +854,7 @@
 			);
 			mainGroup = 5A02AAAB206EBD7E006261C6;
 			packageReferences = (
-				5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist" */,
+				5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist.git" */,
 			);
 			productRefGroup = 5A02AAB5206EBD7E006261C6 /* Products */;
 			projectDirPath = "";
@@ -799,6 +865,7 @@
 				5A2EA2C8209B750A00437608 /* Ziti Mobile Edge */,
 				5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */,
 				5AF3DCA824B52642005047BC /* MobileShare */,
+				34B2C8BE987D38829A769A31 /* ZitiTests */,
 			);
 		};
 /* End PBXProject section */
@@ -853,6 +920,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AF3DCAF24B52642005047BC /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FA1FBFCC1311CFE2A414C51 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -995,6 +1069,20 @@
 				5AF3DCAC24B52642005047BC /* ShareViewController.swift in Sources */,
 				5A2E11B024B6A543002856F3 /* ZitiIdentity.swift in Sources */,
 				5A29853A283CFB540056C9A7 /* Version.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B3CA7B5B48B6F3615FCDAC24 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FBD00F047207F37D2FD623EC /* TestStubs.swift in Sources */,
+				B4F0E1AEC3ECB17A87922999 /* IPUtilsTests.swift in Sources */,
+				65C6760B8C133197BF7734E9 /* DNSUtilsTests.swift in Sources */,
+				028220E3B920F4D1AAD6FD74 /* DateFormatterTimeAgoTests.swift in Sources */,
+				970A82133BEF23A824A2CBB3 /* IPUtils.swift in Sources */,
+				54E2F9470CCE41CEFE77E691 /* DNSUtils.swift in Sources */,
+				49F5A6C4420D7A34C677CD3C /* DateFormatter+timeAgo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1463,6 +1551,40 @@
 			};
 			name = Release;
 		};
+		ABA3776EC7F23B7614471E09 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CODE_SIGN_IDENTITY = "-";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				PRODUCT_BUNDLE_IDENTIFIER = io.openziti.ZitiTests;
+				PRODUCT_MODULE_NAME = ZitiTests;
+				PRODUCT_NAME = ZitiTests;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "";
+			};
+			name = Release;
+		};
+		BFB09C7CF8EB657A6AA8D935 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CODE_SIGN_IDENTITY = "-";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				PRODUCT_BUNDLE_IDENTIFIER = io.openziti.ZitiTests;
+				PRODUCT_MODULE_NAME = ZitiTests;
+				PRODUCT_NAME = ZitiTests;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1520,10 +1642,19 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		921A34B49353FA6664867A73 /* Build configuration list for PBXNativeTarget "ZitiTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABA3776EC7F23B7614471E09 /* Release */,
+				BFB09C7CF8EB657A6AA8D935 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist" */ = {
+		5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/openziti/ziti-sdk-swift-dist.git";
 			requirement = {
@@ -1536,7 +1667,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		5AF4624F29CA4D8800A06DFA /* CZiti */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist" */;
+			package = 5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist.git" */;
 			productName = CZiti;
 		};
 /* End XCSwiftPackageProductDependency section */
