@@ -91,6 +91,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             ZitiLog.setLogLevel(tlsuvLvl, module: "tlsuv")
         }
                         
+        // apply proxy configuration before creating ZitiTunnel
+        applyProxyConfig()
+
         // setup ZitiTunnel
         let ipDNS = providerConfig.dnsAddresses.first ?? ""
         zitiTunnel = ZitiTunnel(zitiTunnelDelegate, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS)
@@ -149,6 +152,44 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
     
+    func applyProxyConfig() {
+        let mode = providerConfig.proxyMode
+        zLog.info("Applying proxy config, mode: \(mode)")
+
+        switch mode {
+        case "manual":
+            guard !providerConfig.proxyHost.isEmpty,
+                  let port = UInt16(providerConfig.proxyPort), port > 0 else {
+                zLog.error("Manual proxy mode but host or port invalid, clearing proxy")
+                ZitiHttpProxyConfig.clearProxy()
+                return
+            }
+            if let creds = ZitiHttpProxyConfig.loadCredentials(proxyHost: providerConfig.proxyHost, proxyPort: port) {
+                ZitiHttpProxyConfig.setProxy(host: providerConfig.proxyHost, port: port,
+                                              username: creds.username, password: creds.password)
+            } else {
+                ZitiHttpProxyConfig.setProxy(host: providerConfig.proxyHost, port: port)
+            }
+
+        case "system":
+            guard let sp = ZitiHttpProxyConfig.systemProxy() else {
+                zLog.warn("System proxy mode but no system proxy detected, clearing proxy")
+                ZitiHttpProxyConfig.clearProxy()
+                return
+            }
+            zLog.info("Using system proxy: \(sp.host):\(sp.port)")
+            if let creds = ZitiHttpProxyConfig.loadCredentials(proxyHost: sp.host, proxyPort: sp.port) {
+                ZitiHttpProxyConfig.setProxy(host: sp.host, port: sp.port,
+                                              username: creds.username, password: creds.password)
+            } else {
+                ZitiHttpProxyConfig.setProxy(host: sp.host, port: sp.port)
+            }
+
+        default: // "none"
+            ZitiHttpProxyConfig.clearProxy()
+        }
+    }
+
     func loadConfig() -> Error? {
         guard let conf = (self.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration as? ProviderConfigDict else {
             let errStr = "Unable to load configuration. Provider configuration not available"

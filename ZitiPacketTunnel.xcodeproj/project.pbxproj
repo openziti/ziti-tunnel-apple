@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		028220E3B920F4D1AAD6FD74 /* DateFormatterTimeAgoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BADD51AD3FBD497F079F1862 /* DateFormatterTimeAgoTests.swift */; };
-		317C4CC567D9613110C57D6A /* ZitiIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C169439F29854B02947306E4 /* ZitiIdentityTests.swift */; };
-		531F4B8409DA10DBE64C9A45 /* ZitiIdentityStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994EB84988C0C65788608087 /* ZitiIdentityStoreTests.swift */; };
-		5860E56C669E8D6588448C2F /* ZitiIdentityCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7EC7282791FBACFC52478 /* ZitiIdentityCodableTests.swift */; };
+		028220E3B920F4D1AAD6FD74 /* Tests/DateFormatterTimeAgoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BADD51AD3FBD497F079F1862 /* Tests/DateFormatterTimeAgoTests.swift */; };
+		317C4CC567D9613110C57D6A /* Tests/ZitiIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C169439F29854B02947306E4 /* Tests/ZitiIdentityTests.swift */; };
+		531F4B8409DA10DBE64C9A45 /* Tests/ZitiIdentityStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */; };
+		5860E56C669E8D6588448C2F /* Tests/ZitiIdentityCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7EC7282791FBACFC52478 /* Tests/ZitiIdentityCodableTests.swift */; };
 		5A00048E2830724000351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004912832769800351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004932832C3DF00351FE2 /* ServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0004922832C3DF00351FE2 /* ServiceViewController.swift */; };
@@ -145,10 +145,11 @@
 		5AFEB76F225E6BFD0048B2F6 /* AdvancedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */; };
 		5AFEB771225EC3BB0048B2F6 /* TunnelSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */; };
 		648155272D615C9E15BDA8CA /* DNSUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF786982090FFCA0093498C /* DNSUtils.swift */; };
-		65C6760B8C133197BF7734E9 /* DNSUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734D2747781DCBB07884EAF1 /* DNSUtilsTests.swift */; };
-		66094CA95F37349413135B6B /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E457C0973798AAD748CA11 /* TestHelpers.swift */; };
-		6C5C80B61B5EE7EABC083778 /* ZitiServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E78327ED970E2088485E22 /* ZitiServiceTests.swift */; };
-		87CD51B3A39090656A6D9D8B /* IpcMessagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE03177A4BB9F38CE6BAE022 /* IpcMessagesTests.swift */; };
+		65C6760B8C133197BF7734E9 /* Tests/DNSUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734D2747781DCBB07884EAF1 /* Tests/DNSUtilsTests.swift */; };
+		66094CA95F37349413135B6B /* Tests/TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E457C0973798AAD748CA11 /* Tests/TestHelpers.swift */; };
+		6C5C80B61B5EE7EABC083778 /* Tests/ZitiServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E78327ED970E2088485E22 /* Tests/ZitiServiceTests.swift */; };
+		87CD51B3A39090656A6D9D8B /* Tests/IpcMessagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE03177A4BB9F38CE6BAE022 /* Tests/IpcMessagesTests.swift */; };
+		A1B2C3D4E5F60718A9B0C1E3 /* Tests/ProviderConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */; };
 		AA9471B02EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AA9471B12EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AABF06A52D38347600238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A32D38338300238DAE /* libz.1.tbd */; };
@@ -157,8 +158,8 @@
 		AABF06A82D42BD4E00238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
 		AABF06A92D42BDA700238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A42D3833A200238DAE /* libz.1.tbd */; };
 		AAF3F22C2E03305100590422 /* EnrollURLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */; };
-		B28480D4B6B07F98CAB95841 /* ArrayZitiIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8EB217C2D21593A31A4A8C7 /* ArrayZitiIdentityTests.swift */; };
-		B4F0E1AEC3ECB17A87922999 /* IPUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2C30D110DCFF3CFF1BA2EE /* IPUtilsTests.swift */; };
+		B28480D4B6B07F98CAB95841 /* Tests/ArrayZitiIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8EB217C2D21593A31A4A8C7 /* Tests/ArrayZitiIdentityTests.swift */; };
+		B4F0E1AEC3ECB17A87922999 /* Tests/IPUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2C30D110DCFF3CFF1BA2EE /* Tests/IPUtilsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -240,8 +241,8 @@
 
 /* Begin PBXFileReference section */
 		17E2F9557142DAFCEC6BBACE /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		1C2C30D110DCFF3CFF1BA2EE /* IPUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/IPUtilsTests.swift; sourceTree = SOURCE_ROOT; };
-		25733FFCD66F11E7B4186458 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		1C2C30D110DCFF3CFF1BA2EE /* Tests/IPUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/IPUtilsTests.swift; sourceTree = SOURCE_ROOT; };
+		25733FFCD66F11E7B4186458 /* System/Library/Frameworks/NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		5A0004922832C3DF00351FE2 /* ServiceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceViewController.swift; sourceTree = "<group>"; };
 		5A00FB9E2849731D00479380 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		5A02AAB4206EBD7E006261C6 /* Ziti Desktop Edge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ziti Desktop Edge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -326,20 +327,21 @@
 		5AFEB76C225D644A0048B2F6 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		5AFEB76E225E6BFD0048B2F6 /* AdvancedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedViewController.swift; sourceTree = "<group>"; };
 		5AFEB770225EC3BB0048B2F6 /* TunnelSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsViewController.swift; sourceTree = "<group>"; };
-		734D2747781DCBB07884EAF1 /* DNSUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DNSUtilsTests.swift; sourceTree = SOURCE_ROOT; };
-		79E78327ED970E2088485E22 /* ZitiServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiServiceTests.swift; sourceTree = SOURCE_ROOT; };
-		994EB84988C0C65788608087 /* ZitiIdentityStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityStoreTests.swift; sourceTree = SOURCE_ROOT; };
+		734D2747781DCBB07884EAF1 /* Tests/DNSUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DNSUtilsTests.swift; sourceTree = SOURCE_ROOT; };
+		79E78327ED970E2088485E22 /* Tests/ZitiServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiServiceTests.swift; sourceTree = SOURCE_ROOT; };
+		994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityStoreTests.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ProviderConfigTests.swift; sourceTree = SOURCE_ROOT; };
 		AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "ziti-v2.icon"; sourceTree = "<group>"; };
 		AABF06A32D38338300238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
 		AABF06A42D3833A200238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.2.sdk/usr/lib/libz.1.tbd; sourceTree = DEVELOPER_DIR; };
 		AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollURLViewController.swift; sourceTree = "<group>"; };
-		B8EB217C2D21593A31A4A8C7 /* ArrayZitiIdentityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ArrayZitiIdentityTests.swift; sourceTree = SOURCE_ROOT; };
-		BADD51AD3FBD497F079F1862 /* DateFormatterTimeAgoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DateFormatterTimeAgoTests.swift; sourceTree = SOURCE_ROOT; };
+		B8EB217C2D21593A31A4A8C7 /* Tests/ArrayZitiIdentityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ArrayZitiIdentityTests.swift; sourceTree = SOURCE_ROOT; };
+		BADD51AD3FBD497F079F1862 /* Tests/DateFormatterTimeAgoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DateFormatterTimeAgoTests.swift; sourceTree = SOURCE_ROOT; };
 		BE4DC486CB7F144C74B5590F /* ZitiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZitiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C169439F29854B02947306E4 /* ZitiIdentityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityTests.swift; sourceTree = SOURCE_ROOT; };
-		E4E457C0973798AAD748CA11 /* TestHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/TestHelpers.swift; sourceTree = SOURCE_ROOT; };
-		EE03177A4BB9F38CE6BAE022 /* IpcMessagesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/IpcMessagesTests.swift; sourceTree = SOURCE_ROOT; };
-		F8B7EC7282791FBACFC52478 /* ZitiIdentityCodableTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityCodableTests.swift; sourceTree = SOURCE_ROOT; };
+		C169439F29854B02947306E4 /* Tests/ZitiIdentityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityTests.swift; sourceTree = SOURCE_ROOT; };
+		E4E457C0973798AAD748CA11 /* Tests/TestHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/TestHelpers.swift; sourceTree = SOURCE_ROOT; };
+		EE03177A4BB9F38CE6BAE022 /* Tests/IpcMessagesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/IpcMessagesTests.swift; sourceTree = SOURCE_ROOT; };
+		F8B7EC7282791FBACFC52478 /* Tests/ZitiIdentityCodableTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityCodableTests.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -487,7 +489,7 @@
 				5AF4626129CA547500A06DFA /* libresolv.9.tbd */,
 				5A02AADB206EBE85006261C6 /* NetworkExtension.framework */,
 				085AAFAB2DA0F5732F68F1EC /* OS X */,
-				25733FFCD66F11E7B4186458 /* NetworkExtension.framework */,
+				25733FFCD66F11E7B4186458 /* System/Library/Frameworks/NetworkExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -619,18 +621,18 @@
 		69D1F95241BFE281F8BC4E6B /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				1C2C30D110DCFF3CFF1BA2EE /* IPUtilsTests.swift */,
-				734D2747781DCBB07884EAF1 /* DNSUtilsTests.swift */,
-				BADD51AD3FBD497F079F1862 /* DateFormatterTimeAgoTests.swift */,
-				E4E457C0973798AAD748CA11 /* TestHelpers.swift */,
-				C169439F29854B02947306E4 /* ZitiIdentityTests.swift */,
-				79E78327ED970E2088485E22 /* ZitiServiceTests.swift */,
-				B8EB217C2D21593A31A4A8C7 /* ArrayZitiIdentityTests.swift */,
-				EE03177A4BB9F38CE6BAE022 /* IpcMessagesTests.swift */,
-				F8B7EC7282791FBACFC52478 /* ZitiIdentityCodableTests.swift */,
-				994EB84988C0C65788608087 /* ZitiIdentityStoreTests.swift */,
+				1C2C30D110DCFF3CFF1BA2EE /* Tests/IPUtilsTests.swift */,
+				734D2747781DCBB07884EAF1 /* Tests/DNSUtilsTests.swift */,
+				BADD51AD3FBD497F079F1862 /* Tests/DateFormatterTimeAgoTests.swift */,
+				E4E457C0973798AAD748CA11 /* Tests/TestHelpers.swift */,
+				C169439F29854B02947306E4 /* Tests/ZitiIdentityTests.swift */,
+				79E78327ED970E2088485E22 /* Tests/ZitiServiceTests.swift */,
+				B8EB217C2D21593A31A4A8C7 /* Tests/ArrayZitiIdentityTests.swift */,
+				EE03177A4BB9F38CE6BAE022 /* Tests/IpcMessagesTests.swift */,
+				F8B7EC7282791FBACFC52478 /* Tests/ZitiIdentityCodableTests.swift */,
+				994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */,
+				A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */,
 			);
-			name = Tests;
 			path = Tests;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -874,7 +876,7 @@
 			);
 			mainGroup = 5A02AAAB206EBD7E006261C6;
 			packageReferences = (
-				5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist.git" */,
+				5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist" */,
 			);
 			productRefGroup = 5A02AAB5206EBD7E006261C6 /* Products */;
 			projectDirPath = "";
@@ -1097,16 +1099,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B4F0E1AEC3ECB17A87922999 /* IPUtilsTests.swift in Sources */,
-				65C6760B8C133197BF7734E9 /* DNSUtilsTests.swift in Sources */,
-				028220E3B920F4D1AAD6FD74 /* DateFormatterTimeAgoTests.swift in Sources */,
-				66094CA95F37349413135B6B /* TestHelpers.swift in Sources */,
-				317C4CC567D9613110C57D6A /* ZitiIdentityTests.swift in Sources */,
-				6C5C80B61B5EE7EABC083778 /* ZitiServiceTests.swift in Sources */,
-				B28480D4B6B07F98CAB95841 /* ArrayZitiIdentityTests.swift in Sources */,
-				87CD51B3A39090656A6D9D8B /* IpcMessagesTests.swift in Sources */,
-				5860E56C669E8D6588448C2F /* ZitiIdentityCodableTests.swift in Sources */,
-				531F4B8409DA10DBE64C9A45 /* ZitiIdentityStoreTests.swift in Sources */,
+				B4F0E1AEC3ECB17A87922999 /* Tests/IPUtilsTests.swift in Sources */,
+				65C6760B8C133197BF7734E9 /* Tests/DNSUtilsTests.swift in Sources */,
+				028220E3B920F4D1AAD6FD74 /* Tests/DateFormatterTimeAgoTests.swift in Sources */,
+				66094CA95F37349413135B6B /* Tests/TestHelpers.swift in Sources */,
+				317C4CC567D9613110C57D6A /* Tests/ZitiIdentityTests.swift in Sources */,
+				6C5C80B61B5EE7EABC083778 /* Tests/ZitiServiceTests.swift in Sources */,
+				B28480D4B6B07F98CAB95841 /* Tests/ArrayZitiIdentityTests.swift in Sources */,
+				87CD51B3A39090656A6D9D8B /* Tests/IpcMessagesTests.swift in Sources */,
+				5860E56C669E8D6588448C2F /* Tests/ZitiIdentityCodableTests.swift in Sources */,
+				531F4B8409DA10DBE64C9A45 /* Tests/ZitiIdentityStoreTests.swift in Sources */,
+				A1B2C3D4E5F60718A9B0C1E3 /* Tests/ProviderConfigTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1680,7 +1683,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist.git" */ = {
+		5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/openziti/ziti-sdk-swift-dist.git";
 			requirement = {
@@ -1693,7 +1696,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		5AF4624F29CA4D8800A06DFA /* CZiti */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist.git" */;
+			package = 5AF4624E29CA4D8800A06DFA /* XCRemoteSwiftPackageReference "ziti-sdk-swift-dist" */;
 			productName = CZiti;
 		};
 /* End XCSwiftPackageProductDependency section */
