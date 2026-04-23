@@ -33,6 +33,19 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var fallbackDNSText: NSTextField!
     @IBOutlet weak var interceptMatchedDomainsSwitch: NSSwitch!
     @IBOutlet weak var lowPowerModeSwitch: NSSwitch!
+    @IBOutlet weak var proxyModePopUp: NSPopUpButton!
+    @IBOutlet weak var proxyHostText: NSTextField!
+    @IBOutlet weak var proxyPortText: NSTextField!
+    @IBOutlet weak var proxyUsernameText: NSTextField!
+    @IBOutlet weak var proxyPasswordText: NSSecureTextField!
+    @IBOutlet weak var proxyHostLabel: NSTextField!
+    @IBOutlet weak var proxyPortLabel: NSTextField!
+    @IBOutlet weak var proxyUsernameLabel: NSTextField!
+    @IBOutlet weak var proxyPasswordLabel: NSTextField!
+
+    // Track previous proxy host/port to clean up orphaned keychain credentials
+    var previousProxyHost: String = ""
+    var previousProxyPort: UInt16 = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,8 +60,13 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.dnsServersText.delegate = self
         self.fallbackDNSText.delegate = self
         
-        self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText ]
-        
+        self.proxyHostText.delegate = self
+        self.proxyPortText.delegate = self
+        self.proxyUsernameText.delegate = self
+        self.proxyPasswordText.delegate = self
+
+        self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText, proxyHostText, proxyPortText ]
+
         self.updateConfigControls()
     }
     
@@ -62,6 +80,11 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.fallbackDNSText.stringValue = defaults.fallbackDns
         self.interceptMatchedDomainsSwitch.state = defaults.interceptMatchedDns ? .on : .off
         self.lowPowerModeSwitch.state = defaults.lowPowerMode ? .on : .off
+        self.proxyModePopUp.selectItem(at: 0)
+        self.proxyHostText.stringValue = ""
+        self.proxyPortText.stringValue = ""
+        self.proxyUsernameText.stringValue = ""
+        self.proxyPasswordText.stringValue = ""
         
         guard
             let pp = vc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
@@ -99,7 +122,47 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         if let lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool {
             self.lowPowerModeSwitch.state = lowPowerMode ? .on : .off
         }
-        
+
+        if let proxyMode = conf[ProviderConfig.PROXY_MODE_KEY] as? String {
+            switch proxyMode {
+            case "manual": self.proxyModePopUp.selectItem(at: 1)
+            case "system": self.proxyModePopUp.selectItem(at: 2)
+            default: self.proxyModePopUp.selectItem(at: 0)
+            }
+        }
+        if let proxyHost = conf[ProviderConfig.PROXY_HOST_KEY] as? String {
+            self.proxyHostText.stringValue = proxyHost
+        }
+        if let proxyPort = conf[ProviderConfig.PROXY_PORT_KEY] as? String {
+            self.proxyPortText.stringValue = proxyPort
+        }
+
+        // Load credentials from keychain
+        let credHost: String
+        let credPort: UInt16
+        if self.proxyModePopUp.indexOfSelectedItem == 2 {
+            if let sp = ZitiHttpProxyConfig.systemProxy() {
+                credHost = sp.host
+                credPort = sp.port
+            } else {
+                credHost = ""
+                credPort = 0
+            }
+        } else {
+            credHost = self.proxyHostText.stringValue
+            credPort = UInt16(self.proxyPortText.stringValue) ?? 0
+        }
+        if !credHost.isEmpty && credPort > 0 {
+            if let creds = ZitiHttpProxyConfig.loadCredentials(proxyHost: credHost, proxyPort: credPort) {
+                self.proxyUsernameText.stringValue = creds.username
+                self.proxyPasswordText.stringValue = creds.password
+            }
+        }
+        self.previousProxyHost = credHost
+        self.previousProxyPort = credPort
+
+        self.updateProxyFieldStates()
+
         self.ipAddressText.becomeFirstResponder()
     }
     
@@ -124,6 +187,40 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     @IBAction func onLowPowerModeToggle(_ sender: Any) {
         self.saveButton.isEnabled = true
     }
+
+    @IBAction func onProxyModeChanged(_ sender: Any) {
+        self.saveButton.isEnabled = true
+        self.restartRequired = true
+        self.updateProxyFieldStates()
+    }
+
+    private func updateProxyFieldStates() {
+        let mode = proxyModePopUp.indexOfSelectedItem  // 0=none, 1=manual, 2=system
+        let isManual = (mode == 1)
+        let hasProxy = (mode != 0)
+
+        proxyHostText.isEnabled = isManual
+        proxyPortText.isEnabled = isManual
+        proxyHostLabel.textColor = isManual ? .labelColor : .disabledControlTextColor
+        proxyPortLabel.textColor = isManual ? .labelColor : .disabledControlTextColor
+
+        proxyUsernameText.isEnabled = hasProxy
+        proxyPasswordText.isEnabled = hasProxy
+        proxyUsernameLabel.textColor = hasProxy ? .labelColor : .disabledControlTextColor
+        proxyPasswordLabel.textColor = hasProxy ? .labelColor : .disabledControlTextColor
+
+        if mode == 2, let sp = ZitiHttpProxyConfig.systemProxy() {
+            proxyHostText.stringValue = sp.host
+            proxyPortText.stringValue = String(sp.port)
+        } else if !isManual {
+            proxyHostText.stringValue = ""
+            proxyPortText.stringValue = ""
+        }
+        if !hasProxy {
+            proxyUsernameText.stringValue = ""
+            proxyPasswordText.stringValue = ""
+        }
+    }
     
     @IBAction func onSaveButton(_ sender: Any) {
         guard
@@ -146,7 +243,59 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         conf[ProviderConfig.FALLBACK_DNS_KEY] = self.fallbackDNSText.stringValue
         conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] = self.interceptMatchedDomainsSwitch.state == .on
         conf[ProviderConfig.LOW_POWER_MODE_KEY] = self.lowPowerModeSwitch.state == .on
-        
+
+        let proxyModeIndex = self.proxyModePopUp.indexOfSelectedItem
+        let proxyMode: String
+        switch proxyModeIndex {
+        case 1: proxyMode = "manual"
+        case 2: proxyMode = "system"
+        default: proxyMode = "none"
+        }
+        conf[ProviderConfig.PROXY_MODE_KEY] = proxyMode
+        conf[ProviderConfig.PROXY_HOST_KEY] = self.proxyHostText.stringValue
+        conf[ProviderConfig.PROXY_PORT_KEY] = self.proxyPortText.stringValue
+
+        // Validate before saving
+        let pc = ProviderConfig()
+        if let error = pc.validateDictionaty(conf) {
+            let alert = NSAlert()
+            alert.messageText = "Configuration Error"
+            alert.informativeText = error.description
+            alert.alertStyle = .warning
+            alert.runModal()
+            return
+        }
+
+        // Determine effective host/port for credential storage
+        var effectiveHost = self.proxyHostText.stringValue
+        var effectivePort = UInt16(self.proxyPortText.stringValue) ?? 0
+        if proxyMode == "system" {
+            if let sp = ZitiHttpProxyConfig.systemProxy() {
+                effectiveHost = sp.host
+                effectivePort = sp.port
+            }
+        }
+
+        // Clean up old credentials if host/port changed
+        if previousProxyHost != effectiveHost || previousProxyPort != effectivePort {
+            if !previousProxyHost.isEmpty && previousProxyPort > 0 {
+                ZitiHttpProxyConfig.deleteCredentials(proxyHost: previousProxyHost, proxyPort: previousProxyPort)
+            }
+        }
+
+        // Store or delete credentials
+        let username = self.proxyUsernameText.stringValue
+        let password = self.proxyPasswordText.stringValue
+        if proxyMode != "none" && !username.isEmpty && !password.isEmpty && !effectiveHost.isEmpty && effectivePort > 0 {
+            if let err = ZitiHttpProxyConfig.storeCredentials(
+                username: username, password: password,
+                proxyHost: effectiveHost, proxyPort: effectivePort) {
+                zLog.error("Failed to store proxy credentials: \(err.localizedDescription)")
+            }
+        } else if !effectiveHost.isEmpty && effectivePort > 0 {
+            ZitiHttpProxyConfig.deleteCredentials(proxyHost: effectiveHost, proxyPort: effectivePort)
+        }
+
         pp.providerConfiguration = conf
         TunnelMgr.shared.tpm?.saveToPreferences { error in
             if let error = error {

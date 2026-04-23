@@ -26,6 +26,8 @@ enum ProviderConfigError : Error {
     case invalidFallbackDns
     case invalidLogRotateCount
     case invalidLogRotateSizeMB
+    case invalidProxyHost
+    case invalidProxyPort
 
     var description: String {
         switch self {
@@ -36,6 +38,8 @@ enum ProviderConfigError : Error {
         case .invalidFallbackDns: return "Invalid Fallback DNS (expect valid IPv4 address)"
         case .invalidLogRotateCount: return "Invalid log rotation count"
         case .invalidLogRotateSizeMB: return "Invalid log rotation size (MB)"
+        case .invalidProxyHost: return "Proxy Host is required for Manual Proxy mode"
+        case .invalidProxyPort: return "Invalid Proxy Port (expect integer 1-65535)"
         }
     }
 }
@@ -57,6 +61,9 @@ class ProviderConfig : NSObject {
     static var LOG_ROTATE_DAILY_KEY = "logRotateDaily"
     static var LOG_ROTATE_COUNT_KEY = "logRotateCount"
     static var LOG_ROTATE_SIZEMB_KEY = "logRotateSizeMB"
+    static var PROXY_MODE_KEY = "proxyMode"
+    static var PROXY_HOST_KEY = "proxyHost"
+    static var PROXY_PORT_KEY = "proxyPort"
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "100.64.0.1"
@@ -95,6 +102,10 @@ class ProviderConfig : NSObject {
     var logRotateCount:Int = 2
     var logRotateSizeMB:Int = 5
 #endif
+
+    var proxyMode:String = "none"  // "none", "manual", "system"
+    var proxyHost:String = ""
+    var proxyPort:String = ""
     
     func createDictionary() -> ProviderConfigDict {
         return [ProviderConfig.IP_KEY: self.ipAddress,
@@ -109,7 +120,10 @@ class ProviderConfig : NSObject {
                 ProviderConfig.INTERCEPT_MATCHED_DNS_KEY: self.interceptMatchedDns,
                 ProviderConfig.LOG_ROTATE_DAILY_KEY: self.logRotateDaily,
                 ProviderConfig.LOG_ROTATE_COUNT_KEY: String(self.logRotateCount),
-                ProviderConfig.LOG_ROTATE_SIZEMB_KEY: String(self.logRotateSizeMB)]
+                ProviderConfig.LOG_ROTATE_SIZEMB_KEY: String(self.logRotateSizeMB),
+                ProviderConfig.PROXY_MODE_KEY: self.proxyMode,
+                ProviderConfig.PROXY_HOST_KEY: self.proxyHost,
+                ProviderConfig.PROXY_PORT_KEY: self.proxyPort]
     }
     
     private func isValidIpAddress(_ obj:Any?) -> Bool {
@@ -152,6 +166,17 @@ class ProviderConfig : NSObject {
                 return ProviderConfigError.invalidLogRotateSizeMB
             }
         }
+
+        if let mode = conf[ProviderConfig.PROXY_MODE_KEY] as? String, mode == "manual" {
+            let host = (conf[ProviderConfig.PROXY_HOST_KEY] as? String ?? "").trimmingCharacters(in: .whitespaces)
+            if host.isEmpty {
+                return ProviderConfigError.invalidProxyHost
+            }
+            let portStr = (conf[ProviderConfig.PROXY_PORT_KEY] as? String ?? "").trimmingCharacters(in: .whitespaces)
+            guard !portStr.isEmpty, let portInt = Int(portStr), portInt > 0, portInt <= 65535 else {
+                return ProviderConfigError.invalidProxyPort
+            }
+        }
         return nil
     }
     
@@ -192,6 +217,15 @@ class ProviderConfig : NSObject {
         if let lrSizeStr = conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] as? String, let lrSizeInt = Int(lrSizeStr) {
             self.logRotateSizeMB = lrSizeInt
         }
+        if let proxyMode = conf[ProviderConfig.PROXY_MODE_KEY] as? String {
+            self.proxyMode = proxyMode
+        }
+        if let proxyHost = conf[ProviderConfig.PROXY_HOST_KEY] as? String {
+            self.proxyHost = proxyHost.trimmingCharacters(in: .whitespaces)
+        }
+        if let proxyPort = conf[ProviderConfig.PROXY_PORT_KEY] as? String {
+            self.proxyPort = proxyPort.trimmingCharacters(in: .whitespaces)
+        }
         return nil
     }
     
@@ -209,6 +243,9 @@ class ProviderConfig : NSObject {
             "logTlsuv: \(self.logTlsuv)\n" +
             "logRotateDaily: \(self.logRotateDaily)\n" +
             "logRotateCount: \(self.logRotateCount)\n" +
-            "logRotateSizeMB: \(self.logRotateSizeMB)"
+            "logRotateSizeMB: \(self.logRotateSizeMB)\n" +
+            "proxyMode: \(self.proxyMode)\n" +
+            "proxyHost: \(self.proxyHost)\n" +
+            "proxyPort: \(self.proxyPort)"
     }
 }
