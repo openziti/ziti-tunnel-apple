@@ -369,7 +369,9 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         var reassert = false
         
         if remove {
-            self.dnsEntries.remove(serviceId)
+            if canDial(eSvc) {
+                self.dnsEntries.remove(serviceId)
+            }
             tzid.services = tzid.services.filter { $0.id != serviceId }
             reassert = true // could be smarter about this, but won't hurt (and removing service is less common that adding)
         }
