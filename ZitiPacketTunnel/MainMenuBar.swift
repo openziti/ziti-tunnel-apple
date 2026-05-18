@@ -43,8 +43,8 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         tunConnectItem = newMenuItem(title:"Connect", action:#selector(MainMenuBar.connect(_:)))
         menu.addItem(tunConnectItem)
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(newMenuItem(title: "Manage Tunnels", action: #selector(MainMenuBar.showPanel(_:))))
         menu.addItem(newMenuItem(title: "Get Started", action: #selector(MainMenuBar.showGettingStarted(_:))))
+        menu.addItem(newMenuItem(title: "Manage Tunnels", action: #selector(MainMenuBar.showPanel(_:))))
 
         showDocItem = newMenuItem(title: "Show In Dock", action: #selector(MainMenuBar.showInDock(_:)))
         showDocItem.state = .on

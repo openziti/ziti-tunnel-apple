@@ -292,17 +292,17 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 cell?.imageView?.image = UIImage(named: imageName)
             }
         } else {
-            // feedback, help, advanced, getting started, about
+            // get started, feedback, help, advanced, about
             if indexPath.row == 0 {
-                cell = tableView.dequeueReusableCell(withIdentifier: "FEEDBACK_CELL", for: indexPath)
-            } else if indexPath.row == 1 {
-                cell = tableView.dequeueReusableCell(withIdentifier: "HELP_CELL", for: indexPath)
-            } else if indexPath.row == 2 {
-                cell = tableView.dequeueReusableCell(withIdentifier: "ADVANCED_CELL", for: indexPath)
-            } else if indexPath.row == 3 {
                 cell = tableView.dequeueReusableCell(withIdentifier: "GETTING_STARTED_CELL", for: indexPath)
                 cell?.textLabel?.text = "Get Started"
                 cell?.accessoryType = .disclosureIndicator
+            } else if indexPath.row == 1 {
+                cell = tableView.dequeueReusableCell(withIdentifier: "FEEDBACK_CELL", for: indexPath)
+            } else if indexPath.row == 2 {
+                cell = tableView.dequeueReusableCell(withIdentifier: "HELP_CELL", for: indexPath)
+            } else if indexPath.row == 3 {
+                cell = tableView.dequeueReusableCell(withIdentifier: "ADVANCED_CELL", for: indexPath)
             } else {
                 cell = tableView.dequeueReusableCell(withIdentifier: "ABOUT_CELL", for: indexPath)
             }
@@ -440,6 +440,9 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 self.present(alert, animated: true, completion: nil)
             }
         } else if indexPath.section == 2 && indexPath.row == 0 {
+            tableView.deselectRow(at: indexPath, animated: true)
+            showGettingStarted()
+        } else if indexPath.section == 2 && indexPath.row == 1 {
             // quick 'n dirty support email composer.  TODO: Look into Instabug
             let supportEmail = Bundle.main.infoDictionary?["ZitiSupportEmail"] as? String ?? ""
             let supportSubj = Bundle.main.infoDictionary?["ZitiSupportSubject"] as? String ?? ""
@@ -475,15 +478,12 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
                 self.present(alert, animated: true, completion: nil)
             }
-        } else if indexPath.section == 2 && indexPath.row == 1 {
+        } else if indexPath.section == 2 && indexPath.row == 2 {
             let zitiHelpUrl = Bundle.main.infoDictionary?["ZitiHelpURL"] as? String ?? ""
             if let url = URL(string: zitiHelpUrl) {
                 let vc = SFSafariViewController(url: url)
                 present(vc, animated: true)
             }
-        } else if indexPath.section == 2 && indexPath.row == 3 {
-            tableView.deselectRow(at: indexPath, animated: true)
-            showGettingStarted()
         }
     }
     
