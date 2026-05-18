@@ -96,11 +96,27 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     weak var ivc:IdentityViewController?
     let sc = ScannerViewController()
+    private var hasShownWelcome = false
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if !hasShownWelcome && zids.isEmpty {
+            hasShownWelcome = true
+            showGettingStarted()
+        }
+    }
+
+    func showGettingStarted() {
+        let gsvc = GettingStartedViewController()
+        let nav = UINavigationController(rootViewController: gsvc)
+        present(nav, animated: true)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.isEditing = true
         tableView.allowsSelectionDuringEditing = true
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "GETTING_STARTED_CELL")
         
         sc.delegate = self
         
@@ -233,7 +249,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         if section == 1 {
             nRows = zids.count + 1
         } else if section == 2 {
-            nRows = 4
+            nRows = 5
         }
         return nRows
     }
@@ -276,13 +292,17 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 cell?.imageView?.image = UIImage(named: imageName)
             }
         } else {
-            // feedback, help, advanced, about
+            // feedback, help, advanced, getting started, about
             if indexPath.row == 0 {
                 cell = tableView.dequeueReusableCell(withIdentifier: "FEEDBACK_CELL", for: indexPath)
             } else if indexPath.row == 1 {
                 cell = tableView.dequeueReusableCell(withIdentifier: "HELP_CELL", for: indexPath)
             } else if indexPath.row == 2 {
                 cell = tableView.dequeueReusableCell(withIdentifier: "ADVANCED_CELL", for: indexPath)
+            } else if indexPath.row == 3 {
+                cell = tableView.dequeueReusableCell(withIdentifier: "GETTING_STARTED_CELL", for: indexPath)
+                cell?.textLabel?.text = "Getting Started"
+                cell?.accessoryType = .disclosureIndicator
             } else {
                 cell = tableView.dequeueReusableCell(withIdentifier: "ABOUT_CELL", for: indexPath)
             }
@@ -461,6 +481,9 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 let vc = SFSafariViewController(url: url)
                 present(vc, animated: true)
             }
+        } else if indexPath.section == 2 && indexPath.row == 3 {
+            tableView.deselectRow(at: indexPath, animated: true)
+            showGettingStarted()
         }
     }
     
