@@ -301,7 +301,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 cell = tableView.dequeueReusableCell(withIdentifier: "ADVANCED_CELL", for: indexPath)
             } else if indexPath.row == 3 {
                 cell = tableView.dequeueReusableCell(withIdentifier: "GETTING_STARTED_CELL", for: indexPath)
-                cell?.textLabel?.text = "Getting Started"
+                cell?.textLabel?.text = "Get Started"
                 cell?.accessoryType = .disclosureIndicator
             } else {
                 cell = tableView.dequeueReusableCell(withIdentifier: "ABOUT_CELL", for: indexPath)

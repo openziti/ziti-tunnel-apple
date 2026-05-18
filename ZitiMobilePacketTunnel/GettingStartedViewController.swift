@@ -20,7 +20,7 @@ class GettingStartedViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Getting Started"
+        title = "Get Started"
         view.backgroundColor = .systemBackground
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onDone))
         setupUI()
