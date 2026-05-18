@@ -232,8 +232,9 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     
     func getMainWindow() -> NSWindow? {
         // Hack (since NSApplication.shared.mainWindow is nil when minimized)
+        let windowTitle = "\(appName) by NetFoundry"
         for window in NSApplication.shared.windows {
-            if window.className == "NSWindow" && window.title == appName {
+            if window.className == "NSWindow" && window.title == windowTitle {
                 return window
             }
         }
