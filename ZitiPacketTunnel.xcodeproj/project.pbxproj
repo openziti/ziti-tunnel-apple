@@ -96,6 +96,8 @@
 		5A9417C8287B9D3100EEE6BD /* LogRotationConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9417C7287B9D3000EEE6BD /* LogRotationConfigViewController.swift */; };
 		5A9417CA2880975100EEE6BD /* MfaVerifyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */; };
 		5A94B33B283EF77F00C07599 /* InAppNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33A283EF77F00C07599 /* InAppNotification.swift */; };
+		BB00A1022ECC8D0000000002 /* GettingStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00A1012ECC8D0000000001 /* GettingStartedViewController.swift */; };
+		BB00A1042ECC8D0000000004 /* netfoundry-logo.svg in Resources */ = {isa = PBXBuildFile; fileRef = BB00A1032ECC8D0000000003 /* netfoundry-logo.svg */; };
 		5A94B3402843D10F00C07599 /* EditableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33F2843D10F00C07599 /* EditableTextField.swift */; };
 		5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
 		5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
@@ -296,6 +298,8 @@
 		5A9417C7287B9D3000EEE6BD /* LogRotationConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogRotationConfigViewController.swift; sourceTree = "<group>"; };
 		5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaVerifyViewController.swift; sourceTree = "<group>"; };
 		5A94B33A283EF77F00C07599 /* InAppNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotification.swift; sourceTree = "<group>"; };
+		BB00A1012ECC8D0000000001 /* GettingStartedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedViewController.swift; sourceTree = "<group>"; };
+		BB00A1032ECC8D0000000003 /* netfoundry-logo.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = "netfoundry-logo.svg"; sourceTree = "<group>"; };
 		5A94B33F2843D10F00C07599 /* EditableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableTextField.swift; sourceTree = "<group>"; };
 		5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelMgr.swift; sourceTree = "<group>"; };
 		5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcMessages.swift; sourceTree = "<group>"; };
@@ -467,6 +471,7 @@
 				5A22383528459247004E7765 /* NotificationsPanel.swift */,
 				5A94B33A283EF77F00C07599 /* InAppNotification.swift */,
 				5A94B33F2843D10F00C07599 /* EditableTextField.swift */,
+				BB00A1012ECC8D0000000001 /* GettingStartedViewController.swift */,
 			);
 			path = ZitiPacketTunnel;
 			sourceTree = "<group>";
@@ -560,6 +565,7 @@
 			isa = PBXGroup;
 			children = (
 				5A76B939226FBAE100204A46 /* Credits.rtf */,
+				BB00A1032ECC8D0000000003 /* netfoundry-logo.svg */,
 			);
 			path = bundle;
 			sourceTree = "<group>";
@@ -901,6 +907,7 @@
 				5A02AABC206EBD7E006261C6 /* Assets.xcassets in Resources */,
 				5A02AABF206EBD7E006261C6 /* Main.storyboard in Resources */,
 				5A76B93A226FBAE100204A46 /* Credits.rtf in Resources */,
+				BB00A1042ECC8D0000000004 /* netfoundry-logo.svg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -986,6 +993,7 @@
 				5A00048E2830724000351FE2 /* UserNotifications.swift in Sources */,
 				5A6BA265226F6AB400224F09 /* MainMenuBar.swift in Sources */,
 				648155272D615C9E15BDA8CA /* DNSUtils.swift in Sources */,
+				BB00A1022ECC8D0000000002 /* GettingStartedViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

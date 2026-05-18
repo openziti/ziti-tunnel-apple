@@ -44,7 +44,8 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         menu.addItem(tunConnectItem)
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "Manage Tunnels", action: #selector(MainMenuBar.showPanel(_:))))
-        
+        menu.addItem(newMenuItem(title: "Getting Started", action: #selector(MainMenuBar.showGettingStarted(_:))))
+
         showDocItem = newMenuItem(title: "Show In Dock", action: #selector(MainMenuBar.showInDock(_:)))
         showDocItem.state = .on
         menu.addItem(showDocItem)
@@ -382,7 +383,17 @@ class MainMenuBar : NSObject, NSWindowDelegate {
             NSApp.activate(ignoringOtherApps: true)
         }
     }
-    
+
+    @objc func showGettingStarted(_ sender: Any?) {
+        showPanel(sender)
+        DispatchQueue.main.async {
+            guard let window = self.getMainWindow(),
+                  let vc = window.contentViewController as? ViewController,
+                  vc.presentedViewControllers?.isEmpty ?? true else { return }
+            vc.presentAsSheet(GettingStartedViewController())
+        }
+    }
+
     @objc func connect(_ sender: Any?) {
         if tunConnectItem.title == "Connect" {
             do {
