@@ -388,8 +388,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         showPanel(sender)
         DispatchQueue.main.async {
             guard let window = self.getMainWindow(),
-                  let vc = window.contentViewController as? ViewController,
-                  vc.presentedViewControllers?.isEmpty ?? true else { return }
+                  let vc = window.contentViewController as? ViewController else { return }
             vc.presentAsSheet(GettingStartedViewController())
         }
     }
