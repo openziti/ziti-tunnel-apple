@@ -192,7 +192,7 @@
                             <outlet property="delegate" destination="vfh-An-ZaB" id="Lpd-Ts-aaX"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Ziti Mobile Edge" id="YH1-Ih-2F5">
+                    <navigationItem key="navigationItem" title="Ziti Mobile Edge by NetFoundry" id="YH1-Ih-2F5">
                         <barButtonItem key="backBarButtonItem" title="Back" id="Qdl-Q1-fyC"/>
                     </navigationItem>
                 </tableViewController>

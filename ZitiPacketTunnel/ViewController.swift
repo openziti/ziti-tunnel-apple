@@ -61,6 +61,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     var enrollingIds:[ZitiIdentity] = []
     var enableStatePendingIds:[ZitiIdentity] = []
+    private var hasShownWelcome = false
     
     let notificationsPanel = NotificationsPanel()
     
@@ -113,12 +114,17 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         buttonsView.wantsLayer = true
         if let layer = buttonsView.layer {
             layer.borderWidth = 1.0
-            
+
             if UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark" {
                 layer.borderColor = CGColor(gray: 0.25, alpha: 1.0)
             } else {
                 layer.borderColor = CGColor(gray: 0.75, alpha: 1.0)
             }
+        }
+
+        if !hasShownWelcome && zids.isEmpty {
+            hasShownWelcome = true
+            presentAsSheet(GettingStartedViewController())
         }
     }
     
