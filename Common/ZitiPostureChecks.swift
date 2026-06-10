@@ -106,7 +106,7 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
     func domainQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping DomainResponse) {
         autoreleasepool { // implicit closure from init()
             zLog.warn("Domain Posture Query - Unimplemented")
-            cb(ctx, nil)
+            cb(ctx, "")
         }
     }
     
