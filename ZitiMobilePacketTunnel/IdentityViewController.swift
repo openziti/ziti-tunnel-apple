@@ -807,6 +807,106 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         }
     }
     
+    func doMfaEnroll() {
+        guard let zid = self.zid else { return }
+
+        let msg = IpcMfaEnrollRequestMessage(zid.id)
+        TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    self.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
+                    return
+                }
+                guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage,
+                    let mfaEnrollment = enrollResp.mfaEnrollment else {
+                    self.dialogAlert("IPC Error", "Unable to parse enrollment response message")
+                    return
+                }
+
+                zid.mfaEnabled = true
+                zid.mfaPending = true
+                zid.mfaVerified = mfaEnrollment.isVerified
+                if let zidStore = self.tvc?.zidStore {
+                    self.zid = zidStore.update(zid, [.Mfa])
+                    self.tvc?.zids.updateIdentity(zid)
+                }
+                self.tableView.reloadData()
+                self.tvc?.tableView.reloadData()
+
+                guard !zid.isMfaVerified,
+                      let provisioningUrl = mfaEnrollment.provisioningUrl else { return }
+                zLog.info("MFA provisioningUrl: \(provisioningUrl)")
+
+                let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+                if let vc = sb.instantiateViewController(withIdentifier: "MFA_VERIFY_VC") as? MfaVerifyViewController {
+                    vc.provisioningUrl = provisioningUrl
+                    vc.completionHandler = { [weak self] code in
+                        if let code = code {
+                            let msg = IpcMfaVerifyRequestMessage(zid.id, code)
+                            TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
+                                DispatchQueue.main.async {
+                                    guard zErr == nil else {
+                                        self?.dialogAlert("Error sending provider message to verify MFA", zErr!.localizedDescription)
+                                        zid.mfaEnabled = false
+                                        zid.mfaVerified = false
+                                        if let updatedZid = self?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                            self?.tvc?.zids.updateIdentity(updatedZid)
+                                        }
+                                        self?.tableView.reloadData()
+                                        self?.tvc?.tableView.reloadData()
+                                        return
+                                    }
+                                    guard let statusMsg = respMsg as? IpcMfaStatusResponseMessage,
+                                          let status = statusMsg.status else {
+                                        self?.dialogAlert("IPC Error", "Unable to parse verification response message")
+                                        zid.mfaEnabled = false
+                                        zid.mfaVerified = false
+                                        if let updatedZid = self?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                            self?.tvc?.zids.updateIdentity(updatedZid)
+                                        }
+                                        self?.tableView.reloadData()
+                                        self?.tvc?.tableView.reloadData()
+                                        return
+                                    }
+                                    guard status == Ziti.ZITI_OK else {
+                                        self?.dialogAlert("MFA Verification Error", Ziti.zitiErrorString(status: status))
+                                        zid.mfaEnabled = false
+                                        zid.mfaVerified = false
+                                        if let updatedZid = self?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                            self?.tvc?.zids.updateIdentity(updatedZid)
+                                        }
+                                        self?.tableView.reloadData()
+                                        self?.tvc?.tableView.reloadData()
+                                        return
+                                    }
+                                    // Success!
+                                    zid.mfaVerified = true
+                                    zid.mfaPending = false
+                                    zid.lastMfaAuth = Date()
+                                    if let updatedZid = self?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                        self?.tvc?.zids.updateIdentity(updatedZid)
+                                    }
+                                    self?.performSegue(withIdentifier: "MFA_CODES_SEGUE", sender: mfaEnrollment.recoveryCodes)
+                                }
+                            }
+                        } else {
+                            zLog.info("Setup MFA cancelled")
+                            zid.mfaEnabled = false
+                            zid.mfaVerified = false
+                            if let updatedZid = self?.tvc?.zidStore.update(zid, [.Mfa]) {
+                                self?.tvc?.zids.updateIdentity(updatedZid)
+                            }
+                            self?.tableView.reloadData()
+                            self?.tvc?.tableView.reloadData()
+                        }
+                        vc.dismiss(animated: true)
+                    }
+                    self.present(vc, animated: true)
+                }
+            }
+        }
+    }
+
     func doExtAuth() {
         guard let zid = self.zid else { return }
         guard let providers = zid.jwtProviders, !providers.isEmpty else {

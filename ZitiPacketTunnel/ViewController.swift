@@ -374,6 +374,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                             if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr }) {
                                 self.doExtAuth(zid)
                             }
+                        } else if action == UserNotifications.Action.MfaEnroll.rawValue {
+                            if let zidStr = msg.meta.zid, let zid = self.zids.first(where: { $0.id == zidStr }) {
+                                self.doMfaEnroll(zid)
+                            }
                         }
                     }
                 }
@@ -802,33 +806,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             
             if mfaSwitch.state == .on {
-                let msg = IpcMfaEnrollRequestMessage(zId.id)
-                tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
-                    DispatchQueue.main.async {
-                        guard zErr == nil else {
-                            self.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
-                            self.toggleMfa(zId, .off)
-                            return
-                        }
-                        guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage,
-                            let mfaEnrollment = enrollResp.mfaEnrollment else {
-                            self.dialogAlert("IPC Error", "Unable to parse enrollment response message")
-                            self.toggleMfa(zId, .off)
-                            return
-                        }
-                        
-                        zId.mfaEnabled = true
-                        zId.mfaPending = true
-                        zId.mfaVerified = mfaEnrollment.isVerified
-                        zId = self.zidStore.update(zId, [.Mfa])
-                        self.zids[indx] = zId
-                        self.updateServiceUI(zId:zId)
-                        
-                        if !zId.isMfaVerified {
-                            self.mfaVerify(zId, mfaEnrollment)
-                        }
-                    }
-                }
+                doMfaEnroll(zId)
             } else {
                 // only need to prompt for code if enrollment is verified (else can just send empty string)
                 var code:String?
@@ -906,6 +884,38 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    func doMfaEnroll(_ zid: ZitiIdentity) {
+        let msg = IpcMfaEnrollRequestMessage(zid.id)
+        tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
+            DispatchQueue.main.async {
+                guard zErr == nil else {
+                    self.dialogAlert("Error sending provider message to enable MFA", zErr!.localizedDescription)
+                    self.toggleMfa(zid, .off)
+                    return
+                }
+                guard let enrollResp = respMsg as? IpcMfaEnrollResponseMessage,
+                    let mfaEnrollment = enrollResp.mfaEnrollment else {
+                    self.dialogAlert("IPC Error", "Unable to parse enrollment response message")
+                    self.toggleMfa(zid, .off)
+                    return
+                }
+
+                zid.mfaEnabled = true
+                zid.mfaPending = true
+                zid.mfaVerified = mfaEnrollment.isVerified
+                let updatedZid = self.zidStore.update(zid, [.Mfa])
+                if let indx = self.zids.firstIndex(where: { $0.id == zid.id }) {
+                    self.zids[indx] = updatedZid
+                }
+                self.updateServiceUI(zId: updatedZid)
+
+                if !updatedZid.isMfaVerified {
+                    self.mfaVerify(updatedZid, mfaEnrollment)
+                }
+            }
+        }
+    }
+
     @IBAction func onMfaAuthNow(_ sender: Any) {
         guard let indx = representedObject as? Int else { return }
         let zid = zids[indx]

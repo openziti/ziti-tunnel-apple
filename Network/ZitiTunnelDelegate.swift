@@ -455,16 +455,19 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
         
         var detail:String?
+        var notificationCategory:UserNotifications.Category = .Mfa
         switch event.operationType {
         case ZitiTunnelMfaEvent.MfaStatus.AuthStatus: detail = "MFA Auth Requested"
         case ZitiTunnelMfaEvent.MfaStatus.AuthChallenge: detail = "MFA Auth Requested"
         case ZitiTunnelMfaEvent.MfaStatus.EnrollmentChallenge: detail = "MFA Auth Requested"
-        case ZitiTunnelMfaEvent.MfaStatus.EnrollmentRequired: detail = "MFA Enrollment Required"
+        case ZitiTunnelMfaEvent.MfaStatus.EnrollmentRequired:
+            detail = "MFA Enrollment Required"
+            notificationCategory = .MfaEnroll
         default: break
         }
 
         if let detail = detail {
-            userNotifications.post(.Mfa, detail, tzid.name, tzid)
+            userNotifications.post(notificationCategory, detail, tzid.name, tzid)
         }
         
         // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
