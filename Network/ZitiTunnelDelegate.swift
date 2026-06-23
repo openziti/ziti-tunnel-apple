@@ -247,6 +247,8 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 handleMfaEvent(ziti, tzid, mfaEvent)
             } else if let extJWTEvent = event as? ZitiTunnelExtJWTEvent {
                 handleExtJWTEvent(ziti, tzid, extJWTEvent)
+            } else if let routerEvent = event as? ZitiTunnelRouterEvent {
+                handleRouterEvent(ziti, tzid, routerEvent)
             }
         }
     }
@@ -288,7 +290,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         _ = zidStore.update(tzid, [.ControllerVersion, .CZitiIdentity, .EdgeStatus, .ExtAuth])
         
         if let ipcCompletionHandler = ziti.userData.removeValue(forKey: IpcAppexServer.CONTEXT_EVENT_ENABLED_CALLBACK_KEY) as? IpcAppexServer.CompletionHandler {
-            zLog.debug("Completion handler found fo IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI)")
+            zLog.debug("Completion handler found for IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI)")
             let respMsg = IpcSetEnabledResponseMessage(ziti.id.id, event.code)
             if let data = try? encoder.encode(respMsg) {
                 zLog.info("Responding to IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI), with status code \(event.code)")
@@ -458,7 +460,6 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         case ZitiTunnelMfaEvent.MfaStatus.AuthChallenge: detail = "MFA Auth Requested"
         case ZitiTunnelMfaEvent.MfaStatus.EnrollmentChallenge: detail = "MFA Auth Requested"
         case ZitiTunnelMfaEvent.MfaStatus.EnrollmentRequired: detail = "MFA Enrollment Required"
-        case .Success: detail = "MFA Auth Successful"
         default: break
         }
 
@@ -483,6 +484,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
     }
     
+    private func handleRouterEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelRouterEvent) {
+        // router events may be too chatty without some kind of filtering. just log for now.
+        //userNotifications.post(.Info, "Router: \(event.status)", "\(tzid.name)\n\(tzid.networkDisplay)", tzid)
+        zLog.info("router \(event.status) for identity \(tzid.name)")
+    }
+
     func dumpZitis() -> String {
         var str = ""
         let cond = NSCondition()
