@@ -262,6 +262,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         
         if event.code == Ziti.ZITI_OK {
             tzid.extAuthPending = false
+            let newlyAvailable = tzid.edgeStatus?.status != .Available
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
             
             // Notifiy when controller comes (back) online after inital startup. Don't notify during startup or right after weke to reduce noise
@@ -269,7 +270,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             if let lwt = lastWakeTime, lwt.timeIntervalSinceNow > -3.0 {
                 justWokeUp = true
             }
-            if identitiesLoaded && !justWokeUp {
+            if identitiesLoaded && !justWokeUp && newlyAvailable {
                 userNotifications.post(.Info, "Controller: \(ZitiIdentity.ConnectivityStatus.Available.rawValue)",
                                        "\(tzid.name)\n\(tzid.networkDisplay)", tzid)
             }
