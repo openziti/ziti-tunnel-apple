@@ -218,6 +218,11 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                         }
                     } else if action == UserNotifications.Action.Restart.rawValue {
                         self.tunnelMgr.restartTunnel()
+                    } else if action == UserNotifications.Action.MfaEnroll.rawValue {
+                        // put this on dispatch queue so it happens after the segue above (else ivc will be stale).
+                        DispatchQueue.main.async {
+                            self.ivc?.doMfaEnroll()
+                        }
                     }
                 }
             }

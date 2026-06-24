@@ -243,22 +243,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 handleConfigEvent(ziti, tzid, configEvent)
             } else if let serviceEvent = event as? ZitiTunnelServiceEvent {
                 handleServiceEvent(ziti, tzid, serviceEvent)
-            } else if let _ = event as? ZitiTunnelMfaEvent {
-                var updateOpts:[ZitiIdentityStore.UpdateOptions] = [.Mfa, .EdgeStatus, .ControllerVersion]
-                tzid.mfaPending = true
-                if tzid.isExtAuthEnabled {
-                    tzid.extAuthPending = false
-                    updateOpts.append(.ExtAuth)
-                }
-                tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
-                
-                userNotifications.post(.Mfa, "MFA Auth Requested", tzid.name, tzid)
-                
-                // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
-                //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
-                _ = zidStore.update(tzid, updateOpts)
+            } else if let mfaEvent = event as? ZitiTunnelMfaEvent {
+                handleMfaEvent(ziti, tzid, mfaEvent)
             } else if let extJWTEvent = event as? ZitiTunnelExtJWTEvent {
                 handleExtJWTEvent(ziti, tzid, extJWTEvent)
+            } else if let routerEvent = event as? ZitiTunnelRouterEvent {
+                handleRouterEvent(ziti, tzid, routerEvent)
             }
         }
     }
@@ -272,6 +262,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         
         if event.code == Ziti.ZITI_OK {
             tzid.extAuthPending = false
+            let newlyAvailable = tzid.edgeStatus?.status != .Available
             tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Available)
             
             // Notifiy when controller comes (back) online after inital startup. Don't notify during startup or right after weke to reduce noise
@@ -279,7 +270,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             if let lwt = lastWakeTime, lwt.timeIntervalSinceNow > -3.0 {
                 justWokeUp = true
             }
-            if identitiesLoaded && !justWokeUp {
+            if identitiesLoaded && !justWokeUp && newlyAvailable {
                 userNotifications.post(.Info, "Controller: \(ZitiIdentity.ConnectivityStatus.Available.rawValue)",
                                        "\(tzid.name)\n\(tzid.networkDisplay)", tzid)
             }
@@ -300,7 +291,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         _ = zidStore.update(tzid, [.ControllerVersion, .CZitiIdentity, .EdgeStatus, .ExtAuth])
         
         if let ipcCompletionHandler = ziti.userData.removeValue(forKey: IpcAppexServer.CONTEXT_EVENT_ENABLED_CALLBACK_KEY) as? IpcAppexServer.CompletionHandler {
-            zLog.debug("Completion handler found fo IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI)")
+            zLog.debug("Completion handler found for IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI)")
             let respMsg = IpcSetEnabledResponseMessage(ziti.id.id, event.code)
             if let data = try? encoder.encode(respMsg) {
                 zLog.info("Responding to IPC Set Enabled Reqeust for identity \(ziti.id.id):\(ziti.id.name ?? "--"), controller: \(ziti.id.ztAPI), with status code \(event.code)")
@@ -455,6 +446,37 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
     }
     
+    private func handleMfaEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelMfaEvent) {
+        var updateOpts:[ZitiIdentityStore.UpdateOptions] = [.Mfa, .EdgeStatus, .ControllerVersion]
+        tzid.mfaPending = true
+        if tzid.isExtAuthEnabled {
+            tzid.extAuthPending = false
+            updateOpts.append(.ExtAuth)
+        }
+        tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
+        
+        var detail:String?
+        var notificationCategory:UserNotifications.Category = .Mfa
+        switch event.operationType {
+        case ZitiTunnelMfaEvent.MfaStatus.AuthStatus: detail = "MFA Auth Requested"
+        case ZitiTunnelMfaEvent.MfaStatus.AuthChallenge: detail = "MFA Auth Requested"
+        case ZitiTunnelMfaEvent.MfaStatus.EnrollmentChallenge: detail = "MFA Auth Requested"
+        case ZitiTunnelMfaEvent.MfaStatus.EnrollmentRequired:
+            detail = "MFA Enrollment Required"
+            notificationCategory = .MfaEnroll
+        default: break
+        }
+
+        if let detail = detail {
+            userNotifications.post(notificationCategory, detail, tzid.name, tzid)
+        }
+        
+        // MFA Notification not reliably shown, so force the auth request, since in some instances it's important MFA succeeds before identities are loaded
+        //tzid.addAppexNotification(IpcMfaAuthQueryMessage(tzid.id, nil))
+        _ = zidStore.update(tzid, updateOpts)
+
+    }
+    
     private func handleExtJWTEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelExtJWTEvent) {
         if !event.providers.isEmpty {
             tzid.extAuthPending = true
@@ -466,6 +488,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
     }
     
+    private func handleRouterEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelRouterEvent) {
+        // router events may be too chatty without some kind of filtering. just log for now.
+        //userNotifications.post(.Info, "Router: \(event.status)", "\(tzid.name)\n\(tzid.networkDisplay)", tzid)
+        zLog.info("router \(event.status) for identity \(tzid.name)")
+    }
+
     func dumpZitis() -> String {
         var str = ""
         let cond = NSCondition()

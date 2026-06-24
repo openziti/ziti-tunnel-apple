@@ -19,76 +19,85 @@ import UserNotifications
 
 class UserNotifications {
     enum Action : String {
-        case Open = "Open", MfaAuth = "MfaAuth", Restart = "Restart", ExtAuth = "ExtAuth"
-        
+        case Open = "Open", MfaAuth = "MfaAuth", Restart = "Restart", ExtAuth = "ExtAuth", MfaEnroll = "MfaEnroll"
+
         var title:String {
             switch self {
-            case .Open:    return "Open"
-            case .MfaAuth: return "Auth Now"
-            case .Restart: return "Restart"
-            case .ExtAuth: return "Auth Now " // trailing space intentional to distinguish from `MfaAuth` action
+            case .Open:      return "Open"
+            case .MfaAuth:   return "Auth Now"
+            case .Restart:   return "Restart"
+            case .ExtAuth:   return "Auth Now " // trailing space intentional to distinguish from `MfaAuth` action
+            case .MfaEnroll: return "Set Up MFA"
             }
         }
-        
+
         static func actionForTitle(_ title:String) -> Action? {
             switch title {
-            case Action.Open.title: return Action.Open
-            case Action.MfaAuth.title: return Action.MfaAuth
-            case Action.Restart.title: return Action.Restart
-            case Action.ExtAuth.title: return Action.ExtAuth
+            case Action.Open.title:      return Action.Open
+            case Action.MfaAuth.title:   return Action.MfaAuth
+            case Action.Restart.title:   return Action.Restart
+            case Action.ExtAuth.title:   return Action.ExtAuth
+            case Action.MfaEnroll.title: return Action.MfaEnroll
             default: return nil
             }
         }
-        
+
         var action:UNNotificationAction {
             switch self {
-            case .Open:    return UNNotificationAction(identifier: Action.Open.rawValue, title: Action.Open.title, options: [.foreground])
-            case .MfaAuth: return UNNotificationAction(identifier: Action.MfaAuth.rawValue, title: Action.MfaAuth.title, options: [.foreground])
-            case .Restart: return UNNotificationAction(identifier: Action.Restart.rawValue, title: Action.Restart.title, options: [.foreground])
-            case .ExtAuth: return UNNotificationAction(identifier: Action.ExtAuth.rawValue, title: Action.ExtAuth.title, options: [.foreground])
+            case .Open:      return UNNotificationAction(identifier: Action.Open.rawValue, title: Action.Open.title, options: [.foreground])
+            case .MfaAuth:   return UNNotificationAction(identifier: Action.MfaAuth.rawValue, title: Action.MfaAuth.title, options: [.foreground])
+            case .Restart:   return UNNotificationAction(identifier: Action.Restart.rawValue, title: Action.Restart.title, options: [.foreground])
+            case .ExtAuth:   return UNNotificationAction(identifier: Action.ExtAuth.rawValue, title: Action.ExtAuth.title, options: [.foreground])
+            case .MfaEnroll: return UNNotificationAction(identifier: Action.MfaEnroll.rawValue, title: Action.MfaEnroll.title, options: [.foreground])
             }
         }
     }
     
     enum Category : String {
-        case Info = "INFO", Error = "ERROR", Posture = "POSTURE", Restart = "RESTART", Mfa = "MFA", Ext = "EXT"
-        
+        case Info = "INFO", Error = "ERROR", Posture = "POSTURE", Restart = "RESTART", Mfa = "MFA", Ext = "EXT", MfaEnroll = "MFAENROLL"
+
         var actions:[UNNotificationAction] {
             switch self {
-            case .Info:    return []
-            case .Error:   return []
-            case .Posture: return []
-            case .Restart: return [ Action.Restart.action ]
-            case .Mfa:     return [ Action.MfaAuth.action ]
-            case .Ext:     return [ Action.ExtAuth.action ]
+            case .Info:      return []
+            case .Error:     return []
+            case .Posture:   return []
+            case .Restart:   return [ Action.Restart.action ]
+            case .Mfa:       return [ Action.MfaAuth.action ]
+            case .Ext:       return [ Action.ExtAuth.action ]
+            case .MfaEnroll: return [ Action.MfaEnroll.action ]
             }
         }
-        
+
         var category:UNNotificationCategory {
             switch self {
-            case .Info:    return UNNotificationCategory.init(identifier: Category.Info.rawValue,
-                                                              actions: Category.Info.actions,
-                                                              intentIdentifiers: [], options: [])
-            case .Error:   return UNNotificationCategory.init(identifier: Category.Error.rawValue,
-                                                              actions: Category.Error.actions,
-                                                              intentIdentifiers: [], options: [])
-            case .Posture: return UNNotificationCategory.init(identifier: Category.Posture.rawValue,
-                                                              actions: Category.Posture.actions,
-                                                              intentIdentifiers: [], options: [])
-            case .Restart: return UNNotificationCategory.init(identifier: Category.Restart.rawValue,
-                                                              actions: Category.Restart.actions,
-                                                              intentIdentifiers: [], options: [])
-            case .Mfa:     return UNNotificationCategory.init(identifier: Category.Mfa.rawValue,
-                                                              actions: Category.Mfa.actions,
-                                                              intentIdentifiers: [], options: [])
-            case .Ext:     return UNNotificationCategory.init(identifier: Category.Ext.rawValue,
-                                                              actions: Category.Ext.actions,
-                                                              intentIdentifiers: [], options: [])
+            case .Info:      return UNNotificationCategory.init(identifier: Category.Info.rawValue,
+                                                                actions: Category.Info.actions,
+                                                                intentIdentifiers: [], options: [])
+            case .Error:     return UNNotificationCategory.init(identifier: Category.Error.rawValue,
+                                                                actions: Category.Error.actions,
+                                                                intentIdentifiers: [], options: [])
+            case .Posture:   return UNNotificationCategory.init(identifier: Category.Posture.rawValue,
+                                                                actions: Category.Posture.actions,
+                                                                intentIdentifiers: [], options: [])
+            case .Restart:   return UNNotificationCategory.init(identifier: Category.Restart.rawValue,
+                                                                actions: Category.Restart.actions,
+                                                                intentIdentifiers: [], options: [])
+            case .Mfa:       return UNNotificationCategory.init(identifier: Category.Mfa.rawValue,
+                                                                actions: Category.Mfa.actions,
+                                                                intentIdentifiers: [], options: [])
+            case .Ext:       return UNNotificationCategory.init(identifier: Category.Ext.rawValue,
+                                                                actions: Category.Ext.actions,
+                                                                intentIdentifiers: [], options: [])
+            case .MfaEnroll: return UNNotificationCategory.init(identifier: Category.MfaEnroll.rawValue,
+                                                                actions: Category.MfaEnroll.actions,
+                                                                intentIdentifiers: [], options: [])
             }
         }
-        
+
         static var allCategories:Set<UNNotificationCategory> {
-            return [ Category.Info.category, Category.Error.category, Category.Posture.category, Category.Restart.category, Category.Mfa.category, Category.Ext.category]
+            return [ Category.Info.category, Category.Error.category, Category.Posture.category,
+                     Category.Restart.category, Category.Mfa.category, Category.Ext.category,
+                     Category.MfaEnroll.category ]
         }
     }
     
