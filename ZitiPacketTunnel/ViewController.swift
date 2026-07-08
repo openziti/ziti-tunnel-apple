@@ -1230,18 +1230,61 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
         }
 
+        let onMfaEnrollRequired: Ziti.MfaEnrollRequiredCallback = { mfaEnrollment, error, submit in
+            DispatchQueue.main.async {
+                if let error = error {
+                    self.dialogAlert("Invalid MFA Code", error.localizedDescription)
+                }
+                guard let provisioningUrl = mfaEnrollment.provisioningUrl,
+                      let code = self.setupMfaDialog(provisioningUrl) else {
+                    submit(nil)
+                    return
+                }
+                zid.mfaEnabled = true
+                zid.mfaVerified = true
+                zid.mfaPending = false
+                submit(code)
+            }
+        }
+
+        let onMfaCodeRequired: Ziti.MfaCodeRequiredCallback = { error, submit in
+            DispatchQueue.main.async {
+                if let error = error {
+                    self.dialogAlert("Invalid MFA Code", error.localizedDescription)
+                }
+                guard let code = self.dialogForString(question: "Authorize MFA\n\(zid.name):\(zid.id)",
+                                                       text: "Enter your authentication code") else {
+                    submit(nil)
+                    return
+                }
+                zid.mfaEnabled = true
+                zid.mfaVerified = true
+                zid.mfaPending = false
+                zid.lastMfaAuth = Date()
+                submit(code)
+            }
+        }
+
         DispatchQueue.global().async {
             if let jwtFile = jwtFile {
                 if mode == .cert {
-                    Ziti.enrollToCert(jwtFile: jwtFile, provider: provider, onAuth: onAuth, enrollCallback)
+                    Ziti.enrollToCert(jwtFile: jwtFile, provider: provider, onAuth: onAuth,
+                                       onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
+                                       enrollCallback)
                 } else {
-                    Ziti.enrollToToken(jwtFile: jwtFile, provider: provider, onAuth: onAuth, enrollCallback)
+                    Ziti.enrollToToken(jwtFile: jwtFile, provider: provider, onAuth: onAuth,
+                                        onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
+                                        enrollCallback)
                 }
             } else if let controllerURL = controllerURL {
                 if mode == .cert {
-                    Ziti.enrollToCert(controllerURL: controllerURL, provider: provider, onAuth: onAuth, enrollCallback)
+                    Ziti.enrollToCert(controllerURL: controllerURL, provider: provider, onAuth: onAuth,
+                                       onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
+                                       enrollCallback)
                 } else {
-                    Ziti.enrollToToken(controllerURL: controllerURL, provider: provider, onAuth: onAuth, enrollCallback)
+                    Ziti.enrollToToken(controllerURL: controllerURL, provider: provider, onAuth: onAuth,
+                                        onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
+                                        enrollCallback)
                 }
             }
         }
@@ -1272,7 +1315,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         let idChanged = zid.applyEnrollmentResponse(zidResp, enrollTo: enrollTo, zidStore: zidStore)
 
         if !idChanged {
-            zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo])
+            zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo, .Mfa])
         }
         if indx < zids.count {
             zids[indx] = zid
