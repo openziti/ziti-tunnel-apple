@@ -651,18 +651,82 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             }
         }
 
+        let onMfaEnrollRequired: Ziti.MfaEnrollRequiredCallback = { [weak self] mfaEnrollment, error, submit in
+            DispatchQueue.main.async {
+                guard let self = self, let provisioningUrl = mfaEnrollment.provisioningUrl else {
+                    submit(nil)
+                    return
+                }
+                if let error = error {
+                    self.dialogAlert("Invalid MFA Code", error.localizedDescription)
+                }
+                let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+                guard let vc = sb.instantiateViewController(withIdentifier: "MFA_VERIFY_VC") as? MfaVerifyViewController else {
+                    submit(nil)
+                    return
+                }
+                vc.provisioningUrl = provisioningUrl
+                vc.completionHandler = { code in
+                    if code != nil {
+                        zid.mfaEnabled = true
+                        zid.mfaVerified = true
+                        zid.mfaPending = false
+                    }
+                    submit(code)
+                    vc.dismiss(animated: true)
+                }
+                self.present(vc, animated: true)
+            }
+        }
+
+        let onMfaCodeRequired: Ziti.MfaCodeRequiredCallback = { [weak self] error, submit in
+            DispatchQueue.main.async {
+                guard let self = self else {
+                    submit(nil)
+                    return
+                }
+                if let error = error {
+                    self.dialogAlert("Invalid MFA Code", error.localizedDescription)
+                }
+                let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+                guard let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController else {
+                    submit(nil)
+                    return
+                }
+                vc.completionHandler = { code in
+                    if code != nil {
+                        zid.mfaEnabled = true
+                        zid.mfaVerified = true
+                        zid.mfaPending = false
+                        zid.lastMfaAuth = Date()
+                    }
+                    submit(code)
+                    vc.dismiss(animated: true)
+                }
+                self.present(vc, animated: true)
+            }
+        }
+
         DispatchQueue.global().async {
             if let jwtFile = jwtFile {
                 if mode == .cert {
-                    Ziti.enrollToCert(jwtFile: jwtFile, provider: provider, onAuth: onAuth, enrollCallback)
+                    Ziti.enrollToCert(jwtFile: jwtFile, provider: provider, onAuth: onAuth,
+                                       onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
+                                       enrollCallback)
                 } else {
-                    Ziti.enrollToToken(jwtFile: jwtFile, provider: provider, onAuth: onAuth, enrollCallback)
+                    Ziti.enrollToToken(jwtFile: jwtFile, provider: provider, onAuth: onAuth,
+                                        onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
+                                        enrollCallback)
                 }
             } else if let controllerURL = controllerURL {
                 if mode == .cert {
-                    Ziti.enrollToCert(controllerURL: controllerURL, provider: provider, onAuth: onAuth, enrollCallback)
+                    Ziti.enrollToCert(controllerURL: controllerURL, provider: provider, onAuth: onAuth,
+                                       onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
+                                       enrollCallback)
                 } else {
-                    Ziti.enrollToToken(controllerURL: controllerURL, provider: provider, onAuth: onAuth, enrollCallback)
+                    Ziti.enrollToToken(controllerURL: controllerURL, provider: provider, onAuth: onAuth,
+                                        onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
+                                        enrollCallback)
                 }
             }
         }
@@ -685,7 +749,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         let idChanged = zid.applyEnrollmentResponse(zidResp, enrollTo: enrollTo, zidStore: zidStore)
 
         if !idChanged {
-            self.zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo])
+            self.zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo, .Mfa])
         } else if let indx = tvc?.zids.firstIndex(where: { $0.id == tempId }) {
             tvc?.zids[indx] = zid
         }
