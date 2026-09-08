@@ -52,16 +52,20 @@ class ZitiPostureChecks : CZiti.ZitiPostureChecks {
         self.processQuery = processQueryImpl
         self.domainQuery = domainQueryImpl
         self.osQuery = osQueryImpl
-        
+
+#if os(macOS)
         Thread(target: self, selector: #selector(keepAlive), object: nil).start()
+#endif
     }
-    
+
+#if os(macOS)
     // NSWorkspace runningApplications need main runloop to be active or list of processes doesn't get updated...
     @objc public func keepAlive() {
         let t = Timer(fire: Date(), interval: 10, repeats: true) {_ in }
         RunLoop.main.add(t, forMode: .common)
         RunLoop.main.run()
     }
+#endif
     
     
     func macQueryImpl(_ ctx:ZitiPostureContext, _ cb: @escaping MacResponse) {
