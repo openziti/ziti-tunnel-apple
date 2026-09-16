@@ -11,6 +11,7 @@
 		317C4CC567D9613110C57D6A /* Tests/ZitiIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C169439F29854B02947306E4 /* Tests/ZitiIdentityTests.swift */; };
 		531F4B8409DA10DBE64C9A45 /* Tests/ZitiIdentityStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */; };
 		5860E56C669E8D6588448C2F /* Tests/ZitiIdentityCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7EC7282791FBACFC52478 /* Tests/ZitiIdentityCodableTests.swift */; };
+		5924787C9352BE1E6B7BFDB8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091AE2F12CEA25BA9D1AC06D /* SceneDelegate.swift */; };
 		5A00048E2830724000351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004912832769800351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
 		5A0004932832C3DF00351FE2 /* ServiceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0004922832C3DF00351FE2 /* ServiceViewController.swift */; };
@@ -96,9 +97,6 @@
 		5A9417C8287B9D3100EEE6BD /* LogRotationConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9417C7287B9D3000EEE6BD /* LogRotationConfigViewController.swift */; };
 		5A9417CA2880975100EEE6BD /* MfaVerifyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */; };
 		5A94B33B283EF77F00C07599 /* InAppNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33A283EF77F00C07599 /* InAppNotification.swift */; };
-		BB00A1022ECC8D0000000002 /* GettingStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00A1012ECC8D0000000001 /* GettingStartedViewController.swift */; };
-		BB00A1042ECC8D0000000004 /* netfoundry-logo.svg in Resources */ = {isa = PBXBuildFile; fileRef = BB00A1032ECC8D0000000003 /* netfoundry-logo.svg */; };
-		BB00A1052ECC8D0000000005 /* GettingStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00A1062ECC8D0000000006 /* GettingStartedViewController.swift */; };
 		5A94B3402843D10F00C07599 /* EditableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33F2843D10F00C07599 /* EditableTextField.swift */; };
 		5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
 		5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
@@ -163,6 +161,9 @@
 		AAF3F22C2E03305100590422 /* EnrollURLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */; };
 		B28480D4B6B07F98CAB95841 /* Tests/ArrayZitiIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8EB217C2D21593A31A4A8C7 /* Tests/ArrayZitiIdentityTests.swift */; };
 		B4F0E1AEC3ECB17A87922999 /* Tests/IPUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2C30D110DCFF3CFF1BA2EE /* Tests/IPUtilsTests.swift */; };
+		BB00A1022ECC8D0000000002 /* GettingStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00A1012ECC8D0000000001 /* GettingStartedViewController.swift */; };
+		BB00A1042ECC8D0000000004 /* netfoundry-logo.svg in Resources */ = {isa = PBXBuildFile; fileRef = BB00A1032ECC8D0000000003 /* netfoundry-logo.svg */; };
+		BB00A1052ECC8D0000000005 /* GettingStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB00A1062ECC8D0000000006 /* GettingStartedViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -243,6 +244,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		091AE2F12CEA25BA9D1AC06D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		17E2F9557142DAFCEC6BBACE /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		1C2C30D110DCFF3CFF1BA2EE /* Tests/IPUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/IPUtilsTests.swift; sourceTree = SOURCE_ROOT; };
 		25733FFCD66F11E7B4186458 /* System/Library/Frameworks/NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
@@ -299,9 +301,6 @@
 		5A9417C7287B9D3000EEE6BD /* LogRotationConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogRotationConfigViewController.swift; sourceTree = "<group>"; };
 		5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaVerifyViewController.swift; sourceTree = "<group>"; };
 		5A94B33A283EF77F00C07599 /* InAppNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotification.swift; sourceTree = "<group>"; };
-		BB00A1012ECC8D0000000001 /* GettingStartedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedViewController.swift; sourceTree = "<group>"; };
-		BB00A1032ECC8D0000000003 /* netfoundry-logo.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = "netfoundry-logo.svg"; sourceTree = "<group>"; };
-		BB00A1062ECC8D0000000006 /* GettingStartedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedViewController.swift; sourceTree = "<group>"; };
 		5A94B33F2843D10F00C07599 /* EditableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableTextField.swift; sourceTree = "<group>"; };
 		5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelMgr.swift; sourceTree = "<group>"; };
 		5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcMessages.swift; sourceTree = "<group>"; };
@@ -343,6 +342,9 @@
 		AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollURLViewController.swift; sourceTree = "<group>"; };
 		B8EB217C2D21593A31A4A8C7 /* Tests/ArrayZitiIdentityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ArrayZitiIdentityTests.swift; sourceTree = SOURCE_ROOT; };
 		BADD51AD3FBD497F079F1862 /* Tests/DateFormatterTimeAgoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DateFormatterTimeAgoTests.swift; sourceTree = SOURCE_ROOT; };
+		BB00A1012ECC8D0000000001 /* GettingStartedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedViewController.swift; sourceTree = "<group>"; };
+		BB00A1032ECC8D0000000003 /* netfoundry-logo.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = "netfoundry-logo.svg"; sourceTree = "<group>"; };
+		BB00A1062ECC8D0000000006 /* GettingStartedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedViewController.swift; sourceTree = "<group>"; };
 		BE4DC486CB7F144C74B5590F /* ZitiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZitiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C169439F29854B02947306E4 /* Tests/ZitiIdentityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityTests.swift; sourceTree = SOURCE_ROOT; };
 		E4E457C0973798AAD748CA11 /* Tests/TestHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/TestHelpers.swift; sourceTree = SOURCE_ROOT; };
@@ -522,6 +524,7 @@
 				5A6BA25E226DF25A00224F09 /* bundle */,
 				5A2EA2EF209B758800437608 /* ZitiMobilePacketTunnel.entitlements */,
 				5A2EA2CB209B750A00437608 /* AppDelegate.swift */,
+				091AE2F12CEA25BA9D1AC06D /* SceneDelegate.swift */,
 				5A2EA2CF209B750A00437608 /* Main.storyboard */,
 				5ABF986A260C2DED00AA982F /* SnapshotViewController.swift */,
 				5A34E96422791FCA00E221DD /* LogViewController.swift */,
@@ -1037,6 +1040,7 @@
 				5AB0FDD8265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5A6BA25D226DE5FB00224F09 /* AboutViewController.swift in Sources */,
 				5A2EA2CC209B750A00437608 /* AppDelegate.swift in Sources */,
+				5924787C9352BE1E6B7BFDB8 /* SceneDelegate.swift in Sources */,
 				5A8702DA22372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */,
 				5A91B4C92222E155006C4277 /* ZitiIdentityStore.swift in Sources */,
@@ -1320,7 +1324,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_APP_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1347,7 +1351,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_APP_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -1376,7 +1380,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-DLOCALHOST_PROXY";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1408,7 +1412,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAC_EXT_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -1602,7 +1606,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "-";
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.openziti.ZitiTests;
 				PRODUCT_MODULE_NAME = ZitiTests;
 				PRODUCT_NAME = ZitiTests;
@@ -1617,7 +1621,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "-";
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.openziti.ZitiTests;
 				PRODUCT_MODULE_NAME = ZitiTests;
 				PRODUCT_NAME = ZitiTests;
