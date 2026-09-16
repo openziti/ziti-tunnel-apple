@@ -24,6 +24,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
     let netMon = NWPathMonitor()
+    var lastNetworkPathSignature: String?
     var zitiTunnel:ZitiTunnel?
     var zitiTunnelDelegate:ZitiTunnelDelegate?
     var writeLock = NSLock()
@@ -402,8 +403,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func startNetworkMonitor() {
         netMon.pathUpdateHandler = { path in
+            let sig = self.networkPathSignature(path)
+            guard sig != self.lastNetworkPathSignature else {
+                zLog.info("Network Path Update: unchanged, skipping")
+                return
+            }
+            self.lastNetworkPathSignature = sig
             self.logNetworkPath(path)
-            
+
             if path.status == .satisfied {
                 if let upstreamDns = self.getUpstreamDns() {
                     self.zitiTunnel?.perform {
@@ -416,13 +423,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
         netMon.start(queue: DispatchQueue.global())
     }
-    
+
+    // captures everything logNetworkPath reports plus a few fields it doesn't, so we can tell
+    // whether a "duplicate-looking" NWPathMonitor callback is actually carrying a real change
+    func networkPathSignature(_ path:Network.NWPath) -> String {
+        let ifaces = path.availableInterfaces.map { "\($0.index):\($0.name):\($0.type)" }.joined(separator: ",")
+        let gateways = path.gateways.map { "\($0)" }.joined(separator: ",")
+        return "status:\(path.status)|expensive:\(path.isExpensive)|constrained:\(path.isConstrained)|cellular:\(path.usesInterfaceType(.cellular))|dns:\(path.supportsDNS)|ipv4:\(path.supportsIPv4)|ipv6:\(path.supportsIPv6)|ifaces:\(ifaces)|gw:\(gateways)"
+    }
+
     func logNetworkPath(_ path:Network.NWPath) {
         var ifaceStr = ""
         for i in path.availableInterfaces {
             ifaceStr += " \n     \(i.index): name:\(i.name), type:\(i.type)"
         }
-        zLog.info("Network Path Update:\nStatus:\(path.status), Expensive:\(path.isExpensive), Cellular:\(path.usesInterfaceType(.cellular)), DNS:\(path.supportsDNS)\n   Interfaces:\(ifaceStr)")
+        let gatewaysStr = path.gateways.map { "\($0)" }.joined(separator: ", ")
+        zLog.info("Network Path Update:\nStatus:\(path.status), Expensive:\(path.isExpensive), Constrained:\(path.isConstrained), Cellular:\(path.usesInterfaceType(.cellular)), DNS:\(path.supportsDNS), IPv4:\(path.supportsIPv4), IPv6:\(path.supportsIPv6)\n   Interfaces:\(ifaceStr)\n   Gateways: \(gatewaysStr)")
     }
     
     override var debugDescription: String {
