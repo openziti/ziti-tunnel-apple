@@ -340,7 +340,6 @@
 		AABF06A32D38338300238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
 		AABF06A42D3833A200238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.2.sdk/usr/lib/libz.1.tbd; sourceTree = DEVELOPER_DIR; };
 		AAF3F22B2E03304400590422 /* EnrollURLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollURLViewController.swift; sourceTree = "<group>"; };
-		AAFE5AA72FA0C59C0063359E /* ziti-sdk-swift-dist */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "ziti-sdk-swift-dist"; sourceTree = "<group>"; };
 		B8EB217C2D21593A31A4A8C7 /* Tests/ArrayZitiIdentityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ArrayZitiIdentityTests.swift; sourceTree = SOURCE_ROOT; };
 		BADD51AD3FBD497F079F1862 /* Tests/DateFormatterTimeAgoTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DateFormatterTimeAgoTests.swift; sourceTree = SOURCE_ROOT; };
 		BB00A1012ECC8D0000000001 /* GettingStartedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GettingStartedViewController.swift; sourceTree = "<group>"; };
@@ -652,7 +651,6 @@
 		AA2098A62C57CC8800BCD073 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				AAFE5AA72FA0C59C0063359E /* ziti-sdk-swift-dist */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
