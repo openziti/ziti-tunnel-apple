@@ -60,6 +60,24 @@ class TunnelMgr: NSObject {
     private override init() {}
     deinit { NotificationCenter.default.removeObserver(self) }
     
+    /// Prefer a configuration that targets our provider. Falls back to the first saved configuration
+    /// (the previous behavior) so an existing install is never orphaned.
+    static func preferredManager(_ managers:[NETunnelProviderManager], _ bid:String) -> NETunnelProviderManager? {
+        let matching = managers.filter {
+            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == bid
+        }
+        if matching.count > 1 {
+            zLog.warn("Found \(matching.count) tunnel configurations for \(bid), using the first")
+        }
+        if let match = matching.first { return match }
+
+        if let first = managers.first {
+            zLog.warn("No tunnel configuration targets \(bid), using \"\(first.localizedDescription ?? "")\"")
+            return first
+        }
+        return nil
+    }
+
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
     func loadFromPreferences(_ bid:String, _ completionHandler: LoadCompletionHandler? = nil) {
         var tpm = NETunnelProviderManager()
@@ -70,8 +88,8 @@ class TunnelMgr: NSObject {
                 return
             }
             
-            if let savedManagers = savedManagers, savedManagers.count > 0 {
-                tpm = savedManagers[0]
+            if let savedManagers = savedManagers, let preferred = TunnelMgr.preferredManager(savedManagers, bid) {
+                tpm = preferred
             }
             
             tpm.loadFromPreferences { error in

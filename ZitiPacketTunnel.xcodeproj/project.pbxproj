@@ -153,6 +153,7 @@
 		6C5C80B61B5EE7EABC083778 /* Tests/ZitiServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E78327ED970E2088485E22 /* Tests/ZitiServiceTests.swift */; };
 		87CD51B3A39090656A6D9D8B /* Tests/IpcMessagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE03177A4BB9F38CE6BAE022 /* Tests/IpcMessagesTests.swift */; };
 		A1B2C3D4E5F60718A9B0C1E3 /* Tests/ProviderConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */; };
+		CB175ECBAF43C6E97BADCF49 /* Tests/TunnelMgrTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA7DB2E60D928326A6E1E46 /* Tests/TunnelMgrTests.swift */; };
 		AA9471B02EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AA9471B12EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AABF06A52D38347600238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A32D38338300238DAE /* libz.1.tbd */; };
@@ -337,6 +338,7 @@
 		79E78327ED970E2088485E22 /* Tests/ZitiServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityStoreTests.swift; sourceTree = SOURCE_ROOT; };
 		A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ProviderConfigTests.swift; sourceTree = SOURCE_ROOT; };
+		8FA7DB2E60D928326A6E1E46 /* Tests/TunnelMgrTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/TunnelMgrTests.swift; sourceTree = SOURCE_ROOT; };
 		AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "ziti-v2.icon"; sourceTree = "<group>"; };
 		AABF06A32D38338300238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
 		AABF06A42D3833A200238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.2.sdk/usr/lib/libz.1.tbd; sourceTree = DEVELOPER_DIR; };
@@ -641,6 +643,7 @@
 				F8B7EC7282791FBACFC52478 /* Tests/ZitiIdentityCodableTests.swift */,
 				994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */,
 				A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */,
+				8FA7DB2E60D928326A6E1E46 /* Tests/TunnelMgrTests.swift */,
 			);
 			path = Tests;
 			sourceTree = SOURCE_ROOT;
@@ -1122,6 +1125,7 @@
 				5860E56C669E8D6588448C2F /* Tests/ZitiIdentityCodableTests.swift in Sources */,
 				531F4B8409DA10DBE64C9A45 /* Tests/ZitiIdentityStoreTests.swift in Sources */,
 				A1B2C3D4E5F60718A9B0C1E3 /* Tests/ProviderConfigTests.swift in Sources */,
+				CB175ECBAF43C6E97BADCF49 /* Tests/TunnelMgrTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
