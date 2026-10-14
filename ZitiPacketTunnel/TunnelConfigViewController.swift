@@ -99,7 +99,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.subnetMaskText.stringValue = subnet
         }
         
-        if let mtu = conf[ProviderConfig.MTU_KEY] as? String {
+        if let mtu = ProviderConfig.stringValue(conf[ProviderConfig.MTU_KEY]) {
             self.mtuText.stringValue = mtu
         }
         
@@ -107,7 +107,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.dnsServersText.stringValue = dns
         }
         
-        if let fallbackDnsEnbled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool {
+        if let fallbackDnsEnbled = ProviderConfig.boolValue(conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY]) {
             self.fallbackDNSCheck.state = fallbackDnsEnbled ? .on : .off
         }
         
@@ -115,11 +115,11 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.fallbackDNSText.stringValue = fallbackDns
         }
         
-        if let interceptMatchedDomains = conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] as? Bool {
+        if let interceptMatchedDomains = ProviderConfig.boolValue(conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY]) {
             self.interceptMatchedDomainsSwitch.state = interceptMatchedDomains ? .on : .off
         }
         
-        if let lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool {
+        if let lowPowerMode = ProviderConfig.boolValue(conf[ProviderConfig.LOW_POWER_MODE_KEY]) {
             self.lowPowerModeSwitch.state = lowPowerMode ? .on : .off
         }
 
@@ -133,7 +133,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         if let proxyHost = conf[ProviderConfig.PROXY_HOST_KEY] as? String {
             self.proxyHostText.stringValue = proxyHost
         }
-        if let proxyPort = conf[ProviderConfig.PROXY_PORT_KEY] as? String {
+        if let proxyPort = ProviderConfig.stringValue(conf[ProviderConfig.PROXY_PORT_KEY]) {
             self.proxyPortText.stringValue = proxyPort
         }
 

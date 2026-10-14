@@ -154,14 +154,14 @@ class TunnelSettingsViewController: UITableViewController {
             let conf = protoConf.providerConfiguration {
             if let ip = conf[ProviderConfig.IP_KEY] as? String,
                 let mask = conf[ProviderConfig.SUBNET_KEY] as? String,
-                let mtu = conf[ProviderConfig.MTU_KEY] as? String,
+                let mtu = ProviderConfig.stringValue(conf[ProviderConfig.MTU_KEY]),
                 let dns = conf[ProviderConfig.DNS_KEY] as? String
             {
                 self.ip = ip
                 self.mask = mask
                 self.mtu = mtu
                 self.dns = dns
-                self.lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool ?? defaults.lowPowerMode
+                self.lowPowerMode = ProviderConfig.boolValue(conf[ProviderConfig.LOW_POWER_MODE_KEY]) ?? defaults.lowPowerMode
             }
 
             // Load proxy settings
@@ -175,7 +175,7 @@ class TunnelSettingsViewController: UITableViewController {
             if let proxyHost = conf[ProviderConfig.PROXY_HOST_KEY] as? String {
                 self.proxyHost = proxyHost
             }
-            if let proxyPort = conf[ProviderConfig.PROXY_PORT_KEY] as? String {
+            if let proxyPort = ProviderConfig.stringValue(conf[ProviderConfig.PROXY_PORT_KEY]) {
                 self.proxyPort = proxyPort
             }
 

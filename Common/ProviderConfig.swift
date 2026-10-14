@@ -131,6 +131,36 @@ class ProviderConfig : NSObject {
         return IPUtils.isValidIpV4Address(str)
     }
     
+    // This app stores numeric values as strings, but configs written elsewhere (e.g., plists
+    // or configuration profiles) may use native number and boolean types. Accept either.
+    
+    private static func isBoolean(_ num:NSNumber) -> Bool {
+        return CFGetTypeID(num) == CFBooleanGetTypeID()
+    }
+    
+    static func stringValue(_ obj:Any?) -> String? {
+        if let str = obj as? String { return str }
+        if let num = obj as? NSNumber, !isBoolean(num) { return num.stringValue }
+        return nil
+    }
+    
+    static func intValue(_ obj:Any?) -> Int? {
+        guard let str = stringValue(obj) else { return nil }
+        return Int(str)
+    }
+    
+    // Same conventions as CFPreferencesGetAppBooleanValue: nonzero numbers are true,
+    // and "true"/"yes" or "false"/"no" strings are accepted in any case.
+    static func boolValue(_ obj:Any?) -> Bool? {
+        if let num = obj as? NSNumber { return num.boolValue }
+        guard let str = obj as? String else { return nil }
+        switch str.lowercased() {
+        case "true", "yes", "1": return true
+        case "false", "no", "0": return false
+        default: return nil
+        }
+    }
+    
     func validateDictionaty(_ conf:ProviderConfigDict) -> ProviderConfigError? {
         if !isValidIpAddress(conf[ProviderConfig.IP_KEY]) {
             return ProviderConfigError.invalidIpAddress
@@ -147,21 +177,21 @@ class ProviderConfig : NSObject {
             return ProviderConfigError.invalidDnsAddresses
         }
         
-        let fallbackEnabled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool ?? false
+        let fallbackEnabled = ProviderConfig.boolValue(conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY]) ?? false
         if fallbackEnabled && !isValidIpAddress(conf[ProviderConfig.FALLBACK_DNS_KEY]) {
             return ProviderConfigError.invalidFallbackDns
         }
-        guard let mtuStr = conf[ProviderConfig.MTU_KEY] as? String, let _ = Int(mtuStr) else {
+        guard ProviderConfig.intValue(conf[ProviderConfig.MTU_KEY]) != nil else {
             return ProviderConfigError.invalidMtu
         }
         
-        if let lrCount = conf[ProviderConfig.LOG_ROTATE_COUNT_KEY] as? String {
+        if let lrCount = ProviderConfig.stringValue(conf[ProviderConfig.LOG_ROTATE_COUNT_KEY]) {
             guard let _ = Int(lrCount) else {
                 return ProviderConfigError.invalidLogRotateCount
             }
         }
         
-        if let lrSize = conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] as? String {
+        if let lrSize = ProviderConfig.stringValue(conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY]) {
             guard let _ = Int(lrSize) else {
                 return ProviderConfigError.invalidLogRotateSizeMB
             }
@@ -172,7 +202,7 @@ class ProviderConfig : NSObject {
             if host.isEmpty {
                 return ProviderConfigError.invalidProxyHost
             }
-            let portStr = (conf[ProviderConfig.PROXY_PORT_KEY] as? String ?? "").trimmingCharacters(in: .whitespaces)
+            let portStr = (ProviderConfig.stringValue(conf[ProviderConfig.PROXY_PORT_KEY]) ?? "").trimmingCharacters(in: .whitespaces)
             guard !portStr.isEmpty, let portInt = Int(portStr), portInt > 0, portInt <= 65535 else {
                 return ProviderConfigError.invalidProxyPort
             }
@@ -188,7 +218,7 @@ class ProviderConfig : NSObject {
         if let subnetMask = conf[ProviderConfig.SUBNET_KEY] as? String {
             self.subnetMask = subnetMask.trimmingCharacters(in: .whitespaces)
         }
-        if let mtu = conf[ProviderConfig.MTU_KEY] as? String, let mtuInt = Int(mtu) {
+        if let mtuInt = ProviderConfig.intValue(conf[ProviderConfig.MTU_KEY]) {
             self.mtu = mtuInt
         }
         if let dnsAddresses = conf[ProviderConfig.DNS_KEY] as? String {
@@ -197,24 +227,24 @@ class ProviderConfig : NSObject {
         if let fallbackDns = conf[ProviderConfig.FALLBACK_DNS_KEY] as? String {
             self.fallbackDns = fallbackDns.trimmingCharacters(in: .whitespaces)
         }
-        self.fallbackDnsEnabled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool ?? false
-        self.interceptMatchedDns = conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] as? Bool ?? true
+        self.fallbackDnsEnabled = ProviderConfig.boolValue(conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY]) ?? false
+        self.interceptMatchedDns = ProviderConfig.boolValue(conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY]) ?? true
         
         // only update lowPowerMode if present in the stored config, otherwise leave it as the default value
         // (which differs per operating system)
-        if let lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool {
+        if let lowPowerMode = ProviderConfig.boolValue(conf[ProviderConfig.LOW_POWER_MODE_KEY]) {
             self.lowPowerMode = lowPowerMode
         }
-        self.logLevel = Int(conf[ProviderConfig.LOG_LEVEL_KEY] as? String ?? "3") ?? 3
-        self.logTlsuv = conf[ProviderConfig.LOG_TLSUV_KEY] as? Bool ?? false
+        self.logLevel = ProviderConfig.intValue(conf[ProviderConfig.LOG_LEVEL_KEY]) ?? 3
+        self.logTlsuv = ProviderConfig.boolValue(conf[ProviderConfig.LOG_TLSUV_KEY]) ?? false
         
-        if let logRotateDaily = conf[ProviderConfig.LOG_ROTATE_DAILY_KEY] as? Bool {
+        if let logRotateDaily = ProviderConfig.boolValue(conf[ProviderConfig.LOG_ROTATE_DAILY_KEY]) {
             self.logRotateDaily = logRotateDaily
         }
-        if let lrCountStr = conf[ProviderConfig.LOG_ROTATE_COUNT_KEY] as? String, let lrCountInt = Int(lrCountStr) {
+        if let lrCountInt = ProviderConfig.intValue(conf[ProviderConfig.LOG_ROTATE_COUNT_KEY]) {
             self.logRotateCount = lrCountInt
         }
-        if let lrSizeStr = conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] as? String, let lrSizeInt = Int(lrSizeStr) {
+        if let lrSizeInt = ProviderConfig.intValue(conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY]) {
             self.logRotateSizeMB = lrSizeInt
         }
         if let proxyMode = conf[ProviderConfig.PROXY_MODE_KEY] as? String {
@@ -223,7 +253,7 @@ class ProviderConfig : NSObject {
         if let proxyHost = conf[ProviderConfig.PROXY_HOST_KEY] as? String {
             self.proxyHost = proxyHost.trimmingCharacters(in: .whitespaces)
         }
-        if let proxyPort = conf[ProviderConfig.PROXY_PORT_KEY] as? String {
+        if let proxyPort = ProviderConfig.stringValue(conf[ProviderConfig.PROXY_PORT_KEY]) {
             self.proxyPort = proxyPort.trimmingCharacters(in: .whitespaces)
         }
         return nil

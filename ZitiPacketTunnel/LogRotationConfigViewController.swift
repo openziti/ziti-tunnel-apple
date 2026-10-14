@@ -43,13 +43,13 @@ class LogRotationConfigViewController: NSViewController {
             return
         }
         
-        if let countStr = conf[ProviderConfig.LOG_ROTATE_COUNT_KEY] as? String, let countInt = UInt32(countStr) {
+        if let countStr = ProviderConfig.stringValue(conf[ProviderConfig.LOG_ROTATE_COUNT_KEY]), let countInt = UInt32(countStr) {
             self.countTextField.intValue = Int32(countInt)
         }
-        if let sizeStr = conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] as? String, let sizeInt = UInt32(sizeStr) {
+        if let sizeStr = ProviderConfig.stringValue(conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY]), let sizeInt = UInt32(sizeStr) {
             self.sizeTextField.intValue = Int32(sizeInt)
         }
-        if let daily = conf[ProviderConfig.LOG_ROTATE_DAILY_KEY] as? Bool {
+        if let daily = ProviderConfig.boolValue(conf[ProviderConfig.LOG_ROTATE_DAILY_KEY]) {
             self.dailyCheckbox.state = daily ? .on : .off
         }
         
