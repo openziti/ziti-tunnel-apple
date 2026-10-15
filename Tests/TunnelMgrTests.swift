@@ -74,6 +74,28 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertTrue(TunnelMgr.isLocked(makeManager(bid, "ours", locked: true)))
     }
 
+    func testSupersededManagers_lockedPreferred_returnsUnlockedMatches() {
+        let ours = makeManager(bid, "ours")
+        let locked = makeManager(bid, "locked", locked: true)
+        let other = makeManager("org.example.other", "other")
+        let superseded = TunnelMgr.supersededManagers([ours, locked, other], locked, bid)
+        XCTAssertEqual(superseded.count, 1)
+        XCTAssertTrue(superseded.first === ours)
+    }
+
+    func testSupersededManagers_unlockedPreferred_returnsNone() {
+        // Without a locked config nothing is removed, so existing installs are untouched
+        let first = makeManager(bid, "first")
+        let second = makeManager(bid, "second")
+        XCTAssertTrue(TunnelMgr.supersededManagers([first, second], first, bid).isEmpty)
+    }
+
+    func testSupersededManagers_keepsOtherLocked() {
+        let locked = makeManager(bid, "locked", locked: true)
+        let locked2 = makeManager(bid, "locked2", locked: true)
+        XCTAssertTrue(TunnelMgr.supersededManagers([locked, locked2], locked, bid).isEmpty)
+    }
+
     func testPreferredManager_noMatch_fallsBackToFirst() {
         // Existing installs must keep using their saved configuration
         let first = makeManager("org.example.other", "first")

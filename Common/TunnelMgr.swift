@@ -83,6 +83,17 @@ class TunnelMgr: NSObject {
         }
         return nil
     }
+    
+    /// Our own configurations superseded by a locked one. Connected ones are left alone (removing
+    /// would drop the tunnel) and picked up on a later load.
+    static func supersededManagers(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String) -> [NETunnelProviderManager] {
+        guard isLocked(preferred) else { return [] }
+        return managers.filter {
+            $0 !== preferred && !isLocked($0) &&
+            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == bid &&
+            ($0.connection.status == .disconnected || $0.connection.status == .invalid)
+        }
+    }
 
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
     func loadFromPreferences(_ bid:String, _ completionHandler: LoadCompletionHandler? = nil) {
@@ -96,6 +107,16 @@ class TunnelMgr: NSObject {
             
             if let savedManagers = savedManagers, let preferred = TunnelMgr.preferredManager(savedManagers, bid) {
                 tpm = preferred
+                
+                TunnelMgr.supersededManagers(savedManagers, preferred, bid).forEach { mgr in
+                    let name = mgr.localizedDescription ?? ""
+                    zLog.info("Removing tunnel configuration \"\(name)\", superseded by locked configuration")
+                    mgr.removeFromPreferences { error in
+                        if let error = error {
+                            zLog.warn("Unable to remove tunnel configuration \"\(name)\": \(error.localizedDescription)")
+                        }
+                    }
+                }
             }
             
             tpm.loadFromPreferences { error in
