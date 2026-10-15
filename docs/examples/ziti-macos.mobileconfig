@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadDisplayName</key>
+	<string>Ziti VPN</string>
+	<key>PayloadIdentifier</key>
+	<string>com.example.ziti.macos</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>8AF447AA-CEF8-49A5-9CAF-A86D03CE6256</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>Ziti VPN</string>
+			<key>PayloadIdentifier</key>
+			<string>com.example.ziti.macos.vpn</string>
+			<key>PayloadType</key>
+			<string>com.apple.vpn.managed</string>
+			<key>PayloadUUID</key>
+			<string>6C697F2D-8BC4-434E-BA78-B8E8A78E2774</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>UserDefinedName</key>
+			<string>Ziti</string>
+			<key>VPNType</key>
+			<string>VPN</string>
+			<key>VPNSubType</key>
+			<string>io.netfoundry.ZitiPacketTunnel</string>
+			<key>VPN</key>
+			<dict>
+				<key>RemoteAddress</key>
+				<string>100.64.0.1</string>
+				<key>AuthenticationMethod</key>
+				<string>Password</string>
+				<key>ProviderBundleIdentifier</key>
+				<string>io.netfoundry.ZitiPacketTunnel.PacketTunnelProvider</string>
+				<key>ProviderType</key>
+				<string>packet-tunnel</string>
+				<key>ProviderDesignatedRequirement</key>
+				<string>REPLACE_WITH_DESIGNATED_REQUIREMENT</string>
+			</dict>
+			<key>VendorConfig</key>
+			<dict>
+				<key>ip</key>
+				<string>100.64.0.1</string>
+				<key>subnet</key>
+				<string>255.192.0.0</string>
+				<key>mtu</key>
+				<integer>4000</integer>
+				<key>dns</key>
+				<string>100.64.0.2</string>
+				<key>locked</key>
+				<true/>
+				<key>fallbackDnsEnabled</key>
+				<false/>
+				<key>fallbackDns</key>
+				<string>1.1.1.1</string>
+				<key>interceptMatchedDns</key>
+				<true/>
+				<key>lowPowerMode</key>
+				<false/>
+				<key>logLevel</key>
+				<integer>3</integer>
+				<key>logTlsuv</key>
+				<false/>
+				<key>logRotateDaily</key>
+				<true/>
+				<key>logRotateCount</key>
+				<integer>5</integer>
+				<key>logRotateSizeMB</key>
+				<integer>50</integer>
+				<key>proxyMode</key>
+				<string>none</string>
+				<key>proxyHost</key>
+				<string></string>
+				<key>proxyPort</key>
+				<string></string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>
