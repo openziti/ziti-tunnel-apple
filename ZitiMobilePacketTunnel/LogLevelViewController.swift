@@ -34,4 +34,11 @@ class LogLevelViewController: UITableViewController {
         let lvl = ZitiLog.LogLevel(rawValue: Int32(indexPath.row)) ?? ZitiLog.LogLevel.INFO
         TunnelMgr.shared.updateLogLevel(lvl)
     }
+    
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        if TunnelMgr.isLocked(TunnelMgr.shared.tpm) {
+            return "Managed by an installed profile. Changes last until Ziti restarts."
+        }
+        return nil
+    }
 }

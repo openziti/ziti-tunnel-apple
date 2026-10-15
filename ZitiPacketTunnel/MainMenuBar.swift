@@ -30,6 +30,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     private var showDocItem:NSMenuItem!
     private var tlsuvLogging:NSMenuItem!
     private var logLevelMenu:NSMenu!
+    private var logLevelLockedItems:[NSMenuItem] = []
     
     private var identityItems:[NSMenuItem] = []
     
@@ -65,6 +66,10 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         let logLevelMenuItem = newMenuItem(title: "Level", action: nil)
         logMenu.addItem(logLevelMenuItem)
         logLevelMenu = NSMenu()
+        logLevelLockedItems = [newMenuItem(title: "Managed by an installed profile.", action: nil),
+                               newMenuItem(title: "Changes last until Ziti restarts.", action: nil),
+                               NSMenuItem.separator()]
+        logLevelLockedItems.forEach { logLevelMenu.addItem($0) }
         logLevelMenu.addItem(newMenuItem(title: "FATAL",
                                          action: #selector(MainMenuBar.selectLogLevel(_:)),
                                          tag: Int(ZitiLog.LogLevel.NONE.rawValue)))
@@ -354,8 +359,10 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     func updateLogLevelMenu() {
         let level = ZitiLog.getLogLevel()
         logLevelMenu.items.forEach { i in
-            i.state = Int32(i.tag) == level.rawValue ? .on : .off
+            i.state = i.action != nil && Int32(i.tag) == level.rawValue ? .on : .off
         }
+        let locked = TunnelMgr.isLocked(TunnelMgr.shared.tpm)
+        logLevelLockedItems.forEach { $0.isHidden = !locked }
         tlsuvLogging.state = TunnelMgr.shared.tlsuvLoggingEnabled ? .on : .off
     }
     
