@@ -358,4 +358,17 @@ class ProviderConfigTests: XCTestCase {
         XCTAssertEqual(restored.debugDescription.split(separator: "\n").dropFirst(),
                        original.debugDescription.split(separator: "\n").dropFirst())
     }
+
+    func testIsLocked() {
+        XCTAssertFalse(ProviderConfig.isLocked(nil))
+        XCTAssertFalse(ProviderConfig.isLocked([:]))
+        XCTAssertFalse(ProviderConfig.isLocked([ProviderConfig.LOCKED_KEY: false]))
+        XCTAssertFalse(ProviderConfig.isLocked([ProviderConfig.LOCKED_KEY: "bogus"]))
+        XCTAssertTrue(ProviderConfig.isLocked([ProviderConfig.LOCKED_KEY: true]))
+        XCTAssertTrue(ProviderConfig.isLocked([ProviderConfig.LOCKED_KEY: "true"]))
+    }
+
+    func testCreateDictionary_neverLocked() {
+        XCTAssertFalse(ProviderConfig.isLocked(ProviderConfig().createDictionary()))
+    }
 }

@@ -55,6 +55,10 @@ class LogRotationConfigViewController: NSViewController {
         
         countStepper.intValue = countTextField.intValue
         sizeStepper.intValue = sizeTextField.intValue
+        
+        if TunnelMgr.isLocked(TunnelMgr.shared.tpm) {
+            showLockedNote(beside: saveBtn, disabling: [countTextField, countStepper, dailyCheckbox, sizeTextField, sizeStepper])
+        }
     }
     
     @IBAction func onCountStepper(_ sender: NSStepper) {

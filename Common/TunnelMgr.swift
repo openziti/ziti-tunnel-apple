@@ -60,16 +60,22 @@ class TunnelMgr: NSObject {
     private override init() {}
     deinit { NotificationCenter.default.removeObserver(self) }
     
-    /// Prefer a configuration that targets our provider. Falls back to the first saved configuration
-    /// (the previous behavior) so an existing install is never orphaned.
+    static func isLocked(_ mgr:NETunnelProviderManager?) -> Bool {
+        return ProviderConfig.isLocked((mgr?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration)
+    }
+    
+    /// Prefer a configuration that targets our provider, locked first. Falls back to the first saved
+    /// configuration (the previous behavior) so an existing install is never orphaned.
     static func preferredManager(_ managers:[NETunnelProviderManager], _ bid:String) -> NETunnelProviderManager? {
         let matching = managers.filter {
             ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == bid
         }
-        if matching.count > 1 {
-            zLog.warn("Found \(matching.count) tunnel configurations for \(bid), using the first")
+        if let match = matching.first(where: { isLocked($0) }) ?? matching.first {
+            if matching.count > 1 {
+                zLog.warn("Found \(matching.count) tunnel configurations for \(bid), using \"\(match.localizedDescription ?? "")\"")
+            }
+            return match
         }
-        if let match = matching.first { return match }
 
         if let first = managers.first {
             zLog.warn("No tunnel configuration targets \(bid), using \"\(first.localizedDescription ?? "")\"")
@@ -180,7 +186,7 @@ class TunnelMgr: NSObject {
     }
     
     /// Saves the tunnel configuration (the loaded one unless another is given). All app-side
-    /// writes go through here so failures are reported consistently.
+    /// writes go through here so failures are reported consistently. Locked configurations are never saved.
     func savePreferences(_ mgr:NETunnelProviderManager? = nil, _ completionHandler:((Error?) -> Void)? = nil) {
         guard let mgr = mgr ?? tpm else {
             let error = ZitiError("Unable to save tunnel configuration: not loaded")
@@ -188,9 +194,15 @@ class TunnelMgr: NSObject {
             completionHandler?(error)
             return
         }
+        guard !TunnelMgr.isLocked(mgr) else {
+            let error = ZitiError("Unable to save tunnel configuration: locked")
+            zLog.warn(error.localizedDescription)
+            completionHandler?(error)
+            return
+        }
         mgr.saveToPreferences { error in
-            if let error = error {
-                zLog.error("Unable to save tunnel configuration: \(error.localizedDescription)")
+            if let error = error as NSError? {
+                zLog.error("Unable to save tunnel configuration: \(error.localizedDescription) (\(error.domain) \(error.code))")
             } else {
                 zLog.info("Saved tunnel configuration")
             }
@@ -242,6 +254,10 @@ class TunnelMgr: NSObject {
                     self.prefReloadHack(tpm)
                 }
             }
+        } else if TunnelMgr.isLocked(tpm) {
+            // Re-enabling requires a save
+            zLog.warn("startTunnel - tunnel not enabled and configuration is locked")
+            throw ZitiError("Ziti is not enabled in system VPN settings. Select it there to connect.")
         } else {
             zLog.warn("startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
             tpm.isEnabled = true
@@ -294,7 +310,10 @@ class TunnelMgr: NSObject {
             return
         }
         
-        if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
+        if TunnelMgr.isLocked(tpm) {
+            zLog.info("Tunnel configuration is locked. Log level applies until the tunnel restarts")
+            sendLogLevel(level, tlsuvLevel)
+        } else if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
             // update logLevel
             conf[ProviderConfig.LOG_LEVEL_KEY] = String(level.rawValue)
             conf[ProviderConfig.LOG_TLSUV_KEY] = self.tlsuvLoggingEnabled
@@ -304,26 +323,30 @@ class TunnelMgr: NSObject {
             
             savePreferences(tpm) { error in
                 if error == nil {
-                    // sendProviderMessage
-                    zLog.info("Sending logLevel \(level) to provider")
-                    let msg = IpcSetLogLevelMessage(level.rawValue)
-                    self.ipcClient.sendToAppex(msg) { _, zErr in
-                        guard zErr == nil else {
-                            zLog.error("Unable to send provider message to update global logLevel to \(level): \(zErr!.localizedDescription)")
-                            return
-                        }
-                    }
-                    let tlsuvMsg = IpcSetLogLevelMessage(tlsuvLevel.rawValue, module: "tlsuv")
-                    self.ipcClient.sendToAppex(tlsuvMsg) { _, zErr in
-                        guard zErr == nil else {
-                            zLog.error("Unable to send provider message to update tlsuv logLevel to \(level): \(zErr!.localizedDescription)")
-                            return
-                        }
-                    }
+                    self.sendLogLevel(level, tlsuvLevel)
                 }
             }
         } else {
             zLog.info("No log level found.  Using default")
+        }
+    }
+    
+    private func sendLogLevel(_ level:ZitiLog.LogLevel, _ tlsuvLevel:ZitiLog.LogLevel) {
+        // sendProviderMessage
+        zLog.info("Sending logLevel \(level) to provider")
+        let msg = IpcSetLogLevelMessage(level.rawValue)
+        ipcClient.sendToAppex(msg) { _, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message to update global logLevel to \(level): \(zErr!.localizedDescription)")
+                return
+            }
+        }
+        let tlsuvMsg = IpcSetLogLevelMessage(tlsuvLevel.rawValue, module: "tlsuv")
+        ipcClient.sendToAppex(tlsuvMsg) { _, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message to update tlsuv logLevel to \(level): \(zErr!.localizedDescription)")
+                return
+            }
         }
     }
     

@@ -22,11 +22,12 @@ class TunnelMgrTests: XCTestCase {
 
     let bid = "org.openziti.test.ptp"
 
-    func makeManager(_ providerBundleId:String?, _ name:String) -> NETunnelProviderManager {
+    func makeManager(_ providerBundleId:String?, _ name:String, locked:Bool = false) -> NETunnelProviderManager {
         let mgr = NETunnelProviderManager()
         if let providerBundleId = providerBundleId {
             let proto = NETunnelProviderProtocol()
             proto.providerBundleIdentifier = providerBundleId
+            if locked { proto.providerConfiguration = [ProviderConfig.LOCKED_KEY: true] }
             mgr.protocolConfiguration = proto
         }
         mgr.localizedDescription = name
@@ -52,6 +53,25 @@ class TunnelMgrTests: XCTestCase {
         let first = makeManager(bid, "first")
         let second = makeManager(bid, "second")
         XCTAssertTrue(TunnelMgr.preferredManager([first, second], bid) === first)
+    }
+
+    func testPreferredManager_multipleMatches_prefersLocked() {
+        let first = makeManager(bid, "first")
+        let locked = makeManager(bid, "locked", locked: true)
+        XCTAssertTrue(TunnelMgr.preferredManager([first, locked], bid) === locked)
+    }
+
+    func testPreferredManager_lockedNonMatching_ignored() {
+        let other = makeManager("org.example.other", "other", locked: true)
+        let ours = makeManager(bid, "ours")
+        XCTAssertTrue(TunnelMgr.preferredManager([other, ours], bid) === ours)
+    }
+
+    func testIsLocked() {
+        XCTAssertFalse(TunnelMgr.isLocked(nil))
+        XCTAssertFalse(TunnelMgr.isLocked(makeManager(nil, "none")))
+        XCTAssertFalse(TunnelMgr.isLocked(makeManager(bid, "ours")))
+        XCTAssertTrue(TunnelMgr.isLocked(makeManager(bid, "ours", locked: true)))
     }
 
     func testPreferredManager_noMatch_fallsBackToFirst() {

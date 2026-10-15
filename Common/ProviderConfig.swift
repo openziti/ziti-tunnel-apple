@@ -64,6 +64,7 @@ class ProviderConfig : NSObject {
     static var PROXY_MODE_KEY = "proxyMode"
     static var PROXY_HOST_KEY = "proxyHost"
     static var PROXY_PORT_KEY = "proxyPort"
+    static var LOCKED_KEY = "locked"
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "100.64.0.1"
@@ -159,6 +160,11 @@ class ProviderConfig : NSObject {
         case "false", "no", "0": return false
         default: return nil
         }
+    }
+    
+    // A locked config (e.g., one installed by a configuration profile) is never modified by the app
+    static func isLocked(_ conf:ProviderConfigDict?) -> Bool {
+        return boolValue(conf?[LOCKED_KEY]) ?? false
     }
     
     func validateDictionaty(_ conf:ProviderConfigDict) -> ProviderConfigError? {

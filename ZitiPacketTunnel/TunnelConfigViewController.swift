@@ -68,6 +68,13 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText, proxyHostText, proxyPortText ]
 
         self.updateConfigControls()
+        
+        if TunnelMgr.isLocked(vc?.tunnelMgr.tpm) {
+            showLockedNote(beside: saveButton, disabling: [
+                ipAddressText, subnetMaskText, mtuText, dnsServersText, fallbackDNSCheck, fallbackDNSText,
+                interceptMatchedDomainsSwitch, lowPowerModeSwitch, proxyModePopUp, proxyHostText, proxyPortText,
+                proxyUsernameText, proxyPasswordText ])
+        }
     }
     
     private func updateConfigControls() {
@@ -320,5 +327,26 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func onCancelButton(_ sender: Any) {
         self.dismiss(self)
+    }
+}
+
+extension NSViewController {
+    /// Makes a settings screen read-only when the tunnel configuration is locked
+    func showLockedNote(beside saveButton:NSButton, disabling controls:[NSControl]) {
+        controls.forEach { $0.isEnabled = false }
+        saveButton.isEnabled = false
+        
+        // Added to the root view: an NSBox forwards addSubview to its content view, which the
+        // storyboard box in tunnel settings never displays
+        let note = NSTextField(wrappingLabelWithString: "Managed by an installed profile")
+        note.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+        note.textColor = .secondaryLabelColor
+        note.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(note)
+        NSLayoutConstraint.activate([
+            note.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 40),
+            note.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12),
+            note.centerYAnchor.constraint(equalTo: saveButton.centerYAnchor)
+        ])
     }
 }

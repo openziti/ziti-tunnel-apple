@@ -128,6 +128,7 @@ class TunnelSettingsViewController: UITableViewController {
     weak var tvc:TableViewController?
     var resetBtn:UIBarButtonItem?
     var restartRequired = false
+    var locked = false
     
     let defaults = ProviderConfig()
     
@@ -152,6 +153,7 @@ class TunnelSettingsViewController: UITableViewController {
 
         if let protoConf = tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
             let conf = protoConf.providerConfiguration {
+            self.locked = ProviderConfig.isLocked(conf)
             if let ip = conf[ProviderConfig.IP_KEY] as? String,
                 let mask = conf[ProviderConfig.SUBNET_KEY] as? String,
                 let mtu = ProviderConfig.stringValue(conf[ProviderConfig.MTU_KEY]),
@@ -435,6 +437,10 @@ class TunnelSettingsViewController: UITableViewController {
                 }
             }
         }
+        if locked {
+            (cell as? TunnelSettingsCell)?.value.isEnabled = false
+            (cell as? ProxyModeCell)?.segmentedControl.isEnabled = false
+        }
         return cell! // Don't let this happen!
     }
 
@@ -445,6 +451,7 @@ class TunnelSettingsViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        if locked && section == 0 { return "Managed by an installed profile" }
         return nil
     }
 }
