@@ -21,6 +21,7 @@ import CZiti
 class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager?
     var tunnelRestarting = false
+    private var loading = false
     var tlsuvLoggingEnabled = false
     let ipcClient = IpcAppClient()
     
@@ -96,11 +97,21 @@ class TunnelMgr: NSObject {
     }
 
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
+    
+    /// Loads the preferred tunnel configuration, creating one on first run. Skipped while a load (including
+    /// a first-run save) is in progress, so overlapping calls can't create duplicate configurations.
     func loadFromPreferences(_ bid:String, _ completionHandler: LoadCompletionHandler? = nil) {
+        guard !loading else {
+            zLog.info("Tunnel configuration load already in progress")
+            return
+        }
+        loading = true
+        
         var tpm = NETunnelProviderManager()
         NETunnelProviderManager.loadAllFromPreferences { [weak self] savedManagers, error in
             if let error = error {
                 zLog.error(error.localizedDescription)
+                self?.loading = false
                 completionHandler?(nil, error)
                 return
             }
@@ -122,12 +133,14 @@ class TunnelMgr: NSObject {
             tpm.loadFromPreferences { error in
                 if let error = error {
                     zLog.error(error.localizedDescription)
+                    self?.loading = false
                     completionHandler?(nil, error)
                     return
                 }
                 
                 // This won't happen unless first time run and no profile preference has been imported
-                if tpm.protocolConfiguration == nil {
+                let creating = tpm.protocolConfiguration == nil
+                if creating {
                     
                     let providerProtocol = NETunnelProviderProtocol()
                     providerProtocol.providerBundleIdentifier = bid
@@ -142,11 +155,15 @@ class TunnelMgr: NSObject {
                     tpm.isEnabled = true
                     
                     self?.savePreferences(tpm) { error in
-                        guard error == nil else { return }
+                        guard error == nil else {
+                            self?.loading = false
+                            return
+                        }
                         zLog.info("Re-loading preferences")
                         // ios hack per apple forums (else NEVPNErrorDomain Code=1)
                         tpm.loadFromPreferences { error in
                             zLog.error("Re-loaded preferences, error=\(error != nil)")
+                            self?.loading = false
                         }
                     }
                 }
@@ -180,6 +197,7 @@ class TunnelMgr: NSObject {
                         zLog.info("No log level found.  Using default")
                     }
                     
+                    if !creating { tmgr.loading = false }
                     completionHandler?(tpm, nil)
                     tmgr.tsChangedCallbacks.forEach { cb in cb(tmgr.status) }
                 } else {

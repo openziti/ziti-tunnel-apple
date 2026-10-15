@@ -112,6 +112,14 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         present(nav, animated: true)
     }
 
+    func loadTunnelConfig() {
+        tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.isEditing = true
@@ -124,10 +132,11 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         NotificationCenter.default.addObserver(self, selector: #selector(self.onNewUrlNotification(_:)), name: NSNotification.Name(rawValue: "NewURL"), object: nil)
 
         // init the manager
-        tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
+        loadTunnelConfig()
+        
+        // pick up tunnel configs added or removed while we were in the background (e.g., by a profile)
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.loadTunnelConfig()
         }
         
         // Load previous identities
