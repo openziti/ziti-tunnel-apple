@@ -114,15 +114,12 @@ class TunnelMgr: NSObject {
                     tpm.localizedDescription = defaultProviderConf.localizedDescription
                     tpm.isEnabled = true
                     
-                    tpm.saveToPreferences { error in
-                        if let error = error {
-                            zLog.error(error.localizedDescription)
-                        } else {
-                            zLog.info("Saved successfully. Re-loading preferences")
-                            // ios hack per apple forums (else NEVPNErrorDomain Code=1)
-                            tpm.loadFromPreferences { error in
-                                zLog.error("Re-loaded preferences, error=\(error != nil)")
-                            }
+                    self?.savePreferences(tpm) { error in
+                        guard error == nil else { return }
+                        zLog.info("Re-loading preferences")
+                        // ios hack per apple forums (else NEVPNErrorDomain Code=1)
+                        tpm.loadFromPreferences { error in
+                            zLog.error("Re-loaded preferences, error=\(error != nil)")
                         }
                     }
                 }
@@ -182,21 +179,37 @@ class TunnelMgr: NSObject {
         }
     }
     
-    func prefReloadHack(_ tpm: NETunnelProviderManager) {
-        tpm.saveToPreferences { error in
+    /// Saves the tunnel configuration (the loaded one unless another is given). All app-side
+    /// writes go through here so failures are reported consistently.
+    func savePreferences(_ mgr:NETunnelProviderManager? = nil, _ completionHandler:((Error?) -> Void)? = nil) {
+        guard let mgr = mgr ?? tpm else {
+            let error = ZitiError("Unable to save tunnel configuration: not loaded")
+            zLog.error(error.localizedDescription)
+            completionHandler?(error)
+            return
+        }
+        mgr.saveToPreferences { error in
             if let error = error {
-                zLog.error(error.localizedDescription)
+                zLog.error("Unable to save tunnel configuration: \(error.localizedDescription)")
             } else {
-                zLog.info("Saved successfully. Re-loading preferences")
-                // ios hack per apple forums (else NEVPNErrorDomain Code=1 on starting tunnel)
-                tpm.loadFromPreferences { [weak tpm] error in
-                    zLog.error("Re-loaded preferences, error=\(error != nil). Attempting to start")
-                    do {
-                        zLog.info("Attempting to start tunnel after load from preferences")
-                        try (tpm?.connection as? NETunnelProviderSession)?.startTunnel()
-                    } catch {
-                        zLog.error("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
-                    }
+                zLog.info("Saved tunnel configuration")
+            }
+            completionHandler?(error)
+        }
+    }
+    
+    func prefReloadHack(_ tpm: NETunnelProviderManager) {
+        savePreferences(tpm) { error in
+            guard error == nil else { return }
+            zLog.info("Re-loading preferences")
+            // ios hack per apple forums (else NEVPNErrorDomain Code=1 on starting tunnel)
+            tpm.loadFromPreferences { [weak tpm] error in
+                zLog.error("Re-loaded preferences, error=\(error != nil). Attempting to start")
+                do {
+                    zLog.info("Attempting to start tunnel after load from preferences")
+                    try (tpm?.connection as? NETunnelProviderSession)?.startTunnel()
+                } catch {
+                    zLog.error("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
                 }
             }
         }
@@ -289,10 +302,8 @@ class TunnelMgr: NSObject {
             
             zLog.info("Updated providerConfiguration: \(conf)")
             
-            tpm.saveToPreferences { error in
-                if let error = error {
-                    zLog.error(error.localizedDescription)
-                } else {
+            savePreferences(tpm) { error in
+                if error == nil {
                     // sendProviderMessage
                     zLog.info("Sending logLevel \(level) to provider")
                     let msg = IpcSetLogLevelMessage(level.rawValue)

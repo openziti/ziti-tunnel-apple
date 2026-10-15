@@ -297,7 +297,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         }
 
         pp.providerConfiguration = conf
-        TunnelMgr.shared.tpm?.saveToPreferences { error in
+        TunnelMgr.shared.savePreferences { error in
             if let error = error {
                 NSAlert(error:error).runModal()
             } else {

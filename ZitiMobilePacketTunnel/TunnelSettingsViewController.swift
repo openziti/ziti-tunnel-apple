@@ -285,7 +285,7 @@ class TunnelSettingsViewController: UITableViewController {
         if let pc = tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol {
             pc.providerConfiguration = conf.createDictionary()
             
-            self.tvc?.tunnelMgr.tpm?.saveToPreferences { error in
+            self.tvc?.tunnelMgr.savePreferences { error in
                 if let error = error {
                     let alert = UIAlertController(
                         title:"Configuation Save Error",

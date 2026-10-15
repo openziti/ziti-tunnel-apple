@@ -107,10 +107,9 @@ class LogRotationConfigViewController: NSViewController {
         conf[ProviderConfig.LOG_ROTATE_DAILY_KEY] = daily
         
         pp.providerConfiguration = conf
-        TunnelMgr.shared.tpm?.saveToPreferences { error in
+        TunnelMgr.shared.savePreferences { error in
             if let error = error {
                 DispatchQueue.main.async {
-                    zLog.error("Error saving updated provider configuration")
                     let alert = NSAlert()
                     alert.messageText = "Config Save Error"
                     alert.informativeText = error.localizedDescription
@@ -119,7 +118,6 @@ class LogRotationConfigViewController: NSViewController {
                 }
                 return
             }
-            zLog.info("Saved provider configuration")
             
             Logger.updateRotateSettings(daily, count, sizeMB)
             
