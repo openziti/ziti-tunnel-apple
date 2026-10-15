@@ -65,7 +65,8 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.proxyUsernameText.delegate = self
         self.proxyPasswordText.delegate = self
 
-        self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText, proxyHostText, proxyPortText ]
+        self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText, proxyHostText, proxyPortText,
+                                proxyUsernameText, proxyPasswordText ]
 
         self.updateConfigControls()
         

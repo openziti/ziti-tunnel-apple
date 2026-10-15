@@ -427,12 +427,12 @@ class TunnelSettingsViewController: UITableViewController {
                         settingsCell.value.isEnabled = (proxyModeIndex == 1)
                         settingsCell.value.keyboardType = .numberPad
                     case 3:
-                        settingsCell.setup(self, "Username", proxyUsername, false) { [weak self] value in
+                        settingsCell.setup(self, "Username", proxyUsername, true) { [weak self] value in
                             self?.proxyUsername = value
                         }
                         settingsCell.value.isEnabled = (proxyModeIndex != 0)
                     case 4:
-                        settingsCell.setup(self, "Password", proxyPassword, false) { [weak self] value in
+                        settingsCell.setup(self, "Password", proxyPassword, true) { [weak self] value in
                             self?.proxyPassword = value
                         }
                         settingsCell.value.isSecureTextEntry = true
