@@ -69,11 +69,11 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
 
         self.updateConfigControls()
         
+        // Proxy credentials stay editable since they're stored in the keychain, not the locked configuration
         if TunnelMgr.isLocked(vc?.tunnelMgr.tpm) {
             showLockedNote(beside: saveButton, disabling: [
                 ipAddressText, subnetMaskText, mtuText, dnsServersText, fallbackDNSCheck, fallbackDNSText,
-                interceptMatchedDomainsSwitch, lowPowerModeSwitch, proxyModePopUp, proxyHostText, proxyPortText,
-                proxyUsernameText, proxyPasswordText ])
+                interceptMatchedDomainsSwitch, lowPowerModeSwitch, proxyModePopUp, proxyHostText, proxyPortText ])
         }
     }
     
@@ -301,6 +301,13 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             }
         } else if !effectiveHost.isEmpty && effectivePort > 0 {
             ZitiHttpProxyConfig.deleteCredentials(proxyHost: effectiveHost, proxyPort: effectivePort)
+        }
+
+        // Only the proxy credentials can change, and they're stored above. Restart to apply them.
+        if TunnelMgr.isLocked(TunnelMgr.shared.tpm) {
+            self.vc?.tunnelMgr.restartTunnel()
+            self.dismiss(self)
+            return
         }
 
         pp.providerConfiguration = conf

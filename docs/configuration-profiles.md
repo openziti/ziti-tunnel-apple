@@ -63,7 +63,7 @@ If a required key is missing or a value is invalid, the tunnel won't start and r
 Without `locked`, a profile's settings can be changed in the app, and the changes stay until the profile is reinstalled. Set `locked` to true to prevent this:
 
 - The app uses the locked configuration even if it already created its own, and removes its own while that one is disconnected.
-- Tunnel settings and log rotation settings are read-only in the app.
+- Tunnel settings and log rotation settings are read-only in the app, except proxy credentials.
 - Log level changes in the app apply until the tunnel restarts, then revert to the profile's `logLevel`.
 - If the configuration is turned off (e.g., another VPN was used on iOS), it has to be selected again in system VPN settings. The app can't turn it back on.
 
@@ -71,5 +71,5 @@ Without `locked`, a profile's settings can be changed in the app, and the change
 
 - The app picks up profiles installed or removed while it's running when it next becomes active.
 - When the profile is removed, the app creates its own default configuration again.
-- Proxy credentials can't be set in a profile. They're entered in the app's tunnel settings, which are read-only when `locked` is set.
+- Proxy credentials can't be set in a profile. Users enter them in the app's tunnel settings, including when `locked` is set.
 - Identities are not part of the profile. Users enroll as usual.

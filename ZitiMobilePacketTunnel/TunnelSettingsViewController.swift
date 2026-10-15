@@ -272,6 +272,12 @@ class TunnelSettingsViewController: UITableViewController {
             ZitiHttpProxyConfig.deleteCredentials(proxyHost: effectiveHost, proxyPort: effectivePort)
         }
 
+        // Only the proxy credentials can change, and they're stored above. Restart to apply them.
+        if locked {
+            tvc?.tunnelMgr.restartTunnel()
+            return
+        }
+
         let conf:ProviderConfig = ProviderConfig()
         if let error = conf.parseDictionary(dict) {
             // alert and get outta here
@@ -437,7 +443,8 @@ class TunnelSettingsViewController: UITableViewController {
                 }
             }
         }
-        if locked {
+        // Proxy credentials (rows 3 and 4) stay editable since they're stored in the keychain, not the locked configuration
+        if locked && !(indexPath.section == 1 && indexPath.row >= 3) {
             (cell as? TunnelSettingsCell)?.value.isEnabled = false
             (cell as? ProxyModeCell)?.segmentedControl.isEnabled = false
         }
