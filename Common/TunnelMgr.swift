@@ -314,6 +314,10 @@ class TunnelMgr: NSObject {
                     }
                     zLog.error("lastDisconnectError: \(err.localizedDescription)")
                     
+                    guard !TunnelMgr.isLocked(tpm) else {
+                        zLog.info("Tunnel configuration is locked, skipping reload prefs hack")
+                        return
+                    }
                     zLog.info("Attempting reload prefs hack")
                     self.prefReloadHack(tpm)
                 }
