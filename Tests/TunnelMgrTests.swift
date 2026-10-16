@@ -27,7 +27,11 @@ class TunnelMgrTests: XCTestCase {
         if let providerBundleId = providerBundleId {
             let proto = NETunnelProviderProtocol()
             proto.providerBundleIdentifier = providerBundleId
-            if locked { proto.providerConfiguration = [ProviderConfig.LOCKED_KEY: true] }
+            if locked {
+                var conf = ProviderConfig().createDictionary()
+                conf[ProviderConfig.LOCKED_KEY] = true
+                proto.providerConfiguration = conf
+            }
             mgr.protocolConfiguration = proto
         }
         mgr.localizedDescription = name
@@ -117,6 +121,17 @@ class TunnelMgrTests: XCTestCase {
         let locked = makeManager(bid, "locked", locked: true)
         let superseded = TunnelMgr.supersededManagers([ours, locked], locked, bid) { $0 === ours ? .connecting : .disconnected }
         XCTAssertTrue(superseded.isEmpty)
+    }
+
+    func testPreferredManager_invalidLocked_ignored() {
+        // A broken profile must not displace a working config
+        let ours = makeManager(bid, "ours")
+        let invalid = makeManager(bid, "invalid")
+        (invalid.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration = [ProviderConfig.LOCKED_KEY: true]
+        XCTAssertTrue(TunnelMgr.preferredManager([invalid, ours], bid) === invalid) // first match, as before
+        XCTAssertTrue(TunnelMgr.preferredManager([ours, invalid], bid) === ours)
+        XCTAssertTrue(TunnelMgr.supersededManagers([ours, invalid], invalid, bid).isEmpty)
+        XCTAssertFalse(TunnelMgr.lockedPending([ours, invalid], ours, bid))
     }
 
     func testSavePreferences_locked_refusesWithoutSaving() {
