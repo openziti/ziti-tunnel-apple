@@ -119,6 +119,22 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertTrue(superseded.isEmpty)
     }
 
+    func testSavePreferences_locked_refusesWithoutSaving() {
+        var saveError:Error?
+        TunnelMgr.shared.savePreferences(makeManager(bid, "locked", locked: true)) { saveError = $0 }
+        XCTAssertNotNil(saveError) // reported synchronously, before any system call
+    }
+
+    func testStartTunnel_lockedAndDisabled_throws() {
+        let saved = TunnelMgr.shared.tpm
+        defer { TunnelMgr.shared.tpm = saved }
+        let locked = makeManager(bid, "locked", locked: true)
+        locked.isEnabled = false
+        TunnelMgr.shared.tpm = locked
+        XCTAssertThrowsError(try TunnelMgr.shared.startTunnel())
+        XCTAssertFalse(locked.isEnabled)
+    }
+
     func testPreferredManager_noMatch_fallsBackToFirst() {
         // Existing installs must keep using their saved configuration
         let first = makeManager("org.example.other", "first")
