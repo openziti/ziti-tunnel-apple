@@ -128,8 +128,9 @@ class TunnelMgrTests: XCTestCase {
         let ours = makeManager(bid, "ours")
         let invalid = makeManager(bid, "invalid")
         (invalid.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration = [ProviderConfig.LOCKED_KEY: true]
-        XCTAssertTrue(TunnelMgr.preferredManager([invalid, ours], bid) === invalid) // first match, as before
+        XCTAssertTrue(TunnelMgr.preferredManager([invalid, ours], bid) === ours)
         XCTAssertTrue(TunnelMgr.preferredManager([ours, invalid], bid) === ours)
+        XCTAssertTrue(TunnelMgr.preferredManager([invalid], bid) === invalid) // only option, reports its config error
         XCTAssertTrue(TunnelMgr.supersededManagers([ours, invalid], invalid, bid).isEmpty)
         XCTAssertFalse(TunnelMgr.lockedPending([ours, invalid], ours, bid))
     }

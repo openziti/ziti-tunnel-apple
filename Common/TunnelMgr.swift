@@ -86,8 +86,8 @@ class TunnelMgr: NSObject {
     }
     
     /// Prefer a configuration that targets our provider: an active one first (so the running tunnel stays
-    /// controllable), then a valid locked one. Falls back to the first saved configuration (the previous
-    /// behavior) so an existing install is never orphaned.
+    /// controllable), then a valid locked one, then an unlocked one. Falls back to the first saved configuration
+    /// (the previous behavior) so an existing install is never orphaned.
     static func preferredManager(_ managers:[NETunnelProviderManager], _ bid:String,
                                  _ statusOf:StatusOf = { $0.connection.status }) -> NETunnelProviderManager? {
         let matching = managers.filter { targets($0, bid) }
@@ -95,7 +95,8 @@ class TunnelMgr: NSObject {
             zLog.warn("Ignoring invalid locked tunnel configuration \"\($0.localizedDescription ?? "")\"")
         }
         if let match = matching.first(where: { isActive(statusOf($0)) }) ??
-                       matching.first(where: { isUsableLocked($0) }) ?? matching.first {
+                       matching.first(where: { isUsableLocked($0) }) ??
+                       matching.first(where: { !isLocked($0) }) ?? matching.first {
             if matching.count > 1 {
                 zLog.warn("Found \(matching.count) tunnel configurations for \(bid), using \"\(match.localizedDescription ?? "")\"")
             }
