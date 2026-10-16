@@ -22,6 +22,8 @@ class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager?
     var tunnelRestarting = false
     private var loading = false
+    private var loadedBid:String?
+    private var lockedPending = false
     var tlsuvLoggingEnabled = false
     let ipcClient = IpcAppClient()
     
@@ -65,13 +67,24 @@ class TunnelMgr: NSObject {
         return ProviderConfig.isLocked((mgr?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration)
     }
     
-    /// Prefer a configuration that targets our provider, locked first. Falls back to the first saved
-    /// configuration (the previous behavior) so an existing install is never orphaned.
-    static func preferredManager(_ managers:[NETunnelProviderManager], _ bid:String) -> NETunnelProviderManager? {
-        let matching = managers.filter {
-            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == bid
-        }
-        if let match = matching.first(where: { isLocked($0) }) ?? matching.first {
+    typealias StatusOf = (NETunnelProviderManager) -> NEVPNStatus
+    
+    private static func targets(_ mgr:NETunnelProviderManager, _ bid:String) -> Bool {
+        return (mgr.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == bid
+    }
+    
+    private static func isActive(_ status:NEVPNStatus) -> Bool {
+        return status != .disconnected && status != .invalid
+    }
+    
+    /// Prefer a configuration that targets our provider: an active one first (so the running tunnel stays
+    /// controllable), then a locked one. Falls back to the first saved configuration (the previous
+    /// behavior) so an existing install is never orphaned.
+    static func preferredManager(_ managers:[NETunnelProviderManager], _ bid:String,
+                                 _ statusOf:StatusOf = { $0.connection.status }) -> NETunnelProviderManager? {
+        let matching = managers.filter { targets($0, bid) }
+        if let match = matching.first(where: { isActive(statusOf($0)) }) ??
+                       matching.first(where: { isLocked($0) }) ?? matching.first {
             if matching.count > 1 {
                 zLog.warn("Found \(matching.count) tunnel configurations for \(bid), using \"\(match.localizedDescription ?? "")\"")
             }
@@ -85,15 +98,19 @@ class TunnelMgr: NSObject {
         return nil
     }
     
-    /// Our own configurations superseded by a locked one. Connected ones are left alone (removing
+    /// Our own configurations superseded by a locked one. Active ones are left alone (removing
     /// would drop the tunnel) and picked up on a later load.
-    static func supersededManagers(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String) -> [NETunnelProviderManager] {
+    static func supersededManagers(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String,
+                                   _ statusOf:StatusOf = { $0.connection.status }) -> [NETunnelProviderManager] {
         guard isLocked(preferred) else { return [] }
         return managers.filter {
-            $0 !== preferred && !isLocked($0) &&
-            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == bid &&
-            ($0.connection.status == .disconnected || $0.connection.status == .invalid)
+            $0 !== preferred && !isLocked($0) && targets($0, bid) && !isActive(statusOf($0))
         }
+    }
+    
+    /// True when a locked configuration is waiting for the preferred (active, unlocked) one to disconnect
+    static func lockedPending(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String) -> Bool {
+        return !isLocked(preferred) && managers.contains { isLocked($0) && targets($0, bid) }
     }
 
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
@@ -106,6 +123,7 @@ class TunnelMgr: NSObject {
             return
         }
         loading = true
+        loadedBid = bid
         
         var tpm = NETunnelProviderManager()
         NETunnelProviderManager.loadAllFromPreferences { [weak self] savedManagers, error in
@@ -118,6 +136,7 @@ class TunnelMgr: NSObject {
             
             if let savedManagers = savedManagers, let preferred = TunnelMgr.preferredManager(savedManagers, bid) {
                 tpm = preferred
+                self?.lockedPending = TunnelMgr.lockedPending(savedManagers, preferred, bid)
                 
                 TunnelMgr.supersededManagers(savedManagers, preferred, bid).forEach { mgr in
                     let name = mgr.localizedDescription ?? ""
@@ -220,6 +239,12 @@ class TunnelMgr: NSObject {
             }
             tsChangedCallbacks.forEach { cb in cb(.reasserting) }
         } else {
+            // A locked configuration arrived while ours was active. Switch to it now that ours is down.
+            if lockedPending && status == .disconnected, let bid = loadedBid {
+                zLog.info("Tunnel disconnected, switching to locked configuration")
+                lockedPending = false
+                loadFromPreferences(bid)
+            }
             tsChangedCallbacks.forEach { cb in cb(status) }
         }
     }

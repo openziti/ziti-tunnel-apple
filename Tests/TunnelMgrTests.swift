@@ -96,6 +96,29 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertTrue(TunnelMgr.supersededManagers([locked, locked2], locked, bid).isEmpty)
     }
 
+    func testPreferredManager_activeUnlocked_beatsLocked() {
+        // The running tunnel must stay controllable until it disconnects
+        let ours = makeManager(bid, "ours")
+        let locked = makeManager(bid, "locked", locked: true)
+        let preferred = TunnelMgr.preferredManager([locked, ours], bid) { $0 === ours ? .connected : .disconnected }
+        XCTAssertTrue(preferred === ours)
+        XCTAssertTrue(TunnelMgr.lockedPending([locked, ours], ours, bid))
+    }
+
+    func testLockedPending_falseWhenLockedPreferredOrAbsent() {
+        let ours = makeManager(bid, "ours")
+        let locked = makeManager(bid, "locked", locked: true)
+        XCTAssertFalse(TunnelMgr.lockedPending([locked, ours], locked, bid))
+        XCTAssertFalse(TunnelMgr.lockedPending([ours], ours, bid))
+    }
+
+    func testSupersededManagers_keepsActive() {
+        let ours = makeManager(bid, "ours")
+        let locked = makeManager(bid, "locked", locked: true)
+        let superseded = TunnelMgr.supersededManagers([ours, locked], locked, bid) { $0 === ours ? .connecting : .disconnected }
+        XCTAssertTrue(superseded.isEmpty)
+    }
+
     func testPreferredManager_noMatch_fallsBackToFirst() {
         // Existing installs must keep using their saved configuration
         let first = makeManager("org.example.other", "first")
