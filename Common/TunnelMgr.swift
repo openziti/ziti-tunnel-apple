@@ -25,6 +25,10 @@ class TunnelMgr: NSObject {
     private var loadedBid:String?
     private var lockedPending = false
     var tlsuvLoggingEnabled = false
+    
+    typealias LogSettings = (level:ZitiLog.LogLevel, tlsuv:Bool)
+    /// Log settings changed in the app while locked. They only reach the running tunnel, so they apply until it restarts.
+    private var sessionLogSettings:LogSettings?
     let ipcClient = IpcAppClient()
     
     var zids:[ZitiIdentity] = []
@@ -214,25 +218,7 @@ class TunnelMgr: NSObject {
                 
                     tmgr.tpm = tpm
                     
-                    // Get our logger config from provider
-                    if let conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
-                        let pc = ProviderConfig()
-                        if let error = pc.parseDictionary(conf) {
-                            zLog.error("Unable to parse provider config to determine logger settings: \(error.localizedDescription)")
-                        } else {
-                            let ll = ZitiLog.LogLevel(rawValue: Int32(pc.logLevel)) ?? ZitiLog.LogLevel.INFO
-                            zLog.info("Updating log level to \(pc.logLevel) (\(ll))")
-                            ZitiLog.setLogLevel(ll)
-                            
-                            TunnelMgr.shared.tlsuvLoggingEnabled = Bool(pc.logTlsuv)
-                            var tlsuvLl = ZitiLog.LogLevel.ERROR
-                            if TunnelMgr.shared.tlsuvLoggingEnabled { tlsuvLl = ll }
-                            ZitiLog.setLogLevel(tlsuvLl, module: "tlsuv")
-                            Logger.updateRotateSettings(pc.logRotateDaily, pc.logRotateCount, pc.logRotateSizeMB)
-                        }
-                    } else {
-                        zLog.info("No log level found.  Using default")
-                    }
+                    tmgr.applyLogSettings()
                     
                     if !creating { tmgr.loading = false }
                     completionHandler?(tpm, nil)
@@ -244,7 +230,40 @@ class TunnelMgr: NSObject {
         }
     }
     
+    /// Log settings for the app: the configuration's, unless a locked configuration's were changed for the running tunnel
+    static func logSettings(_ configured:LogSettings, session:LogSettings?, locked:Bool) -> LogSettings {
+        guard locked, let session = session else { return configured }
+        return session
+    }
+    
+    /// Sets the app's logger from the loaded configuration
+    private func applyLogSettings() {
+        guard let conf = (tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration else {
+            zLog.info("No log level found.  Using default")
+            return
+        }
+        let pc = ProviderConfig()
+        if let error = pc.parseDictionary(conf) {
+            zLog.error("Unable to parse provider config to determine logger settings: \(error.localizedDescription)")
+            return
+        }
+        let configured = (ZitiLog.LogLevel(rawValue: Int32(pc.logLevel)) ?? ZitiLog.LogLevel.INFO, Bool(pc.logTlsuv))
+        let (ll, tlsuv) = TunnelMgr.logSettings(configured, session: sessionLogSettings, locked: TunnelMgr.isLocked(tpm))
+        zLog.info("Updating log level to \(ll.rawValue) (\(ll))")
+        ZitiLog.setLogLevel(ll)
+        
+        tlsuvLoggingEnabled = tlsuv
+        ZitiLog.setLogLevel(tlsuv ? ll : ZitiLog.LogLevel.ERROR, module: "tlsuv")
+        Logger.updateRotateSettings(pc.logRotateDaily, pc.logRotateCount, pc.logRotateSizeMB)
+    }
+    
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
+        // A starting tunnel reads its log settings from the configuration, so the app goes back to them too
+        if status == .connecting && sessionLogSettings != nil {
+            sessionLogSettings = nil
+            applyLogSettings()
+        }
+        
         if tunnelRestarting == true {
             if status == .disconnected {
                 tunnelRestarting = false
@@ -414,6 +433,7 @@ class TunnelMgr: NSObject {
         
         if TunnelMgr.isLocked(tpm) {
             zLog.info("Tunnel configuration is locked. Log level applies until the tunnel restarts")
+            sessionLogSettings = (level, tlsuvLoggingEnabled)
             sendLogLevel(level, tlsuvLevel)
         } else if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
             // update logLevel

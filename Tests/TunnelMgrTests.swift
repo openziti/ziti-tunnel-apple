@@ -141,6 +141,17 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertNotNil(saveError) // reported synchronously, before any system call
     }
 
+    func testLogSettings() {
+        let configured:TunnelMgr.LogSettings = (.INFO, false)
+        let session:TunnelMgr.LogSettings = (.TRACE, true)
+        XCTAssertEqual(TunnelMgr.logSettings(configured, session: session, locked: true).level, .TRACE)
+        XCTAssertTrue(TunnelMgr.logSettings(configured, session: session, locked: true).tlsuv)
+        XCTAssertEqual(TunnelMgr.logSettings(configured, session: nil, locked: true).level, .INFO)
+        // Unlocked changes are saved, so the configuration is current
+        XCTAssertEqual(TunnelMgr.logSettings(configured, session: session, locked: false).level, .INFO)
+        XCTAssertFalse(TunnelMgr.logSettings(configured, session: session, locked: false).tlsuv)
+    }
+
     func testStartAction() {
         XCTAssertEqual(TunnelMgr.startAction(enabled: true, locked: false, status: .disconnected), .start)
         XCTAssertEqual(TunnelMgr.startAction(enabled: true, locked: true, status: .disconnected), .start)
