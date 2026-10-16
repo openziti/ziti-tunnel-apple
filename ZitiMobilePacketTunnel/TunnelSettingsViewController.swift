@@ -272,6 +272,12 @@ class TunnelSettingsViewController: UITableViewController {
             ZitiHttpProxyConfig.deleteCredentials(proxyHost: effectiveHost, proxyPort: effectivePort)
         }
 
+        // A reload may have switched to a locked configuration since the screen opened
+        if !locked && TunnelMgr.isLocked(tvc?.tunnelMgr.tpm) {
+            zLog.warn("Tunnel configuration is now locked, not saving tunnel settings")
+            locked = true
+        }
+
         // Only the proxy credentials can change, and they're stored above. Restart to apply them.
         if locked {
             tvc?.tunnelMgr.restartTunnel()
