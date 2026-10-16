@@ -112,8 +112,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         present(nav, animated: true)
     }
 
-    func loadTunnelConfig() {
-        tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier) { tpm, error in
+    func loadTunnelConfig(createIfMissing:Bool = true) {
+        tunnelMgr.loadFromPreferences(TableViewController.providerBundleIdentifier, createIfMissing: createIfMissing) { tpm, error in
             DispatchQueue.main.async {
                 self.tableView.reloadData()
             }
@@ -136,7 +136,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         
         // pick up tunnel configs added or removed while we were in the background (e.g., by a profile)
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.loadTunnelConfig()
+            self?.loadTunnelConfig(createIfMissing: false)
         }
         
         // Load previous identities

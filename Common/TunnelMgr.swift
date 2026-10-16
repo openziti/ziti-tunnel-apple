@@ -126,9 +126,10 @@ class TunnelMgr: NSObject {
 
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
     
-    /// Loads the preferred tunnel configuration, creating one on first run. Skipped while a load (including
-    /// a first-run save) is in progress, so overlapping calls can't create duplicate configurations.
-    func loadFromPreferences(_ bid:String, _ completionHandler: LoadCompletionHandler? = nil) {
+    /// Loads the preferred tunnel configuration, creating one on first run. Reloads pass `createIfMissing: false`
+    /// so a deleted configuration or a denied permission prompt doesn't trigger another prompt. Skipped while a
+    /// load (including a first-run save) is in progress, so overlapping calls can't create duplicate configurations.
+    func loadFromPreferences(_ bid:String, createIfMissing:Bool = true, _ completionHandler: LoadCompletionHandler? = nil) {
         guard !loading else {
             zLog.info("Tunnel configuration load already in progress")
             return
@@ -158,6 +159,11 @@ class TunnelMgr: NSObject {
                         }
                     }
                 }
+            } else if !createIfMissing {
+                zLog.info("No tunnel configuration found, not creating one on reload")
+                self?.loading = false
+                completionHandler?(nil, nil)
+                return
             }
             
             tpm.loadFromPreferences { error in
@@ -254,7 +260,7 @@ class TunnelMgr: NSObject {
             if lockedPending && status == .disconnected, let bid = loadedBid {
                 zLog.info("Tunnel disconnected, switching to locked configuration")
                 lockedPending = false
-                loadFromPreferences(bid)
+                loadFromPreferences(bid, createIfMissing: false)
             }
             tsChangedCallbacks.forEach { cb in cb(status) }
         }
@@ -302,13 +308,26 @@ class TunnelMgr: NSObject {
         }
     }
     
+    enum StartAction { case start, saveAndStart, lockedDisabled, createDefault }
+    
+    /// What starting the tunnel takes, given the loaded configuration's state
+    static func startAction(enabled:Bool, locked:Bool, status:NEVPNStatus) -> StartAction {
+        // A removed configuration (e.g., deleted in system settings) reports .invalid. Saving re-creates it,
+        // except a locked one, which is replaced by our default configuration.
+        if status == .invalid { return locked ? .createDefault : .saveAndStart }
+        if enabled { return .start }
+        // Re-enabling requires a save, which a locked configuration doesn't allow
+        return locked ? .lockedDisabled : .saveAndStart
+    }
+    
     func startTunnel() throws {
         guard let tpm = self.tpm else {
             zLog.error("Unable to access TPM")
             return
         }
         
-        if tpm.isEnabled {
+        switch TunnelMgr.startAction(enabled: tpm.isEnabled, locked: TunnelMgr.isLocked(tpm), status: status) {
+        case .start:
             guard let tps = (tpm.connection as? NETunnelProviderSession) else {
                 zLog.error("Unable to access connection as NETunnelProviderSession")
                 return
@@ -333,14 +352,17 @@ class TunnelMgr: NSObject {
                     self.prefReloadHack(tpm)
                 }
             }
-        } else if TunnelMgr.isLocked(tpm) {
-            // Re-enabling requires a save
-            zLog.warn("startTunnel - tunnel not enabled and configuration is locked")
-            throw ZitiError("Ziti is not enabled in system VPN settings. Select it there to connect.")
-        } else {
-            zLog.warn("startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
+        case .saveAndStart:
+            zLog.warn(status == .invalid ? "startTunnel - tunnel configuration was removed. Re-creating and starting tunnel" :
+                                           "startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
             tpm.isEnabled = true
             self.prefReloadHack(tpm)
+        case .lockedDisabled:
+            zLog.warn("startTunnel - tunnel not enabled and configuration is locked")
+            throw ZitiError("Ziti is not enabled in system VPN settings. Select it there to connect.")
+        case .createDefault:
+            zLog.warn("startTunnel - locked tunnel configuration was removed. Creating default configuration")
+            if let bid = loadedBid { loadFromPreferences(bid) }
         }
     }
     

@@ -216,6 +216,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
             break
         case .invalid:
             tunStatusItem.title = "Status: Invalid"
+            tunConnectItem.title = "Connect"
             statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarDisconnected"))
             break
         case .reasserting:

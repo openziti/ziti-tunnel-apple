@@ -140,14 +140,14 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertNotNil(saveError) // reported synchronously, before any system call
     }
 
-    func testStartTunnel_lockedAndDisabled_throws() {
-        let saved = TunnelMgr.shared.tpm
-        defer { TunnelMgr.shared.tpm = saved }
-        let locked = makeManager(bid, "locked", locked: true)
-        locked.isEnabled = false
-        TunnelMgr.shared.tpm = locked
-        XCTAssertThrowsError(try TunnelMgr.shared.startTunnel())
-        XCTAssertFalse(locked.isEnabled)
+    func testStartAction() {
+        XCTAssertEqual(TunnelMgr.startAction(enabled: true, locked: false, status: .disconnected), .start)
+        XCTAssertEqual(TunnelMgr.startAction(enabled: true, locked: true, status: .disconnected), .start)
+        XCTAssertEqual(TunnelMgr.startAction(enabled: false, locked: false, status: .disconnected), .saveAndStart)
+        XCTAssertEqual(TunnelMgr.startAction(enabled: false, locked: true, status: .disconnected), .lockedDisabled)
+        // Removed configuration
+        XCTAssertEqual(TunnelMgr.startAction(enabled: true, locked: false, status: .invalid), .saveAndStart)
+        XCTAssertEqual(TunnelMgr.startAction(enabled: true, locked: true, status: .invalid), .createDefault)
     }
 
     func testPreferredManager_noMatch_fallsBackToFirst() {
