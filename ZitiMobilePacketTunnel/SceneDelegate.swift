@@ -19,9 +19,34 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    var launchURL:URL?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // window is initialized automatically from the Main storyboard via UISceneStoryboardFile
         guard let _ = (scene as? UIWindowScene) else { return }
+
+        // Posted once active, when the main view is observing
+        if let url = connectionOptions.urlContexts.first?.url {
+            zLog.info("Launching app with URL: \(url.absoluteString)")
+            launchURL = url
+        }
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        zLog.info("SceneDelegate notifying new URL: \(url.absoluteURL)")
+        notifyNewURL(url)
+    }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        if let url = launchURL {
+            notifyNewURL(url)
+            launchURL = nil
+        }
+    }
+
+    func notifyNewURL(_ url:URL) {
+        let dict:[String: URL] = ["url": url]
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "NewURL"), object: nil, userInfo: dict)
     }
 }

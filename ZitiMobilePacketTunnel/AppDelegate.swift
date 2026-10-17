@@ -21,7 +21,6 @@ import UserNotifications
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var launchURL:URL?
     
     override init() {
         Logger.initShared(Logger.APP_TAG)
@@ -65,18 +64,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        if let opts = launchOptions {
-            launchURL = opts[UIApplication.LaunchOptionsKey.url] as? URL
-            zLog.info("Launching app with URL: \(launchURL?.absoluteString ?? "invalid")")
-        }
-        return true
-    }
-    
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        if launchURL == nil {
-            zLog.info("AppDelegate notifying new URL: \(url.absoluteURL)")
-            notifyNewURL(url)
-        }
         return true
     }
     
@@ -90,10 +77,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        if let url = launchURL {
-            notifyNewURL(url)
-            launchURL = nil
-        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -104,11 +87,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-    }
-
-    func notifyNewURL(_ url:URL) {
-        let dict:[String: URL] = ["url": url]
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "NewURL"), object: nil, userInfo: dict)
     }
 }
 
