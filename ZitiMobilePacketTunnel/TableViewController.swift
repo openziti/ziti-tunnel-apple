@@ -461,28 +461,20 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             let supportEmail = Bundle.main.infoDictionary?["ZitiSupportEmail"] as? String ?? ""
             let supportSubj = Bundle.main.infoDictionary?["ZitiSupportSubject"] as? String ?? ""
             if MFMailComposeViewController.canSendMail() {
-                let mail = MFMailComposeViewController()
-                mail.mailComposeDelegate = self
-                mail.setSubject(supportSubj)
-                mail.setToRecipients([supportEmail])
-                mail.setMessageBody("\n\n\nVersion: \(Version.str)\nOS \(Version.osVersion)\nDevice: \(deviceName())", isHTML: false)
-                if let logger = Logger.shared {
-                    if let url = logger.currLog(forTag: Logger.TUN_TAG), let data = try? Data(contentsOf: url) {
-                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
-                        let prev = url.appendingPathExtension("1")
-                        if let prevData = try? Data(contentsOf: prev) {
-                            mail.addAttachmentData(prevData, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                StatusSummary.snapshot { snapshot in
+                    let mail = MFMailComposeViewController()
+                    mail.mailComposeDelegate = self
+                    mail.setSubject(supportSubj)
+                    mail.setToRecipients([supportEmail])
+                    mail.setMessageBody("\n\n\nVersion: \(Version.str)\nOS \(Version.osVersion)\nDevice: \(self.deviceName())", isHTML: false)
+                    mail.addAttachmentData(Data(snapshot.utf8), mimeType: "text/plain", fileName: "snapshot.txt")
+                    Logger.shared?.feedbackLogs().forEach { url in
+                        if let data = try? Data(contentsOf: url) {
+                            mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
                         }
                     }
-                    if let url = logger.currLog(forTag: Logger.APP_TAG), let data = try? Data(contentsOf: url) {
-                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
-                        let prev = url.appendingPathExtension("1")
-                        if let prevData = try? Data(contentsOf: prev) {
-                            mail.addAttachmentData(prevData, mimeType: "text/plain", fileName: prev.lastPathComponent)
-                        }
-                    }
+                    self.present(mail, animated: true)
                 }
-                self.present(mail, animated: true)
             } else {
                 zLog.warn("Mail view controller not available")
                 let alert = UIAlertController(

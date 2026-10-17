@@ -26,7 +26,6 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     private var menu:NSMenu!
     private var tunStatusItem:NSMenuItem!
     private var tunConnectItem:NSMenuItem!
-    private var snapshotItem:NSMenuItem!
     private var showDocItem:NSMenuItem!
     private var tlsuvLogging:NSMenuItem!
     private var logLevelMenu:NSMenu!
@@ -99,8 +98,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         menu.setSubmenu(logMenu, for: logMenuItem)
         // End Log Menu
         
-        snapshotItem = newMenuItem(title: "Snapshot...", action: nil)
-        menu.addItem(snapshotItem)
+        menu.addItem(newMenuItem(title: "Snapshot...", action: #selector(MainMenuBar.showSnapshot(_:))))
         
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
@@ -187,7 +185,6 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     }
     
     func tunnelStatusDidChange(_ status:NEVPNStatus) {
-        snapshotItem.action = nil
         switch status {
         case .connecting:
             tunStatusItem.title = "Status: Connecting..."
@@ -197,7 +194,6 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         case .connected:
             tunStatusItem.title = "Status: Connected"
             tunConnectItem.title = "Disconnect"
-            snapshotItem.action = #selector(MainMenuBar.showSnapshot(_:))
             
             if TunnelMgr.shared.allEnabledZidsFullyAvailable() {
                 statusItem.button?.image = NSImage(named:NSImage.Name("StatusBarConnected"))
@@ -331,18 +327,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
     }
     
     @objc func showSnapshot(_ sender:Any?) {
-        TunnelMgr.shared.ipcClient.sendToAppex(IpcDumpRequestMessage()) { respMsg, zErr in
-            guard zErr == nil else {
-                zLog.error("Unable to send provider message for snapshot (dump): \(zErr!.localizedDescription)")
-                return
-            }
-            guard let dumpResp = respMsg as? IpcDumpResponseMessage,
-                  let str = dumpResp.dump else {
-                zLog.error("Unable to parse snapshot (dump) string from response message")
-                return
-            }
-            
-            zLog.info(str)
+        StatusSummary.snapshot { str in
             guard let wc = NSStoryboard(name: "Main", bundle: nil).instantiateController(withIdentifier: "SNAPSHOT_WINDOW") as? NSWindowController else {
                 zLog.wtf("Unable to access SNAPSHOT_WINDOW from Main Storyboard")
                 return
