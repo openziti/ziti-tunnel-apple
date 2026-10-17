@@ -21,7 +21,14 @@ import CZiti
 class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager?
     var tunnelRestarting = false
+    private var loading = false
+    private var loadedBid:String?
+    private var lockedPending = false
     var tlsuvLoggingEnabled = false
+    
+    typealias LogSettings = (level:ZitiLog.LogLevel, tlsuv:Bool)
+    /// Log settings changed in the app while locked. They only reach the running tunnel, so they apply until it restarts.
+    private var sessionLogSettings:LogSettings?
     let ipcClient = IpcAppClient()
     
     var zids:[ZitiIdentity] = []
@@ -60,29 +67,121 @@ class TunnelMgr: NSObject {
     private override init() {}
     deinit { NotificationCenter.default.removeObserver(self) }
     
+    static func isLocked(_ mgr:NETunnelProviderManager?) -> Bool {
+        return ProviderConfig.isLocked((mgr?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration)
+    }
+    
+    typealias StatusOf = (NETunnelProviderManager) -> NEVPNStatus
+    
+    private static func targets(_ mgr:NETunnelProviderManager, _ bid:String) -> Bool {
+        return (mgr.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == bid
+    }
+    
+    /// A locked configuration that would actually work. An invalid one never displaces ours.
+    private static func isUsableLocked(_ mgr:NETunnelProviderManager) -> Bool {
+        guard isLocked(mgr), let conf = (mgr.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration else {
+            return false
+        }
+        return ProviderConfig().validateDictionaty(conf) == nil
+    }
+    
+    private static func isActive(_ status:NEVPNStatus) -> Bool {
+        return status != .disconnected && status != .invalid
+    }
+    
+    /// Prefer a configuration that targets our provider: an active one first (so the running tunnel stays
+    /// controllable), then a valid locked one, then an unlocked one. Falls back to the first saved configuration
+    /// (the previous behavior) so an existing install is never orphaned.
+    static func preferredManager(_ managers:[NETunnelProviderManager], _ bid:String,
+                                 _ statusOf:StatusOf = { $0.connection.status }) -> NETunnelProviderManager? {
+        let matching = managers.filter { targets($0, bid) }
+        matching.filter { isLocked($0) && !isUsableLocked($0) }.forEach {
+            zLog.warn("Ignoring invalid locked tunnel configuration \"\($0.localizedDescription ?? "")\"")
+        }
+        if let match = matching.first(where: { isActive(statusOf($0)) }) ??
+                       matching.first(where: { isUsableLocked($0) }) ??
+                       matching.first(where: { !isLocked($0) }) ?? matching.first {
+            if matching.count > 1 {
+                zLog.warn("Found \(matching.count) tunnel configurations for \(bid), using \"\(match.localizedDescription ?? "")\"")
+            }
+            return match
+        }
+
+        if let first = managers.first {
+            zLog.warn("No tunnel configuration targets \(bid), using \"\(first.localizedDescription ?? "")\"")
+            return first
+        }
+        return nil
+    }
+    
+    /// Our own configurations superseded by a locked one. Active ones are left alone (removing
+    /// would drop the tunnel) and picked up on a later load.
+    static func supersededManagers(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String,
+                                   _ statusOf:StatusOf = { $0.connection.status }) -> [NETunnelProviderManager] {
+        guard isUsableLocked(preferred) else { return [] }
+        return managers.filter {
+            $0 !== preferred && !isLocked($0) && targets($0, bid) && !isActive(statusOf($0))
+        }
+    }
+    
+    /// True when a locked configuration is waiting for the preferred (active, unlocked) one to disconnect
+    static func lockedPending(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String) -> Bool {
+        return !isLocked(preferred) && managers.contains { targets($0, bid) && isUsableLocked($0) }
+    }
+
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
-    func loadFromPreferences(_ bid:String, _ completionHandler: LoadCompletionHandler? = nil) {
+    
+    /// Loads the preferred tunnel configuration, creating one on first run. Reloads pass `createIfMissing: false`
+    /// so a deleted configuration or a denied permission prompt doesn't trigger another prompt. Skipped while a
+    /// load (including a first-run save) is in progress, so overlapping calls can't create duplicate configurations.
+    func loadFromPreferences(_ bid:String, createIfMissing:Bool = true, _ completionHandler: LoadCompletionHandler? = nil) {
+        guard !loading else {
+            zLog.info("Tunnel configuration load already in progress")
+            return
+        }
+        loading = true
+        loadedBid = bid
+        
         var tpm = NETunnelProviderManager()
         NETunnelProviderManager.loadAllFromPreferences { [weak self] savedManagers, error in
             if let error = error {
                 zLog.error(error.localizedDescription)
+                self?.loading = false
                 completionHandler?(nil, error)
                 return
             }
             
-            if let savedManagers = savedManagers, savedManagers.count > 0 {
-                tpm = savedManagers[0]
+            if let savedManagers = savedManagers, let preferred = TunnelMgr.preferredManager(savedManagers, bid) {
+                tpm = preferred
+                self?.lockedPending = TunnelMgr.lockedPending(savedManagers, preferred, bid)
+                
+                TunnelMgr.supersededManagers(savedManagers, preferred, bid).forEach { mgr in
+                    let name = mgr.localizedDescription ?? ""
+                    zLog.info("Removing tunnel configuration \"\(name)\", superseded by locked configuration")
+                    mgr.removeFromPreferences { error in
+                        if let error = error {
+                            zLog.warn("Unable to remove tunnel configuration \"\(name)\": \(error.localizedDescription)")
+                        }
+                    }
+                }
+            } else if !createIfMissing {
+                zLog.info("No tunnel configuration found, not creating one on reload")
+                self?.loading = false
+                completionHandler?(nil, nil)
+                return
             }
             
             tpm.loadFromPreferences { error in
                 if let error = error {
                     zLog.error(error.localizedDescription)
+                    self?.loading = false
                     completionHandler?(nil, error)
                     return
                 }
                 
                 // This won't happen unless first time run and no profile preference has been imported
-                if tpm.protocolConfiguration == nil {
+                let creating = tpm.protocolConfiguration == nil
+                if creating {
                     
                     let providerProtocol = NETunnelProviderProtocol()
                     providerProtocol.providerBundleIdentifier = bid
@@ -96,15 +195,16 @@ class TunnelMgr: NSObject {
                     tpm.localizedDescription = defaultProviderConf.localizedDescription
                     tpm.isEnabled = true
                     
-                    tpm.saveToPreferences { error in
-                        if let error = error {
-                            zLog.error(error.localizedDescription)
-                        } else {
-                            zLog.info("Saved successfully. Re-loading preferences")
-                            // ios hack per apple forums (else NEVPNErrorDomain Code=1)
-                            tpm.loadFromPreferences { error in
-                                zLog.error("Re-loaded preferences, error=\(error != nil)")
-                            }
+                    self?.savePreferences(tpm) { error in
+                        guard error == nil else {
+                            self?.loading = false
+                            return
+                        }
+                        zLog.info("Re-loading preferences")
+                        // ios hack per apple forums (else NEVPNErrorDomain Code=1)
+                        tpm.loadFromPreferences { error in
+                            zLog.error("Re-loaded preferences, error=\(error != nil)")
+                            self?.loading = false
                         }
                     }
                 }
@@ -118,26 +218,9 @@ class TunnelMgr: NSObject {
                 
                     tmgr.tpm = tpm
                     
-                    // Get our logger config from provider
-                    if let conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
-                        let pc = ProviderConfig()
-                        if let error = pc.parseDictionary(conf) {
-                            zLog.error("Unable to parse provider config to determine logger settings: \(error.localizedDescription)")
-                        } else {
-                            let ll = ZitiLog.LogLevel(rawValue: Int32(pc.logLevel)) ?? ZitiLog.LogLevel.INFO
-                            zLog.info("Updating log level to \(pc.logLevel) (\(ll))")
-                            ZitiLog.setLogLevel(ll)
-                            
-                            TunnelMgr.shared.tlsuvLoggingEnabled = Bool(pc.logTlsuv)
-                            var tlsuvLl = ZitiLog.LogLevel.ERROR
-                            if TunnelMgr.shared.tlsuvLoggingEnabled { tlsuvLl = ll }
-                            ZitiLog.setLogLevel(tlsuvLl, module: "tlsuv")
-                            Logger.updateRotateSettings(pc.logRotateDaily, pc.logRotateCount, pc.logRotateSizeMB)
-                        }
-                    } else {
-                        zLog.info("No log level found.  Using default")
-                    }
+                    tmgr.applyLogSettings()
                     
+                    if !creating { tmgr.loading = false }
                     completionHandler?(tpm, nil)
                     tmgr.tsChangedCallbacks.forEach { cb in cb(tmgr.status) }
                 } else {
@@ -147,7 +230,40 @@ class TunnelMgr: NSObject {
         }
     }
     
+    /// Log settings for the app: the configuration's, unless a locked configuration's were changed for the running tunnel
+    static func logSettings(_ configured:LogSettings, session:LogSettings?, locked:Bool) -> LogSettings {
+        guard locked, let session = session else { return configured }
+        return session
+    }
+    
+    /// Sets the app's logger from the loaded configuration
+    private func applyLogSettings() {
+        guard let conf = (tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration else {
+            zLog.info("No log level found.  Using default")
+            return
+        }
+        let pc = ProviderConfig()
+        if let error = pc.parseDictionary(conf) {
+            zLog.error("Unable to parse provider config to determine logger settings: \(error.localizedDescription)")
+            return
+        }
+        let configured = (ZitiLog.LogLevel(rawValue: Int32(pc.logLevel)) ?? ZitiLog.LogLevel.INFO, Bool(pc.logTlsuv))
+        let (ll, tlsuv) = TunnelMgr.logSettings(configured, session: sessionLogSettings, locked: TunnelMgr.isLocked(tpm))
+        zLog.info("Updating log level to \(ll.rawValue) (\(ll))")
+        ZitiLog.setLogLevel(ll)
+        
+        tlsuvLoggingEnabled = tlsuv
+        ZitiLog.setLogLevel(tlsuv ? ll : ZitiLog.LogLevel.ERROR, module: "tlsuv")
+        Logger.updateRotateSettings(pc.logRotateDaily, pc.logRotateCount, pc.logRotateSizeMB)
+    }
+    
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
+        // A starting tunnel reads its log settings from the configuration, so the app goes back to them too
+        if status == .connecting && sessionLogSettings != nil {
+            sessionLogSettings = nil
+            applyLogSettings()
+        }
+        
         if tunnelRestarting == true {
             if status == .disconnected {
                 tunnelRestarting = false
@@ -160,28 +276,68 @@ class TunnelMgr: NSObject {
             }
             tsChangedCallbacks.forEach { cb in cb(.reasserting) }
         } else {
+            // A locked configuration arrived while ours was active. Switch to it now that ours is down.
+            if lockedPending && status == .disconnected, let bid = loadedBid {
+                zLog.info("Tunnel disconnected, switching to locked configuration")
+                lockedPending = false
+                loadFromPreferences(bid, createIfMissing: false)
+            }
             tsChangedCallbacks.forEach { cb in cb(status) }
         }
     }
     
-    func prefReloadHack(_ tpm: NETunnelProviderManager) {
-        tpm.saveToPreferences { error in
-            if let error = error {
-                zLog.error(error.localizedDescription)
+    /// Saves the tunnel configuration (the loaded one unless another is given). All app-side
+    /// writes go through here so failures are reported consistently. Locked configurations are never saved.
+    func savePreferences(_ mgr:NETunnelProviderManager? = nil, _ completionHandler:((Error?) -> Void)? = nil) {
+        guard let mgr = mgr ?? tpm else {
+            let error = ZitiError("Unable to save tunnel configuration: not loaded")
+            zLog.error(error.localizedDescription)
+            completionHandler?(error)
+            return
+        }
+        guard !TunnelMgr.isLocked(mgr) else {
+            let error = ZitiError("Unable to save tunnel configuration: locked")
+            zLog.warn(error.localizedDescription)
+            completionHandler?(error)
+            return
+        }
+        mgr.saveToPreferences { error in
+            if let error = error as NSError? {
+                zLog.error("Unable to save tunnel configuration: \(error.localizedDescription) (\(error.domain) \(error.code))")
             } else {
-                zLog.info("Saved successfully. Re-loading preferences")
-                // ios hack per apple forums (else NEVPNErrorDomain Code=1 on starting tunnel)
-                tpm.loadFromPreferences { [weak tpm] error in
-                    zLog.error("Re-loaded preferences, error=\(error != nil). Attempting to start")
-                    do {
-                        zLog.info("Attempting to start tunnel after load from preferences")
-                        try (tpm?.connection as? NETunnelProviderSession)?.startTunnel()
-                    } catch {
-                        zLog.error("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
-                    }
+                zLog.info("Saved tunnel configuration")
+            }
+            completionHandler?(error)
+        }
+    }
+    
+    func prefReloadHack(_ tpm: NETunnelProviderManager) {
+        savePreferences(tpm) { error in
+            guard error == nil else { return }
+            zLog.info("Re-loading preferences")
+            // ios hack per apple forums (else NEVPNErrorDomain Code=1 on starting tunnel)
+            tpm.loadFromPreferences { [weak tpm] error in
+                zLog.error("Re-loaded preferences, error=\(error != nil). Attempting to start")
+                do {
+                    zLog.info("Attempting to start tunnel after load from preferences")
+                    try (tpm?.connection as? NETunnelProviderSession)?.startTunnel()
+                } catch {
+                    zLog.error("Failed starting tunnel after re-enabling. \(error.localizedDescription)")
                 }
             }
         }
+    }
+    
+    enum StartAction { case start, saveAndStart, lockedDisabled, createDefault }
+    
+    /// What starting the tunnel takes, given the loaded configuration's state
+    static func startAction(enabled:Bool, locked:Bool, status:NEVPNStatus) -> StartAction {
+        // A removed configuration (e.g., deleted in system settings) reports .invalid. Saving re-creates it,
+        // except a locked one, which is replaced by our default configuration.
+        if status == .invalid { return locked ? .createDefault : .saveAndStart }
+        if enabled { return .start }
+        // Re-enabling requires a save, which a locked configuration doesn't allow
+        return locked ? .lockedDisabled : .saveAndStart
     }
     
     func startTunnel() throws {
@@ -190,7 +346,8 @@ class TunnelMgr: NSObject {
             return
         }
         
-        if tpm.isEnabled {
+        switch TunnelMgr.startAction(enabled: tpm.isEnabled, locked: TunnelMgr.isLocked(tpm), status: status) {
+        case .start:
             guard let tps = (tpm.connection as? NETunnelProviderSession) else {
                 zLog.error("Unable to access connection as NETunnelProviderSession")
                 return
@@ -207,14 +364,25 @@ class TunnelMgr: NSObject {
                     }
                     zLog.error("lastDisconnectError: \(err.localizedDescription)")
                     
+                    guard !TunnelMgr.isLocked(tpm) else {
+                        zLog.info("Tunnel configuration is locked, skipping reload prefs hack")
+                        return
+                    }
                     zLog.info("Attempting reload prefs hack")
                     self.prefReloadHack(tpm)
                 }
             }
-        } else {
-            zLog.warn("startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
+        case .saveAndStart:
+            zLog.warn(status == .invalid ? "startTunnel - tunnel configuration was removed. Re-creating and starting tunnel" :
+                                           "startTunnel - tunnel not enabled.  Re-enabling and starting tunnel")
             tpm.isEnabled = true
             self.prefReloadHack(tpm)
+        case .lockedDisabled:
+            zLog.warn("startTunnel - tunnel not enabled and configuration is locked")
+            throw ZitiError("Ziti is not enabled in system VPN settings. Select it there to connect.")
+        case .createDefault:
+            zLog.warn("startTunnel - locked tunnel configuration was removed. Creating default configuration")
+            if let bid = loadedBid { loadFromPreferences(bid) }
         }
     }
     
@@ -263,7 +431,11 @@ class TunnelMgr: NSObject {
             return
         }
         
-        if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
+        if TunnelMgr.isLocked(tpm) {
+            zLog.info("Tunnel configuration is locked. Log level applies until the tunnel restarts")
+            sessionLogSettings = (level, tlsuvLoggingEnabled)
+            sendLogLevel(level, tlsuvLevel)
+        } else if var conf = (tpm.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
             // update logLevel
             conf[ProviderConfig.LOG_LEVEL_KEY] = String(level.rawValue)
             conf[ProviderConfig.LOG_TLSUV_KEY] = self.tlsuvLoggingEnabled
@@ -271,30 +443,32 @@ class TunnelMgr: NSObject {
             
             zLog.info("Updated providerConfiguration: \(conf)")
             
-            tpm.saveToPreferences { error in
-                if let error = error {
-                    zLog.error(error.localizedDescription)
-                } else {
-                    // sendProviderMessage
-                    zLog.info("Sending logLevel \(level) to provider")
-                    let msg = IpcSetLogLevelMessage(level.rawValue)
-                    self.ipcClient.sendToAppex(msg) { _, zErr in
-                        guard zErr == nil else {
-                            zLog.error("Unable to send provider message to update global logLevel to \(level): \(zErr!.localizedDescription)")
-                            return
-                        }
-                    }
-                    let tlsuvMsg = IpcSetLogLevelMessage(tlsuvLevel.rawValue, module: "tlsuv")
-                    self.ipcClient.sendToAppex(tlsuvMsg) { _, zErr in
-                        guard zErr == nil else {
-                            zLog.error("Unable to send provider message to update tlsuv logLevel to \(level): \(zErr!.localizedDescription)")
-                            return
-                        }
-                    }
+            savePreferences(tpm) { error in
+                if error == nil {
+                    self.sendLogLevel(level, tlsuvLevel)
                 }
             }
         } else {
             zLog.info("No log level found.  Using default")
+        }
+    }
+    
+    private func sendLogLevel(_ level:ZitiLog.LogLevel, _ tlsuvLevel:ZitiLog.LogLevel) {
+        // sendProviderMessage
+        zLog.info("Sending logLevel \(level) to provider")
+        let msg = IpcSetLogLevelMessage(level.rawValue)
+        ipcClient.sendToAppex(msg) { _, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message to update global logLevel to \(level): \(zErr!.localizedDescription)")
+                return
+            }
+        }
+        let tlsuvMsg = IpcSetLogLevelMessage(tlsuvLevel.rawValue, module: "tlsuv")
+        ipcClient.sendToAppex(tlsuvMsg) { _, zErr in
+            guard zErr == nil else {
+                zLog.error("Unable to send provider message to update tlsuv logLevel to \(level): \(zErr!.localizedDescription)")
+                return
+            }
         }
     }
     

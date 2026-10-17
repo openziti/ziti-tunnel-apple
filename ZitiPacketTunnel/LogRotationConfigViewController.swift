@@ -43,18 +43,22 @@ class LogRotationConfigViewController: NSViewController {
             return
         }
         
-        if let countStr = conf[ProviderConfig.LOG_ROTATE_COUNT_KEY] as? String, let countInt = UInt32(countStr) {
+        if let countStr = ProviderConfig.stringValue(conf[ProviderConfig.LOG_ROTATE_COUNT_KEY]), let countInt = UInt32(countStr) {
             self.countTextField.intValue = Int32(countInt)
         }
-        if let sizeStr = conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY] as? String, let sizeInt = UInt32(sizeStr) {
+        if let sizeStr = ProviderConfig.stringValue(conf[ProviderConfig.LOG_ROTATE_SIZEMB_KEY]), let sizeInt = UInt32(sizeStr) {
             self.sizeTextField.intValue = Int32(sizeInt)
         }
-        if let daily = conf[ProviderConfig.LOG_ROTATE_DAILY_KEY] as? Bool {
+        if let daily = ProviderConfig.boolValue(conf[ProviderConfig.LOG_ROTATE_DAILY_KEY]) {
             self.dailyCheckbox.state = daily ? .on : .off
         }
         
         countStepper.intValue = countTextField.intValue
         sizeStepper.intValue = sizeTextField.intValue
+        
+        if TunnelMgr.isLocked(TunnelMgr.shared.tpm) {
+            showLockedNote(beside: saveBtn, disabling: [countTextField, countStepper, dailyCheckbox, sizeTextField, sizeStepper])
+        }
     }
     
     @IBAction func onCountStepper(_ sender: NSStepper) {
@@ -107,10 +111,9 @@ class LogRotationConfigViewController: NSViewController {
         conf[ProviderConfig.LOG_ROTATE_DAILY_KEY] = daily
         
         pp.providerConfiguration = conf
-        TunnelMgr.shared.tpm?.saveToPreferences { error in
+        TunnelMgr.shared.savePreferences { error in
             if let error = error {
                 DispatchQueue.main.async {
-                    zLog.error("Error saving updated provider configuration")
                     let alert = NSAlert()
                     alert.messageText = "Config Save Error"
                     alert.informativeText = error.localizedDescription
@@ -119,7 +122,6 @@ class LogRotationConfigViewController: NSViewController {
                 }
                 return
             }
-            zLog.info("Saved provider configuration")
             
             Logger.updateRotateSettings(daily, count, sizeMB)
             

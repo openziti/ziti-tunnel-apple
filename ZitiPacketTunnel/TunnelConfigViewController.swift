@@ -22,6 +22,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     weak var vc: ViewController?
     var restartRequired = false
     var requireRestart:[NSTextField] = []
+    private var locked = false
     
     @IBOutlet weak var box: NSBox!
     @IBOutlet weak var ipAddressText: NSTextField!
@@ -65,9 +66,18 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.proxyUsernameText.delegate = self
         self.proxyPasswordText.delegate = self
 
-        self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText, proxyHostText, proxyPortText ]
+        self.requireRestart = [ ipAddressText, subnetMaskText, dnsServersText, proxyHostText, proxyPortText,
+                                proxyUsernameText, proxyPasswordText ]
 
         self.updateConfigControls()
+        
+        // Proxy credentials stay editable since they're stored in the keychain, not the locked configuration
+        locked = TunnelMgr.isLocked(vc?.tunnelMgr.tpm)
+        if locked {
+            showLockedNote(beside: saveButton, disabling: [
+                ipAddressText, subnetMaskText, mtuText, dnsServersText, fallbackDNSCheck, fallbackDNSText,
+                interceptMatchedDomainsSwitch, lowPowerModeSwitch, proxyModePopUp, proxyHostText, proxyPortText ])
+        }
     }
     
     private func updateConfigControls() {
@@ -99,7 +109,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.subnetMaskText.stringValue = subnet
         }
         
-        if let mtu = conf[ProviderConfig.MTU_KEY] as? String {
+        if let mtu = ProviderConfig.stringValue(conf[ProviderConfig.MTU_KEY]) {
             self.mtuText.stringValue = mtu
         }
         
@@ -107,7 +117,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.dnsServersText.stringValue = dns
         }
         
-        if let fallbackDnsEnbled = conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool {
+        if let fallbackDnsEnbled = ProviderConfig.boolValue(conf[ProviderConfig.FALLBACK_DNS_ENABLED_KEY]) {
             self.fallbackDNSCheck.state = fallbackDnsEnbled ? .on : .off
         }
         
@@ -115,11 +125,11 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             self.fallbackDNSText.stringValue = fallbackDns
         }
         
-        if let interceptMatchedDomains = conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY] as? Bool {
+        if let interceptMatchedDomains = ProviderConfig.boolValue(conf[ProviderConfig.INTERCEPT_MATCHED_DNS_KEY]) {
             self.interceptMatchedDomainsSwitch.state = interceptMatchedDomains ? .on : .off
         }
         
-        if let lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool {
+        if let lowPowerMode = ProviderConfig.boolValue(conf[ProviderConfig.LOW_POWER_MODE_KEY]) {
             self.lowPowerModeSwitch.state = lowPowerMode ? .on : .off
         }
 
@@ -133,7 +143,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         if let proxyHost = conf[ProviderConfig.PROXY_HOST_KEY] as? String {
             self.proxyHostText.stringValue = proxyHost
         }
-        if let proxyPort = conf[ProviderConfig.PROXY_PORT_KEY] as? String {
+        if let proxyPort = ProviderConfig.stringValue(conf[ProviderConfig.PROXY_PORT_KEY]) {
             self.proxyPortText.stringValue = proxyPort
         }
 
@@ -296,8 +306,16 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             ZitiHttpProxyConfig.deleteCredentials(proxyHost: effectiveHost, proxyPort: effectivePort)
         }
 
+        // Only the proxy credentials can change, and they're stored above. Restart to apply them. Checks the lock
+        // as shown when the screen opened and as it is now, since a reload may have changed it.
+        if locked || TunnelMgr.isLocked(TunnelMgr.shared.tpm) {
+            self.vc?.tunnelMgr.restartTunnel()
+            self.dismiss(self)
+            return
+        }
+
         pp.providerConfiguration = conf
-        TunnelMgr.shared.tpm?.saveToPreferences { error in
+        TunnelMgr.shared.savePreferences { error in
             if let error = error {
                 NSAlert(error:error).runModal()
             } else {
@@ -320,5 +338,26 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     
     @IBAction func onCancelButton(_ sender: Any) {
         self.dismiss(self)
+    }
+}
+
+extension NSViewController {
+    /// Makes a settings screen read-only when the tunnel configuration is locked
+    func showLockedNote(beside saveButton:NSButton, disabling controls:[NSControl]) {
+        controls.forEach { $0.isEnabled = false }
+        saveButton.isEnabled = false
+        
+        // Added to the root view: an NSBox forwards addSubview to its content view, which the
+        // storyboard box in tunnel settings never displays
+        let note = NSTextField(wrappingLabelWithString: "Managed by an installed profile")
+        note.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+        note.textColor = .secondaryLabelColor
+        note.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(note)
+        NSLayoutConstraint.activate([
+            note.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 40),
+            note.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12),
+            note.centerYAnchor.constraint(equalTo: saveButton.centerYAnchor)
+        ])
     }
 }

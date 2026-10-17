@@ -22,6 +22,9 @@ IOS_EXT_IDENTIFIER = ...mobile.ptp
 IOS_SHARE_IDENTIFIER = ...mobile.share
 ```
 
+## Configuration Profiles
+The tunnel configuration can be installed with a configuration profile. See [docs/configuration-profiles.md](docs/configuration-profiles.md).
+
 ## Getting Help
 Please use these community resources for getting help.
 - Read the [docs](https://docs.openziti.io/docs/learn/introduction/)

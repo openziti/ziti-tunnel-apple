@@ -128,6 +128,7 @@ class TunnelSettingsViewController: UITableViewController {
     weak var tvc:TableViewController?
     var resetBtn:UIBarButtonItem?
     var restartRequired = false
+    var locked = false
     
     let defaults = ProviderConfig()
     
@@ -152,16 +153,17 @@ class TunnelSettingsViewController: UITableViewController {
 
         if let protoConf = tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol,
             let conf = protoConf.providerConfiguration {
+            self.locked = ProviderConfig.isLocked(conf)
             if let ip = conf[ProviderConfig.IP_KEY] as? String,
                 let mask = conf[ProviderConfig.SUBNET_KEY] as? String,
-                let mtu = conf[ProviderConfig.MTU_KEY] as? String,
+                let mtu = ProviderConfig.stringValue(conf[ProviderConfig.MTU_KEY]),
                 let dns = conf[ProviderConfig.DNS_KEY] as? String
             {
                 self.ip = ip
                 self.mask = mask
                 self.mtu = mtu
                 self.dns = dns
-                self.lowPowerMode = conf[ProviderConfig.LOW_POWER_MODE_KEY] as? Bool ?? defaults.lowPowerMode
+                self.lowPowerMode = ProviderConfig.boolValue(conf[ProviderConfig.LOW_POWER_MODE_KEY]) ?? defaults.lowPowerMode
             }
 
             // Load proxy settings
@@ -175,7 +177,7 @@ class TunnelSettingsViewController: UITableViewController {
             if let proxyHost = conf[ProviderConfig.PROXY_HOST_KEY] as? String {
                 self.proxyHost = proxyHost
             }
-            if let proxyPort = conf[ProviderConfig.PROXY_PORT_KEY] as? String {
+            if let proxyPort = ProviderConfig.stringValue(conf[ProviderConfig.PROXY_PORT_KEY]) {
                 self.proxyPort = proxyPort
             }
 
@@ -270,6 +272,18 @@ class TunnelSettingsViewController: UITableViewController {
             ZitiHttpProxyConfig.deleteCredentials(proxyHost: effectiveHost, proxyPort: effectivePort)
         }
 
+        // A reload may have switched to a locked configuration since the screen opened
+        if !locked && TunnelMgr.isLocked(tvc?.tunnelMgr.tpm) {
+            zLog.warn("Tunnel configuration is now locked, not saving tunnel settings")
+            locked = true
+        }
+
+        // Only the proxy credentials can change, and they're stored above. Restart to apply them.
+        if locked {
+            tvc?.tunnelMgr.restartTunnel()
+            return
+        }
+
         let conf:ProviderConfig = ProviderConfig()
         if let error = conf.parseDictionary(dict) {
             // alert and get outta here
@@ -285,7 +299,7 @@ class TunnelSettingsViewController: UITableViewController {
         if let pc = tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol {
             pc.providerConfiguration = conf.createDictionary()
             
-            self.tvc?.tunnelMgr.tpm?.saveToPreferences { error in
+            self.tvc?.tunnelMgr.savePreferences { error in
                 if let error = error {
                     let alert = UIAlertController(
                         title:"Configuation Save Error",
@@ -419,12 +433,12 @@ class TunnelSettingsViewController: UITableViewController {
                         settingsCell.value.isEnabled = (proxyModeIndex == 1)
                         settingsCell.value.keyboardType = .numberPad
                     case 3:
-                        settingsCell.setup(self, "Username", proxyUsername, false) { [weak self] value in
+                        settingsCell.setup(self, "Username", proxyUsername, true) { [weak self] value in
                             self?.proxyUsername = value
                         }
                         settingsCell.value.isEnabled = (proxyModeIndex != 0)
                     case 4:
-                        settingsCell.setup(self, "Password", proxyPassword, false) { [weak self] value in
+                        settingsCell.setup(self, "Password", proxyPassword, true) { [weak self] value in
                             self?.proxyPassword = value
                         }
                         settingsCell.value.isSecureTextEntry = true
@@ -434,6 +448,11 @@ class TunnelSettingsViewController: UITableViewController {
                     }
                 }
             }
+        }
+        // Proxy credentials (rows 3 and 4) stay editable since they're stored in the keychain, not the locked configuration
+        if locked && !(indexPath.section == 1 && indexPath.row >= 3) {
+            (cell as? TunnelSettingsCell)?.value.isEnabled = false
+            (cell as? ProxyModeCell)?.segmentedControl.isEnabled = false
         }
         return cell! // Don't let this happen!
     }
@@ -445,6 +464,7 @@ class TunnelSettingsViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        if locked && section == 0 { return "Managed by an installed profile" }
         return nil
     }
 }

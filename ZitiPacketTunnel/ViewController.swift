@@ -85,6 +85,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             break
         case .invalid:
             connectStatus.stringValue = "Invalid"
+            connectButton.title = "Turn Ziti On"
             break
         case .reasserting:
             connectStatus.stringValue = "Reasserting..."
@@ -262,6 +263,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
    
+    func loadTunnelConfig(createIfMissing:Bool = true) {
+        tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier, createIfMissing: createIfMissing) {_,_ in 
+            DispatchQueue.main.async {
+                if let indx = self.representedObject as? Int, self.zids.count > 0 {
+                    self.updateServiceUI(zId: self.zids[indx])
+                }
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -276,12 +287,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         // init the manager
         tunnelMgr.tsChangedCallbacks.append(self.tunnelStatusDidChange)
-        tunnelMgr.loadFromPreferences(ViewController.providerBundleIdentifier) {_,_ in 
-            DispatchQueue.main.async {
-                if let indx = self.representedObject as? Int, self.zids.count > 0 {
-                    self.updateServiceUI(zId: self.zids[indx])
-                }
-            }
+        loadTunnelConfig()
+        
+        // pick up tunnel configs added or removed while we were in the background (e.g., by a profile)
+        NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.loadTunnelConfig(createIfMissing: false)
         }
         
         // Load previous identities
