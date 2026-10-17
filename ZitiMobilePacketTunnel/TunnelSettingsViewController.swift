@@ -226,7 +226,8 @@ class TunnelSettingsViewController: UITableViewController {
     }
     
     @objc func saveConfig() {
-        var dict = ProviderConfigDict()
+        // Start from the saved config so settings this screen doesn't show (e.g., fallback DNS, log rotation) are kept
+        var dict = (tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration ?? ProviderConfigDict()
         dict[ProviderConfig.IP_KEY] = ip
         dict[ProviderConfig.SUBNET_KEY] = mask
         dict[ProviderConfig.MTU_KEY] = mtu
