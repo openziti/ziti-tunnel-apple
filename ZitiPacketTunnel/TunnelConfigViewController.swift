@@ -22,6 +22,7 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
     weak var vc: ViewController?
     var restartRequired = false
     var requireRestart:[NSTextField] = []
+    private var locked = false
     
     @IBOutlet weak var box: NSBox!
     @IBOutlet weak var ipAddressText: NSTextField!
@@ -71,7 +72,8 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
         self.updateConfigControls()
         
         // Proxy credentials stay editable since they're stored in the keychain, not the locked configuration
-        if TunnelMgr.isLocked(vc?.tunnelMgr.tpm) {
+        locked = TunnelMgr.isLocked(vc?.tunnelMgr.tpm)
+        if locked {
             showLockedNote(beside: saveButton, disabling: [
                 ipAddressText, subnetMaskText, mtuText, dnsServersText, fallbackDNSCheck, fallbackDNSText,
                 interceptMatchedDomainsSwitch, lowPowerModeSwitch, proxyModePopUp, proxyHostText, proxyPortText ])
@@ -304,8 +306,9 @@ class TunnelConfigViewController: NSViewController, NSTextFieldDelegate {
             ZitiHttpProxyConfig.deleteCredentials(proxyHost: effectiveHost, proxyPort: effectivePort)
         }
 
-        // Only the proxy credentials can change, and they're stored above. Restart to apply them.
-        if TunnelMgr.isLocked(TunnelMgr.shared.tpm) {
+        // Only the proxy credentials can change, and they're stored above. Restart to apply them. Checks the lock
+        // as shown when the screen opened and as it is now, since a reload may have changed it.
+        if locked || TunnelMgr.isLocked(TunnelMgr.shared.tpm) {
             self.vc?.tunnelMgr.restartTunnel()
             self.dismiss(self)
             return
