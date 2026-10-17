@@ -17,6 +17,7 @@
 import Cocoa
 import NetworkExtension
 import CZiti
+import UniformTypeIdentifiers
 
 class MainMenuBar : NSObject, NSWindowDelegate {
     static let shared = MainMenuBar()
@@ -99,6 +100,7 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         // End Log Menu
         
         menu.addItem(newMenuItem(title: "Snapshot...", action: #selector(MainMenuBar.showSnapshot(_:))))
+        menu.addItem(newMenuItem(title: "Capture Feedback...", action: #selector(MainMenuBar.captureFeedback(_:))))
         
         menu.addItem(NSMenuItem.separator())
         menu.addItem(newMenuItem(title: "About \(appName)", action: #selector(MainMenuBar.about(_:))))
@@ -340,6 +342,64 @@ class MainMenuBar : NSObject, NSWindowDelegate {
             wc.showWindow(self)
             NSApp.activate(ignoringOtherApps: true)
         }
+    }
+    
+    @objc func captureFeedback(_ sender:Any?) {
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "en_US_POSIX")
+        df.dateFormat = "yyyy-MM-dd_HHmmss"
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "ziti-feedback-\(df.string(from: Date())).zip"
+        panel.allowedContentTypes = [.zip]
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        
+        StatusSummary.snapshot { snapshot in
+            // Logs can be large, so zip them off the main thread
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    try self.writeFeedback(snapshot, to: url)
+                    DispatchQueue.main.async { NSWorkspace.shared.activateFileViewerSelecting([url]) }
+                } catch {
+                    zLog.error("Unable to save feedback to \(url.path): \(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        let alert = NSAlert()
+                        alert.messageText = "Feedback Not Saved"
+                        alert.informativeText = "Unable to save \(url.lastPathComponent): \(error.localizedDescription)"
+                        alert.alertStyle = .warning
+                        alert.addButton(withTitle: "OK")
+                        alert.runModal()
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Zips the snapshot and logs into a folder named after the destination
+    private func writeFeedback(_ snapshot:String, to url:URL) throws {
+        let fm = FileManager.default
+        let dir = fm.temporaryDirectory.appendingPathComponent(url.deletingPathExtension().lastPathComponent)
+        try? fm.removeItem(at: dir)
+        try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? fm.removeItem(at: dir) }
+        
+        try Data(snapshot.utf8).write(to: dir.appendingPathComponent("snapshot.txt"))
+        for log in Logger.shared?.feedbackLogs() ?? [] {
+            try fm.copyItem(at: log, to: dir.appendingPathComponent(log.lastPathComponent))
+        }
+        
+        // Reading a folder for upload gives a zip of it
+        var coordError:NSError?
+        var copyError:Error?
+        NSFileCoordinator().coordinate(readingItemAt: dir, options: .forUploading, error: &coordError) { zipURL in
+            do {
+                try? fm.removeItem(at: url)
+                try fm.copyItem(at: zipURL, to: url)
+            } catch {
+                copyError = error
+            }
+        }
+        if let error = coordError ?? copyError { throw error }
     }
     
     func updateLogLevelMenu() {
