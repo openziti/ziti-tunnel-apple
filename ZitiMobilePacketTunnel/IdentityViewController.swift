@@ -487,260 +487,23 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             return
         }
 
-        let jwtUrl = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory: false)
-        let jwtFile = jwtUrl.path
-        let hasJwt = FileManager.default.fileExists(atPath: jwtFile)
-
         showSpinner()
 
-        // OTT JWT: direct enrollment (existing flow)
-        if hasJwt && zid.getEnrollmentMethod() == .ott {
-            performOttEnroll(jwtFile: jwtFile)
-            return
-        }
-
-        // Non-OTT (URL or network JWT): query providers then show enrollment options
-        let source: String? = hasJwt ? jwtFile : zid.czid?.ztAPI
-        guard let enrollSource = source else {
-            hideSpinner()
-            dialogAlert("Unable to enroll \(zid.name)", "No JWT file or controller URL available")
-            return
-        }
-
-        let queryCallback: ([ZitiEvent.JwtSigner]?, CZiti.ZitiError?) -> Void = { providers, zErr in
-            DispatchQueue.main.async {
-                guard zErr == nil, let providers = providers else {
-                    // Query failed - fall back to basic enrollment
-                    self.performBasicEnroll(jwtFile: hasJwt ? jwtFile : nil,
-                                            controllerURL: zid.czid?.ztAPI)
-                    return
-                }
-
-                let hasCert = providers.contains { $0.canCertEnroll }
-                let hasToken = providers.contains { $0.canTokenEnroll }
-
-                if !hasCert && !hasToken {
-                    self.performBasicEnroll(jwtFile: hasJwt ? jwtFile : nil,
-                                            controllerURL: zid.czid?.ztAPI)
-                    return
-                }
-
-                self.hideSpinner()
-                self.showEnrollmentOptions(hasCert: hasCert, hasToken: hasToken,
-                                           providers: providers) { enrollTo, providerName in
-                    guard let enrollTo = enrollTo else {
-                        return // User cancelled
-                    }
-                    self.showSpinner()
-                    switch enrollTo {
-                    case .cert, .token:
-                        self.performEnrollTo(mode: enrollTo, provider: providerName,
-                                             jwtFile: hasJwt ? jwtFile : nil,
-                                             controllerURL: hasJwt ? nil : zid.czid?.ztAPI)
-                    case .none:
-                        self.performBasicEnroll(jwtFile: hasJwt ? jwtFile : nil,
-                                                controllerURL: zid.czid?.ztAPI)
-                    }
-                }
+        let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory: false).path
+        Enrollment(zid, ui: self).start(jwtFile: jwtFile) { result in
+            self.hideSpinner()
+            switch result {
+            case .enrolled(let zidResp, let enrollTo):
+                self.handleEnrollmentSuccess(zidResp: zidResp, enrollTo: enrollTo)
+            case .failed(let msg):
+                _ = self.tvc?.zidStore.store(zid)
+                self.tableView.reloadData()
+                self.tvc?.tableView.reloadData()
+                self.dialogAlert("Unable to enroll \(zid.name)", msg)
+            case .cancelled:
+                break
             }
         }
-
-        DispatchQueue.global().async {
-            if hasJwt {
-                Ziti.queryProviders(jwtFile: enrollSource, cb: queryCallback)
-            } else {
-                Ziti.queryProviders(controllerURL: enrollSource, cb: queryCallback)
-            }
-        }
-    }
-
-    // MARK: - Enrollment Helpers
-
-    private func performOttEnroll(jwtFile: String) {
-        guard let zid = self.zid else { return }
-        var handled = false
-        DispatchQueue.global().async {
-            Ziti.enroll(jwtFile) { zidResp, zErr in
-                DispatchQueue.main.async {
-                    guard !handled else { return }
-                    handled = true
-                    self.hideSpinner()
-                    guard zErr == nil, let zidResp = zidResp else {
-                        _ = self.tvc?.zidStore.store(zid)
-                        self.tableView.reloadData()
-                        self.tvc?.tableView.reloadData()
-                        self.dialogAlert("Unable to enroll \(zid.name)", zErr?.localizedDescription ?? "invalid response")
-                        return
-                    }
-                    self.handleEnrollmentSuccess(zidResp: zidResp, enrollTo: .none)
-                }
-            }
-        }
-    }
-
-    private func performBasicEnroll(jwtFile: String?, controllerURL: String?) {
-        guard let zid = self.zid else { return }
-        var handled = false
-        DispatchQueue.global().async {
-            let enrollCallback: (CZiti.ZitiIdentity?, CZiti.ZitiError?) -> Void = { zidResp, zErr in
-                DispatchQueue.main.async {
-                    guard !handled else { return }
-                    handled = true
-                    self.hideSpinner()
-                    guard zErr == nil, let zidResp = zidResp else {
-                        _ = self.tvc?.zidStore.store(zid)
-                        self.tableView.reloadData()
-                        self.tvc?.tableView.reloadData()
-                        self.dialogAlert("Unable to enroll \(zid.name)", zErr?.localizedDescription ?? "invalid response")
-                        return
-                    }
-                    self.handleEnrollmentSuccess(zidResp: zidResp, enrollTo: .none)
-                }
-            }
-
-            if let jwtFile = jwtFile {
-                Ziti.enroll(jwtFile, enrollCallback)
-            } else if let controllerURL = controllerURL {
-                Ziti.enroll(controllerURL: controllerURL, enrollCallback)
-            }
-        }
-    }
-
-    private func performEnrollTo(mode: ZitiIdentity.EnrollTo, provider: String?,
-                                  jwtFile: String?, controllerURL: String?) {
-        guard let zid = self.zid else { return }
-        var handled = false
-        let requestedType = (mode == .cert) ? "Device Certificate" : "User Session"
-
-        let onAuth: (String) -> Void = { urlString in
-            DispatchQueue.main.async {
-                guard let url = URL(string: urlString) else {
-                    self.dialogAlert("Invalid authentication URL: \(urlString)")
-                    return
-                }
-                self.beginEnrollmentBackgroundTask()
-                UIApplication.shared.open(url) { success in
-                    if !success {
-                        self.endEnrollmentBackgroundTask()
-                        self.dialogAlert("Unable to open authentication URL. Please copy and paste into your browser: \(urlString)")
-                    }
-                }
-            }
-        }
-
-        let enrollCallback: (CZiti.ZitiIdentity?, CZiti.ZitiError?) -> Void = { zidResp, zErr in
-            DispatchQueue.main.async {
-                guard !handled else { return }
-                handled = true
-                self.endEnrollmentBackgroundTask()
-                self.hideSpinner()
-                if let zErr = zErr {
-                    if zErr.isAlreadyEnrolled {
-                        self.handleAlreadyEnrolled(jwtFile: jwtFile, controllerURL: controllerURL,
-                                                   requestedType: requestedType)
-                        return
-                    }
-                    self.dialogAlert("Unable to enroll \(zid.name)", zErr.localizedDescription)
-                    return
-                }
-                guard let zidResp = zidResp else {
-                    self.dialogAlert("Unable to enroll \(zid.name)", "invalid response")
-                    return
-                }
-                self.handleEnrollmentSuccess(zidResp: zidResp, enrollTo: mode)
-            }
-        }
-
-        let onMfaEnrollRequired: Ziti.MfaEnrollRequiredCallback = { [weak self] mfaEnrollment, error, submit in
-            DispatchQueue.main.async {
-                guard let self = self, let provisioningUrl = mfaEnrollment.provisioningUrl else {
-                    submit(nil)
-                    return
-                }
-                if let error = error {
-                    self.dialogAlert("Invalid MFA Code", error.localizedDescription)
-                }
-                let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
-                guard let vc = sb.instantiateViewController(withIdentifier: "MFA_VERIFY_VC") as? MfaVerifyViewController else {
-                    submit(nil)
-                    return
-                }
-                vc.provisioningUrl = provisioningUrl
-                vc.completionHandler = { code in
-                    if code != nil {
-                        zid.mfaEnabled = true
-                        zid.mfaVerified = true
-                        zid.mfaPending = false
-                    }
-                    submit(code)
-                    vc.dismiss(animated: true)
-                }
-                self.present(vc, animated: true)
-            }
-        }
-
-        let onMfaCodeRequired: Ziti.MfaCodeRequiredCallback = { [weak self] error, submit in
-            DispatchQueue.main.async {
-                guard let self = self else {
-                    submit(nil)
-                    return
-                }
-                if let error = error {
-                    self.dialogAlert("Invalid MFA Code", error.localizedDescription)
-                }
-                let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
-                guard let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController else {
-                    submit(nil)
-                    return
-                }
-                vc.completionHandler = { code in
-                    if code != nil {
-                        zid.mfaEnabled = true
-                        zid.mfaVerified = true
-                        zid.mfaPending = false
-                        zid.lastMfaAuth = Date()
-                    }
-                    submit(code)
-                    vc.dismiss(animated: true)
-                }
-                self.present(vc, animated: true)
-            }
-        }
-
-        DispatchQueue.global().async {
-            if let jwtFile = jwtFile {
-                if mode == .cert {
-                    Ziti.enrollToCert(jwtFile: jwtFile, provider: provider, onAuth: onAuth,
-                                       onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
-                                       enrollCallback)
-                } else {
-                    Ziti.enrollToToken(jwtFile: jwtFile, provider: provider, onAuth: onAuth,
-                                        onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
-                                        enrollCallback)
-                }
-            } else if let controllerURL = controllerURL {
-                if mode == .cert {
-                    Ziti.enrollToCert(controllerURL: controllerURL, provider: provider, onAuth: onAuth,
-                                       onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
-                                       enrollCallback)
-                } else {
-                    Ziti.enrollToToken(controllerURL: controllerURL, provider: provider, onAuth: onAuth,
-                                        onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired,
-                                        enrollCallback)
-                }
-            }
-        }
-    }
-
-    private func handleAlreadyEnrolled(jwtFile: String?, controllerURL: String?, requestedType: String) {
-        let info = ZitiIdentity.alreadyEnrolledInfo(requestedType: requestedType)
-        let alert = UIAlertController(title: info.title, message: info.detail, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: info.action, style: .default) { _ in
-            self.showSpinner()
-            self.performBasicEnroll(jwtFile: jwtFile, controllerURL: controllerURL)
-        })
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        self.present(alert, animated: true, completion: nil)
     }
 
     private func handleEnrollmentSuccess(zidResp: CZiti.ZitiIdentity, enrollTo: ZitiIdentity.EnrollTo) {
@@ -757,74 +520,6 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         tableView.reloadData()
         tvc?.tableView.reloadData()
         tvc?.tunnelMgr.restartTunnel()
-    }
-
-    // MARK: - Enrollment Options Dialog
-
-    private func showEnrollmentOptions(hasCert: Bool, hasToken: Bool,
-                                       providers: [ZitiEvent.JwtSigner],
-                                       completion: @escaping (ZitiIdentity.EnrollTo?, String?) -> Void) {
-        // If only one type available, auto-select it
-        if hasCert && !hasToken {
-            let certProviders = providers.filter { $0.canCertEnroll }
-            selectProvider(from: certProviders, title: "Device Certificate Enrollment") { providerName in
-                completion(providerName != nil ? .cert : nil, providerName)
-            }
-            return
-        }
-        if hasToken && !hasCert {
-            let tokenProviders = providers.filter { $0.canTokenEnroll }
-            selectProvider(from: tokenProviders, title: "User Session Enrollment") { providerName in
-                completion(providerName != nil ? .token : nil, providerName)
-            }
-            return
-        }
-
-        // Both available - ask the user
-        let alert = UIAlertController(title: "Select Enrollment Type",
-                                      message: "Device Certificate: permanent, tied to this device\n\nUser Session: requires periodic login, tied to user account",
-                                      preferredStyle: .alert)
-
-        alert.addAction(UIAlertAction(title: "Device Certificate", style: .default) { _ in
-            let certProviders = providers.filter { $0.canCertEnroll }
-            self.selectProvider(from: certProviders, title: "Device Certificate Enrollment") { providerName in
-                completion(providerName != nil ? .cert : nil, providerName)
-            }
-        })
-        alert.addAction(UIAlertAction(title: "User Session", style: .default) { _ in
-            let tokenProviders = providers.filter { $0.canTokenEnroll }
-            self.selectProvider(from: tokenProviders, title: "User Session Enrollment") { providerName in
-                completion(providerName != nil ? .token : nil, providerName)
-            }
-        })
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
-            completion(nil, nil)
-        })
-        self.present(alert, animated: true, completion: nil)
-    }
-
-    private func selectProvider(from providers: [ZitiEvent.JwtSigner], title: String,
-                                completion: @escaping (String?) -> Void) {
-        guard !providers.isEmpty else {
-            completion(nil)
-            return
-        }
-        if providers.count == 1 {
-            completion(providers[0].name)
-            return
-        }
-        let alert = UIAlertController(title: title,
-                                      message: "Select authentication provider",
-                                      preferredStyle: .actionSheet)
-        for provider in providers {
-            alert.addAction(UIAlertAction(title: provider.name, style: .default) { _ in
-                completion(provider.name)
-            })
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
-            completion(nil)
-        })
-        self.present(alert, animated: true, completion: nil)
     }
     
     func doMfaAuth() {
@@ -1165,5 +860,109 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 codeVc.codes = codes
             }
         }
+    }
+}
+
+extension IdentityViewController: EnrollmentUI {
+    func chooseEnrollTo(_ zid: ZitiIdentity, _ completion: @escaping (ZitiIdentity.EnrollTo?) -> Void) {
+        hideSpinner()
+        let alert = UIAlertController(title: "Select Enrollment Type",
+                                      message: "Device Certificate: permanent, tied to this device\n\nUser Session: requires periodic login, tied to user account",
+                                      preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: "Device Certificate", style: .default) { _ in
+            self.showSpinner()
+            completion(.cert)
+        })
+        alert.addAction(UIAlertAction(title: "User Session", style: .default) { _ in
+            self.showSpinner()
+            completion(.token)
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            completion(nil)
+        })
+        self.present(alert, animated: true, completion: nil)
+    }
+
+    func chooseProvider(_ zid: ZitiIdentity, _ enrollTo: ZitiIdentity.EnrollTo, _ names: [String],
+                        _ completion: @escaping (String?) -> Void) {
+        hideSpinner()
+        let alert = UIAlertController(title: enrollTo == .cert ? "Device Certificate Enrollment" : "User Session Enrollment",
+                                      message: "Select authentication provider",
+                                      preferredStyle: .actionSheet)
+        for name in names {
+            alert.addAction(UIAlertAction(title: name, style: .default) { _ in
+                self.showSpinner()
+                completion(name)
+            })
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            completion(nil)
+        })
+        self.present(alert, animated: true, completion: nil)
+    }
+
+    func confirmBasicEnroll(_ info: (title: String, detail: String, action: String), _ completion: @escaping (Bool) -> Void) {
+        hideSpinner()
+        let alert = UIAlertController(title: info.title, message: info.detail, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: info.action, style: .default) { _ in
+            self.showSpinner()
+            completion(true)
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            completion(false)
+        })
+        self.present(alert, animated: true, completion: nil)
+    }
+
+    func openAuthURL(_ url: URL, _ completion: @escaping (Bool) -> Void) {
+        beginEnrollmentBackgroundTask()
+        UIApplication.shared.open(url) { success in
+            if !success {
+                self.endEnrollmentBackgroundTask()
+            }
+            completion(success)
+        }
+    }
+
+    func authFinished() {
+        endEnrollmentBackgroundTask()
+    }
+
+    func mfaSetup(_ zid: ZitiIdentity, _ provisioningUrl: String, _ error: String?, _ submit: @escaping (String?) -> Void) {
+        if let error = error {
+            dialogAlert("Invalid MFA Code", error)
+        }
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        guard let vc = sb.instantiateViewController(withIdentifier: "MFA_VERIFY_VC") as? MfaVerifyViewController else {
+            submit(nil)
+            return
+        }
+        vc.provisioningUrl = provisioningUrl
+        vc.completionHandler = { code in
+            submit(code)
+            vc.dismiss(animated: true)
+        }
+        self.present(vc, animated: true)
+    }
+
+    func mfaCode(_ zid: ZitiIdentity, _ error: String?, _ submit: @escaping (String?) -> Void) {
+        if let error = error {
+            dialogAlert("Invalid MFA Code", error)
+        }
+        let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+        guard let vc = sb.instantiateViewController(withIdentifier: "MFA_CODE_VC") as? MfaCodeViewController else {
+            submit(nil)
+            return
+        }
+        vc.completionHandler = { code in
+            submit(code)
+            vc.dismiss(animated: true)
+        }
+        self.present(vc, animated: true)
+    }
+
+    func showError(_ msg: String) {
+        dialogAlert(msg)
     }
 }
