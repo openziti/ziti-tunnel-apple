@@ -31,13 +31,19 @@ class StatusSummary {
         }
     }
 
-    static func text(version:String, status:NEVPNStatus, locked:Bool, zids:[ZitiIdentity]) -> String {
+    /// `config` is the saved tunnel configuration, listed as stored (invalid values included)
+    static func text(version:String, status:NEVPNStatus, config:ProviderConfigDict?, zids:[ZitiIdentity]) -> String {
         var lines = [
             "======= Status ==========",
             version,
-            "Tunnel: \(statusDescription(status))",
-            "Tunnel settings: \(locked ? "Locked by an installed profile" : "Editable")",
-            "Identities: \(zids.count)"]
+            "Tunnel: \(statusDescription(status))"]
+        if let config = config {
+            lines.append("Tunnel settings: \(ProviderConfig.isLocked(config) ? "Locked by an installed profile" : "Editable")")
+            lines += config.keys.sorted().map { "  \($0): \(config[$0]!)" }
+        } else {
+            lines.append("Tunnel settings: None saved")
+        }
+        lines.append("Identities: \(zids.count)")
         for zid in zids {
             lines.append("")
             lines.append("Identity: \(zid.name) [\(zid.id)]")
@@ -62,8 +68,8 @@ class StatusSummary {
     /// Calls back on the main queue with the summary, followed by the tunnel's snapshot when it's running
     static func snapshot(_ completion:@escaping (String) -> Void) {
         let tunnelMgr = TunnelMgr.shared
-        let summary = text(version: Version.verboseStr, status: tunnelMgr.status,
-                           locked: TunnelMgr.isLocked(tunnelMgr.tpm), zids: tunnelMgr.zids)
+        let config = (tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration
+        let summary = text(version: Version.verboseStr, status: tunnelMgr.status, config: config, zids: tunnelMgr.zids)
         guard canDump(tunnelMgr.status) else {
             DispatchQueue.main.async { completion(summary + "\nNo connection data available\n") }
             return

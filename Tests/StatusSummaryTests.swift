@@ -21,12 +21,12 @@ import NetworkExtension
 final class StatusSummaryTests: XCTestCase {
 
     func testNoIdentities() {
-        let text = StatusSummary.text(version: "Ziti Version: 2.60 (0), OS: 26.5", status: .disconnected, locked: false, zids: [])
+        let text = StatusSummary.text(version: "Ziti Version: 2.60 (0), OS: 26.5", status: .disconnected, config: nil, zids: [])
         XCTAssertEqual(text, """
             ======= Status ==========
             Ziti Version: 2.60 (0), OS: 26.5
             Tunnel: Disconnected
-            Tunnel settings: Editable
+            Tunnel settings: None saved
             Identities: 0
 
             """)
@@ -39,12 +39,16 @@ final class StatusSummaryTests: XCTestCase {
         zid.controllerVersion = "v1.6.0"
         zid.edgeStatus = ZitiIdentity.EdgeStatus(0, status: .Available)
 
-        let text = StatusSummary.text(version: "v", status: .connected, locked: true, zids: [zid])
+        let config:ProviderConfigDict = ["mtu": "4000", "locked": true, "dns": "100.64.0.2"]
+        let text = StatusSummary.text(version: "v", status: .connected, config: config, zids: [zid])
         XCTAssertEqual(text, """
             ======= Status ==========
             v
             Tunnel: Connected
             Tunnel settings: Locked by an installed profile
+              dns: 100.64.0.2
+              locked: true
+              mtu: 4000
             Identities: 1
 
             Identity: laptop [id1]
@@ -62,9 +66,8 @@ final class StatusSummaryTests: XCTestCase {
         let pending = makeIdentity(id: "id2", name: "phone", mfaEnabled: true, mfaVerified: false, mfaPending: true)
         let verified = makeIdentity(id: "id3", name: "tablet", mfaEnabled: true, mfaVerified: true)
 
-        let text = StatusSummary.text(version: "v", status: .connecting, locked: false, zids: [pending, verified])
-        XCTAssertTrue(text.contains("Tunnel: Connecting\n"))
-        XCTAssertTrue(text.contains("Identities: 2\n"))
+        let text = StatusSummary.text(version: "v", status: .connecting, config: [:], zids: [pending, verified])
+        XCTAssertTrue(text.contains("Tunnel: Connecting\nTunnel settings: Editable\nIdentities: 2\n"))
         XCTAssertTrue(text.contains("""
             Identity: phone [id2]
               Controllers: https://ctrl.example.com
@@ -76,6 +79,17 @@ final class StatusSummaryTests: XCTestCase {
               Services: 0
             """))
         XCTAssertTrue(text.contains("  MFA: Verified\n"))
+    }
+
+    func testInvalidSettingsListedAsStored() {
+        let config:ProviderConfigDict = ["mtu": "abc", "locked": "yes"]
+        let text = StatusSummary.text(version: "v", status: .invalid, config: config, zids: [])
+        XCTAssertTrue(text.contains("""
+            Tunnel settings: Locked by an installed profile
+              locked: yes
+              mtu: abc
+            Identities: 0
+            """))
     }
 
     func testStatusDescription() {
