@@ -92,6 +92,19 @@ final class StatusSummaryTests: XCTestCase {
             """))
     }
 
+    // Saved settings come back from preferences as NSNumber, not Swift Bool or Int
+    func testSavedNumbersListed() {
+        let config:ProviderConfigDict = ["locked": kCFBooleanTrue as NSNumber, "lowPowerMode": kCFBooleanFalse as NSNumber, "mtu": NSNumber(value: 1)]
+        let text = StatusSummary.text(version: "v", status: .connected, config: config, zids: [])
+        XCTAssertTrue(text.contains("""
+            Tunnel settings: Locked by an installed profile
+              locked: true
+              lowPowerMode: false
+              mtu: 1
+            Identities: 0
+            """))
+    }
+
     func testStatusDescription() {
         XCTAssertEqual(StatusSummary.statusDescription(.invalid), "Invalid")
         XCTAssertEqual(StatusSummary.statusDescription(.reasserting), "Reasserting")

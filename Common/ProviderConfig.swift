@@ -135,7 +135,7 @@ class ProviderConfig : NSObject {
     // This app stores numeric values as strings, but configs written elsewhere (e.g., plists
     // or configuration profiles) may use native number and boolean types. Accept either.
     
-    private static func isBoolean(_ num:NSNumber) -> Bool {
+    static func isBoolean(_ num:NSNumber) -> Bool {
         return CFGetTypeID(num) == CFBooleanGetTypeID()
     }
     

@@ -31,6 +31,14 @@ class StatusSummary {
         }
     }
 
+    // Saved settings come back as NSNumber, so booleans would otherwise show as 1 or 0
+    private static func valueDescription(_ value:Any) -> String {
+        if let num = value as? NSNumber, ProviderConfig.isBoolean(num) {
+            return num.boolValue ? "true" : "false"
+        }
+        return "\(value)"
+    }
+
     /// `config` is the saved tunnel configuration, listed as stored (invalid values included)
     static func text(version:String, status:NEVPNStatus, config:ProviderConfigDict?, zids:[ZitiIdentity]) -> String {
         var lines = [
@@ -39,7 +47,7 @@ class StatusSummary {
             "Tunnel: \(statusDescription(status))"]
         if let config = config {
             lines.append("Tunnel settings: \(ProviderConfig.isLocked(config) ? "Locked by an installed profile" : "Editable")")
-            lines += config.keys.sorted().map { "  \($0): \(config[$0]!)" }
+            lines += config.keys.sorted().map { "  \($0): \(valueDescription(config[$0]!))" }
         } else {
             lines.append("Tunnel settings: None saved")
         }
