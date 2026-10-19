@@ -284,8 +284,10 @@ class TunnelSettingsViewController: UITableViewController {
             return
         }
 
+        // Keep saved settings this screen doesn't show (e.g., fallback DNS, log rotation)
+        let saved = (tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration
         let conf:ProviderConfig = ProviderConfig()
-        if let error = conf.parseDictionary(dict) {
+        if let error = conf.parseDictionary(ProviderConfig.merge(dict, onto: saved)) {
             // alert and get outta here
             let alert = UIAlertController(
                 title:"Configuration Error",
