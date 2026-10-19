@@ -24,7 +24,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     let providerConfig = ProviderConfig()
     var appLogLevel:ZitiLog.LogLevel?
     let netMon = NWPathMonitor()
-    var lastNetworkPathSignature: String?
+    let netMonQueue = DispatchQueue(label: "io.openziti.netmon") // serial, so path updates don't race each other
+    var lastNetworkPathSignature: String? // only accessed on netMonQueue
+    var appliedUpstreamDns: String? // only accessed on the ziti loop (via zitiTunnel.perform)
+    var lastUpstreamDnsWarning: String? // accessed in startTunnel before the monitor starts, then only on netMonQueue
     var zitiTunnel:ZitiTunnel?
     var zitiTunnelDelegate:ZitiTunnelDelegate?
     var writeLock = NSLock()
@@ -99,6 +102,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let ipDNS = providerConfig.dnsAddresses.first ?? ""
         zitiTunnel = ZitiTunnel(zitiTunnelDelegate, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS)
         
+        lastUpstreamDnsWarning = nil
         if let upstreamDns = getUpstreamDns() {
             if zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
                 zLog.warn("Unable to set upstream D?NS to \(upstreamDns)")
@@ -135,6 +139,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             self.zitiTunnelDelegate?.onIdentitiesLoaded()
             
             // watch for interface changes
+            self.lastNetworkPathSignature = nil
+            self.appliedUpstreamDns = nil
             self.startNetworkMonitor()
             
             // identies have loaded, so go ahead and setup the TUN
@@ -369,18 +375,25 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
                 let firstResolver = DNSUtils.getFirstResolver(excludedRoute)
                 if let fr = firstResolver {
-                    zLog.warn("No fallback DNS configured. Setting to first resolver: \(fr)")
+                    warnUpstreamDns("No fallback DNS configured. Setting to first resolver: \(fr)")
                 }
                 upstreamDns = firstResolver
             }
             
             if upstreamDns == nil {
                 upstreamDns = "1.1.1.1"
-                zLog.warn("No fallback DNS available. Defaulting to \(upstreamDns!)")
+                warnUpstreamDns("No fallback DNS available. Defaulting to \(upstreamDns!)")
             }
         #endif
         
         return upstreamDns
+    }
+
+    // getUpstreamDns runs on every network path update, so only warn when the message changes
+    func warnUpstreamDns(_ msg:String) {
+        guard msg != lastUpstreamDnsWarning else { return }
+        lastUpstreamDnsWarning = msg
+        zLog.warn(msg)
     }
     
     func setUpstreamDns(_ upstreamDns:String, _ attemptNum:Int=1) {
@@ -390,7 +403,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let waitInterval = 1.0 / Double(nAttempts)
         if attemptNum <= nAttempts {
             zitiTunnel?.perform {
-                if self.zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
+                if self.zitiTunnel?.setUpstreamDns(upstreamDns) == 0 {
+                    self.appliedUpstreamDns = upstreamDns
+                } else {
                     zLog.error("Attempt \(attemptNum) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
                     DispatchQueue.global().async {
                         Thread.sleep(forTimeInterval: waitInterval)
@@ -403,17 +418,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     
     func startNetworkMonitor() {
         netMon.pathUpdateHandler = { path in
+            // NWPathMonitor sends lots of duplicate updates. Only log the ones that look different
             let sig = self.networkPathSignature(path)
-            guard sig != self.lastNetworkPathSignature else {
-                zLog.info("Network Path Update: unchanged, skipping")
-                return
+            if sig != self.lastNetworkPathSignature {
+                self.lastNetworkPathSignature = sig
+                self.logNetworkPath(path)
             }
-            self.lastNetworkPathSignature = sig
-            self.logNetworkPath(path)
 
+            // the resolver can change without anything in the path changing, so check it on every update
+            // but only push it to the tunnel when it differs from what was last applied successfully
             if path.status == .satisfied {
                 if let upstreamDns = self.getUpstreamDns() {
                     self.zitiTunnel?.perform {
+                        guard upstreamDns != self.appliedUpstreamDns else { return }
                         zLog.info("Setting fallback DNS to \(upstreamDns)")
                         self.setUpstreamDns(upstreamDns)
                     }
@@ -421,11 +438,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
             //isSatisfied = path.status == .satisfied
         }
-        netMon.start(queue: DispatchQueue.global())
+        netMon.start(queue: netMonQueue)
     }
 
-    // captures everything logNetworkPath reports plus a few fields it doesn't, so we can tell
-    // whether a "duplicate-looking" NWPathMonitor callback is actually carrying a real change
+    // captures the fields logNetworkPath reports, so we can tell whether an update is worth logging
     func networkPathSignature(_ path:Network.NWPath) -> String {
         let ifaces = path.availableInterfaces.map { "\($0.index):\($0.name):\($0.type)" }.joined(separator: ",")
         let gateways = path.gateways.map { "\($0)" }.joined(separator: ",")
