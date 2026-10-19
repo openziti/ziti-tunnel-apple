@@ -26,7 +26,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     let netMon = NWPathMonitor()
     let netMonQueue = DispatchQueue(label: "io.openziti.netmon") // serial
     var lastNetworkPathKey:String? // only accessed on netMonQueue
-    var latestUpstreamDns:String? // most recent value passed to setUpstreamDns. only accessed on the ziti loop
+    var upstreamDnsGeneration = 0 // bumped on each network path change so stale retries stop. only accessed on the ziti loop
     var zitiTunnel:ZitiTunnel?
     var zitiTunnelDelegate:ZitiTunnelDelegate?
     var writeLock = NSLock()
@@ -385,23 +385,27 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         return upstreamDns
     }
     
-    func setUpstreamDns(_ upstreamDns:String, _ attemptNum:Int=1) {
+    // must be called on the ziti loop
+    func setUpstreamDns(_ upstreamDns:String, _ generation:Int, _ pathKey:String, _ attemptNum:Int=1) {
         // This rots.  After tunnels starts, when network monitor detects newly satisfied status the initial
         // attempt to set this address for upstream DNS fails. So we're gonna retry it...
         let nAttempts = 3
         let waitInterval = 1.0 / Double(nAttempts)
-        zitiTunnel?.perform {
-            // don't let a retry for an older value overwrite a newer one
-            guard upstreamDns == self.latestUpstreamDns else { return }
-            if self.zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
-                zLog.error("Attempt \(attemptNum) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
-                if attemptNum < nAttempts {
-                    DispatchQueue.global().asyncAfter(deadline: .now() + waitInterval) {
-                        self.setUpstreamDns(upstreamDns, attemptNum + 1)
+        // a newer network path update has come along, so this attempt is stale
+        guard generation == upstreamDnsGeneration else { return }
+        if zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
+            zLog.error("Attempt \(attemptNum) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
+            if attemptNum < nAttempts {
+                DispatchQueue.global().asyncAfter(deadline: .now() + waitInterval) {
+                    self.zitiTunnel?.perform {
+                        self.setUpstreamDns(upstreamDns, generation, pathKey, attemptNum + 1)
                     }
-                } else {
-                    // give up for now, but don't let the next network path update be skipped as a duplicate
-                    self.netMonQueue.async { self.lastNetworkPathKey = nil }
+                }
+            } else {
+                // give up for now, but don't let the next network path update be skipped as a duplicate
+                // (unless a newer update has already replaced the key)
+                netMonQueue.async {
+                    if self.lastNetworkPathKey == pathKey { self.lastNetworkPathKey = nil }
                 }
             }
         }
@@ -418,11 +422,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             self.lastNetworkPathKey = key
             zLog.info("Network Path Update:\n\(pathStr)")
             
-            if let upstreamDns = upstreamDns {
-                self.zitiTunnel?.perform {
+            self.zitiTunnel?.perform {
+                // stop any retries from a previous update, even if there's nothing to set now (path unsatisfied)
+                self.upstreamDnsGeneration += 1
+                if let upstreamDns = upstreamDns {
                     zLog.info("Setting fallback DNS to \(upstreamDns)")
-                    self.latestUpstreamDns = upstreamDns
-                    self.setUpstreamDns(upstreamDns)
+                    self.setUpstreamDns(upstreamDns, self.upstreamDnsGeneration, key)
                 }
             }
             //isSatisfied = path.status == .satisfied
