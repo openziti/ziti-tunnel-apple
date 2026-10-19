@@ -515,12 +515,18 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     
     @objc func onNewUrlNotification(_ notification: NSNotification) {
         if let dict = notification.userInfo as NSDictionary?, let url = dict["url"] as? URL {
-            onNewUrl(url)
+            onNewUrl(url, tempDir: dict["tempDir"] as? URL)
         }
     }
-    
-    func onNewUrl(_ url:URL) {
+
+    /// `tempDir` holds a temporary copy of the file, removed once it's been read
+    func onNewUrl(_ url:URL, tempDir:URL? = nil) {
         DispatchQueue(label: "JwtLoader").async {
+            defer {
+                if let tempDir = tempDir {
+                    try? FileManager.default.removeItem(at: tempDir)
+                }
+            }
             do {
                 if url.isFileURL {
                     try self.zids.insertFromJWT(url, self.zidStore, at: 0)
