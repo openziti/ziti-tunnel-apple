@@ -26,6 +26,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     let netMon = NWPathMonitor()
     let netMonQueue = DispatchQueue(label: "io.openziti.netmon") // serial
     var lastNetworkPathKey:String? // only accessed on netMonQueue
+    var latestUpstreamDns:String? // most recent value passed to setUpstreamDns. only accessed on the ziti loop
     var zitiTunnel:ZitiTunnel?
     var zitiTunnelDelegate:ZitiTunnelDelegate?
     var writeLock = NSLock()
@@ -391,11 +392,12 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let waitInterval = 1.0 / Double(nAttempts)
         if attemptNum <= nAttempts {
             zitiTunnel?.perform {
+                // don't let a retry for an older value overwrite a newer one
+                guard upstreamDns == self.latestUpstreamDns else { return }
                 if self.zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
                     zLog.error("Attempt \(attemptNum) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
                     if attemptNum < nAttempts {
-                        DispatchQueue.global().async {
-                            Thread.sleep(forTimeInterval: waitInterval)
+                        DispatchQueue.global().asyncAfter(deadline: .now() + waitInterval) {
                             self.setUpstreamDns(upstreamDns, attemptNum + 1)
                         }
                     } else {
@@ -408,7 +410,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
     
     func startNetworkMonitor() {
-        netMonQueue.sync { lastNetworkPathKey = nil }
         netMon.pathUpdateHandler = { path in
             // NWPathMonitor delivers lots of duplicate updates (every few seconds on iOS, even when nothing
             // changed). Only log and set upstream DNS when the path or the upstream DNS has actually changed
@@ -422,6 +423,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             if let upstreamDns = upstreamDns {
                 self.zitiTunnel?.perform {
                     zLog.info("Setting fallback DNS to \(upstreamDns)")
+                    self.latestUpstreamDns = upstreamDns
                     self.setUpstreamDns(upstreamDns)
                 }
             }
