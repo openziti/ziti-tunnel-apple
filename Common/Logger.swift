@@ -69,6 +69,16 @@ class Logger {
         return appGroupURL.appendingPathComponent("logs/\(tag).log", isDirectory:false)
     }
     
+    /// Current and previous tunnel and app logs that exist, for sending to support
+    func feedbackLogs() -> [URL] {
+        var urls:[URL] = []
+        for tag in [Logger.TUN_TAG, Logger.APP_TAG] {
+            guard let url = currLog(forTag: tag) else { continue }
+            urls += [url, url.appendingPathExtension("1")].filter { FileManager.default.fileExists(atPath: $0.path) }
+        }
+        return urls
+    }
+    
     private func initLogDir() {
         guard let appGroupURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)  else {
