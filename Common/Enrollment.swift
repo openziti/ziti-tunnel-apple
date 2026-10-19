@@ -19,10 +19,10 @@ import CZiti
 
 /// Dialogs and other platform UI used during enrollment. Called on the main queue
 protocol EnrollmentUI : AnyObject {
+    /// One of `names`, or nil to cancel
+    func chooseProvider(_ zid:ZitiIdentity, _ names:[String], _ completion:@escaping (String?) -> Void)
     /// Device Certificate or User Session, or nil to cancel
     func chooseEnrollTo(_ zid:ZitiIdentity, _ completion:@escaping (ZitiIdentity.EnrollTo?) -> Void)
-    /// One of `names`, or nil to cancel
-    func chooseProvider(_ zid:ZitiIdentity, _ enrollTo:ZitiIdentity.EnrollTo, _ names:[String], _ completion:@escaping (String?) -> Void)
     /// Whether to enroll without cert or token after the network reports an existing identity
     func confirmBasicEnroll(_ info:(title:String, detail:String, action:String), _ completion:@escaping (Bool) -> Void)
     func openAuthURL(_ url:URL, _ completion:@escaping (Bool) -> Void)
@@ -39,7 +39,7 @@ protocol EnrollmentSDK {
     typealias MfaSetupCallback = (_ provisioningUrl:String?, _ error:String?, _ submit:@escaping (String?) -> Void) -> Void
     typealias MfaCodeCallback = (_ error:String?, _ submit:@escaping (String?) -> Void) -> Void
 
-    /// Providers that can enroll to cert or token, or nil if the query failed
+    /// The network's providers, or nil if the query failed
     func queryProviders(_ source:Enrollment.Source, _ cb:@escaping ([Enrollment.Provider]?) -> Void)
     func enroll(_ source:Enrollment.Source, _ cb:@escaping Callback)
     func enroll(_ source:Enrollment.Source, to enrollTo:ZitiIdentity.EnrollTo, provider:String,
@@ -78,11 +78,10 @@ class Enrollment {
         return controllerURL.map { .controller($0) }
     }
 
-    /// Provider names for each enrollment type, or nil when only basic enrollment applies
-    static func choices(_ providers:[Provider]?) -> (cert:[String], token:[String])? {
-        let cert = (providers ?? []).filter { $0.canCert }.map { $0.name }
-        let token = (providers ?? []).filter { $0.canToken }.map { $0.name }
-        return cert.isEmpty && token.isEmpty ? nil : (cert, token)
+    /// Providers to choose from, or nil when none can enroll to cert or token and only basic enrollment applies
+    static func choices(_ providers:[Provider]?) -> [Provider]? {
+        guard let providers = providers, providers.contains(where: { $0.canCert || $0.canToken }) else { return nil }
+        return providers
     }
 
     let zid:ZitiIdentity
@@ -118,38 +117,37 @@ class Enrollment {
     }
 
     private func choose(_ source:Source, _ providers:[Provider]?) {
-        guard let choices = Enrollment.choices(providers) else {
+        guard let providers = Enrollment.choices(providers) else {
             enroll(source)
             return
         }
-        let chosen:(ZitiIdentity.EnrollTo?) -> Void = { enrollTo in
-            guard let enrollTo = enrollTo else {
+        if providers.count == 1 {
+            chosen(source, providers[0])
+            return
+        }
+        ui.chooseProvider(zid, providers.map { $0.name }) { name in
+            guard let provider = providers.first(where: { $0.name == name }) else {
                 self.finish(.cancelled)
                 return
             }
-            guard enrollTo != .none else {
-                self.enroll(source)
-                return
-            }
-            let names = enrollTo == .cert ? choices.cert : choices.token
-            if names.count == 1 {
-                self.enroll(source, to: enrollTo, provider: names[0])
-                return
-            }
-            self.ui.chooseProvider(self.zid, enrollTo, names) { name in
-                guard let name = name else {
+            self.chosen(source, provider)
+        }
+    }
+
+    /// Enrolls with whatever the provider offers, asking when it offers both cert and token
+    private func chosen(_ source:Source, _ provider:Provider) {
+        switch (provider.canCert, provider.canToken) {
+        case (true, true):
+            ui.chooseEnrollTo(zid) { enrollTo in
+                guard let enrollTo = enrollTo else {
                     self.finish(.cancelled)
                     return
                 }
-                self.enroll(source, to: enrollTo, provider: name)
+                enrollTo == .none ? self.enroll(source) : self.enroll(source, to: enrollTo, provider: provider.name)
             }
-        }
-        if choices.token.isEmpty {
-            chosen(.cert)
-        } else if choices.cert.isEmpty {
-            chosen(.token)
-        } else {
-            ui.chooseEnrollTo(zid, chosen)
+        case (true, false): enroll(source, to: .cert, provider: provider.name)
+        case (false, true): enroll(source, to: .token, provider: provider.name)
+        case (false, false): enroll(source)
         }
     }
 

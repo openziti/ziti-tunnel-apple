@@ -1156,10 +1156,8 @@ extension ViewController: EnrollmentUI {
         completion(radioMatrix.selectedRow == 0 ? .cert : .token)
     }
 
-    func chooseProvider(_ zid: ZitiIdentity, _ enrollTo: ZitiIdentity.EnrollTo, _ names: [String],
-                        _ completion: @escaping (String?) -> Void) {
-        let title = enrollTo == .cert ? "Device Certificate Enrollment" : "User Session Enrollment"
-        completion(dialogForListSelect(question: title, text: "Select authentication provider for '\(zid.name)'", options: names))
+    func chooseProvider(_ zid: ZitiIdentity, _ names: [String], _ completion: @escaping (String?) -> Void) {
+        completion(dialogForListSelect(question: "Select Provider", text: "Select authentication provider for '\(zid.name)'", options: names))
     }
 
     func confirmBasicEnroll(_ info: (title: String, detail: String, action: String), _ completion: @escaping (Bool) -> Void) {

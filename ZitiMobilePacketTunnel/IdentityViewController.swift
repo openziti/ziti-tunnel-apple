@@ -884,10 +884,9 @@ extension IdentityViewController: EnrollmentUI {
         self.present(alert, animated: true, completion: nil)
     }
 
-    func chooseProvider(_ zid: ZitiIdentity, _ enrollTo: ZitiIdentity.EnrollTo, _ names: [String],
-                        _ completion: @escaping (String?) -> Void) {
+    func chooseProvider(_ zid: ZitiIdentity, _ names: [String], _ completion: @escaping (String?) -> Void) {
         hideSpinner()
-        let alert = UIAlertController(title: enrollTo == .cert ? "Device Certificate Enrollment" : "User Session Enrollment",
+        let alert = UIAlertController(title: "Select Provider",
                                       message: "Select authentication provider",
                                       preferredStyle: .actionSheet)
         for name in names {
