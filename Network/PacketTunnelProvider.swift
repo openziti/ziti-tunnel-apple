@@ -390,20 +390,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // attempt to set this address for upstream DNS fails. So we're gonna retry it...
         let nAttempts = 3
         let waitInterval = 1.0 / Double(nAttempts)
-        if attemptNum <= nAttempts {
-            zitiTunnel?.perform {
-                // don't let a retry for an older value overwrite a newer one
-                guard upstreamDns == self.latestUpstreamDns else { return }
-                if self.zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
-                    zLog.error("Attempt \(attemptNum) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
-                    if attemptNum < nAttempts {
-                        DispatchQueue.global().asyncAfter(deadline: .now() + waitInterval) {
-                            self.setUpstreamDns(upstreamDns, attemptNum + 1)
-                        }
-                    } else {
-                        // give up for now, but don't let the next network path update be skipped as a duplicate
-                        self.netMonQueue.async { self.lastNetworkPathKey = nil }
+        zitiTunnel?.perform {
+            // don't let a retry for an older value overwrite a newer one
+            guard upstreamDns == self.latestUpstreamDns else { return }
+            if self.zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
+                zLog.error("Attempt \(attemptNum) of \(nAttempts) failed setting upstream DNS to \(upstreamDns)")
+                if attemptNum < nAttempts {
+                    DispatchQueue.global().asyncAfter(deadline: .now() + waitInterval) {
+                        self.setUpstreamDns(upstreamDns, attemptNum + 1)
                     }
+                } else {
+                    // give up for now, but don't let the next network path update be skipped as a duplicate
+                    self.netMonQueue.async { self.lastNetworkPathKey = nil }
                 }
             }
         }
