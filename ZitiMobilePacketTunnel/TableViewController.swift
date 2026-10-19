@@ -97,6 +97,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     weak var ivc:IdentityViewController?
     let sc = ScannerViewController()
     private var hasShownWelcome = false
+    private var gatheringFeedback = false
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -457,11 +458,20 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             tableView.deselectRow(at: indexPath, animated: true)
             showGettingStarted()
         } else if indexPath.section == 2 && indexPath.row == 1 {
+            tableView.deselectRow(at: indexPath, animated: true)
             // quick 'n dirty support email composer.  TODO: Look into Instabug
             let supportEmail = Bundle.main.infoDictionary?["ZitiSupportEmail"] as? String ?? ""
             let supportSubj = Bundle.main.infoDictionary?["ZitiSupportSubject"] as? String ?? ""
             if MFMailComposeViewController.canSendMail() {
+                // The snapshot can take several seconds, so show progress and ignore taps until it's ready
+                guard !gatheringFeedback else { return }
+                gatheringFeedback = true
+                let spinner = UIActivityIndicatorView(style: .medium)
+                spinner.startAnimating()
+                tableView.cellForRow(at: indexPath)?.accessoryView = spinner
                 StatusSummary.snapshot { snapshot in
+                    self.gatheringFeedback = false
+                    self.tableView.cellForRow(at: indexPath)?.accessoryView = nil
                     let mail = MFMailComposeViewController()
                     mail.mailComposeDelegate = self
                     mail.setSubject(supportSubj)
