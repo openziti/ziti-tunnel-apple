@@ -414,11 +414,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     func startNetworkMonitor() {
         netMon.pathUpdateHandler = { path in
             // NWPathMonitor delivers lots of duplicate updates (every few seconds on iOS, even when nothing
-            // changed). Only log and set upstream DNS when the path or the upstream DNS has actually changed
+            // changed). Only log (at INFO) and set upstream DNS when the path or the upstream DNS has actually changed
             let pathStr = self.describeNetworkPath(path)
             let upstreamDns = path.status == .satisfied ? self.getUpstreamDns() : nil
             let key = "\(pathStr)\nUpstream DNS: \(upstreamDns ?? "")"
-            guard key != self.lastNetworkPathKey else { return }
+            guard key != self.lastNetworkPathKey else {
+                zLog.debug("Network Path Update (unchanged):\n\(pathStr)")
+                return
+            }
             self.lastNetworkPathKey = key
             zLog.info("Network Path Update:\n\(pathStr)")
             
