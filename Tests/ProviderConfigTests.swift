@@ -371,4 +371,36 @@ class ProviderConfigTests: XCTestCase {
     func testCreateDictionary_neverLocked() {
         XCTAssertFalse(ProviderConfig.isLocked(ProviderConfig().createDictionary()))
     }
+
+    // MARK: - Merge
+
+    func testMerge_keepsSavedSettingsNotShown() {
+        var saved = validBaseConfig()
+        saved[ProviderConfig.MTU_KEY] = "1500"
+        saved[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] = true
+        saved[ProviderConfig.FALLBACK_DNS_KEY] = "9.9.9.9"
+        let merged = ProviderConfig.merge(validBaseConfig(), onto: saved)
+        XCTAssertEqual(merged[ProviderConfig.MTU_KEY] as? String, "4000")
+        XCTAssertEqual(merged[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] as? Bool, true)
+        XCTAssertEqual(merged[ProviderConfig.FALLBACK_DNS_KEY] as? String, "9.9.9.9")
+    }
+
+    func testMerge_noSavedSettings() {
+        XCTAssertEqual(ProviderConfig.merge(validBaseConfig(), onto: nil).count, validBaseConfig().count)
+    }
+
+    func testMerge_invalidSavedSettingsDropped() {
+        var saved = validBaseConfig()
+        saved[ProviderConfig.FALLBACK_DNS_ENABLED_KEY] = true
+        saved[ProviderConfig.FALLBACK_DNS_KEY] = ""
+        let merged = ProviderConfig.merge(validBaseConfig(), onto: saved)
+        XCTAssertNil(merged[ProviderConfig.FALLBACK_DNS_ENABLED_KEY])
+        XCTAssertNil(ProviderConfig().validateDictionaty(merged))
+    }
+
+    func testMerge_invalidShownSettingsStillFail() {
+        var shown = validBaseConfig()
+        shown[ProviderConfig.MTU_KEY] = "bogus"
+        XCTAssertNotNil(ProviderConfig().validateDictionaty(ProviderConfig.merge(shown, onto: validBaseConfig())))
+    }
 }

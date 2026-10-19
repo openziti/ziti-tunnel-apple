@@ -226,8 +226,7 @@ class TunnelSettingsViewController: UITableViewController {
     }
     
     @objc func saveConfig() {
-        // Start from the saved config so settings this screen doesn't show (e.g., fallback DNS, log rotation) are kept
-        var dict = (tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration ?? ProviderConfigDict()
+        var dict = ProviderConfigDict()
         dict[ProviderConfig.IP_KEY] = ip
         dict[ProviderConfig.SUBNET_KEY] = mask
         dict[ProviderConfig.MTU_KEY] = mtu
@@ -285,8 +284,10 @@ class TunnelSettingsViewController: UITableViewController {
             return
         }
 
+        // Keep saved settings this screen doesn't show (e.g., fallback DNS, log rotation)
+        let saved = (tvc?.tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration
         let conf:ProviderConfig = ProviderConfig()
-        if let error = conf.parseDictionary(dict) {
+        if let error = conf.parseDictionary(ProviderConfig.merge(dict, onto: saved)) {
             // alert and get outta here
             let alert = UIAlertController(
                 title:"Configuration Error",
