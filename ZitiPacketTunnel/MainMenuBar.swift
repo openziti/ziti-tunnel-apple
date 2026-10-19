@@ -393,8 +393,13 @@ class MainMenuBar : NSObject, NSWindowDelegate {
         var copyError:Error?
         NSFileCoordinator().coordinate(readingItemAt: dir, options: .forUploading, error: &coordError) { zipURL in
             do {
-                try? fm.removeItem(at: url)
-                try fm.copyItem(at: zipURL, to: url)
+                // Stage on the destination's volume (replacing doesn't work across volumes), so an
+                // existing file is only replaced once the new one is ready
+                let staging = try fm.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: url, create: true)
+                defer { try? fm.removeItem(at: staging) }
+                let staged = staging.appendingPathComponent(url.lastPathComponent)
+                try fm.copyItem(at: zipURL, to: staged)
+                _ = try fm.replaceItemAt(url, withItemAt: staged)
             } catch {
                 copyError = error
             }
