@@ -101,8 +101,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let ipDNS = providerConfig.dnsAddresses.first ?? ""
         zitiTunnel = ZitiTunnel(zitiTunnelDelegate, providerConfig.ipAddress, providerConfig.subnetMask, ipDNS)
         
-        if let upstreamDns = getUpstreamDns() {
-            zLog.info("Setting fallback DNS to \(upstreamDns)")
+        if case let (upstreamDns, source)? = getUpstreamDns() {
+            zLog.info("Setting fallback DNS to \(upstreamDns) (\(source))")
             if zitiTunnel?.setUpstreamDns(upstreamDns) != 0 {
                 zLog.warn("Unable to set upstream DNS to \(upstreamDns)")
             }
@@ -352,8 +352,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         return zitiTunnelDelegate?.dumpZitis() ?? ""
     }
     
-    func getUpstreamDns() -> String? {
+    func getUpstreamDns() -> (String, String)? {
         var upstreamDns:String?
+        var source = "configured"
         if providerConfig.fallbackDnsEnabled {
             upstreamDns = providerConfig.fallbackDns
         }
@@ -366,7 +367,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         // TODO: on iOS, we find the first resolver, but setting any fallbackDNS is causing issues
         //
         // This is called on every network path update (including duplicates), so only log at DEBUG here.
-        // Callers log the selected value at INFO when they actually set it.
+        // Callers log the selected value and its source at INFO when they actually set it.
         #if os(macOS)        
             if upstreamDns == nil {
                 var excludedRoute:NEIPv4Route?
@@ -378,15 +379,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                     zLog.debug("No fallback DNS configured. Using first resolver: \(fr)")
                 }
                 upstreamDns = firstResolver
+                source = "first resolver"
             }
             
             if upstreamDns == nil {
                 upstreamDns = "1.1.1.1"
+                source = "default"
                 zLog.debug("No fallback DNS available. Defaulting to \(upstreamDns!)")
             }
         #endif
         
-        return upstreamDns
+        guard let upstreamDns = upstreamDns else { return nil }
+        return (upstreamDns, source)
     }
     
     // must be called on the ziti loop
@@ -421,7 +425,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             // changed). Only log (at INFO) and set upstream DNS when the path or the upstream DNS has actually changed
             let pathStr = self.describeNetworkPath(path)
             let upstreamDns = path.status == .satisfied ? self.getUpstreamDns() : nil
-            let key = "\(pathStr)\nUpstream DNS: \(upstreamDns ?? "")"
+            let key = "\(pathStr)\nUpstream DNS: \(upstreamDns?.0 ?? "")"
             guard key != self.lastNetworkPathKey else {
                 zLog.debug("Network Path Update (unchanged):\n\(pathStr)")
                 return
@@ -432,8 +436,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             self.zitiTunnel?.perform {
                 // stop any retries from a previous update, even if there's nothing to set now (path unsatisfied)
                 self.upstreamDnsGeneration += 1
-                if let upstreamDns = upstreamDns {
-                    zLog.info("Setting fallback DNS to \(upstreamDns)")
+                if case let (upstreamDns, source)? = upstreamDns {
+                    zLog.info("Setting fallback DNS to \(upstreamDns) (\(source))")
                     self.setUpstreamDns(upstreamDns, self.upstreamDnsGeneration, key)
                 }
             }
