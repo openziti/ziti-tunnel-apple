@@ -135,7 +135,7 @@ class ProviderConfig : NSObject {
     // This app stores numeric values as strings, but configs written elsewhere (e.g., plists
     // or configuration profiles) may use native number and boolean types. Accept either.
     
-    private static func isBoolean(_ num:NSNumber) -> Bool {
+    static func isBoolean(_ num:NSNumber) -> Bool {
         return CFGetTypeID(num) == CFBooleanGetTypeID()
     }
     
@@ -166,7 +166,18 @@ class ProviderConfig : NSObject {
     static func isLocked(_ conf:ProviderConfigDict?) -> Bool {
         return boolValue(conf?[LOCKED_KEY]) ?? false
     }
-    
+
+    // Settings a screen shows on top of the saved ones, so settings it doesn't show are kept. If the saved
+    // settings don't validate, only the shown ones are used, since the screen can't fix the others.
+    static func merge(_ shown:ProviderConfigDict, onto saved:ProviderConfigDict?) -> ProviderConfigDict {
+        let merged = (saved ?? [:]).merging(shown) { _, new in new }
+        if let error = ProviderConfig().validateDictionaty(merged), ProviderConfig().validateDictionaty(shown) == nil {
+            zLog.warn("Resetting saved settings that aren't shown: \(error.localizedDescription)")
+            return shown
+        }
+        return merged
+    }
+
     func validateDictionaty(_ conf:ProviderConfigDict) -> ProviderConfigError? {
         if !isValidIpAddress(conf[ProviderConfig.IP_KEY]) {
             return ProviderConfigError.invalidIpAddress

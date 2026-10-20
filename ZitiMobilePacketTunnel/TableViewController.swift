@@ -97,6 +97,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     weak var ivc:IdentityViewController?
     let sc = ScannerViewController()
     private var hasShownWelcome = false
+    private var gatheringFeedback = false
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -457,32 +458,33 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             tableView.deselectRow(at: indexPath, animated: true)
             showGettingStarted()
         } else if indexPath.section == 2 && indexPath.row == 1 {
+            tableView.deselectRow(at: indexPath, animated: true)
             // quick 'n dirty support email composer.  TODO: Look into Instabug
             let supportEmail = Bundle.main.infoDictionary?["ZitiSupportEmail"] as? String ?? ""
             let supportSubj = Bundle.main.infoDictionary?["ZitiSupportSubject"] as? String ?? ""
             if MFMailComposeViewController.canSendMail() {
-                let mail = MFMailComposeViewController()
-                mail.mailComposeDelegate = self
-                mail.setSubject(supportSubj)
-                mail.setToRecipients([supportEmail])
-                mail.setMessageBody("\n\n\nVersion: \(Version.str)\nOS \(Version.osVersion)\nDevice: \(deviceName())", isHTML: false)
-                if let logger = Logger.shared {
-                    if let url = logger.currLog(forTag: Logger.TUN_TAG), let data = try? Data(contentsOf: url) {
-                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
-                        let prev = url.appendingPathExtension("1")
-                        if let prevData = try? Data(contentsOf: prev) {
-                            mail.addAttachmentData(prevData, mimeType: "text/plain", fileName: prev.lastPathComponent)
+                // The snapshot can take several seconds, so show progress and ignore taps until it's ready
+                guard !gatheringFeedback else { return }
+                gatheringFeedback = true
+                let spinner = UIActivityIndicatorView(style: .medium)
+                spinner.startAnimating()
+                tableView.cellForRow(at: indexPath)?.accessoryView = spinner
+                StatusSummary.snapshot { snapshot in
+                    self.gatheringFeedback = false
+                    self.tableView.cellForRow(at: indexPath)?.accessoryView = nil
+                    let mail = MFMailComposeViewController()
+                    mail.mailComposeDelegate = self
+                    mail.setSubject(supportSubj)
+                    mail.setToRecipients([supportEmail])
+                    mail.setMessageBody("\n\n\nVersion: \(Version.str)\nOS \(Version.osVersion)\nDevice: \(self.deviceName())", isHTML: false)
+                    mail.addAttachmentData(Data(snapshot.utf8), mimeType: "text/plain", fileName: "snapshot.txt")
+                    Logger.shared?.feedbackLogs().forEach { url in
+                        if let data = try? Data(contentsOf: url) {
+                            mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
                         }
                     }
-                    if let url = logger.currLog(forTag: Logger.APP_TAG), let data = try? Data(contentsOf: url) {
-                        mail.addAttachmentData(data, mimeType: "text/plain", fileName: url.lastPathComponent)
-                        let prev = url.appendingPathExtension("1")
-                        if let prevData = try? Data(contentsOf: prev) {
-                            mail.addAttachmentData(prevData, mimeType: "text/plain", fileName: prev.lastPathComponent)
-                        }
-                    }
+                    self.present(mail, animated: true)
                 }
-                self.present(mail, animated: true)
             } else {
                 zLog.warn("Mail view controller not available")
                 let alert = UIAlertController(
@@ -515,12 +517,18 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     
     @objc func onNewUrlNotification(_ notification: NSNotification) {
         if let dict = notification.userInfo as NSDictionary?, let url = dict["url"] as? URL {
-            onNewUrl(url)
+            onNewUrl(url, tempDir: dict["tempDir"] as? URL)
         }
     }
-    
-    func onNewUrl(_ url:URL) {
+
+    /// `tempDir` holds a temporary copy of the file, removed once it's been read
+    func onNewUrl(_ url:URL, tempDir:URL? = nil) {
         DispatchQueue(label: "JwtLoader").async {
+            defer {
+                if let tempDir = tempDir {
+                    try? FileManager.default.removeItem(at: tempDir)
+                }
+            }
             do {
                 if url.isFileURL {
                     try self.zids.insertFromJWT(url, self.zidStore, at: 0)

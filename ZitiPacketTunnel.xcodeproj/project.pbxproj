@@ -103,6 +103,8 @@
 		5A94B3402843D10F00C07599 /* EditableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A94B33F2843D10F00C07599 /* EditableTextField.swift */; };
 		5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
 		5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */; };
+		5ACD5A1F2E9F000100A1B2C3 /* StatusSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACD5A1E2E9F000100A1B2C3 /* StatusSummary.swift */; };
+		5ACD5A202E9F000100A1B2C3 /* StatusSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACD5A1E2E9F000100A1B2C3 /* StatusSummary.swift */; };
 		5AB0FDD6265B2E0700B41D58 /* IpcMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */; };
 		5AB0FDD7265B2E0700B41D58 /* IpcMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */; };
 		5AB0FDD8265B2E0700B41D58 /* IpcMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */; };
@@ -155,6 +157,7 @@
 		87CD51B3A39090656A6D9D8B /* Tests/IpcMessagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE03177A4BB9F38CE6BAE022 /* Tests/IpcMessagesTests.swift */; };
 		A1B2C3D4E5F60718A9B0C1E3 /* Tests/ProviderConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */; };
 		CB175ECBAF43C6E97BADCF49 /* Tests/TunnelMgrTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA7DB2E60D928326A6E1E46 /* Tests/TunnelMgrTests.swift */; };
+		5ACD5A222E9F000100A1B2C3 /* Tests/StatusSummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACD5A212E9F000100A1B2C3 /* Tests/StatusSummaryTests.swift */; };
 		AA9471B02EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AA9471B12EBB8CCB00305DE8 /* ziti-v2.icon in Resources */ = {isa = PBXBuildFile; fileRef = AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */; };
 		AABF06A52D38347600238DAE /* libz.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABF06A32D38338300238DAE /* libz.1.tbd */; };
@@ -308,6 +311,7 @@
 		5A94B33A283EF77F00C07599 /* InAppNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotification.swift; sourceTree = "<group>"; };
 		5A94B33F2843D10F00C07599 /* EditableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableTextField.swift; sourceTree = "<group>"; };
 		5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelMgr.swift; sourceTree = "<group>"; };
+		5ACD5A1E2E9F000100A1B2C3 /* StatusSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusSummary.swift; sourceTree = "<group>"; };
 		5AB0FDD5265B2E0600B41D58 /* IpcMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcMessages.swift; sourceTree = "<group>"; };
 		5AB5F9F826ED46D600F198F2 /* IpcAppClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpcAppClient.swift; sourceTree = "<group>"; };
 		5ABA5ED92274D2EB00B2221D /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
@@ -343,6 +347,7 @@
 		5ACE5A212E9F000100A1B2C3 /* Tests/EnrollmentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/EnrollmentTests.swift; sourceTree = SOURCE_ROOT; };
 		A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ProviderConfigTests.swift; sourceTree = SOURCE_ROOT; };
 		8FA7DB2E60D928326A6E1E46 /* Tests/TunnelMgrTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/TunnelMgrTests.swift; sourceTree = SOURCE_ROOT; };
+		5ACD5A212E9F000100A1B2C3 /* Tests/StatusSummaryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/StatusSummaryTests.swift; sourceTree = SOURCE_ROOT; };
 		AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "ziti-v2.icon"; sourceTree = "<group>"; };
 		AABF06A32D38338300238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
 		AABF06A42D3833A200238DAE /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.2.sdk/usr/lib/libz.1.tbd; sourceTree = DEVELOPER_DIR; };
@@ -588,6 +593,7 @@
 			children = (
 				5A2EA2A52097890400437608 /* ProviderConfig.swift */,
 				5AA8B4382260FB4500A27BFE /* TunnelMgr.swift */,
+				5ACD5A1E2E9F000100A1B2C3 /* StatusSummary.swift */,
 				5A379ACB221EDB1400051475 /* ZitiIdentity.swift */,
 				5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */,
 				5ACE5A1E2E9F000100A1B2C3 /* Enrollment.swift */,
@@ -654,6 +660,7 @@
 				5ACE5A212E9F000100A1B2C3 /* Tests/EnrollmentTests.swift */,
 				A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */,
 				8FA7DB2E60D928326A6E1E46 /* Tests/TunnelMgrTests.swift */,
+				5ACD5A212E9F000100A1B2C3 /* Tests/StatusSummaryTests.swift */,
 			);
 			path = Tests;
 			sourceTree = SOURCE_ROOT;
@@ -1003,6 +1010,7 @@
 				5A298535283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */,
 				5A379ACC221EDB1400051475 /* ZitiIdentity.swift in Sources */,
 				5AA8B4392260FB4500A27BFE /* TunnelMgr.swift in Sources */,
+				5ACD5A1F2E9F000100A1B2C3 /* StatusSummary.swift in Sources */,
 				5A02AABA206EBD7E006261C6 /* ViewController.swift in Sources */,
 				5A02AAB8206EBD7E006261C6 /* AppDelegate.swift in Sources */,
 				5A8702D922372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
@@ -1068,6 +1076,7 @@
 				5A0004912832769800351FE2 /* UserNotifications.swift in Sources */,
 				5AF50FE6257D82770092DC47 /* LogLevelViewController.swift in Sources */,
 				5AA8B43A2260FB4500A27BFE /* TunnelMgr.swift in Sources */,
+				5ACD5A202E9F000100A1B2C3 /* StatusSummary.swift in Sources */,
 				AAF3F22C2E03305100590422 /* EnrollURLViewController.swift in Sources */,
 				5AF05FB42884F692006CD604 /* MfaCodesViewController.swift in Sources */,
 				5AFEB76D225D644A0048B2F6 /* TableViewController.swift in Sources */,
@@ -1140,6 +1149,7 @@
 				5ACE5A222E9F000100A1B2C3 /* Tests/EnrollmentTests.swift in Sources */,
 				A1B2C3D4E5F60718A9B0C1E3 /* Tests/ProviderConfigTests.swift in Sources */,
 				CB175ECBAF43C6E97BADCF49 /* Tests/TunnelMgrTests.swift in Sources */,
+				5ACD5A222E9F000100A1B2C3 /* Tests/StatusSummaryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
