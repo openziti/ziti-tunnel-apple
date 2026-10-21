@@ -99,10 +99,10 @@ final class EnrollmentTests: XCTestCase {
     private let noJwt = "/nonexistent/id.jwt"
     private let both = [Enrollment.Provider(name: "both", canCert: true, canToken: true)]
 
-    private func run(_ zid:ZitiIdentity, jwtFile:String? = nil) -> Enrollment.Result {
+    private func run(_ zid:ZitiIdentity, jwtFile:String? = nil, hint:Enrollment.Hint = Enrollment.Hint()) -> Enrollment.Result {
         let done = expectation(description: "enrollment completes")
         var result:Enrollment.Result?
-        Enrollment(zid, ui: ui, sdk: sdk).start(jwtFile: jwtFile ?? noJwt) { r in
+        Enrollment(zid, ui: ui, sdk: sdk, hint: hint).start(jwtFile: jwtFile ?? noJwt) { r in
             XCTAssertNil(result, "completed more than once")
             result = r
             done.fulfill()
@@ -212,6 +212,33 @@ final class EnrollmentTests: XCTestCase {
         XCTAssertEqual(describe(run(makeIdentity())), "enrolled real-id none")
         XCTAssertEqual(ui.calls, ["chooseProvider [\"both\", \"legacy\"]"])
         XCTAssertEqual(sdk.calls.last, "enroll controller(\"https://ctrl.example.com\")")
+    }
+
+    func testHintsSkipDialogs() {
+        sdk.providers = both + [Enrollment.Provider(name: "token2", canCert: false, canToken: true)]
+        XCTAssertEqual(describe(run(makeIdentity(), hint: Enrollment.Hint(provider: "both", enrollTo: .cert))), "enrolled real-id cert")
+        XCTAssertEqual(ui.calls, ["authFinished"])
+        XCTAssertEqual(sdk.calls.last, "enroll controller(\"https://ctrl.example.com\") to cert with both")
+    }
+
+    func testUnknownProviderHintAsks() {
+        sdk.providers = both + [Enrollment.Provider(name: "token2", canCert: false, canToken: true)]
+        ui.provider = "token2"
+        XCTAssertEqual(describe(run(makeIdentity(), hint: Enrollment.Hint(provider: "gone", enrollTo: nil))), "enrolled real-id token")
+        XCTAssertEqual(ui.calls, ["chooseProvider [\"both\", \"token2\"]", "authFinished"])
+    }
+
+    func testTypeHintIgnoredWhenProviderOffersOneType() {
+        sdk.providers = both + [Enrollment.Provider(name: "token2", canCert: false, canToken: true)]
+        XCTAssertEqual(describe(run(makeIdentity(), hint: Enrollment.Hint(provider: "token2", enrollTo: .cert))), "enrolled real-id token")
+        XCTAssertEqual(sdk.calls.last, "enroll controller(\"https://ctrl.example.com\") to token with token2")
+    }
+
+    func testTypeHintAfterAskingForProvider() {
+        sdk.providers = both + [Enrollment.Provider(name: "token2", canCert: false, canToken: true)]
+        ui.provider = "both"
+        XCTAssertEqual(describe(run(makeIdentity(), hint: Enrollment.Hint(provider: nil, enrollTo: .token))), "enrolled real-id token")
+        XCTAssertEqual(ui.calls, ["chooseProvider [\"both\", \"token2\"]", "authFinished"])
     }
 
     func testCancelType() {

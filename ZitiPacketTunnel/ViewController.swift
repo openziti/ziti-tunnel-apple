@@ -704,6 +704,21 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    func onEnrollmentLink(_ link:EnrollmentLink) {
+        guard dialogOKCancel(question: "Enroll Identity", text: "Enroll with the network at \(link.controllerName)?") else { return }
+        
+        do {
+            try self.zids.insertFromLink(link, self.zidStore, at: 0)
+        } catch {
+            self.dialogAlert("Unable to add identity", error.localizedDescription)
+            return
+        }
+        self.tableView.reloadData()
+        self.representedObject = 0
+        self.tableView.selectRowIndexes([0], byExtendingSelection: false)
+        enroll(link.hint)
+    }
+    
     @IBAction func addIdentityButton(_ sender: NSButton) {
         guard view.window != nil else { return }
         
@@ -1068,6 +1083,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
 
     @IBAction func onEnrollButton(_ sender: Any) {
+        enroll()
+    }
+
+    func enroll(_ hint:Enrollment.Hint = Enrollment.Hint()) {
         guard let indx = representedObject as? Int else { return }
         let zid = zids[indx]
 
@@ -1079,7 +1098,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         updateServiceUI(zId: zid)
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false).path
-        Enrollment(zid, ui: self).start(jwtFile: jwtFile) { result in
+        Enrollment(zid, ui: self, hint: hint).start(jwtFile: jwtFile) { result in
             self.enrollingIds.removeAll { $0.id == zid.id }
             switch result {
             case .enrolled(let zidResp, let enrollTo):

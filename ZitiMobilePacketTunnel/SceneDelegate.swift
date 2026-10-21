@@ -27,14 +27,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Posted once active, when the main view is observing
         if let url = connectionOptions.urlContexts.first?.url {
-            zLog.info("Launching app with URL: \(url.absoluteString)")
+            zLog.info("Launching app with URL: \(EnrollmentLink.redacted(url))")
             launchURL = url
         }
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url else { return }
-        zLog.info("SceneDelegate notifying new URL: \(url.absoluteURL)")
+        zLog.info("SceneDelegate notifying new URL: \(EnrollmentLink.redacted(url))")
         notifyNewURL(url)
     }
 

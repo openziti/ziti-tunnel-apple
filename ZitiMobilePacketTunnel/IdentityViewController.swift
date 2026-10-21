@@ -480,7 +480,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         }
     }
 
-    func onEnroll() {
+    func onEnroll(_ hint:Enrollment.Hint = Enrollment.Hint()) {
         guard let zid = self.zid else { return }
         guard let presentedItemURL = self.tvc?.zidStore.presentedItemURL else {
             dialogAlert("Unable to enroll \(zid.name)", "Unable to access group container")
@@ -490,7 +490,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         showSpinner()
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory: false).path
-        Enrollment(zid, ui: self).start(jwtFile: jwtFile) { result in
+        Enrollment(zid, ui: self, hint: hint).start(jwtFile: jwtFile) { result in
             self.hideSpinner()
             switch result {
             case .enrolled(let zidResp, let enrollTo):

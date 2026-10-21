@@ -369,8 +369,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         if let vc = sb.instantiateViewController(withIdentifier: "ENROLL_URL_VC") as? EnrollURLViewController {
             vc.completionHandler = { [weak self] urlStr in
                 if let urlStr = urlStr {
-                    zLog.info("enroll url: \(urlStr)")
                     if let ctrlUrl = URL(string: urlStr) {
+                        zLog.info("enroll url: \(EnrollmentLink.redacted(ctrlUrl))")
                         self!.onNewUrl(ctrlUrl)
                     } else {
                         // oh no!
@@ -523,6 +523,20 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
 
     /// `tempDir` holds a temporary copy of the file, removed once it's been read
     func onNewUrl(_ url:URL, tempDir:URL? = nil) {
+        if url.scheme?.lowercased() == EnrollmentLink.scheme {
+            guard let link = EnrollmentLink(url) else {
+                zLog.warn("Ignoring unsupported link: \(EnrollmentLink.redacted(url))")
+                let alert = UIAlertController(
+                    title:"Unable to add identity",
+                    message: "Unsupported enrollment link",
+                    preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+                present(alert, animated: true, completion: nil)
+                return
+            }
+            onEnrollmentLink(link)
+            return
+        }
         DispatchQueue(label: "JwtLoader").async {
             defer {
                 if let tempDir = tempDir {
@@ -554,6 +568,40 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         }
     }
     
+    func onEnrollmentLink(_ link:EnrollmentLink) {
+        let alert = UIAlertController(
+            title: "Enroll Identity",
+            message: "Enroll with the network at \(link.controllerName)?",
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Enroll", style: .default) { _ in
+            do {
+                try self.zids.insertFromLink(link, self.zidStore, at: 0)
+            } catch {
+                let alert = UIAlertController(
+                    title:"Unable to add identity",
+                    message: error.localizedDescription,
+                    preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+                self.present(alert, animated: true, completion: nil)
+                zLog.error("Unable to add identity: \(error.localizedDescription)")
+                return
+            }
+            self.tableView.reloadData()
+            self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
+            self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+
+            // enroll once the identity screen is showing, so it can present the enrollment sheets
+            let ivc = self.ivc
+            if let tc = self.navigationController?.transitionCoordinator {
+                tc.animate(alongsideTransition: nil) { _ in ivc?.onEnroll(link.hint) }
+            } else {
+                ivc?.onEnroll(link.hint)
+            }
+        })
+        present(alert, animated: true)
+    }
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let avc = segue.destination as? AdvancedViewController {
             avc.tvc = self

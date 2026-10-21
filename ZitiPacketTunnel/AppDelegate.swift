@@ -71,6 +71,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ aNotification: Notification) {
     }
+    
+    func application(_ application: NSApplication, open urls: [URL]) {
+        guard let url = urls.first else { return }
+        let link = EnrollmentLink(url)
+        zLog.info("Opening link: \(EnrollmentLink.redacted(url))")
+        menuBar?.showPanel(nil)
+        DispatchQueue.main.async {
+            guard let vc = self.menuBar?.getMainWindow()?.contentViewController as? ViewController else { return }
+            guard let link = link else {
+                vc.dialogAlert("Unable to add identity", "Unsupported enrollment link")
+                return
+            }
+            vc.onEnrollmentLink(link)
+        }
+    }
 }
 
 extension AppDelegate : UNUserNotificationCenterDelegate {

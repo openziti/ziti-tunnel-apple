@@ -71,6 +71,12 @@ class Enrollment {
         case cancelled
     }
 
+    /// Answers to use instead of asking, when they fit what the network offers
+    struct Hint : Equatable {
+        var provider:String?
+        var enrollTo:ZitiIdentity.EnrollTo?
+    }
+
     static func source(jwtFile:String?, method:ZitiIdentity.EnrollmentMethod, controllerURL:String?) -> Source? {
         if let jwtFile = jwtFile {
             return method == .ott ? .ott(jwtFile) : .jwt(jwtFile)
@@ -87,14 +93,16 @@ class Enrollment {
     let zid:ZitiIdentity
     private let ui:EnrollmentUI
     private let sdk:EnrollmentSDK
+    private let hint:Hint
     private var completion:((Result) -> Void)?
     private var mfaEnabled = false
     private var lastMfaAuth:Date?
 
-    init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK()) {
+    init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK(), hint:Hint = Hint()) {
         self.zid = zid
         self.ui = ui
         self.sdk = sdk
+        self.hint = hint
     }
 
     /// Completes once, on the main queue. `jwtFile` is where the identity's JWT is kept, if it has one
@@ -125,6 +133,13 @@ class Enrollment {
             chosen(source, providers[0])
             return
         }
+        if let name = hint.provider {
+            if let provider = providers.first(where: { $0.name == name }) {
+                chosen(source, provider)
+                return
+            }
+            zLog.warn("Provider \(name) not offered by the network, asking instead")
+        }
         ui.chooseProvider(zid, providers.map { $0.name }) { name in
             guard let provider = providers.first(where: { $0.name == name }) else {
                 self.finish(.cancelled)
@@ -138,6 +153,10 @@ class Enrollment {
     private func chosen(_ source:Source, _ provider:Provider) {
         switch (provider.canCert, provider.canToken) {
         case (true, true):
+            if let enrollTo = hint.enrollTo, enrollTo != .none {
+                enroll(source, to: enrollTo, provider: provider.name)
+                return
+            }
             ui.chooseEnrollTo(zid) { enrollTo in
                 guard let enrollTo = enrollTo else {
                     self.finish(.cancelled)
