@@ -15,7 +15,10 @@
 //
 
 import XCTest
+import CZiti
 @testable import Ziti_Desktop_Edge
+
+private typealias ZitiIdentity = Ziti_Desktop_Edge.ZitiIdentity
 
 final class EnrollmentLinkTests: XCTestCase {
 
@@ -93,7 +96,28 @@ final class EnrollmentLinkTests: XCTestCase {
         XCTAssertNil(link("ziti://enroll?controller=http://ctrl.example.com"))
         XCTAssertNil(link("ziti://enroll?controller=ctrl.example.com"))
         XCTAssertNil(link("ziti://enroll?controller=https://user@ctrl.example.com"))
+        XCTAssertNil(link("ziti://enroll?controller=https://:pw@ctrl.example.com"))
+        XCTAssertNil(link("ziti://enroll?controller="))
         XCTAssertNil(link("ziti://enroll?jwt=\(networkJwt("http://ctrl.example.com"))"))
+    }
+
+    func testRejectsEncodedHosts() {
+        XCTAssertNil(link("ziti://enroll?controller=https%3A%2F%2F..%252F..%252Fx"))
+        XCTAssertNil(link("ziti://enroll?controller=https%3A%2F%2Fctrl.example.com%250Aevil"))
+        XCTAssertNil(link("ziti://enroll?jwt=\(networkJwt("https://..%2F..%2Fx/"))"))
+    }
+
+    func testRejectsControllerQueryOrFragment() {
+        XCTAssertNil(link("ziti://enroll?controller=https%3A%2F%2Fctrl.example.com%3Fx%3D1"))
+        XCTAssertNil(link("ziti://enroll?controller=https%3A%2F%2Fctrl.example.com%23x"))
+    }
+
+    func testFirstOfRepeatedParameterWins() {
+        XCTAssertEqual(link("ziti://enroll?controller=https://a.example.com&controller=https://b.example.com")?.controllerName, "a.example.com")
+    }
+
+    func testIPv6Controller() {
+        XCTAssertEqual(link("ziti://enroll?controller=https%3A%2F%2F%5B%3A%3A1%5D%3A1280")?.controllerName, "::1:1280")
     }
 
     func testRejectsMalformedJwt() {
@@ -105,5 +129,31 @@ final class EnrollmentLinkTests: XCTestCase {
     func testRedacted() {
         XCTAssertEqual(EnrollmentLink.redacted(URL(string: "ziti://enroll?jwt=\(networkJwt())#x")!), "ziti://enroll")
         XCTAssertEqual(EnrollmentLink.redacted(URL(string: "https://ctrl.example.com:1280/path")!), "https://ctrl.example.com:1280/path")
+        XCTAssertEqual(EnrollmentLink.redacted(URL(string: "https://user:pw@ctrl.example.com")!), "https://ctrl.example.com")
+    }
+
+    // MARK: - Pending identities
+
+    private func identity(_ ztAPI:String, enrolled:Bool = false) -> ZitiIdentity {
+        let zid = ZitiIdentity()
+        zid.czid = CZiti.ZitiIdentity(id: UUID().uuidString, ztAPIs: [ztAPI])
+        zid.enrolled = enrolled
+        return zid
+    }
+
+    func testPendingMatchesController() {
+        let zid = identity("https://ctrl.example.com:1280")
+        let zids = [identity("https://other.example.com:1280"), zid]
+        XCTAssertTrue(zids.pending(link("ziti://enroll?controller=https://ctrl.example.com:1280/")!) === zid)
+    }
+
+    func testPendingMatchesNetworkJwtIssuer() {
+        let zid = identity("https://ctrl.example.com:443/")
+        XCTAssertTrue([zid].pending(link("ziti://enroll?jwt=\(networkJwt())")!) === zid)
+    }
+
+    func testPendingIgnoresEnrolledAndOtherPorts() {
+        let zids = [identity("https://ctrl.example.com:1280", enrolled: true), identity("https://ctrl.example.com:443")]
+        XCTAssertNil(zids.pending(link("ziti://enroll?controller=https://ctrl.example.com:1280")!))
     }
 }

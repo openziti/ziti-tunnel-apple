@@ -705,7 +705,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     func onEnrollmentLink(_ link:EnrollmentLink) {
-        guard dialogOKCancel(question: "Enroll Identity", text: "Enroll with the network at \(link.controllerName)?") else { return }
+        let alert = NSAlert()
+        alert.messageText = "Enroll Identity"
+        alert.informativeText = "Enroll with the network at \(link.controllerName)?"
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "Enroll")
+        alert.addButton(withTitle: "Cancel")
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
         
         do {
             try self.zids.insertFromLink(link, self.zidStore, at: 0)
@@ -1102,7 +1108,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             self.enrollingIds.removeAll { $0.id == zid.id }
             switch result {
             case .enrolled(let zidResp, let enrollTo):
-                self.handleEnrollmentSuccess(zid: zid, zidResp: zidResp, enrollTo: enrollTo, indx: indx)
+                self.handleEnrollmentSuccess(zid: zid, zidResp: zidResp, enrollTo: enrollTo)
             case .failed(let msg):
                 _ = self.zidStore.store(zid)
                 self.updateServiceUI(zId: zid)
@@ -1114,14 +1120,16 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
 
     func handleEnrollmentSuccess(zid: ZitiIdentity, zidResp: CZiti.ZitiIdentity,
-                                 enrollTo: ZitiIdentity.EnrollTo, indx: Int) {
+                                 enrollTo: ZitiIdentity.EnrollTo) {
+        // the list may have changed while enrolling (e.g., an identity added from a link)
+        let indx = zids.firstIndex { $0 === zid }
         var zid = zid
         let idChanged = zid.applyEnrollmentResponse(zidResp, enrollTo: enrollTo, zidStore: zidStore)
 
         if !idChanged {
             zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo, .Mfa])
         }
-        if indx < zids.count {
+        if let indx = indx {
             zids[indx] = zid
         }
         if idChanged {

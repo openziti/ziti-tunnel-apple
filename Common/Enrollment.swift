@@ -138,7 +138,7 @@ class Enrollment {
                 chosen(source, provider)
                 return
             }
-            zLog.warn("Provider \(name) not offered by the network, asking instead")
+            zLog.warn("Provider \(name.debugDescription) not offered by the network, asking instead")
         }
         ui.chooseProvider(zid, providers.map { $0.name }) { name in
             guard let provider = providers.first(where: { $0.name == name }) else {
@@ -162,10 +162,14 @@ class Enrollment {
                     self.finish(.cancelled)
                     return
                 }
-                enrollTo == .none ? self.enroll(source) : self.enroll(source, to: enrollTo, provider: provider.name)
+                self.enroll(source, to: enrollTo, provider: provider.name)
             }
-        case (true, false): enroll(source, to: .cert, provider: provider.name)
-        case (false, true): enroll(source, to: .token, provider: provider.name)
+        case (true, false), (false, true):
+            let enrollTo:ZitiIdentity.EnrollTo = provider.canCert ? .cert : .token
+            if let hinted = hint.enrollTo, hinted != enrollTo {
+                zLog.warn("Provider \(provider.name.debugDescription) doesn't offer \(hinted.rawValue) enrollment, using \(enrollTo.rawValue)")
+            }
+            enroll(source, to: enrollTo, provider: provider.name)
         case (false, false): enroll(source)
         }
     }

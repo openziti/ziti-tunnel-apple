@@ -73,12 +73,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func application(_ application: NSApplication, open urls: [URL]) {
-        guard let url = urls.first else { return }
+        guard let url = urls.first, url.scheme?.lowercased() == EnrollmentLink.scheme else { return }
         let link = EnrollmentLink(url)
         zLog.info("Opening link: \(EnrollmentLink.redacted(url))")
-        menuBar?.showPanel(nil)
+
+        // At launch, links can arrive before applicationDidFinishLaunching sets up the menu bar
         DispatchQueue.main.async {
-            guard let vc = self.menuBar?.getMainWindow()?.contentViewController as? ViewController else { return }
+            self.menuBar?.showPanel(nil)
+            guard let vc = self.menuBar?.getMainWindow()?.contentViewController as? ViewController else {
+                zLog.error("Unable to open link: main window not available")
+                return
+            }
             guard let link = link else {
                 vc.dialogAlert("Unable to add identity", "Unsupported enrollment link")
                 return

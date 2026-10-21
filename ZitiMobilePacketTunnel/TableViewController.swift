@@ -531,7 +531,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                     message: "Unsupported enrollment link",
                     preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
-                present(alert, animated: true, completion: nil)
+                linkPresenter.present(alert, animated: true, completion: nil)
                 return
             }
             onEnrollmentLink(link)
@@ -575,6 +575,9 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Enroll", style: .default) { _ in
+            // start from the identity list, whatever was showing when the link arrived
+            self.navigationController?.dismiss(animated: false)
+            self.navigationController?.popToRootViewController(animated: false)
             do {
                 try self.zids.insertFromLink(link, self.zidStore, at: 0)
             } catch {
@@ -590,7 +593,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             self.tableView.reloadData()
             self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
             self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
-
+            
             // enroll once the identity screen is showing, so it can present the enrollment sheets
             let ivc = self.ivc
             if let tc = self.navigationController?.transitionCoordinator {
@@ -599,7 +602,16 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 ivc?.onEnroll(link.hint)
             }
         })
-        present(alert, animated: true)
+        linkPresenter.present(alert, animated: true)
+    }
+    
+    /// Links can arrive while another screen or dialog is showing
+    private var linkPresenter:UIViewController {
+        var vc:UIViewController = navigationController ?? self
+        while let presented = vc.presentedViewController, !presented.isBeingDismissed {
+            vc = presented
+        }
+        return vc
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

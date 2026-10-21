@@ -898,6 +898,12 @@ extension IdentityViewController: EnrollmentUI {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
             completion(nil)
         })
+        // action sheets need an anchor on iPad
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
         self.present(alert, animated: true, completion: nil)
     }
 

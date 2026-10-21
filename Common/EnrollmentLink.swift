@@ -59,23 +59,31 @@ struct EnrollmentLink : Equatable {
 
     /// Host, plus the port when given, to show the user before enrolling
     var controllerName:String {
-        guard let host = controller.host else { return controller.absoluteString }
-        if let port = controller.port { return "\(host):\(port)" }
-        return host
+        return EnrollmentLink.controllerName(controller)
     }
 
-    /// The URL without its query, for logging
+    /// The URL without its query, fragment or user info, for logging
     static func redacted(_ url:URL) -> String {
         guard var comps = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return url.scheme ?? "" }
         comps.query = nil
         comps.fragment = nil
+        comps.user = nil
+        comps.password = nil
         return comps.string ?? url.scheme ?? ""
     }
 
+    static func controllerName(_ url:URL) -> String {
+        guard let host = url.host else { return url.absoluteString }
+        if let port = url.port { return "\(host):\(port)" }
+        return host
+    }
+
+    /// Plain https URLs only. Percent-encoded hosts are refused since they decode to anything (e.g., "../" or a newline)
     private static func controllerURL(_ str:String) -> URL? {
-        guard let url = URL(string: str), url.scheme?.lowercased() == "https",
-              let host = url.host, !host.isEmpty, url.user == nil else { return nil }
-        return url
+        guard let comps = URLComponents(string: str), comps.scheme?.lowercased() == "https",
+              let host = comps.percentEncodedHost, !host.isEmpty, !host.contains("%"),
+              comps.user == nil, comps.password == nil, comps.query == nil, comps.fragment == nil else { return nil }
+        return comps.url
     }
 
     private static func claims(_ jwt:String) -> [String: Any]? {
@@ -90,13 +98,20 @@ struct EnrollmentLink : Equatable {
 }
 
 extension Array where Element == ZitiIdentity {
+    /// An identity already added for the link's controller and not yet enrolled (links are easy to open twice)
+    func pending(_ link:EnrollmentLink) -> ZitiIdentity? {
+        return first { zid in
+            guard !zid.isEnrolled, let ztAPI = zid.czid?.ztAPI, let url = URL(string: ztAPI) else { return false }
+            return EnrollmentLink.controllerName(url) == link.controllerName
+        }
+    }
+
     mutating func insertFromLink(_ link:EnrollmentLink, _ zidStore:ZitiIdentityStore, at:Int) throws {
+        if let zid = pending(link) {
+            throw ZitiError("\(zid.name) is already waiting to enroll with \(link.controllerName)")
+        }
         switch link.source {
         case .controller(let url):
-            // links are easy to open twice
-            guard self.first(where:{$0.id == url.host}) == nil else {
-                throw ZitiError("Identity \(link.controllerName) is already present")
-            }
             try insertFromURL(url, zidStore, at: at)
         case .jwt(let jwt):
             // the file name becomes the identity name until enrolled
