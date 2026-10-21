@@ -77,6 +77,14 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                             do {
                                 var zids = loadedZids ?? []
                                 try zids.insertFromJWT(url, zidStore, at: 0)
+
+                                // network JWTs need a provider and a browser login, so enroll from the app
+                                guard zids.first?.getEnrollmentMethod() == .ott else {
+                                    self?.showAlert("Imported", "Open Ziti Mobile Edge to finish enrolling \(url.lastPathComponent)") { _ in
+                                        self?.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+                                    }
+                                    return
+                                }
                                 DispatchQueue.main.async {
                                     self?.url = url
                                     self?.fileLabel.text = url.lastPathComponent

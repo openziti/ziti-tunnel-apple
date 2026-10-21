@@ -57,6 +57,19 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>2.60</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>org.openziti.enroll</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>ziti</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>0</string>
 	<key>LSRequiresIPhoneOS</key>

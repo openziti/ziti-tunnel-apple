@@ -10,6 +10,8 @@
 		028220E3B920F4D1AAD6FD74 /* Tests/DateFormatterTimeAgoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BADD51AD3FBD497F079F1862 /* Tests/DateFormatterTimeAgoTests.swift */; };
 		317C4CC567D9613110C57D6A /* Tests/ZitiIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C169439F29854B02947306E4 /* Tests/ZitiIdentityTests.swift */; };
 		531F4B8409DA10DBE64C9A45 /* Tests/ZitiIdentityStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */; };
+		5ACE5A222E9F000100A1B2C3 /* Tests/EnrollmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE5A212E9F000100A1B2C3 /* Tests/EnrollmentTests.swift */; };
+		5ACE5A272E9F000100A1B2C3 /* Tests/EnrollmentLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE5A262E9F000100A1B2C3 /* Tests/EnrollmentLinkTests.swift */; };
 		5860E56C669E8D6588448C2F /* Tests/ZitiIdentityCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B7EC7282791FBACFC52478 /* Tests/ZitiIdentityCodableTests.swift */; };
 		5924787C9352BE1E6B7BFDB8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091AE2F12CEA25BA9D1AC06D /* SceneDelegate.swift */; };
 		5A00048E2830724000351FE2 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFC6A69282F399800A0229C /* UserNotifications.swift */; };
@@ -89,6 +91,10 @@
 		5A8702DA22372F6400314199 /* DateFormatter+timeAgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */; };
 		5A91B4B2222091DE006C4277 /* ZitiIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A379ACB221EDB1400051475 /* ZitiIdentity.swift */; };
 		5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */; };
+		5ACE5A1F2E9F000100A1B2C3 /* Enrollment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE5A1E2E9F000100A1B2C3 /* Enrollment.swift */; };
+		5ACE5A202E9F000100A1B2C3 /* Enrollment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE5A1E2E9F000100A1B2C3 /* Enrollment.swift */; };
+		5ACE5A242E9F000100A1B2C3 /* EnrollmentLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE5A232E9F000100A1B2C3 /* EnrollmentLink.swift */; };
+		5ACE5A252E9F000100A1B2C3 /* EnrollmentLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE5A232E9F000100A1B2C3 /* EnrollmentLink.swift */; };
 		5A91B4C82222E154006C4277 /* ZitiIdentityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */; };
 		5A91B4C92222E155006C4277 /* ZitiIdentityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */; };
 		5A91B4CA2222E156006C4277 /* ZitiIdentityStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */; };
@@ -302,6 +308,8 @@
 		5A8702CD2230B24B00314199 /* ZitiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiService.swift; sourceTree = "<group>"; };
 		5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+timeAgo.swift"; sourceTree = "<group>"; };
 		5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZitiIdentityStore.swift; sourceTree = "<group>"; };
+		5ACE5A1E2E9F000100A1B2C3 /* Enrollment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enrollment.swift; sourceTree = "<group>"; };
+		5ACE5A232E9F000100A1B2C3 /* EnrollmentLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollmentLink.swift; sourceTree = "<group>"; };
 		5A9417C7287B9D3000EEE6BD /* LogRotationConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogRotationConfigViewController.swift; sourceTree = "<group>"; };
 		5A9417C92880975100EEE6BD /* MfaVerifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaVerifyViewController.swift; sourceTree = "<group>"; };
 		5A94B33A283EF77F00C07599 /* InAppNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotification.swift; sourceTree = "<group>"; };
@@ -340,6 +348,8 @@
 		734D2747781DCBB07884EAF1 /* Tests/DNSUtilsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/DNSUtilsTests.swift; sourceTree = SOURCE_ROOT; };
 		79E78327ED970E2088485E22 /* Tests/ZitiServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiServiceTests.swift; sourceTree = SOURCE_ROOT; };
 		994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ZitiIdentityStoreTests.swift; sourceTree = SOURCE_ROOT; };
+		5ACE5A212E9F000100A1B2C3 /* Tests/EnrollmentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/EnrollmentTests.swift; sourceTree = SOURCE_ROOT; };
+		5ACE5A262E9F000100A1B2C3 /* Tests/EnrollmentLinkTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/EnrollmentLinkTests.swift; sourceTree = SOURCE_ROOT; };
 		A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/ProviderConfigTests.swift; sourceTree = SOURCE_ROOT; };
 		8FA7DB2E60D928326A6E1E46 /* Tests/TunnelMgrTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/TunnelMgrTests.swift; sourceTree = SOURCE_ROOT; };
 		5ACD5A212E9F000100A1B2C3 /* Tests/StatusSummaryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tests/StatusSummaryTests.swift; sourceTree = SOURCE_ROOT; };
@@ -591,6 +601,8 @@
 				5ACD5A1E2E9F000100A1B2C3 /* StatusSummary.swift */,
 				5A379ACB221EDB1400051475 /* ZitiIdentity.swift */,
 				5A91B4C62222DBE7006C4277 /* ZitiIdentityStore.swift */,
+				5ACE5A1E2E9F000100A1B2C3 /* Enrollment.swift */,
+				5ACE5A232E9F000100A1B2C3 /* EnrollmentLink.swift */,
 				5A8702CD2230B24B00314199 /* ZitiService.swift */,
 				5ABA5ED92274D2EB00B2221D /* Logger.swift */,
 				5A34E95D2278F49100E221DD /* Version.swift */,
@@ -651,6 +663,8 @@
 				EE03177A4BB9F38CE6BAE022 /* Tests/IpcMessagesTests.swift */,
 				F8B7EC7282791FBACFC52478 /* Tests/ZitiIdentityCodableTests.swift */,
 				994EB84988C0C65788608087 /* Tests/ZitiIdentityStoreTests.swift */,
+				5ACE5A212E9F000100A1B2C3 /* Tests/EnrollmentTests.swift */,
+				5ACE5A262E9F000100A1B2C3 /* Tests/EnrollmentLinkTests.swift */,
 				A1B2C3D4E5F60718A9B0C1D2 /* Tests/ProviderConfigTests.swift */,
 				8FA7DB2E60D928326A6E1E46 /* Tests/TunnelMgrTests.swift */,
 				5ACD5A212E9F000100A1B2C3 /* Tests/StatusSummaryTests.swift */,
@@ -991,6 +1005,8 @@
 				5A22383628459247004E7765 /* NotificationsPanel.swift in Sources */,
 				5A379AC9221C448A00051475 /* TunnelConfigViewController.swift in Sources */,
 				5A91B4C72222DBE7006C4277 /* ZitiIdentityStore.swift in Sources */,
+				5ACE5A1F2E9F000100A1B2C3 /* Enrollment.swift in Sources */,
+				5ACE5A242E9F000100A1B2C3 /* EnrollmentLink.swift in Sources */,
 				5AB0FDD6265B2E0700B41D58 /* IpcMessages.swift in Sources */,
 				5A8702CE2230B24B00314199 /* ZitiService.swift in Sources */,
 				5A34E95E2278F49100E221DD /* Version.swift in Sources */,
@@ -1055,6 +1071,8 @@
 				5A8702DA22372F6400314199 /* DateFormatter+timeAgo.swift in Sources */,
 				5ABA5EDC2274D2EC00B2221D /* Logger.swift in Sources */,
 				5A91B4C92222E155006C4277 /* ZitiIdentityStore.swift in Sources */,
+				5ACE5A202E9F000100A1B2C3 /* Enrollment.swift in Sources */,
+				5ACE5A252E9F000100A1B2C3 /* EnrollmentLink.swift in Sources */,
 				5A298536283A93770056C9A7 /* Array+ZitiIdentity.swift in Sources */,
 				5AF0C41524905FC000CD4DAE /* IPUtils.swift in Sources */,
 				5A0D1D2E222B093F00D01F30 /* ZitiError.swift in Sources */,
@@ -1137,6 +1155,8 @@
 				87CD51B3A39090656A6D9D8B /* Tests/IpcMessagesTests.swift in Sources */,
 				5860E56C669E8D6588448C2F /* Tests/ZitiIdentityCodableTests.swift in Sources */,
 				531F4B8409DA10DBE64C9A45 /* Tests/ZitiIdentityStoreTests.swift in Sources */,
+				5ACE5A222E9F000100A1B2C3 /* Tests/EnrollmentTests.swift in Sources */,
+				5ACE5A272E9F000100A1B2C3 /* Tests/EnrollmentLinkTests.swift in Sources */,
 				A1B2C3D4E5F60718A9B0C1E3 /* Tests/ProviderConfigTests.swift in Sources */,
 				CB175ECBAF43C6E97BADCF49 /* Tests/TunnelMgrTests.swift in Sources */,
 				5ACD5A222E9F000100A1B2C3 /* Tests/StatusSummaryTests.swift in Sources */,
