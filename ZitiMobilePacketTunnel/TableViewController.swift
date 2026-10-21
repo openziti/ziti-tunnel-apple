@@ -95,6 +95,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     weak var ivc:IdentityViewController?
+    var enrollingIds:[ZitiIdentity] = []
     let sc = ScannerViewController()
     private var hasShownWelcome = false
     private var gatheringFeedback = false
@@ -569,6 +570,16 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     func onEnrollmentLink(_ link:EnrollmentLink) {
+        // the link closes whatever screen is showing, which could be part of that enrollment
+        if let zid = enrollingIds.first {
+            let alert = UIAlertController(
+                title:"Unable to add identity",
+                message: "\(zid.name) is still enrolling. Open the link again when it finishes.",
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+            linkPresenter.present(alert, animated: true)
+            return
+        }
         let alert = UIAlertController(
             title: "Enroll Identity",
             message: "Enroll with the network at \(link.controllerName)?",

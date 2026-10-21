@@ -303,4 +303,17 @@ final class EnrollmentTests: XCTestCase {
         XCTAssertFalse(zid.isMfaEnabled)
         XCTAssertNil(zid.lastMfaAuth)
     }
+
+    func testMfaNotAppliedAfterBasicFallback() {
+        sdk.providers = both
+        ui.enrollTo = .cert
+        ui.confirm = true
+        ui.mfaCode = "123456"
+        sdk.mfaCodeError = .some(nil)
+        sdk.enrollToResult = (nil, Enrollment.Failure(message: "exists", alreadyEnrolled: true))
+        let zid = makeIdentity()
+        XCTAssertEqual(describe(run(zid)), "enrolled real-id none")
+        XCTAssertFalse(zid.isMfaEnabled)
+        XCTAssertNil(zid.lastMfaAuth)
+    }
 }

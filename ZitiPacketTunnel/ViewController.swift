@@ -705,6 +705,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     func onEnrollmentLink(_ link:EnrollmentLink) {
+        // one enrollment at a time, so its dialogs aren't mixed up with the link's
+        if let zid = enrollingIds.first {
+            dialogAlert("Unable to add identity", "\(zid.name) is still enrolling. Open the link again when it finishes.")
+            return
+        }
         let alert = NSAlert()
         alert.messageText = "Enroll Identity"
         alert.informativeText = "Enroll with the network at \(link.controllerName)?"

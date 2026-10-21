@@ -134,9 +134,14 @@ final class EnrollmentLinkTests: XCTestCase {
 
     // MARK: - Pending identities
 
-    private func identity(_ ztAPI:String, enrolled:Bool = false) -> ZitiIdentity {
+    /// An identity added by URL, or from a JWT with the given enrollment method
+    private func identity(_ ztAPI:String, em:String? = nil, enrolled:Bool = false) -> ZitiIdentity {
         let zid = ZitiIdentity()
         zid.czid = CZiti.ZitiIdentity(id: UUID().uuidString, ztAPIs: [ztAPI])
+        if let em = em {
+            let json = try! JSONSerialization.data(withJSONObject: ["sub": "abc", "iss": ztAPI, "em": em])
+            zid.claims = try! JSONDecoder().decode(CZiti.ZitiClaims.self, from: json)
+        }
         zid.enrolled = enrolled
         return zid
     }
@@ -148,12 +153,18 @@ final class EnrollmentLinkTests: XCTestCase {
     }
 
     func testPendingMatchesNetworkJwtIssuer() {
-        let zid = identity("https://ctrl.example.com:443/")
-        XCTAssertTrue([zid].pending(link("ziti://enroll?jwt=\(networkJwt())")!) === zid)
+        let zid = identity("https://ctrl.example.com:443/", em: "network")
+        XCTAssertTrue([identity("https://ctrl.example.com:443/"), zid].pending(link("ziti://enroll?jwt=\(networkJwt())")!) === zid)
     }
 
     func testPendingIgnoresEnrolledAndOtherPorts() {
         let zids = [identity("https://ctrl.example.com:1280", enrolled: true), identity("https://ctrl.example.com:443")]
         XCTAssertNil(zids.pending(link("ziti://enroll?controller=https://ctrl.example.com:1280")!))
+    }
+
+    func testPendingIgnoresOtherSources() {
+        let zids = [identity("https://ctrl.example.com:443", em: "ott"), identity("https://ctrl.example.com:443", em: "network")]
+        XCTAssertNil(zids.pending(link("ziti://enroll?controller=https://ctrl.example.com:443")!))
+        XCTAssertNil([identity("https://ctrl.example.com:443", em: "ott")].pending(link("ziti://enroll?jwt=\(networkJwt())")!))
     }
 }

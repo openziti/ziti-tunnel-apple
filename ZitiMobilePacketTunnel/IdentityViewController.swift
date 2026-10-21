@@ -488,10 +488,12 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         }
 
         showSpinner()
+        tvc?.enrollingIds.append(zid)
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory: false).path
         Enrollment(zid, ui: self, hint: hint).start(jwtFile: jwtFile) { result in
             self.hideSpinner()
+            self.tvc?.enrollingIds.removeAll { $0 === zid }
             switch result {
             case .enrolled(let zidResp, let enrollTo):
                 self.handleEnrollmentSuccess(zidResp: zidResp, enrollTo: enrollTo)

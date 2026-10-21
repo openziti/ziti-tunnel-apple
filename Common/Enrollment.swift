@@ -235,7 +235,14 @@ class Enrollment {
                         return
                     }
                     self.ui.confirmBasicEnroll(ZitiIdentity.alreadyEnrolledInfo(requestedType: requestedType)) { confirmed in
-                        confirmed ? self.enroll(source) : self.finish(.cancelled)
+                        guard confirmed else {
+                            self.finish(.cancelled)
+                            return
+                        }
+                        // basic enrollment doesn't do MFA, so drop any from the failed attempt
+                        self.mfaEnabled = false
+                        self.lastMfaAuth = nil
+                        self.enroll(source)
                     }
                     return
                 }

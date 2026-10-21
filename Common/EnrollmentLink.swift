@@ -98,11 +98,15 @@ struct EnrollmentLink : Equatable {
 }
 
 extension Array where Element == ZitiIdentity {
-    /// An identity already added for the link's controller and not yet enrolled (links are easy to open twice)
+    /// An identity already added from the same link and not yet enrolled (links are easy to open twice)
     func pending(_ link:EnrollmentLink) -> ZitiIdentity? {
         return first { zid in
-            guard !zid.isEnrolled, let ztAPI = zid.czid?.ztAPI, let url = URL(string: ztAPI) else { return false }
-            return EnrollmentLink.controllerName(url) == link.controllerName
+            guard !zid.isEnrolled, let ztAPI = zid.czid?.ztAPI, let url = URL(string: ztAPI),
+                  EnrollmentLink.controllerName(url) == link.controllerName else { return false }
+            switch link.source {
+            case .controller: return zid.claims == nil
+            case .jwt: return zid.claims?.em == "network"
+            }
         }
     }
 
