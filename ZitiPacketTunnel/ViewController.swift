@@ -597,7 +597,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         return nil // Cancel
     }
     
-    func dialogForListSelect(question: String, text: String, options: [String]) -> String? {
+    func dialogForListSelect(question: String, text: String, options: [String], selected: String? = nil) -> String? {
         let alert = NSAlert()
         alert.messageText = question
         alert.informativeText = text
@@ -607,6 +607,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         let listView = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 200, height: 60))
         listView.addItems(withTitles: options)
+        if let selected = selected { listView.selectItem(withTitle: selected) }
         alert.accessoryView = listView
         alert.window.initialFirstResponder = listView
         
@@ -1018,18 +1019,19 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
-    /// called when handling notification. initiate ext auth immediately if only one provider exists, otherwise display combobox
+    /// called when handling notification. initiate ext auth immediately if only one provider exists or one was chosen when enrolling, otherwise display combobox with the last used selected
     func doExtAuth(_ zid: ZitiIdentity) {
         if let providers = zid.jwtProviders {
-            // save some clicking if there's only one provider
-            if providers.count == 1, let provider = providers.first {
+            // save some clicking if there's only one provider, or one was chosen when enrolling
+            if let provider = zid.loginJWTProvider {
                 doExternalAuth(zid, provider)
                 return
             }
             let providerNames = providers.map(\.name)
             let providerName = dialogForListSelect(question: "External Authentication Required",
                                                    text: "Select authentication provider for '\(zid.name)'",
-                                                   options: providerNames)
+                                                   options: providerNames,
+                                                   selected: zid.defaultJWTProvider?.name)
             if let provider = providers.first(where: { $0.name == providerName }) {
                 doExternalAuth(zid, provider)
             }
@@ -1037,6 +1039,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
 
     func doExternalAuth(_ zid: ZitiIdentity, _ provider: JWTProvider) {
+        zid.useJWTProvider(provider)
+        _ = zidStore.update(zid, [.SelectedJWTProvider, .EnrollProvider])
         let msg = IpcExternalAuthRequestMessage(zid.id, provider.name)
         self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
             DispatchQueue.main.async {
@@ -1076,8 +1080,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         if let providers = zid.jwtProviders {
             guard view.window != nil else { return }
             
-            // save some clicking if there's only one provider
-            if providers.count == 1, let provider = providers.first {
+            // save some clicking if there's only one provider, or one was chosen when enrolling
+            if let provider = zid.loginJWTProvider {
                 doExternalAuth(zid, provider)
                 return
             }
@@ -1086,6 +1090,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             for case let provider? in providers {
                 let mi = NSMenuItem(title: provider.name, action: #selector(externalAuthProviderSelected(_:)), keyEquivalent: "")
                 mi.representedObject = provider
+                mi.state = provider.name == zid.defaultJWTProvider?.name ? .on : .off
                 menu.addItem(mi)
             }
             let location = NSPoint(x: 0, y: menu.size.height - 20)
@@ -1132,7 +1137,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         let idChanged = zid.applyEnrollmentResponse(zidResp, enrollTo: enrollTo, zidStore: zidStore)
 
         if !idChanged {
-            zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo, .Mfa])
+            zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo, .EnrollProvider, .Mfa])
         }
         if let indx = indx {
             zids[indx] = zid

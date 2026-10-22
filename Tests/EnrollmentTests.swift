@@ -254,6 +254,61 @@ final class EnrollmentTests: XCTestCase {
         XCTAssertEqual(ui.calls, ["chooseProvider [\"a\", \"b\"]"])
     }
 
+    // MARK: - Provider remembered for login
+
+    func testChosenProviderRemembered() {
+        sdk.providers = both + [Enrollment.Provider(name: "token2", canCert: false, canToken: true)]
+        ui.provider = "token2"
+        let zid = makeIdentity()
+        _ = run(zid)
+        XCTAssertEqual(zid.enrollProvider, "token2")
+    }
+
+    func testOnlyProviderRemembered() {
+        sdk.providers = [Enrollment.Provider(name: "okta", canCert: true, canToken: false)]
+        let zid = makeIdentity()
+        _ = run(zid)
+        XCTAssertEqual(zid.enrollProvider, "okta")
+    }
+
+    func testProviderRememberedWhenBasic() {
+        sdk.providers = both + [Enrollment.Provider(name: "legacy", canCert: false, canToken: false)]
+        ui.provider = "legacy"
+        let zid = makeIdentity()
+        XCTAssertEqual(describe(run(zid)), "enrolled real-id none")
+        XCTAssertEqual(zid.enrollProvider, "legacy")
+    }
+
+    func testProviderRememberedAfterBasicFallback() {
+        sdk.providers = both
+        ui.enrollTo = .token
+        ui.confirm = true
+        sdk.enrollToResult = (nil, Enrollment.Failure(message: "exists", alreadyEnrolled: true))
+        let zid = makeIdentity()
+        XCTAssertEqual(describe(run(zid)), "enrolled real-id none")
+        XCTAssertEqual(zid.enrollProvider, "both")
+    }
+
+    func testNoProviderRememberedWithoutChoice() {
+        sdk.providers = [Enrollment.Provider(name: "a", canCert: false, canToken: false)]
+        let zid = makeIdentity()
+        XCTAssertEqual(describe(run(zid)), "enrolled real-id none")
+        XCTAssertNil(zid.enrollProvider)
+    }
+
+    func testProviderNotRememberedUnlessEnrolled() {
+        sdk.providers = both
+        let cancelled = makeIdentity()
+        XCTAssertEqual(describe(run(cancelled)), "cancelled")
+        XCTAssertNil(cancelled.enrollProvider)
+
+        ui.enrollTo = .cert
+        sdk.result = (nil, Enrollment.Failure(message: "denied", alreadyEnrolled: false))
+        let failed = makeIdentity()
+        XCTAssertEqual(describe(run(failed)), "failed denied")
+        XCTAssertNil(failed.enrollProvider)
+    }
+
     func testFailure() {
         sdk.result = (nil, Enrollment.Failure(message: "bad token", alreadyEnrolled: false))
         XCTAssertEqual(describe(run(makeIdentity())), "failed bad token")

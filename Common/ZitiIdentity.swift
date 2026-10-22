@@ -74,6 +74,7 @@ class ZitiIdentity : NSObject, Codable {
     var enrollTo:EnrollTo?
     var jwtProviders:[CZiti.JWTProvider]?
     var selectedJWTProvider:CZiti.JWTProvider?
+    var enrollProvider:String? // chosen when enrolling, used for the first external login
     var extAuthPending:Bool? = false
     
     var name:String { return czid?.name ?? "--" }
@@ -142,6 +143,24 @@ class ZitiIdentity : NSObject, Codable {
     var effectiveEnrollTo:EnrollTo { return enrollTo ?? .none }
     var isExtAuthEnabled:Bool { return jwtProviders != nil && !jwtProviders!.isEmpty }
     var isExtAuthPending:Bool { return extAuthPending ?? false }
+    
+    /// The provider to log in with without asking: the one chosen when enrolling, or the only one offered
+    var loginJWTProvider:CZiti.JWTProvider? {
+        guard let providers = jwtProviders else { return nil }
+        return providers.first { $0.name == enrollProvider } ?? (providers.count == 1 ? providers.first : nil)
+    }
+    
+    /// The provider to offer first: the one selected or last used, else `loginJWTProvider`
+    var defaultJWTProvider:CZiti.JWTProvider? {
+        return jwtProviders?.first { $0.name == selectedJWTProvider?.name } ?? loginJWTProvider
+    }
+    
+    /// Records a login with `provider`: offered first next time; the one chosen when enrolling is only used for the first login
+    func useJWTProvider(_ provider:CZiti.JWTProvider) {
+        selectedJWTProvider = provider
+        enrollProvider = nil
+    }
+    
     var isEnabled:Bool { return enabled ?? false }
     var isEnrolled:Bool { return enrolled ?? false }
     var edgeStatus:EdgeStatus?
