@@ -116,6 +116,17 @@ class ZitiIdentityCodableTests: XCTestCase {
         XCTAssertEqual(decoded.enrollmentStatusDisplay, "Enrolled (Authentication Required)")
     }
 
+    func testRoundTrip_enrollProvider() throws {
+        XCTAssertNil(makeIdentity(enrolled: true).enrollProvider)
+
+        let original = makeIdentity(enrolled: true)
+        original.enrollProvider = "alpha"
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(ZitiIdentity.self, from: data)
+
+        XCTAssertEqual(decoded.enrollProvider, "alpha")
+    }
+
     func testRoundTrip_jwtProviders() throws {
         let original = makeIdentity(
             enrolled: true,

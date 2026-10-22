@@ -97,6 +97,7 @@ class Enrollment {
     private var completion:((Result) -> Void)?
     private var mfaEnabled = false
     private var lastMfaAuth:Date?
+    private var provider:String?
 
     init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK(), hint:Hint = Hint()) {
         self.zid = zid
@@ -151,6 +152,7 @@ class Enrollment {
 
     /// Enrolls with whatever the provider offers, asking when it offers both cert and token
     private func chosen(_ source:Source, _ provider:Provider) {
+        self.provider = provider.name
         switch (provider.canCert, provider.canToken) {
         case (true, true):
             if let enrollTo = hint.enrollTo, enrollTo != .none {
@@ -267,13 +269,16 @@ class Enrollment {
         }
     }
 
-    /// MFA set up or used during enrollment is applied once it succeeds
+    /// MFA set up or used during enrollment, and the provider chosen, are applied once it succeeds
     private func finish(_ result:Result) {
-        if case .enrolled = result, mfaEnabled {
-            zid.mfaEnabled = true
-            zid.mfaVerified = true
-            zid.mfaPending = false
-            if let lastMfaAuth = lastMfaAuth { zid.lastMfaAuth = lastMfaAuth }
+        if case .enrolled = result {
+            zid.enrollProvider = provider
+            if mfaEnabled {
+                zid.mfaEnabled = true
+                zid.mfaVerified = true
+                zid.mfaPending = false
+                if let lastMfaAuth = lastMfaAuth { zid.lastMfaAuth = lastMfaAuth }
+            }
         }
         completion?(result)
         completion = nil
