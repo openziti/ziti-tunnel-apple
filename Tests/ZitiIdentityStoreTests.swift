@@ -235,6 +235,33 @@ class ZitiIdentityStoreTests: XCTestCase {
         XCTAssertEqual(loaded?.effectiveEnrollTo, .cert)
     }
 
+    func testUpdate_selectedJWTProvider() {
+        let providers = [["name": "p", "issuer": "i", "canCertEnroll": false, "canTokenEnroll": false]]
+        _ = store.store(makeIdentity(id: "upd", jwtProviders: providers))
+
+        let selected = makeIdentity(id: "upd", jwtProviders: providers)
+        selected.selectedJWTProvider = selected.jwtProviders?.first
+        _ = store.update(selected, [.SelectedJWTProvider])
+        XCTAssertEqual(store.load("upd").0?.selectedJWTProvider?.name, "p")
+
+        // the tunnel's updates leave it alone
+        _ = store.update(makeIdentity(id: "upd", extAuthPending: true, jwtProviders: providers), [.ExtAuth])
+        XCTAssertEqual(store.load("upd").0?.selectedJWTProvider?.name, "p")
+    }
+
+    func testUpdate_enrollProvider() {
+        let original = makeIdentity(id: "upd", enrolled: true)
+        original.enrollProvider = "alpha"
+        _ = store.store(original)
+
+        // the tunnel's updates leave it alone
+        _ = store.update(makeIdentity(id: "upd", enrolled: true, extAuthPending: true), [.ExtAuth, .EdgeStatus])
+        XCTAssertEqual(store.load("upd").0?.enrollProvider, "alpha")
+
+        _ = store.update(makeIdentity(id: "upd", enrolled: true), [.EnrollProvider])
+        XCTAssertNil(store.load("upd").0?.enrollProvider)
+    }
+
     func testUpdate_services() {
         _ = store.store(makeIdentity(id: "upd", enrolled: true, enabled: true))
 

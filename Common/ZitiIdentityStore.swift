@@ -33,9 +33,11 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         case CZitiIdentity
         case Mfa
         case ExtAuth
+        case SelectedJWTProvider
         case Services
         case AppexNotifications
         case EnrollTo
+        case EnrollProvider
     }
     
     var presentedItemURL:URL? = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)
@@ -200,11 +202,16 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
             }
             if options.contains(.ExtAuth) {
                 zidOnDisk?.jwtProviders = zid.jwtProviders
-                zidOnDisk?.selectedJWTProvider = zid.selectedJWTProvider
                 zidOnDisk?.extAuthPending = zid.extAuthPending
+            }
+            if options.contains(.SelectedJWTProvider) {
+                zidOnDisk?.selectedJWTProvider = zid.selectedJWTProvider
             }
             if options.contains(.EnrollTo) {
                 zidOnDisk?.enrollTo = zid.enrollTo
+            }
+            if options.contains(.EnrollProvider) {
+                zidOnDisk?.enrollProvider = zid.enrollProvider
             }
             
             // store to disk

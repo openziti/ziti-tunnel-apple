@@ -64,14 +64,15 @@ class MfaAuthNowCell : UITableViewCell {
             authNeed = "idp"
             self.authProviderBtn.isHidden = false
             var selectedFound: Bool = false
+            let selected = zid.defaultJWTProvider
             if let providers = zid.jwtProviders, !providers.isEmpty {
                 var elements: [UIMenuElement] = []
                 for provider in providers {
                     let e = UIAction(title: provider.name, identifier: nil) { _ in
                         zid.selectedJWTProvider = provider
-                        _ = ZitiIdentityStore().update(zid, [.ExtAuth])
+                        _ = ZitiIdentityStore().update(zid, [.SelectedJWTProvider])
                     }
-                    if provider.name == zid.selectedJWTProvider?.name {
+                    if provider.name == selected?.name {
                         selectedFound = true
                         e.state = .on
                     }
@@ -79,7 +80,7 @@ class MfaAuthNowCell : UITableViewCell {
                 }
                 self.authProviderBtn.menu = self.authProviderBtn.menu?.replacingChildren(elements)
                 if selectedFound {
-                    self.authProviderBtn.setTitle(zid.selectedJWTProvider?.name, for: UIControl.State.normal)
+                    self.authProviderBtn.setTitle(selected?.name, for: UIControl.State.normal)
                 }
             }
         } else if zid.isMfaPending {
@@ -514,7 +515,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         let idChanged = zid.applyEnrollmentResponse(zidResp, enrollTo: enrollTo, zidStore: zidStore)
 
         if !idChanged {
-            self.zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo, .Mfa])
+            self.zid = zidStore.update(zid, [.Enabled, .Enrolled, .CZitiIdentity, .EnrollTo, .EnrollProvider, .Mfa])
         } else if let indx = tvc?.zids.firstIndex(where: { $0.id == tempId }) {
             tvc?.zids[indx] = zid
         }
@@ -675,8 +676,8 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             return
         }
         
-        if let pn = zid.selectedJWTProvider?.name {
-            let msg = IpcExternalAuthRequestMessage(zid.id, pn)
+        if let provider = zid.defaultJWTProvider {
+            let msg = IpcExternalAuthRequestMessage(zid.id, provider.name)
             TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
                 DispatchQueue.main.async {
                     guard zErr == nil else {
@@ -689,6 +690,8 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                         self.dialogAlert("IPC Error", "Unable to parse auth response message")
                         return
                     }
+                    zid.useJWTProvider(provider)
+                    _ = self.tvc?.zidStore.update(zid, [.SelectedJWTProvider, .EnrollProvider])
                     
                     UIApplication.shared.open(url) { (success) in
                         if !success {

@@ -240,6 +240,62 @@ class ZitiIdentityTests: XCTestCase {
         XCTAssertFalse(makeIdentity(jwtProviders: []).isExtAuthEnabled)
     }
 
+    private let alphaAndBeta: [[String: Any]] = [
+        ["name": "alpha", "issuer": "a", "canCertEnroll": false, "canTokenEnroll": false],
+        ["name": "beta", "issuer": "b", "canCertEnroll": false, "canTokenEnroll": false]
+    ]
+
+    func testLoginJWTProvider_asksWhenNoneChosen() {
+        XCTAssertNil(makeIdentity(jwtProviders: alphaAndBeta).loginJWTProvider)
+        // providers not known yet
+        let pending = makeIdentity()
+        pending.enrollProvider = "beta"
+        XCTAssertNil(pending.loginJWTProvider)
+    }
+
+    func testLoginJWTProvider_onlyOneOffered() {
+        let zid = makeIdentity(jwtProviders: [alphaAndBeta[0]])
+        XCTAssertEqual(zid.loginJWTProvider?.name, "alpha")
+        zid.enrollProvider = "gone"
+        XCTAssertEqual(zid.loginJWTProvider?.name, "alpha")
+    }
+
+    func testLoginJWTProvider_chosenWhenEnrolling() {
+        let zid = makeIdentity(jwtProviders: alphaAndBeta)
+        zid.enrollProvider = "beta"
+        XCTAssertEqual(zid.loginJWTProvider?.name, "beta")
+        // no longer offered
+        zid.enrollProvider = "gone"
+        XCTAssertNil(zid.loginJWTProvider)
+    }
+
+    func testLoginJWTProvider_ignoresSelected() {
+        let zid = makeIdentity(jwtProviders: alphaAndBeta)
+        zid.selectedJWTProvider = zid.jwtProviders?.first
+        XCTAssertNil(zid.loginJWTProvider)
+    }
+
+    func testDefaultJWTProvider_selectedFirst() {
+        let zid = makeIdentity(jwtProviders: alphaAndBeta)
+        XCTAssertNil(zid.defaultJWTProvider)
+        zid.enrollProvider = "beta"
+        XCTAssertEqual(zid.defaultJWTProvider?.name, "beta")
+        zid.selectedJWTProvider = zid.jwtProviders?.first
+        XCTAssertEqual(zid.defaultJWTProvider?.name, "alpha")
+        // a selection no longer offered is ignored
+        zid.jwtProviders = [zid.jwtProviders![1]]
+        XCTAssertEqual(zid.defaultJWTProvider?.name, "beta")
+    }
+
+    func testUseJWTProvider_firstLoginOnly() {
+        let zid = makeIdentity(jwtProviders: alphaAndBeta)
+        zid.enrollProvider = "beta"
+        zid.useJWTProvider(zid.jwtProviders![0])
+        XCTAssertNil(zid.enrollProvider)
+        XCTAssertNil(zid.loginJWTProvider)
+        XCTAssertEqual(zid.defaultJWTProvider?.name, "alpha")
+    }
+
     func testIsExtAuthPending() {
         XCTAssertFalse(makeIdentity().isExtAuthPending)
         XCTAssertTrue(makeIdentity(extAuthPending: true).isExtAuthPending)
