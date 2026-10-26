@@ -1039,8 +1039,6 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
 
     func doExternalAuth(_ zid: ZitiIdentity, _ provider: JWTProvider) {
-        zid.useJWTProvider(provider)
-        _ = zidStore.update(zid, [.SelectedJWTProvider, .EnrollProvider])
         let msg = IpcExternalAuthRequestMessage(zid.id, provider.name)
         self.tunnelMgr.ipcClient.sendToAppex(msg) { respMsg, zErr in
             DispatchQueue.main.async {
@@ -1054,6 +1052,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                     self.dialogAlert("IPC Error", "Unable to parse auth response message")
                     return
                 }
+                zid.useJWTProvider(provider)
+                _ = self.zidStore.update(zid, [.SelectedJWTProvider, .EnrollProvider])
                 
                 let opened = NSWorkspace.shared.open(url)
                 if !opened {

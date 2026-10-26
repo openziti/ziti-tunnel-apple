@@ -677,8 +677,6 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         }
         
         if let provider = zid.defaultJWTProvider {
-            zid.useJWTProvider(provider)
-            _ = tvc?.zidStore.update(zid, [.SelectedJWTProvider, .EnrollProvider])
             let msg = IpcExternalAuthRequestMessage(zid.id, provider.name)
             TunnelMgr.shared.ipcClient.sendToAppex(msg) { respMsg, zErr in
                 DispatchQueue.main.async {
@@ -692,6 +690,8 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                         self.dialogAlert("IPC Error", "Unable to parse auth response message")
                         return
                     }
+                    zid.useJWTProvider(provider)
+                    _ = self.tvc?.zidStore.update(zid, [.SelectedJWTProvider, .EnrollProvider])
                     
                     UIApplication.shared.open(url) { (success) in
                         if !success {
