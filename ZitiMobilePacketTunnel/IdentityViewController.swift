@@ -777,7 +777,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             if let ivCell = cell as? IdentityEnabledCell {
                 ivCell.ivc = self
                 ivCell.switch.isOn = zid?.isEnabled ?? false
-                ivCell.switch.isEnabled = zid?.isEnrolled ?? false
+                ivCell.switch.isEnabled = zid.map { $0.isEnrolled && !(tvc?.tunnelMgr.isBlocked($0) ?? false) } ?? false
                 ivCell.label.isEnabled = ivCell.switch.isEnabled
             }
         } else if indexPath.section == 1 {
@@ -832,7 +832,11 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = csStr
             } else {
                 cell?.textLabel?.text = "Enrollment Status"
-                cell?.detailTextLabel?.text = zid?.enrollmentStatusDisplay ?? ""
+                if let zid = zid, tvc?.tunnelMgr.isBlocked(zid) ?? false {
+                    cell?.detailTextLabel?.text = CABundlePolicy.blockedStatus
+                } else {
+                    cell?.detailTextLabel?.text = zid?.enrollmentStatusDisplay ?? ""
+                }
             }
         } else if indexPath.section == 3 {
             if let zid = zid, zid.isEnrolled {

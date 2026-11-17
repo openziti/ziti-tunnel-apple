@@ -28,6 +28,7 @@ struct CABundlePolicy : Equatable {
     }
 
     static let notAllowedMessage = "This network isn't allowed by your organization."
+    static let blockedStatus = "Blocked by your organization"
 
     /// SHA-256 fingerprints of the allowed certificates (DER), lowercase hex without separators
     let fingerprints:Set<String>
@@ -56,6 +57,11 @@ struct CABundlePolicy : Equatable {
             }
         }
         return .allowed
+    }
+
+    /// An enrolled identity the tunnel won't load. Pending ones are checked when they enroll
+    func blocks(_ zid:ZitiIdentity) -> Bool {
+        return zid.isEnrolled && check(zid.czid?.ca) != .allowed
     }
 
     /// SHA-256 over DER, lowercase hex

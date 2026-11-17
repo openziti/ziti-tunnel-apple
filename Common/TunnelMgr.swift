@@ -31,7 +31,20 @@ class TunnelMgr: NSObject {
         }
     }
     /// The networks identities may belong to, from the loaded configuration (nil: no restriction)
-    private(set) var caBundlePolicy:CABundlePolicy?
+    private(set) var caBundlePolicy:CABundlePolicy? {
+        didSet { blockedByBundle = [:] }
+    }
+    private var blockedByBundle:[String: Bool] = [:]
+
+    /// Whether the policy blocks an identity, cached by CA bundle since the identity screens ask on every refresh
+    func isBlocked(_ zid:ZitiIdentity) -> Bool {
+        guard let policy = caBundlePolicy, zid.isEnrolled else { return false }
+        let bundle = zid.czid?.ca ?? ""
+        if let blocked = blockedByBundle[bundle] { return blocked }
+        let blocked = policy.blocks(zid)
+        blockedByBundle[bundle] = blocked
+        return blocked
+    }
     var tunnelRestarting = false
     private var loading = false
     private var loadedBid:String?

@@ -15,7 +15,10 @@
 //
 
 import XCTest
+import CZiti
 @testable import Ziti_Desktop_Edge
+
+private typealias ZitiIdentity = Ziti_Desktop_Edge.ZitiIdentity
 
 final class CABundlePolicyTests: XCTestCase {
 
@@ -103,6 +106,21 @@ final class CABundlePolicyTests: XCTestCase {
 
     func testPemPrefix() {
         XCTAssertEqual(policy(CAFixtures.rootA).check("pem:" + CAFixtures.rootA), .allowed)
+    }
+
+    // MARK: - Identities
+
+    func testBlocksEnrolledIdentitiesOnly() {
+        let p = policy(CAFixtures.rootA)
+        let zid = ZitiIdentity()
+        zid.czid = CZiti.ZitiIdentity(id: "id", ztAPIs: ["https://ctrl"], ca: CAFixtures.rootB)
+        XCTAssertFalse(p.blocks(zid), "pending: checked when it enrolls")
+        zid.enrolled = true
+        XCTAssertTrue(p.blocks(zid))
+        zid.czid?.ca = CAFixtures.rootA
+        XCTAssertFalse(p.blocks(zid))
+        zid.czid?.ca = nil
+        XCTAssertTrue(p.blocks(zid))
     }
 
     // MARK: - Validity

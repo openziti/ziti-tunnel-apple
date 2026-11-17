@@ -157,11 +157,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             box.alphaValue = 1.0
             
             if tunnelMgr.status != .connected { enableStatePendingIds = [] }
+            let blocked = tunnelMgr.isBlocked(zId)
             if enableStatePendingIds.contains(where: { $0.id == zId.id }) {
                 idEnabledBtn.isEnabled = false
             } else {
-                idEnabledBtn.isEnabled = zId.isEnrolled
+                idEnabledBtn.isEnabled = zId.isEnrolled && !blocked
             }
+            idEnabledBtn.toolTip = blocked ? CABundlePolicy.notAllowedMessage : nil
             idEnabledBtn.state = zId.isEnabled ? .on : .off
             mfaSwitch.isEnabled = zId.isEnabled && (tunnelMgr.status == .connected || tunnelMgr.status == .connecting)
             mfaSwitch.state = zId.isMfaEnabled ? .on : .off
@@ -215,7 +217,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.networkDisplay
             idControllerStatusLabel.stringValue = zId.controllerVersion ?? "" //csStr
-            let enrollStatusStr = zId.enrollmentStatusDisplay
+            let enrollStatusStr = blocked ? CABundlePolicy.blockedStatus : zId.enrollmentStatusDisplay
             idEnrollStatusLabel.stringValue = enrollStatusStr
             if let expDate = zId.expDate {
                 idExpiresAtLabel.stringValue = "(expiration: \(dateToString(expDate))"
