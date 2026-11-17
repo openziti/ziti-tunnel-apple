@@ -122,6 +122,7 @@
 		5ABF986B260C2DED00AA982F /* SnapshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABF986A260C2DED00AA982F /* SnapshotViewController.swift */; };
 		5ADAE97C280F7F66007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFE864527E3C6AA00D47A47 /* libresolv.9.tbd */; };
 		5ADAE97D280F7F6F007D1DF4 /* libresolv.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFE864527E3C6AA00D47A47 /* libresolv.9.tbd */; };
+		5AE3582A30ACE588008D6819 /* UITests/ZitiMobileUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3582930ACE588008D6819 /* UITests/ZitiMobileUITests.swift */; };
 		5AF05FB22884445F006CD604 /* MfaCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF05FB12884445F006CD604 /* MfaCodeViewController.swift */; };
 		5AF05FB42884F692006CD604 /* MfaCodesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF05FB32884F692006CD604 /* MfaCodesViewController.swift */; };
 		5AF0C41424905FBF00CD4DAE /* IPUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AF78688208A8D050093498C /* IPUtils.swift */; };
@@ -190,6 +191,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 5A2EA2DE209B754400437608;
 			remoteInfo = MobilePacketTunnelProvider;
+		};
+		5AE3582430ACE588008D6819 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A02AAAC206EBD7E006261C6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A2EA2C8209B750A00437608;
+			remoteInfo = "Ziti Mobile Edge";
 		};
 		5AF3DCB124B52642005047BC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -321,6 +329,8 @@
 		5ABA5ED92274D2EB00B2221D /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		5ABF9862260C13EF00AA982F /* SnapshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotViewController.swift; sourceTree = "<group>"; };
 		5ABF986A260C2DED00AA982F /* SnapshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotViewController.swift; sourceTree = "<group>"; };
+		5AE3581E30ACE588008D6819 /* ZitiMobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZitiMobileUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AE3582930ACE588008D6819 /* UITests/ZitiMobileUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UITests/ZitiMobileUITests.swift; sourceTree = SOURCE_ROOT; };
 		5AF05FB12884445F006CD604 /* MfaCodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaCodeViewController.swift; sourceTree = "<group>"; };
 		5AF05FB32884F692006CD604 /* MfaCodesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaCodesViewController.swift; sourceTree = "<group>"; };
 		5AF0C419249303EA00CD4DAE /* PacketTunnelProvider-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PacketTunnelProvider-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -419,6 +429,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AE3581B30ACE588008D6819 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AF3DCA624B52642005047BC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -457,6 +474,7 @@
 				5A02AAD8206EBE3C006261C6 /* Frameworks */,
 				AA9471AF2EBB8CCB00305DE8 /* ziti-v2.icon */,
 				69D1F95241BFE281F8BC4E6B /* Tests */,
+				5AE3581F30ACE588008D6819 /* UITests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -469,6 +487,7 @@
 				5A2EA2DF209B754400437608 /* MobilePacketTunnelProvider.appex */,
 				5AF3DCA924B52642005047BC /* MobileShare.appex */,
 				BE4DC486CB7F144C74B5590F /* ZitiTests.xctest */,
+				5AE3581E30ACE588008D6819 /* ZitiMobileUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -617,6 +636,14 @@
 				5A8702D822372F6400314199 /* DateFormatter+timeAgo.swift */,
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		5AE3581F30ACE588008D6819 /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				5AE3582930ACE588008D6819 /* UITests/ZitiMobileUITests.swift */,
+			);
+			name = UITests;
 			sourceTree = "<group>";
 		};
 		5AF3DCAA24B52642005047BC /* MobileShare */ = {
@@ -784,6 +811,24 @@
 			productReference = 5A2EA2DF209B754400437608 /* MobilePacketTunnelProvider.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		5AE3581D30ACE588008D6819 /* ZitiMobileUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AE3582630ACE588008D6819 /* Build configuration list for PBXNativeTarget "ZitiMobileUITests" */;
+			buildPhases = (
+				5AE3581A30ACE588008D6819 /* Sources */,
+				5AE3581B30ACE588008D6819 /* Frameworks */,
+				5AE3581C30ACE588008D6819 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5AE3582530ACE588008D6819 /* PBXTargetDependency */,
+			);
+			name = ZitiMobileUITests;
+			productName = ZitiMobileUITests;
+			productReference = 5AE3581E30ACE588008D6819 /* ZitiMobileUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		5AF3DCA824B52642005047BC /* MobileShare */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5AF3DCB424B52642005047BC /* Build configuration list for PBXNativeTarget "MobileShare" */;
@@ -896,6 +941,10 @@
 							};
 						};
 					};
+					5AE3581D30ACE588008D6819 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 5A2EA2C8209B750A00437608;
+					};
 					5AF3DCA824B52642005047BC = {
 						CreatedOnToolsVersion = 11.5;
 						ProvisioningStyle = Automatic;
@@ -924,6 +973,7 @@
 				5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */,
 				5AF3DCA824B52642005047BC /* MobileShare */,
 				34B2C8BE987D38829A769A31 /* ZitiTests */,
+				5AE3581D30ACE588008D6819 /* ZitiMobileUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -971,6 +1021,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A6BA261226DF2E300224F09 /* Notices.rtf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AE3581C30ACE588008D6819 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1123,6 +1180,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AE3581A30ACE588008D6819 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AE3582A30ACE588008D6819 /* UITests/ZitiMobileUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AF3DCA524B52642005047BC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1175,6 +1240,11 @@
 			isa = PBXTargetDependency;
 			target = 5A2EA2DE209B754400437608 /* MobilePacketTunnelProvider */;
 			targetProxy = 5A2EA2E5209B754500437608 /* PBXContainerItemProxy */;
+		};
+		5AE3582530ACE588008D6819 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A2EA2C8209B750A00437608 /* Ziti Mobile Edge */;
+			targetProxy = 5AE3582430ACE588008D6819 /* PBXContainerItemProxy */;
 		};
 		5AF3DCB224B52642005047BC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1580,6 +1650,39 @@
 			};
 			name = Release;
 		};
+		5AE3582730ACE588008D6819 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_APP_IDENTIFIER).UITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Ziti Mobile Edge";
+			};
+			name = Debug;
+		};
+		5AE3582830ACE588008D6819 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(IOS_APP_IDENTIFIER).UITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Ziti Mobile Edge";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		5AF3DCB524B52642005047BC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
@@ -1708,6 +1811,15 @@
 			buildConfigurations = (
 				5A2EA2E9209B754500437608 /* Debug */,
 				5A2EA2EA209B754500437608 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AE3582630ACE588008D6819 /* Build configuration list for PBXNativeTarget "ZitiMobileUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AE3582730ACE588008D6819 /* Debug */,
+				5AE3582830ACE588008D6819 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
