@@ -65,6 +65,7 @@ class ProviderConfig : NSObject {
     static var PROXY_HOST_KEY = "proxyHost"
     static var PROXY_PORT_KEY = "proxyPort"
     static var LOCKED_KEY = "locked"
+    static var ALLOWED_CAS_KEY = "allowedCAs"
     
     // some defaults in case .mobileconfig not used
     var ipAddress:String = "100.64.0.1"
@@ -165,6 +166,17 @@ class ProviderConfig : NSObject {
     // A locked config (e.g., one installed by a configuration profile) is never modified by the app
     static func isLocked(_ conf:ProviderConfigDict?) -> Bool {
         return boolValue(conf?[LOCKED_KEY]) ?? false
+    }
+
+    // The networks identities may belong to (`allowedCAs`: a list, or one comma-separated string like `dns`). nil means
+    // no restriction. Only a locked config counts, since an unlocked one can be edited or replaced by the app's own.
+    // A value without valid fingerprints allows nothing, so a mistake doesn't lift the restriction.
+    static func caBundlePolicy(_ conf:ProviderConfigDict?) -> CABundlePolicy? {
+        guard isLocked(conf), let value = conf?[ALLOWED_CAS_KEY] else { return nil }
+        if let list = value as? [Any] {
+            return CABundlePolicy(list.map { stringValue($0) ?? "" })
+        }
+        return CABundlePolicy(stringValue(value)?.components(separatedBy: ",") ?? [])
     }
 
     // Settings a screen shows on top of the saved ones, so settings it doesn't show are kept. If the saved
