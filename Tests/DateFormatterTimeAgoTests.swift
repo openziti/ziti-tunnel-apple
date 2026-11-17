@@ -21,6 +21,11 @@ class DateFormatterTimeAgoTests: XCTestCase {
 
     let formatter = DateFormatter()
 
+    /// Calendar days, so a daylight saving change in between doesn't shift the result by an hour
+    private func daysAgo(_ days:Int) -> TimeInterval {
+        return Calendar.current.date(byAdding: .day, value: -days, to: Date())!.timeIntervalSince1970
+    }
+
     // MARK: - Edge cases
 
     func testTimeSince_zeroInterval() {
@@ -75,31 +80,31 @@ class DateFormatterTimeAgoTests: XCTestCase {
     }
 
     func testTimeSince_daysAgo() {
-        let threeDaysAgo = Date().timeIntervalSince1970 - (3 * 24 * 60 * 60)
+        let threeDaysAgo = daysAgo(3)
         XCTAssertEqual(formatter.timeSince(threeDaysAgo), "3 days ago")
     }
 
     // MARK: - Weeks
 
     func testTimeSince_lastWeek() {
-        let eightDaysAgo = Date().timeIntervalSince1970 - (8 * 24 * 60 * 60)
+        let eightDaysAgo = daysAgo(8)
         XCTAssertEqual(formatter.timeSince(eightDaysAgo), "last week")
     }
 
     func testTimeSince_weeksAgo() {
-        let threeWeeksAgo = Date().timeIntervalSince1970 - (21 * 24 * 60 * 60)
+        let threeWeeksAgo = daysAgo(21)
         XCTAssertEqual(formatter.timeSince(threeWeeksAgo), "3 weeks ago")
     }
 
     // MARK: - Months
 
     func testTimeSince_lastMonth() {
-        let fiveWeeksAgo = Date().timeIntervalSince1970 - (35 * 24 * 60 * 60)
+        let fiveWeeksAgo = daysAgo(35)
         XCTAssertEqual(formatter.timeSince(fiveWeeksAgo), "last month")
     }
 
     func testTimeSince_monthsAgo() {
-        let threeMonthsAgo = Date().timeIntervalSince1970 - (90 * 24 * 60 * 60)
+        let threeMonthsAgo = daysAgo(90)
         let result = formatter.timeSince(threeMonthsAgo)
         // Could be 2 or 3 months depending on calendar month lengths
         XCTAssertTrue(result.hasSuffix("months ago"), "Expected 'N months ago' but got '\(result)'")
@@ -108,12 +113,12 @@ class DateFormatterTimeAgoTests: XCTestCase {
     // MARK: - Years
 
     func testTimeSince_lastYear() {
-        let fourteenMonthsAgo = Date().timeIntervalSince1970 - (400 * 24 * 60 * 60)
+        let fourteenMonthsAgo = daysAgo(400)
         XCTAssertEqual(formatter.timeSince(fourteenMonthsAgo), "last year")
     }
 
     func testTimeSince_yearsAgo() {
-        let threeYearsAgo = Date().timeIntervalSince1970 - (3 * 365 * 24 * 60 * 60)
+        let threeYearsAgo = daysAgo(3 * 365)
         let result = formatter.timeSince(threeYearsAgo)
         XCTAssertTrue(result.hasSuffix("years ago"), "Expected 'N years ago' but got '\(result)'")
     }
