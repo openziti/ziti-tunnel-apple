@@ -92,6 +92,32 @@ final class StatusSummaryTests: XCTestCase {
             """))
     }
 
+    func testAllowedCAs() {
+        let rootA = CABundlePolicy.certificates(CAFixtures.rootA)!.first!
+        let rootB = CABundlePolicy.certificates(CAFixtures.rootB)!.first!
+        let config:ProviderConfigDict = [ProviderConfig.LOCKED_KEY: true,
+                                         ProviderConfig.ALLOWED_CAS_KEY: [CABundlePolicy.fingerprint(rootA)]]
+        let allowed = makeIdentity(id: "a", ztAPI: "https://a.example.com", name: "a", enrolled: true, enabled: true)
+        allowed.czid?.ca = CAFixtures.rootA
+        let blocked = makeIdentity(id: "b", ztAPI: "https://b.example.com", name: "b", enrolled: true, enabled: true)
+        blocked.czid?.ca = CAFixtures.rootB
+
+        let text = StatusSummary.text(version: "v", status: .connected, config: config, managedConfig: nil, zids: [allowed, blocked])
+        XCTAssertTrue(text.contains("  allowedCAs: \(CABundlePolicy.fingerprint(rootA))\n"))
+        XCTAssertTrue(text.contains("Allowed CAs: 1\nIdentities: 2"))
+        XCTAssertTrue(text.contains("  CA: Example A Root CA \(CABundlePolicy.displayFingerprint(rootA))\n\nIdentity: b"))
+        XCTAssertTrue(text.contains("""
+              CA: Example B Root CA \(CABundlePolicy.displayFingerprint(rootB))
+              Blocked: CA \(CABundlePolicy.displayFingerprint(rootB)) isn't allowed
+            """))
+
+        var unlocked = config
+        unlocked[ProviderConfig.LOCKED_KEY] = false
+        let ignored = StatusSummary.text(version: "v", status: .connected, config: unlocked, managedConfig: nil, zids: [blocked])
+        XCTAssertTrue(ignored.contains("Allowed CAs: ignored, the tunnel settings aren't locked"))
+        XCTAssertFalse(ignored.contains("Blocked:"))
+    }
+
     func testInvalidSettingsListedAsStored() {
         let config:ProviderConfigDict = ["mtu": "abc", "locked": "yes"]
         let text = StatusSummary.text(version: "v", status: .invalid, config: config, managedConfig: nil, zids: [])
