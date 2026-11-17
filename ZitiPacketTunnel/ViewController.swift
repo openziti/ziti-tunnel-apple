@@ -43,6 +43,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     @IBOutlet weak var mfaCodesBtn: NSButton!
     @IBOutlet weak var mfaNewCodesBtn: NSButton!
     @IBOutlet weak var extAuthNowBtn: NSButton!
+    @IBOutlet weak var addIdentityBtn: NSButton!
+    @IBOutlet weak var removeIdentityBtn: NSButton!
     
     static var providerBundleIdentifier:String {
         guard let bid = Bundle.main.object(forInfoDictionaryKey: "MAC_EXT_IDENTIFIER") else {
@@ -62,6 +64,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     var enrollingIds:[ZitiIdentity] = []
     var enableStatePendingIds:[ZitiIdentity] = []
     private var hasShownWelcome = false
+    private(set) var managedConfig:ManagedConfig?
     
     let notificationsPanel = NotificationsPanel()
     
@@ -137,6 +140,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     func updateServiceUI(zId:ZitiIdentity?=nil) {
+        updateIdentityButtons(zId)
                         
         if let zId = zId {
             let cs = zId.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
@@ -292,6 +296,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         // pick up tunnel configs added or removed while we were in the background (e.g., by a profile)
         NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.loadTunnelConfig(createIfMissing: false)
+            self?.applyManagedConfig()
         }
         
         // Load previous identities
@@ -304,6 +309,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         tableView.reloadData()
         representedObject = 0
         tableView.selectRowIndexes([0], byExtendingSelection: false)
+        
+        applyManagedConfig()
+        NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.applyManagedConfig()
+        }
         
         // listen for newOrChanged
         NotificationCenter.default.addObserver(forName: .onNewOrChangedId, object: nil, queue: OperationQueue.main) { [self] notification in
@@ -705,7 +715,40 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    /// Adds identities for the organization's networks, waiting for the user to enroll them, and applies its restrictions
+    func applyManagedConfig() {
+        let config = ManagedConfig.current()
+        guard config != managedConfig else { return }
+        managedConfig = config
+        zLog.info("Managed configuration: \(config?.description ?? "none")")
+        
+        if let config = config, zids.insertManaged(config, zidStore) > 0 {
+            tableView.reloadData()
+            representedObject = 0
+            tableView.selectRowIndexes([0], byExtendingSelection: false)
+        } else if let indx = representedObject as? Int, indx < zids.count {
+            updateIdentityButtons(zids[indx])
+        } else {
+            updateIdentityButtons(nil)
+        }
+    }
+    
+    private func updateIdentityButtons(_ zid:ZitiIdentity?) {
+        let canAdd = !(managedConfig?.disableAddIdentity ?? false)
+        addIdentityBtn.isEnabled = canAdd
+        addIdentityBtn.toolTip = canAdd ? nil : SharedRestrictions.addDisabledMessage
+        
+        let canRemove = zid.map { managedConfig?.canRemove($0) ?? true } ?? true
+        removeIdentityBtn.isEnabled = canRemove
+        removeIdentityBtn.toolTip = canRemove ? nil : ManagedConfig.removeDisabledMessage
+    }
+    
     func onEnrollmentLink(_ link:EnrollmentLink) {
+        if managedConfig?.disableAddIdentity ?? false {
+            zLog.info("Not adding identity for \(link.controllerName): turned off by managed configuration")
+            dialogAlert("Unable to add identity", SharedRestrictions.addDisabledMessage)
+            return
+        }
         // one enrollment at a time, so its dialogs aren't mixed up with the link's
         if let zid = enrollingIds.first {
             dialogAlert("Unable to add identity", "\(zid.name) is still enrolling. Open the link again when it finishes.")
@@ -1099,7 +1142,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
 
     @IBAction func onEnrollButton(_ sender: Any) {
-        enroll()
+        guard let indx = representedObject as? Int else { return }
+        enroll(managedConfig?.hint(for: zids[indx]) ?? Enrollment.Hint())
     }
 
     func enroll(_ hint:Enrollment.Hint = Enrollment.Hint()) {

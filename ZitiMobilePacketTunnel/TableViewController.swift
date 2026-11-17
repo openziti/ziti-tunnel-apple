@@ -96,6 +96,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     weak var ivc:IdentityViewController?
     var enrollingIds:[ZitiIdentity] = []
+    private(set) var managedConfig:ManagedConfig?
     let sc = ScannerViewController()
     private var hasShownWelcome = false
     private var gatheringFeedback = false
@@ -139,6 +140,10 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         // pick up tunnel configs added or removed while we were in the background (e.g., by a profile)
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.loadTunnelConfig(createIfMissing: false)
+            self?.applyManagedConfig()
+        }
+        NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.applyManagedConfig()
         }
         
         // Load previous identities
@@ -149,6 +154,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         self.zids = loadedZids ?? []
         
         tableView.reloadData()
+        applyManagedConfig()
         
         // listen for newOrChanged
         NotificationCenter.default.addObserver(forName: .onNewOrChangedId, object: nil, queue: OperationQueue.main) { [self] notification in
@@ -263,7 +269,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 1 {
-            nRows = zids.count + 1
+            nRows = zids.count + (managedConfig?.disableAddIdentity ?? false ? 0 : 1)
         } else if section == 2 {
             nRows = 5
         }
@@ -522,8 +528,39 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         }
     }
 
+    /// Adds identities for the organization's networks, waiting for the user to enroll them, and applies its restrictions
+    func applyManagedConfig() {
+        let config = ManagedConfig.current()
+        // saved every time, so the share extension never sees a restriction that's since been lifted
+        if let url = SharedRestrictions.url {
+            SharedRestrictions.save(addIdentityDisabled: config?.disableAddIdentity ?? false, to: url)
+        }
+        guard config != managedConfig else { return }
+        managedConfig = config
+        zLog.info("Managed configuration: \(config?.description ?? "none")")
+        
+        if let config = config {
+            _ = zids.insertManaged(config, zidStore)
+        }
+        tableView.reloadData()
+        ivc?.tableView.reloadData()
+    }
+    
     /// `tempDir` holds a temporary copy of the file, removed once it's been read
     func onNewUrl(_ url:URL, tempDir:URL? = nil) {
+        if managedConfig?.disableAddIdentity ?? false {
+            zLog.info("Not adding identity: turned off by managed configuration")
+            if let tempDir = tempDir {
+                try? FileManager.default.removeItem(at: tempDir)
+            }
+            let alert = UIAlertController(
+                title:"Unable to add identity",
+                message: SharedRestrictions.addDisabledMessage,
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+            linkPresenter.present(alert, animated: true, completion: nil)
+            return
+        }
         if url.scheme?.lowercased() == EnrollmentLink.scheme {
             guard let link = EnrollmentLink(url) else {
                 zLog.warn("Ignoring unsupported link: \(EnrollmentLink.redacted(url))")

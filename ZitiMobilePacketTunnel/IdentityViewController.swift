@@ -37,7 +37,8 @@ class ForgetIdentityCell: UITableViewCell {
 class EnrollIdentityCell: UITableViewCell {
     weak var ivc:IdentityViewController?
     @IBAction func onButton(_ sender: Any) {
-        ivc?.onEnroll()
+        let hint = ivc?.zid.flatMap { ivc?.tvc?.managedConfig?.hint(for: $0) }
+        ivc?.onEnroll(hint ?? Enrollment.Hint())
     }
 }
 
@@ -734,6 +735,11 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             }
         } else if section == 2 {
             nRows = 5
+        } else if section == 4 {
+            // forget
+            if let zid = zid, !(tvc?.managedConfig?.canRemove(zid) ?? true) {
+                nRows = 0
+            }
         } else if section == 3 {
             if zid?.isEnrolled ?? false {
                 nRows = zid?.services.count ?? 0

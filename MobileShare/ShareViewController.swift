@@ -52,6 +52,14 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let alertTitle = "Unable to import to Ziti"
         self.fileLabel.text = ""
         
+        if let url = SharedRestrictions.url, SharedRestrictions.isAddIdentityDisabled(at: url) {
+            zLog.info("Not importing: adding identities turned off by managed configuration")
+            showAlert(alertTitle, SharedRestrictions.addDisabledMessage) { _ in
+                self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+            }
+            return
+        }
+        
         let attachments = (self.extensionContext?.inputItems.first as? NSExtensionItem)?.attachments ?? []
         if let provider = attachments.first {
             // Check if the content type is the same as we expected

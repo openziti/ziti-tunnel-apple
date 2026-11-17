@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadDisplayName</key>
+	<string>Ziti App Configuration</string>
+	<key>PayloadIdentifier</key>
+	<string>com.example.ziti.macos.appconfig</string>
+	<key>PayloadScope</key>
+	<string>User</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>6F628F39-28DE-4964-AC6D-06038BEAF4A7</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>Ziti App Configuration</string>
+			<key>PayloadIdentifier</key>
+			<string>com.example.ziti.macos.appconfig.prefs</string>
+			<key>PayloadType</key>
+			<string>com.apple.ManagedClient.preferences</string>
+			<key>PayloadUUID</key>
+			<string>75E58966-E81B-4DD3-8F7B-91A51D6F7250</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>PayloadContent</key>
+			<dict>
+				<key>io.netfoundry.ZitiPacketTunnel</key>
+				<dict>
+					<key>Forced</key>
+					<array>
+						<dict>
+							<key>mcx_preference_settings</key>
+							<dict>
+								<key>networks</key>
+								<array>
+									<dict>
+										<key>controller</key>
+										<string>https://ctrl.example.com:443</string>
+										<key>provider</key>
+										<string>example-idp</string>
+										<key>type</key>
+										<string>cert</string>
+									</dict>
+								</array>
+								<key>disableAddIdentity</key>
+								<true/>
+								<key>disableRemoveIdentity</key>
+								<true/>
+							</dict>
+						</dict>
+					</array>
+				</dict>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>

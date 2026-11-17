@@ -81,6 +81,17 @@ final class StatusSummaryTests: XCTestCase {
         XCTAssertTrue(text.contains("  MFA: Verified\n"))
     }
 
+    func testManagedConfig() {
+        let managed = ManagedConfig([ManagedConfig.NETWORKS_KEY: [["controller": "https://ctrl.example.com"]],
+                                     ManagedConfig.DISABLE_ADD_IDENTITY_KEY: true])
+        let text = StatusSummary.text(version: "v", status: .connected, config: nil, managedConfig: managed, zids: [])
+        XCTAssertTrue(text.contains("""
+            Tunnel settings: None saved
+            Managed configuration: 1 network, adding identities turned off
+            Identities: 0
+            """))
+    }
+
     func testInvalidSettingsListedAsStored() {
         let config:ProviderConfigDict = ["mtu": "abc", "locked": "yes"]
         let text = StatusSummary.text(version: "v", status: .invalid, config: config, zids: [])

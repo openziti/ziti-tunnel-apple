@@ -25,6 +25,8 @@ IOS_SHARE_IDENTIFIER = ...mobile.share
 ## Configuration Profiles
 The tunnel configuration can be installed with a configuration profile. See [docs/configuration-profiles.md](docs/configuration-profiles.md).
 
+An organization's device management can also add networks to the app and restrict adding or removing identities. See [docs/managed-app-config.md](docs/managed-app-config.md).
+
 ## Getting Help
 Please use these community resources for getting help.
 - Read the [docs](https://docs.openziti.io/docs/learn/introduction/)

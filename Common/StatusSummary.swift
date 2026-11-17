@@ -40,7 +40,7 @@ class StatusSummary {
     }
 
     /// `config` is the saved tunnel configuration, listed as stored (invalid values included)
-    static func text(version:String, status:NEVPNStatus, config:ProviderConfigDict?, zids:[ZitiIdentity]) -> String {
+    static func text(version:String, status:NEVPNStatus, config:ProviderConfigDict?, managedConfig:ManagedConfig? = nil, zids:[ZitiIdentity]) -> String {
         var lines = [
             "======= Status ==========",
             version,
@@ -50,6 +50,9 @@ class StatusSummary {
             lines += config.keys.sorted().map { "  \($0): \(valueDescription(config[$0]!))" }
         } else {
             lines.append("Tunnel settings: None saved")
+        }
+        if let managedConfig = managedConfig {
+            lines.append("Managed configuration: \(managedConfig.description)")
         }
         lines.append("Identities: \(zids.count)")
         for zid in zids {
@@ -77,7 +80,8 @@ class StatusSummary {
     static func snapshot(_ completion:@escaping (String) -> Void) {
         let tunnelMgr = TunnelMgr.shared
         let config = (tunnelMgr.tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration
-        let summary = text(version: Version.verboseStr, status: tunnelMgr.status, config: config, zids: tunnelMgr.zids)
+        let summary = text(version: Version.verboseStr, status: tunnelMgr.status, config: config,
+                           managedConfig: ManagedConfig.current(), zids: tunnelMgr.zids)
         guard canDump(tunnelMgr.status) else {
             DispatchQueue.main.async { completion(summary + "\nNo connection data available\n") }
             return

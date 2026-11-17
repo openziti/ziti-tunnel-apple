@@ -796,6 +796,7 @@ Gw
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="addIdentityBtn" destination="tHd-b1-js8" id="Aid-Bt-n01"/>
                         <outlet property="box" destination="Cv8-fk-doz" id="bSi-Yt-in1"/>
                         <outlet property="buttonsView" destination="7t0-mW-Nxn" id="1qr-BY-ifG"/>
                         <outlet property="connectButton" destination="yhe-Hc-OL2" id="w0f-1v-uce"/>
@@ -816,6 +817,7 @@ Gw
                         <outlet property="mfaLockImageView" destination="FTl-qP-2Nj" id="qH2-tk-8tD"/>
                         <outlet property="mfaNewCodesBtn" destination="OYu-ET-6Q0" id="Wy4-uh-Nle"/>
                         <outlet property="mfaSwitch" destination="RYQ-9S-sLU" id="mOj-bJ-pcO"/>
+                        <outlet property="removeIdentityBtn" destination="Sgt-3Q-HVK" id="Rid-Bt-n02"/>
                         <outlet property="tableView" destination="Gny-TY-peg" id="4em-sl-JaC"/>
                     </connections>
                 </viewController>

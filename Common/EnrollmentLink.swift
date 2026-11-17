@@ -34,27 +34,31 @@ struct EnrollmentLink : Equatable {
         guard url.scheme?.lowercased() == EnrollmentLink.scheme, url.host?.lowercased() == "enroll",
               let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems else { return nil }
         let value = { (name:String) in items.first { $0.name == name }?.value }
+        self.init(controller: value("controller"), jwt: value("jwt"), provider: value("provider"), type: value("type"))
+    }
 
-        switch (value("controller"), value("jwt")) {
+    /// The link's fields, validated the same way wherever they come from (e.g., managed app configuration)
+    init?(controller:String?, jwt:String?, provider:String?, type:String?) {
+        switch (controller, jwt) {
         case (let ctrl?, nil):
             guard let ctrlUrl = EnrollmentLink.controllerURL(ctrl) else { return nil }
             source = .controller(ctrlUrl)
-            controller = ctrlUrl
+            self.controller = ctrlUrl
         case (nil, let jwt?):
             guard let claims = EnrollmentLink.claims(jwt), claims["em"] as? String == "network",
                   let iss = claims["iss"] as? String, let ctrlUrl = EnrollmentLink.controllerURL(iss) else { return nil }
             source = .jwt(jwt)
-            controller = ctrlUrl
+            self.controller = ctrlUrl
         default:
             return nil
         }
 
         var enrollTo:ZitiIdentity.EnrollTo?
-        if let type = value("type") {
+        if let type = type {
             guard type == "cert" || type == "token" else { return nil }
             enrollTo = ZitiIdentity.EnrollTo(rawValue: type)
         }
-        hint = Enrollment.Hint(provider: value("provider"), enrollTo: enrollTo)
+        hint = Enrollment.Hint(provider: provider, enrollTo: enrollTo)
     }
 
     /// Host, plus the port when given, to show the user before enrolling
