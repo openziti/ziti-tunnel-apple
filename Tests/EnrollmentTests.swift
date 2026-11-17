@@ -52,6 +52,10 @@ private class FakeSDK : EnrollmentSDK {
             cb(result.0, result.1)
         }
     }
+
+    func discard(_ czid:CZiti.ZitiIdentity) {
+        calls.append("discard \(czid.id)")
+    }
 }
 
 private class FakeUI : EnrollmentUI {
@@ -99,10 +103,11 @@ final class EnrollmentTests: XCTestCase {
     private let noJwt = "/nonexistent/id.jwt"
     private let both = [Enrollment.Provider(name: "both", canCert: true, canToken: true)]
 
-    private func run(_ zid:ZitiIdentity, jwtFile:String? = nil, hint:Enrollment.Hint = Enrollment.Hint()) -> Enrollment.Result {
+    private func run(_ zid:ZitiIdentity, jwtFile:String? = nil, hint:Enrollment.Hint = Enrollment.Hint(),
+                     policy:CABundlePolicy? = nil) -> Enrollment.Result {
         let done = expectation(description: "enrollment completes")
         var result:Enrollment.Result?
-        Enrollment(zid, ui: ui, sdk: sdk, hint: hint).start(jwtFile: jwtFile ?? noJwt) { r in
+        Enrollment(zid, ui: ui, sdk: sdk, hint: hint, policy: policy).start(jwtFile: jwtFile ?? noJwt) { r in
             XCTAssertNil(result, "completed more than once")
             result = r
             done.fulfill()
@@ -370,5 +375,34 @@ final class EnrollmentTests: XCTestCase {
         XCTAssertEqual(describe(run(zid)), "enrolled real-id none")
         XCTAssertFalse(zid.isMfaEnabled)
         XCTAssertNil(zid.lastMfaAuth)
+    }
+
+    // MARK: - Allowed CAs
+
+    private var allowRootA:CABundlePolicy {
+        return CABundlePolicy([CABundlePolicy.fingerprint(CABundlePolicy.certificates(CAFixtures.rootA)!.first!)])
+    }
+
+    /// One-time token enrollment whose identity comes back with `ca`
+    private func runOtt(ca:String?) throws -> Enrollment.Result {
+        let jwtFile = NSTemporaryDirectory() + UUID().uuidString + ".jwt"
+        try "jwt".write(toFile: jwtFile, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(atPath: jwtFile) }
+
+        let resp = CZiti.ZitiIdentity(id: "real-id", ztAPIs: ["https://ctrl"])
+        resp.ca = ca
+        sdk.result = (resp, nil)
+        return run(makeIdentity(claims: ["sub": "s", "iss": "i", "em": "ott"]), jwtFile: jwtFile, policy: allowRootA)
+    }
+
+    func testAllowedNetworkEnrolls() throws {
+        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.interA + "\n" + CAFixtures.rootA)), "enrolled real-id none")
+        XCTAssertFalse(sdk.calls.contains("discard real-id"))
+    }
+
+    func testOtherNetworkDiscarded() throws {
+        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootB)), "failed \(CABundlePolicy.notAllowedMessage)")
+        XCTAssertTrue(sdk.calls.contains("discard real-id"))
+        XCTAssertEqual(describe(try runOtt(ca: nil)), "failed \(CABundlePolicy.notAllowedMessage)")
     }
 }

@@ -45,6 +45,8 @@ protocol EnrollmentSDK {
     func enroll(_ source:Enrollment.Source, to enrollTo:ZitiIdentity.EnrollTo, provider:String,
                 onAuth:@escaping (String) -> Void, onMfaSetup:@escaping MfaSetupCallback, onMfaCode:@escaping MfaCodeCallback,
                 _ cb:@escaping Callback)
+    /// Removes what enrollment stored for an identity that won't be used (its key and certificate)
+    func discard(_ czid:CZiti.ZitiIdentity)
 }
 
 /// Enrolls one identity, shared by macOS and iOS
@@ -94,16 +96,19 @@ class Enrollment {
     private let ui:EnrollmentUI
     private let sdk:EnrollmentSDK
     private let hint:Hint
+    private let policy:CABundlePolicy?
     private var completion:((Result) -> Void)?
     private var mfaEnabled = false
     private var lastMfaAuth:Date?
     private var provider:String?
 
-    init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK(), hint:Hint = Hint()) {
+    /// With a `policy`, an identity whose network it doesn't allow is discarded and the enrollment fails
+    init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK(), hint:Hint = Hint(), policy:CABundlePolicy? = nil) {
         self.zid = zid
         self.ui = ui
         self.sdk = sdk
         self.hint = hint
+        self.policy = policy
     }
 
     /// Completes once, on the main queue. `jwtFile` is where the identity's JWT is kept, if it has one
@@ -271,6 +276,12 @@ class Enrollment {
 
     /// MFA set up or used during enrollment, and the provider chosen, are applied once it succeeds
     private func finish(_ result:Result) {
+        var result = result
+        if case .enrolled(let zidResp, _) = result, let policy = policy, case .blocked(let reason) = policy.check(zidResp.ca) {
+            zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
+            sdk.discard(zidResp)
+            result = .failed(CABundlePolicy.notAllowedMessage)
+        }
         if case .enrolled = result {
             zid.enrollProvider = provider
             if mfaEnabled {
@@ -330,6 +341,10 @@ struct ZitiEnrollmentSDK : EnrollmentSDK {
             Ziti.enrollToToken(controllerURL: url, provider: provider, onAuth: onAuth,
                                onMfaEnrollRequired: onMfaEnrollRequired, onMfaCodeRequired: onMfaCodeRequired, callback(cb))
         }
+    }
+
+    func discard(_ czid:CZiti.ZitiIdentity) {
+        Ziti(withId: czid).forget()
     }
 
     private func callback(_ cb:@escaping Callback) -> Ziti.EnrollmentCallback {

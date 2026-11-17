@@ -34,75 +34,75 @@ final class CABundlePolicyTests: XCTestCase {
     // MARK: - Fingerprints
 
     func testFingerprintFormats() {
-        let hex = CABundlePolicy.fingerprint(cert(Fixtures.rootA))
-        let display = CABundlePolicy.displayFingerprint(cert(Fixtures.rootA))
+        let hex = CABundlePolicy.fingerprint(cert(CAFixtures.rootA))
+        let display = CABundlePolicy.displayFingerprint(cert(CAFixtures.rootA))
         XCTAssertEqual(display, "15:71:F3:C0:A1:A7:AB:7F:1C:C0:41:A2:BE:4C:20:66:32:4F:28:A6:6D:1E:03:02:B5:89:A8:53:A1:99:BC:40")
         XCTAssertEqual(CABundlePolicy([display]).fingerprints, [hex])
         XCTAssertEqual(CABundlePolicy([hex.uppercased(), " \(hex)\n"]).fingerprints, [hex])
     }
 
     func testInvalidFingerprintsSkipped() {
-        let hex = CABundlePolicy.fingerprint(cert(Fixtures.rootA))
+        let hex = CABundlePolicy.fingerprint(cert(CAFixtures.rootA))
         let policy = CABundlePolicy(["", "abc", String(hex.dropLast()), String(hex.dropLast()) + "g", hex])
         XCTAssertEqual(policy.fingerprints, [hex])
     }
 
     func testNoFingerprintsAllowsNothing() {
-        XCTAssertNotEqual(CABundlePolicy([]).check(Fixtures.rootA), .allowed)
-        XCTAssertNotEqual(CABundlePolicy(["abc"]).check(Fixtures.rootA), .allowed)
+        XCTAssertNotEqual(CABundlePolicy([]).check(CAFixtures.rootA), .allowed)
+        XCTAssertNotEqual(CABundlePolicy(["abc"]).check(CAFixtures.rootA), .allowed)
     }
 
     // MARK: - Bundles
 
     func testAllowedRoot() {
-        XCTAssertEqual(policy(Fixtures.rootA).check(Fixtures.rootA), .allowed)
+        XCTAssertEqual(policy(CAFixtures.rootA).check(CAFixtures.rootA), .allowed)
     }
 
     func testChainsToAllowedRoot() {
-        let p = policy(Fixtures.rootA)
-        XCTAssertEqual(p.check(bundle(Fixtures.interA, Fixtures.rootA)), .allowed)
-        XCTAssertEqual(p.check(bundle(Fixtures.interA2, Fixtures.interA, Fixtures.rootA)), .allowed)
-        XCTAssertEqual(p.check(bundle(Fixtures.rootA, Fixtures.interA2, Fixtures.interA)), .allowed)
+        let p = policy(CAFixtures.rootA)
+        XCTAssertEqual(p.check(bundle(CAFixtures.interA, CAFixtures.rootA)), .allowed)
+        XCTAssertEqual(p.check(bundle(CAFixtures.interA2, CAFixtures.interA, CAFixtures.rootA)), .allowed)
+        XCTAssertEqual(p.check(bundle(CAFixtures.rootA, CAFixtures.interA2, CAFixtures.interA)), .allowed)
     }
 
     func testAllowedIntermediateOnly() {
         // partial chains: an allowed intermediate is enough on its own
-        XCTAssertEqual(policy(Fixtures.interA).check(Fixtures.interA), .allowed)
-        XCTAssertEqual(policy(Fixtures.interA).check(bundle(Fixtures.interA2, Fixtures.interA)), .allowed)
+        XCTAssertEqual(policy(CAFixtures.interA).check(CAFixtures.interA), .allowed)
+        XCTAssertEqual(policy(CAFixtures.interA).check(bundle(CAFixtures.interA2, CAFixtures.interA)), .allowed)
     }
 
     func testRootAboveAllowedIntermediateBlocked() {
         // the root is an anchor too, and it trusts more than the intermediate does
-        XCTAssertNotEqual(policy(Fixtures.interA).check(bundle(Fixtures.interA, Fixtures.rootA)), .allowed)
+        XCTAssertNotEqual(policy(CAFixtures.interA).check(bundle(CAFixtures.interA, CAFixtures.rootA)), .allowed)
     }
 
     func testOtherNetworkBlocked() {
-        let rootB = CABundlePolicy.displayFingerprint(cert(Fixtures.rootB))
-        XCTAssertEqual(policy(Fixtures.rootA).check(bundle(Fixtures.rootA, Fixtures.rootB)), .blocked("CA \(rootB) isn't allowed"))
-        XCTAssertNotEqual(policy(Fixtures.rootA).check(Fixtures.rootB), .allowed)
-        XCTAssertEqual(policy(Fixtures.rootA, Fixtures.rootB).check(bundle(Fixtures.rootA, Fixtures.rootB)), .allowed)
+        let rootB = CABundlePolicy.displayFingerprint(cert(CAFixtures.rootB))
+        XCTAssertEqual(policy(CAFixtures.rootA).check(bundle(CAFixtures.rootA, CAFixtures.rootB)), .blocked("CA \(rootB) isn't allowed"))
+        XCTAssertNotEqual(policy(CAFixtures.rootA).check(CAFixtures.rootB), .allowed)
+        XCTAssertEqual(policy(CAFixtures.rootA, CAFixtures.rootB).check(bundle(CAFixtures.rootA, CAFixtures.rootB)), .allowed)
     }
 
     func testImpostorIssuerBlocked() {
-        XCTAssertNotEqual(policy(Fixtures.rootA).check(bundle(Fixtures.rootA, Fixtures.impostorInter)), .allowed)
+        XCTAssertNotEqual(policy(CAFixtures.rootA).check(bundle(CAFixtures.rootA, CAFixtures.impostorInter)), .allowed)
     }
 
     func testValidityDatesDontMatter() {
-        XCTAssertEqual(policy(Fixtures.rootA).check(bundle(Fixtures.rootA, Fixtures.expiredA, Fixtures.futureA)), .allowed)
-        XCTAssertEqual(policy(Fixtures.expiredA).check(Fixtures.expiredA), .allowed)
+        XCTAssertEqual(policy(CAFixtures.rootA).check(bundle(CAFixtures.rootA, CAFixtures.expiredA, CAFixtures.futureA)), .allowed)
+        XCTAssertEqual(policy(CAFixtures.expiredA).check(CAFixtures.expiredA), .allowed)
     }
 
     func testEmptyOrUnreadableBundleBlocked() {
-        let p = policy(Fixtures.rootA)
+        let p = policy(CAFixtures.rootA)
         XCTAssertEqual(p.check(nil), .blocked("no CA bundle"))
         XCTAssertEqual(p.check(""), .blocked("no CA bundle"))
         XCTAssertEqual(p.check("not a bundle"), .blocked("no CA bundle"))
         XCTAssertEqual(p.check("-----BEGIN CERTIFICATE-----\n!!!\n-----END CERTIFICATE-----"), .blocked("CA bundle can't be read"))
-        XCTAssertEqual(p.check(bundle(Fixtures.rootA, "-----BEGIN CERTIFICATE-----\nMIIB")), .blocked("CA bundle can't be read"))
+        XCTAssertEqual(p.check(bundle(CAFixtures.rootA, "-----BEGIN CERTIFICATE-----\nMIIB")), .blocked("CA bundle can't be read"))
     }
 
     func testPemPrefix() {
-        XCTAssertEqual(policy(Fixtures.rootA).check("pem:" + Fixtures.rootA), .allowed)
+        XCTAssertEqual(policy(CAFixtures.rootA).check("pem:" + CAFixtures.rootA), .allowed)
     }
 
     // MARK: - Validity
@@ -113,20 +113,20 @@ final class CABundlePolicyTests: XCTestCase {
             c.timeZone = TimeZone(identifier: "UTC")
             return Calendar(identifier: .gregorian).date(from: c)!
         }
-        let expired = CABundlePolicy.validity(cert(Fixtures.expiredA))
+        let expired = CABundlePolicy.validity(cert(CAFixtures.expiredA))
         XCTAssertEqual(expired?.0, utc(2020, 1, 1))
         XCTAssertEqual(expired?.1, utc(2021, 1, 1))
 
         // GeneralizedTime from 2050 on
-        let root = CABundlePolicy.validity(cert(Fixtures.rootA))
+        let root = CABundlePolicy.validity(cert(CAFixtures.rootA))
         XCTAssertEqual(root?.0, utc(2019, 1, 1))
         XCTAssertEqual(root?.1, utc(2099, 12, 31))
-        XCTAssertEqual(CABundlePolicy.validity(cert(Fixtures.futureA))?.0, utc(2090, 1, 1))
+        XCTAssertEqual(CABundlePolicy.validity(cert(CAFixtures.futureA))?.0, utc(2090, 1, 1))
     }
 }
 
 /// EC P-256 CAs made with OpenSSL for these tests
-private enum Fixtures {
+enum CAFixtures {
     /// Network A root (self-signed), 2019-2099
     static let rootA = """
 -----BEGIN CERTIFICATE-----

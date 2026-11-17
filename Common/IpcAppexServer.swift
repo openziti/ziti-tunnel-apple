@@ -122,7 +122,7 @@ class IpcAppexServer : NSObject {
 
         ziti.perform {
             if enabled, self.ptp.zitiTunnelDelegate?.blockedIds.contains(ziti.id.id) ?? false {
-                let errStr = "This network isn't allowed by your organization."
+                let errStr = CABundlePolicy.notAllowedMessage
                 zLog.warn("Not enabling \(ziti.id.name ?? ""):\(ziti.id.id): \(errStr)")
                 completionHandler?(self.errData(errStr))
                 return

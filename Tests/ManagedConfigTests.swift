@@ -298,4 +298,26 @@ final class ManagedConfigTests: XCTestCase {
         try! PropertyListSerialization.data(fromPropertyList: ["disableAddIdentity": "true"], format: .xml, options: 0).write(to: url)
         XCTAssertFalse(SharedRestrictions.isAddIdentityDisabled(at: url))
     }
+
+    func testSharedRestrictionsKeepEachOther() {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("restrictions-\(UUID().uuidString).plist")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let policy = CABundlePolicy([String(repeating: "ab", count: 32)])
+
+        XCTAssertNil(SharedRestrictions.caBundlePolicy(at: url))
+        SharedRestrictions.save(caBundlePolicy: policy, to: url)
+        SharedRestrictions.save(addIdentityDisabled: true, to: url)
+        XCTAssertEqual(SharedRestrictions.caBundlePolicy(at: url), policy)
+        XCTAssertTrue(SharedRestrictions.isAddIdentityDisabled(at: url))
+
+        // a policy without fingerprints still restricts
+        SharedRestrictions.save(caBundlePolicy: CABundlePolicy([]), to: url)
+        XCTAssertEqual(SharedRestrictions.caBundlePolicy(at: url)?.fingerprints, [])
+
+        SharedRestrictions.save(addIdentityDisabled: false, to: url)
+        XCTAssertNotNil(SharedRestrictions.caBundlePolicy(at: url))
+        SharedRestrictions.save(caBundlePolicy: nil, to: url)
+        XCTAssertNil(SharedRestrictions.caBundlePolicy(at: url))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+    }
 }

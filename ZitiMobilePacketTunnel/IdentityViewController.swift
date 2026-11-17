@@ -505,7 +505,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         tvc?.enrollingIds.append(zid)
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory: false).path
-        Enrollment(zid, ui: self, hint: hint).start(jwtFile: jwtFile) { result in
+        Enrollment(zid, ui: self, hint: hint, policy: tvc?.tunnelMgr.caBundlePolicy).start(jwtFile: jwtFile) { result in
             self.hideSpinner()
             self.tvc?.enrollingIds.removeAll { $0 === zid }
             switch result {

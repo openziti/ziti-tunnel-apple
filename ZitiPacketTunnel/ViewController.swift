@@ -1186,7 +1186,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         updateServiceUI(zId: zid)
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false).path
-        Enrollment(zid, ui: self, hint: hint).start(jwtFile: jwtFile) { result in
+        Enrollment(zid, ui: self, hint: hint, policy: tunnelMgr.caBundlePolicy).start(jwtFile: jwtFile) { result in
             self.enrollingIds.removeAll { $0.id == zid.id }
             switch result {
             case .enrolled(let zidResp, let enrollTo):

@@ -27,6 +27,8 @@ struct CABundlePolicy : Equatable {
         case blocked(String)
     }
 
+    static let notAllowedMessage = "This network isn't allowed by your organization."
+
     /// SHA-256 fingerprints of the allowed certificates (DER), lowercase hex without separators
     let fingerprints:Set<String>
 

@@ -19,7 +19,19 @@ import NetworkExtension
 import CZiti
 
 class TunnelMgr: NSObject {
-    var tpm:NETunnelProviderManager?
+    var tpm:NETunnelProviderManager? {
+        didSet {
+            caBundlePolicy = ProviderConfig.caBundlePolicy((tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration)
+#if os(iOS)
+            // the share extension enrolls one-time tokens itself
+            if let url = SharedRestrictions.url {
+                SharedRestrictions.save(caBundlePolicy: caBundlePolicy, to: url)
+            }
+#endif
+        }
+    }
+    /// The networks identities may belong to, from the loaded configuration (nil: no restriction)
+    private(set) var caBundlePolicy:CABundlePolicy?
     var tunnelRestarting = false
     private var loading = false
     private var loadedBid:String?

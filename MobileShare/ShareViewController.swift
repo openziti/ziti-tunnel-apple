@@ -184,6 +184,16 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                         return
                     }
                     
+                    if let url = SharedRestrictions.url, let policy = SharedRestrictions.caBundlePolicy(at: url),
+                       case .blocked(let reason) = policy.check(zidResp.ca) {
+                        zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
+                        Ziti(withId: zidResp).forget()
+                        _ = zidStore.store(zid)
+                        self.tableView.reloadData()
+                        self.showAlert("Unable to enroll", CABundlePolicy.notAllowedMessage)
+                        return
+                    }
+
                     if zid.czid == nil {
                         zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
                     }
