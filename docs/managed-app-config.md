@@ -62,6 +62,8 @@ The restrictions shape what the app lets users do, not what the device can do:
 - On iOS, deleting the app removes its identities. Make the app non-removable with your MDM if that matters.
 - The share extension learns the restrictions from the app, so until the app has run with the configuration, the share sheet can still import.
 
+To keep devices on your networks whatever the user does, use [allowed networks](allowed-networks.md), which the tunnel enforces.
+
 ## Troubleshooting
 
 - **Nothing happens.** Check the snapshot for the `Managed configuration` line. If it's missing, the app isn't receiving the configuration: on macOS, check that the keys are forced for `io.netfoundry.ZitiPacketTunnel` (`profiles list` shows the installed profiles); on iOS, check that the app is managed by the MDM.

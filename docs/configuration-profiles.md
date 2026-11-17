@@ -43,6 +43,7 @@ Numbers and booleans can be native plist types (`<integer>`, `<true/>`) or strin
 | `mtu` | integer | `4000` | **Required** |
 | `dns` | string | `100.64.0.2` | **Required.** Comma-separated IPv4 addresses |
 | `locked` | boolean | `false` | Settings can't be changed in the app (see below) |
+| `allowedCAs` | array of strings | | Only with `locked`. Restricts identities to your networks, by CA fingerprint. See [allowed-networks.md](allowed-networks.md) |
 | `fallbackDnsEnabled` | boolean | `false` | |
 | `fallbackDns` | string | `1.1.1.1` | Required when `fallbackDnsEnabled` is true |
 | `interceptMatchedDns` | boolean | `true` | |
