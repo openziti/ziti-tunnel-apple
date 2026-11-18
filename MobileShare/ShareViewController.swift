@@ -188,8 +188,14 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                        case .blocked(let reason) = policy.check(zidResp.ca) {
                         zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
                         Ziti(withId: zidResp).forget()
-                        // not stored: nothing of it is usable, so there's no pending identity to keep
-                        self.showAlert("Unable to enroll", CABundlePolicy.notAllowedMessage)
+                        // the pending identity and its JWT were stored on import, and the token is used up, so nothing
+                        // of it is usable
+                        if let error = zidStore.remove(zid) {
+                            zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
+                        }
+                        self.showAlert("Unable to enroll", CABundlePolicy.notAllowedMessage) { _ in
+                            self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+                        }
                         return
                     }
 
