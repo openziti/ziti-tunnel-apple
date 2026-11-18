@@ -643,8 +643,8 @@
 			children = (
 				5AE3582930ACE588008D6819 /* UITests/ZitiMobileUITests.swift */,
 			);
-			name = UITests;
-			sourceTree = "<group>";
+			path = UITests;
+			sourceTree = SOURCE_ROOT;
 		};
 		5AF3DCAA24B52642005047BC /* MobileShare */ = {
 			isa = PBXGroup;
@@ -1654,6 +1654,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
@@ -1670,6 +1671,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AF5104C2582474E0092DC47 /* workspace-settings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
