@@ -26,14 +26,16 @@ final class ZitiMobileUITests: XCTestCase {
         app = XCUIApplication()
     }
 
-    /// Launches the app, allows notifications and closes Get Started, shown when there are no identities.
-    /// Until the notification prompt is answered the app stays inactive, so it doesn't handle links
+    /// Launches the app, allows its permission prompts (notifications, and on a device the VPN configuration) and closes
+    /// Get Started, shown when there are no identities. While a prompt is up the app stays inactive, so it doesn't handle links
     private func launch(_ arguments:[String] = []) {
         app.launchArguments = arguments
         app.launch()
         let allow = springboard.alerts.buttons["Allow"]
-        if allow.waitForExistence(timeout: 3) {
+        var answered = 0
+        while answered < 3, allow.waitForExistence(timeout: 5) {
             allow.tap()
+            answered += 1
         }
         let getStarted = app.navigationBars["Get Started"]
         if getStarted.waitForExistence(timeout: 5) {
