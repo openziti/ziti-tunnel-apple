@@ -60,7 +60,9 @@ class GettingStartedViewController: NSViewController {
         // Already have a network section
         stack.addArrangedSubview(makeSection(
             title: "Already have a network?",
-            body: "Use the \"+\" button at the bottom of the identity list to add an identity. Your network admin can provide an enrollment JWT file or an enrollment URL.",
+            body: ManagedConfig.current()?.disableAddIdentity ?? false ?
+                "Your organization sets up this app's networks. Contact your network admin if one is missing." :
+                "Use the \"+\" button at the bottom of the identity list to add an identity. Your network admin can provide an enrollment JWT file or an enrollment URL.",
             linkTitle: nil,
             url: nil))
 

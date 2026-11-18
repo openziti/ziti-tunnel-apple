@@ -34,32 +34,36 @@ struct EnrollmentLink : Equatable {
         guard url.scheme?.lowercased() == EnrollmentLink.scheme, url.host?.lowercased() == "enroll",
               let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems else { return nil }
         let value = { (name:String) in items.first { $0.name == name }?.value }
+        self.init(controller: value("controller"), jwt: value("jwt"), provider: value("provider"), type: value("type"))
+    }
 
-        switch (value("controller"), value("jwt")) {
+    /// The link's fields, validated the same way wherever they come from (e.g., managed app configuration)
+    init?(controller:String?, jwt:String?, provider:String?, type:String?) {
+        switch (controller, jwt) {
         case (let ctrl?, nil):
             guard let ctrlUrl = EnrollmentLink.controllerURL(ctrl) else { return nil }
             source = .controller(ctrlUrl)
-            controller = ctrlUrl
+            self.controller = ctrlUrl
         case (nil, let jwt?):
             guard let claims = EnrollmentLink.claims(jwt), claims["em"] as? String == "network",
                   let iss = claims["iss"] as? String, let ctrlUrl = EnrollmentLink.controllerURL(iss) else { return nil }
             source = .jwt(jwt)
-            controller = ctrlUrl
+            self.controller = ctrlUrl
         default:
             return nil
         }
 
         var enrollTo:ZitiIdentity.EnrollTo?
-        if let type = value("type") {
+        if let type = type {
             guard type == "cert" || type == "token" else { return nil }
             enrollTo = ZitiIdentity.EnrollTo(rawValue: type)
         }
-        hint = Enrollment.Hint(provider: value("provider"), enrollTo: enrollTo)
+        hint = Enrollment.Hint(provider: provider, enrollTo: enrollTo)
     }
 
     /// Host, plus the port when given, to show the user before enrolling
     var controllerName:String {
-        return EnrollmentLink.controllerName(controller)
+        return ZitiIdentity.controllerName(controller)
     }
 
     /// The URL without its query, fragment or user info, for logging
@@ -70,12 +74,6 @@ struct EnrollmentLink : Equatable {
         comps.user = nil
         comps.password = nil
         return comps.string ?? url.scheme ?? ""
-    }
-
-    static func controllerName(_ url:URL) -> String {
-        guard let host = url.host else { return url.absoluteString }
-        if let port = url.port { return "\(host):\(port)" }
-        return host
     }
 
     /// Plain https URLs only. Percent-encoded hosts are refused since they decode to anything (e.g., "../" or a newline)
@@ -97,23 +95,15 @@ struct EnrollmentLink : Equatable {
     }
 }
 
-extension Array where Element == ZitiIdentity {
-    /// An identity already added from the same link and not yet enrolled (links are easy to open twice)
-    func pending(_ link:EnrollmentLink) -> ZitiIdentity? {
-        return first { zid in
-            guard !zid.isEnrolled, let ztAPI = zid.czid?.ztAPI, let url = URL(string: ztAPI),
-                  EnrollmentLink.controllerName(url) == link.controllerName else { return false }
-            switch link.source {
-            case .controller: return zid.claims == nil
-            case .jwt: return zid.claims?.em == "network"
-            }
-        }
+extension ZitiIdentity {
+    /// Whether one of the identity's controllers is the link's, enrolled or not
+    func isOnController(of link:EnrollmentLink) -> Bool {
+        return isOnController(link.controller)
     }
+}
 
+extension Array where Element == ZitiIdentity {
     mutating func insertFromLink(_ link:EnrollmentLink, _ zidStore:ZitiIdentityStore, at:Int) throws {
-        if let zid = pending(link) {
-            throw ZitiError("\(zid.name) is already waiting to enroll with \(link.controllerName)")
-        }
         switch link.source {
         case .controller(let url):
             try insertFromURL(url, zidStore, at: at)

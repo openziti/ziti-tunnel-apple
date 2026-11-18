@@ -427,6 +427,12 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             style: .default,
             handler: { _ in
                 if let zid = self.zid {
+                    // the configuration may have changed while this was showing
+                    self.tvc?.applyManagedConfig()
+                    if let config = self.tvc?.managedConfig, !config.canRemove(zid) {
+                        self.dialogAlert("Unable to remove identity", ManagedConfig.removeDisabledMessage)
+                        return
+                    }
                     _ = self.tvc?.zidStore.remove(zid)
                     if let indx = self.tvc?.zids.firstIndex(of: zid) {
                         self.tvc?.zids.remove(at: indx)
@@ -481,8 +487,15 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         }
     }
 
-    func onEnroll(_ hint:Enrollment.Hint = Enrollment.Hint()) {
+    /// Without a hint, the organization's provider and type for the identity's network, if it has set them
+    func onEnroll(_ hint:Enrollment.Hint? = nil) {
         guard let zid = self.zid else { return }
+        tvc?.applyManagedConfig()
+        if let config = tvc?.managedConfig, !config.canEnroll(zid) {
+            dialogAlert("Unable to enroll \(zid.name)", SharedRestrictions.addDisabledMessage)
+            return
+        }
+        let hint = hint ?? tvc?.managedConfig?.hint(for: zid) ?? Enrollment.Hint()
         guard let presentedItemURL = self.tvc?.zidStore.presentedItemURL else {
             dialogAlert("Unable to enroll \(zid.name)", "Unable to access group container")
             return
@@ -739,6 +752,11 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 nRows = zid?.services.count ?? 0
             } else {
                 nRows = 1
+            }
+        } else if section == 4 {
+            // forget
+            if let zid = zid, !(tvc?.managedConfig?.canRemove(zid) ?? true) {
+                nRows = 0
             }
         }
         return nRows

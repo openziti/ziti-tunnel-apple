@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>networks</key>
+	<array>
+		<dict>
+			<key>controller</key>
+			<string>https://ctrl.example.com:443</string>
+			<key>provider</key>
+			<string>example-idp</string>
+			<key>type</key>
+			<string>cert</string>
+		</dict>
+	</array>
+	<key>disableAddIdentity</key>
+	<true/>
+	<key>disableRemoveIdentity</key>
+	<true/>
+</dict>
+</plist>

@@ -96,6 +96,8 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     var zidStore:ZitiIdentityStore { return tunnelMgr.zidStore }
     weak var ivc:IdentityViewController?
     var enrollingIds:[ZitiIdentity] = []
+    private(set) var managedConfig:ManagedConfig?
+    private var restrictionsShared = false
     let sc = ScannerViewController()
     private var hasShownWelcome = false
     private var gatheringFeedback = false
@@ -139,6 +141,10 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         // pick up tunnel configs added or removed while we were in the background (e.g., by a profile)
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
             self?.loadTunnelConfig(createIfMissing: false)
+            self?.applyManagedConfig()
+        }
+        NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.applyManagedConfig()
         }
         
         // Load previous identities
@@ -149,6 +155,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         self.zids = loadedZids ?? []
         
         tableView.reloadData()
+        applyManagedConfig()
         
         // listen for newOrChanged
         NotificationCenter.default.addObserver(forName: .onNewOrChangedId, object: nil, queue: OperationQueue.main) { [self] notification in
@@ -263,7 +270,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var nRows = 1
         if section == 1 {
-            nRows = zids.count + 1
+            nRows = zids.count + (managedConfig?.disableAddIdentity ?? false ? 0 : 1)
         } else if section == 2 {
             nRows = 5
         }
@@ -522,8 +529,44 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         }
     }
 
+    /// Adds identities for the organization's networks, waiting for the user to enroll them, and applies its restrictions.
+    /// Also called before each decision the restrictions affect, so none rests on a stale copy
+    func applyManagedConfig() {
+        let config = ManagedConfig.current()
+        guard config != managedConfig || !restrictionsShared else { return }
+        // also saved at launch, since the configuration can change while the app isn't running
+        if let url = SharedRestrictions.url {
+            SharedRestrictions.save(addIdentityDisabled: config?.disableAddIdentity ?? false, to: url)
+        }
+        restrictionsShared = true
+        guard config != managedConfig else { return }
+        managedConfig = config
+        config?.problems.forEach { zLog.warn($0) }
+        zLog.info("Managed configuration: \(config?.description ?? "none")")
+        
+        if let config = config {
+            _ = zids.insertManaged(config, zidStore)
+        }
+        tableView.reloadData()
+        ivc?.tableView.reloadData()
+    }
+    
     /// `tempDir` holds a temporary copy of the file, removed once it's been read
     func onNewUrl(_ url:URL, tempDir:URL? = nil) {
+        applyManagedConfig()
+        if managedConfig?.disableAddIdentity ?? false {
+            zLog.info("Not adding identity: turned off by managed configuration")
+            if let tempDir = tempDir {
+                try? FileManager.default.removeItem(at: tempDir)
+            }
+            let alert = UIAlertController(
+                title:"Unable to add identity",
+                message: SharedRestrictions.addDisabledMessage,
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+            linkPresenter.present(alert, animated: true, completion: nil)
+            return
+        }
         if url.scheme?.lowercased() == EnrollmentLink.scheme {
             guard let link = EnrollmentLink(url) else {
                 zLog.warn("Ignoring unsupported link: \(EnrollmentLink.redacted(url))")
@@ -538,6 +581,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             onEnrollmentLink(link)
             return
         }
+        let config = managedConfig
         DispatchQueue(label: "JwtLoader").async {
             defer {
                 if let tempDir = tempDir {
@@ -545,14 +589,22 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 }
             }
             do {
-                if url.isFileURL {
-                    try self.zids.insertFromJWT(url, self.zidStore, at: 0)
-                } else {
-                    try self.zids.insertFromURL(url, self.zidStore, at: 0)
+                // a managed network goes to the identity the configuration added for it
+                let managed = try config.flatMap { config in
+                    try url.isFileURL ? self.zids.managedIdentity(forJWT: url, config, self.zidStore)
+                                      : self.zids.managedIdentity(at: url, config, self.zidStore)
+                }
+                if managed == nil {
+                    if url.isFileURL {
+                        try self.zids.insertFromJWT(url, self.zidStore, at: 0)
+                    } else {
+                        try self.zids.insertFromURL(url, self.zidStore, at: 0)
+                    }
                 }
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
-                    self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
+                    let row = managed.flatMap { zid in self.zids.firstIndex { $0 === zid } } ?? 0
+                    self.tableView.selectRow(at: IndexPath(row: row, section: 1), animated: false, scrollPosition: .none)
                     self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
                 }
             } catch {
@@ -580,6 +632,30 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             linkPresenter.present(alert, animated: true)
             return
         }
+        // a managed network goes to the identity the configuration added for it
+        let managed:ZitiIdentity?
+        do {
+            managed = try managedConfig.flatMap { try zids.managedIdentity(at: link.controller, $0, zidStore) }
+        } catch {
+            let alert = UIAlertController(
+                title:"Unable to add identity",
+                message: error.localizedDescription,
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+            linkPresenter.present(alert, animated: true)
+            return
+        }
+        // it may have just been added back, before the user confirms
+        if managed != nil {
+            tableView.reloadData()
+        }
+        if let zid = managed, zid.isEnrolled {
+            // already set up, so showing it is all the link can do
+            navigationController?.dismiss(animated: false)
+            navigationController?.popToRootViewController(animated: false)
+            showLinkedIdentity(zid)
+            return
+        }
         let alert = UIAlertController(
             title: "Enroll Identity",
             message: "Enroll with the network at \(link.controllerName)?",
@@ -589,6 +665,12 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             // start from the identity list, whatever was showing when the link arrived
             self.navigationController?.dismiss(animated: false)
             self.navigationController?.popToRootViewController(animated: false)
+            if let zid = managed {
+                self.showLinkedIdentity(zid)
+                // the configuration's settings, as from the Enroll button, not the link's
+                self.enrollWhenShowing(nil)
+                return
+            }
             do {
                 try self.zids.insertFromLink(link, self.zidStore, at: 0)
             } catch {
@@ -601,19 +683,29 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 zLog.error("Unable to add identity: \(error.localizedDescription)")
                 return
             }
-            self.tableView.reloadData()
-            self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
-            self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
-            
-            // enroll once the identity screen is showing, so it can present the enrollment sheets
-            let ivc = self.ivc
-            if let tc = self.navigationController?.transitionCoordinator {
-                tc.animate(alongsideTransition: nil) { _ in ivc?.onEnroll(link.hint) }
-            } else {
-                ivc?.onEnroll(link.hint)
-            }
+            self.showLinkedIdentity(self.zids[0])
+            self.enrollWhenShowing(link.hint)
         })
         linkPresenter.present(alert, animated: true)
+    }
+
+    /// Opens an identity from the list
+    private func showLinkedIdentity(_ zid:ZitiIdentity) {
+        tableView.reloadData()
+        let row = zids.firstIndex { $0 === zid } ?? 0
+        tableView.selectRow(at: IndexPath(row: row, section: 1), animated: false, scrollPosition: .none)
+        performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+    }
+
+    /// Enrolls once the identity screen is showing, so it can present the enrollment sheets. A nil hint uses the
+    /// managed configuration's
+    private func enrollWhenShowing(_ hint:Enrollment.Hint?) {
+        let ivc = self.ivc
+        if let tc = navigationController?.transitionCoordinator {
+            tc.animate(alongsideTransition: nil) { _ in ivc?.onEnroll(hint) }
+        } else {
+            ivc?.onEnroll(hint)
+        }
     }
     
     /// Links can arrive while another screen or dialog is showing
