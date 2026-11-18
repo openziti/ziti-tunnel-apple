@@ -17,10 +17,9 @@
 import Foundation
 
 extension DateFormatter {
-    func timeSince(_ fromTimeIntervalSince1970: TimeInterval) -> String {
+    /// `now` and `calendar` are for tests, so they don't depend on the clock or the time zone
+    func timeSince(_ fromTimeIntervalSince1970: TimeInterval, now: Date = Date(), calendar: Calendar = .current) -> String {
         if fromTimeIntervalSince1970 <= 0 { return "never" }
-        let calendar = Calendar.current
-        let now = Date()
         let unitFlags: NSCalendar.Unit = [.second, .minute, .hour, .day, .weekOfYear, .month, .year]
         let from = Date(timeIntervalSince1970: fromTimeIntervalSince1970)
         let components = (calendar as NSCalendar).components(unitFlags, from:from, to:now, options:[])
