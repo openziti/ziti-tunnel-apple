@@ -21,100 +21,116 @@ class DateFormatterTimeAgoTests: XCTestCase {
 
     let formatter = DateFormatter()
 
+    /// A fixed moment and a UTC calendar, so results don't depend on the clock, the time zone or daylight saving
+    private let now = Date(timeIntervalSince1970: 1_773_144_000) // 2026-03-10 12:00 UTC
+    private let utc:Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        return calendar
+    }()
+
+    private let minute:TimeInterval = 60, hour:TimeInterval = 60 * 60, day:TimeInterval = 24 * 60 * 60
+
+    private func timeSince(_ secondsAgo:TimeInterval) -> String {
+        return formatter.timeSince(now.timeIntervalSince1970 - secondsAgo, now: now, calendar: utc)
+    }
+
+    private func timeSince(_ component:Calendar.Component, ago value:Int) -> String {
+        let from = utc.date(byAdding: component, value: -value, to: now)!
+        return formatter.timeSince(from.timeIntervalSince1970, now: now, calendar: utc)
+    }
+
     // MARK: - Edge cases
 
     func testTimeSince_zeroInterval() {
-        XCTAssertEqual(formatter.timeSince(0), "never")
+        XCTAssertEqual(formatter.timeSince(0, now: now, calendar: utc), "never")
     }
 
     func testTimeSince_negativeInterval() {
-        XCTAssertEqual(formatter.timeSince(-100), "never")
+        XCTAssertEqual(formatter.timeSince(-100, now: now, calendar: utc), "never")
+    }
+
+    func testTimeSince_usesTheGivenCalendar() {
+        // 88 days back is 2 Gregorian months but 3 Islamic civil ones
+        var islamic = Calendar(identifier: .islamicCivil)
+        islamic.timeZone = utc.timeZone
+        let from = now.timeIntervalSince1970 - 88 * day
+        XCTAssertEqual(formatter.timeSince(from, now: now, calendar: utc), "2 months ago")
+        XCTAssertEqual(formatter.timeSince(from, now: now, calendar: islamic), "3 months ago")
+    }
+
+    func testTimeSince_defaultsToNow() {
+        // the real clock and time zone: well inside the range, so timing and daylight saving don't matter
+        XCTAssertEqual(formatter.timeSince(Date().timeIntervalSince1970 - 2.5 * day), "2 days ago")
     }
 
     // MARK: - Seconds
 
     func testTimeSince_justNow() {
-        let twoSecondsAgo = Date().timeIntervalSince1970 - 2
-        XCTAssertEqual(formatter.timeSince(twoSecondsAgo), "just now")
+        XCTAssertEqual(timeSince(2), "just now")
     }
 
     func testTimeSince_secondsAgo() {
-        let tenSecondsAgo = Date().timeIntervalSince1970 - 10
-        XCTAssertEqual(formatter.timeSince(tenSecondsAgo), "10 seconds ago")
+        XCTAssertEqual(timeSince(10), "10 seconds ago")
     }
 
     // MARK: - Minutes
 
     func testTimeSince_aMinuteAgo() {
-        let oneMinuteAgo = Date().timeIntervalSince1970 - 65
-        XCTAssertEqual(formatter.timeSince(oneMinuteAgo), "a minute ago")
+        XCTAssertEqual(timeSince(65), "a minute ago")
     }
 
     func testTimeSince_minutesAgo() {
-        let fiveMinutesAgo = Date().timeIntervalSince1970 - (5 * 60)
-        XCTAssertEqual(formatter.timeSince(fiveMinutesAgo), "5 minutes ago")
+        XCTAssertEqual(timeSince(5 * minute), "5 minutes ago")
     }
 
     // MARK: - Hours
 
     func testTimeSince_anHourAgo() {
-        let oneHourAgo = Date().timeIntervalSince1970 - (65 * 60)
-        XCTAssertEqual(formatter.timeSince(oneHourAgo), "an hour ago")
+        XCTAssertEqual(timeSince(65 * minute), "an hour ago")
     }
 
     func testTimeSince_hoursAgo() {
-        let threeHoursAgo = Date().timeIntervalSince1970 - (3 * 60 * 60)
-        XCTAssertEqual(formatter.timeSince(threeHoursAgo), "3 hours ago")
+        XCTAssertEqual(timeSince(3 * hour), "3 hours ago")
     }
 
     // MARK: - Days
 
     func testTimeSince_yesterday() {
-        let oneDayAgo = Date().timeIntervalSince1970 - (26 * 60 * 60)
-        XCTAssertEqual(formatter.timeSince(oneDayAgo), "yesterday")
+        XCTAssertEqual(timeSince(26 * hour), "yesterday")
     }
 
     func testTimeSince_daysAgo() {
-        let threeDaysAgo = Date().timeIntervalSince1970 - (3 * 24 * 60 * 60)
-        XCTAssertEqual(formatter.timeSince(threeDaysAgo), "3 days ago")
+        XCTAssertEqual(timeSince(3 * day), "3 days ago")
     }
 
     // MARK: - Weeks
 
     func testTimeSince_lastWeek() {
-        let eightDaysAgo = Date().timeIntervalSince1970 - (8 * 24 * 60 * 60)
-        XCTAssertEqual(formatter.timeSince(eightDaysAgo), "last week")
+        XCTAssertEqual(timeSince(8 * day), "last week")
     }
 
     func testTimeSince_weeksAgo() {
-        let threeWeeksAgo = Date().timeIntervalSince1970 - (21 * 24 * 60 * 60)
-        XCTAssertEqual(formatter.timeSince(threeWeeksAgo), "3 weeks ago")
+        XCTAssertEqual(timeSince(21 * day), "3 weeks ago")
     }
 
     // MARK: - Months
 
     func testTimeSince_lastMonth() {
-        let fiveWeeksAgo = Date().timeIntervalSince1970 - (35 * 24 * 60 * 60)
-        XCTAssertEqual(formatter.timeSince(fiveWeeksAgo), "last month")
+        XCTAssertEqual(timeSince(35 * day), "last month")
     }
 
     func testTimeSince_monthsAgo() {
-        let threeMonthsAgo = Date().timeIntervalSince1970 - (90 * 24 * 60 * 60)
-        let result = formatter.timeSince(threeMonthsAgo)
-        // Could be 2 or 3 months depending on calendar month lengths
-        XCTAssertTrue(result.hasSuffix("months ago"), "Expected 'N months ago' but got '\(result)'")
+        XCTAssertEqual(timeSince(.month, ago: 3), "3 months ago")
     }
 
     // MARK: - Years
 
     func testTimeSince_lastYear() {
-        let fourteenMonthsAgo = Date().timeIntervalSince1970 - (400 * 24 * 60 * 60)
-        XCTAssertEqual(formatter.timeSince(fourteenMonthsAgo), "last year")
+        XCTAssertEqual(timeSince(400 * day), "last year")
     }
 
     func testTimeSince_yearsAgo() {
-        let threeYearsAgo = Date().timeIntervalSince1970 - (3 * 365 * 24 * 60 * 60)
-        let result = formatter.timeSince(threeYearsAgo)
-        XCTAssertTrue(result.hasSuffix("years ago"), "Expected 'N years ago' but got '\(result)'")
+        XCTAssertEqual(timeSince(.year, ago: 3), "3 years ago")
     }
 }
