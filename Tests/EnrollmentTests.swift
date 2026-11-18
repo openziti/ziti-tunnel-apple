@@ -123,6 +123,7 @@ final class EnrollmentTests: XCTestCase {
         case .enrolled(let zidResp, let enrollTo): return "enrolled \(zidResp.id) \(enrollTo)"
         case .failed(let msg): return "failed \(msg)"
         case .cancelled: return "cancelled"
+        case .refused: return "refused"
         }
     }
 
@@ -401,8 +402,83 @@ final class EnrollmentTests: XCTestCase {
     }
 
     func testOtherNetworkDiscarded() throws {
-        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootB)), "failed \(CABundlePolicy.notAllowedMessage)")
+        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootB)), "refused")
+        XCTAssertEqual(sdk.calls.filter { $0 == "discard real-id" }.count, 1)
+        XCTAssertEqual(describe(try runOtt(ca: nil)), "refused")
+        XCTAssertEqual(sdk.calls.filter { $0 == "discard real-id" }.count, 2)
+    }
+
+    private func bootstrapResult(ca:String?) -> (CZiti.ZitiIdentity?, Enrollment.Failure?) {
+        let resp = CZiti.ZitiIdentity(id: "bootstrap-id", ztAPIs: ["https://ctrl"])
+        resp.ca = ca
+        return (resp, nil)
+    }
+
+    private func networkJwt() throws -> String {
+        let jwtFile = NSTemporaryDirectory() + UUID().uuidString + ".jwt"
+        try "jwt".write(toFile: jwtFile, atomically: true, encoding: .utf8)
+        addTeardownBlock { try? FileManager.default.removeItem(atPath: jwtFile) }
+        return jwtFile
+    }
+
+    // A network JWT or controller URL is checked from its bootstrap bundle, before providers or a sign-in
+    func testOutsideNetworkJwtRefusedBeforeSignIn() throws {
+        let jwtFile = try networkJwt()
+        sdk.result = bootstrapResult(ca: CAFixtures.rootB)
+        sdk.providers = both
+        let result = run(makeIdentity(claims: ["sub": "s", "iss": "i", "em": "network"]), jwtFile: jwtFile,
+                         hint: Enrollment.Hint(provider: "both", enrollTo: .cert), policy: allowRootA)
+        XCTAssertEqual(describe(result), "refused")
+        XCTAssertEqual(sdk.calls, ["enroll jwt(\"\(jwtFile)\")"])
+        XCTAssertEqual(ui.calls, [])
+    }
+
+    func testOutsideControllerURLRefusedBeforeSignIn() {
+        sdk.result = bootstrapResult(ca: CAFixtures.rootB)
+        sdk.providers = both
+        let result = run(makeIdentity(ztAPIs: ["https://ctrl.example.com"]), policy: allowRootA)
+        XCTAssertEqual(describe(result), "refused")
+        XCTAssertEqual(sdk.calls, ["enroll controller(\"https://ctrl.example.com\")"])
+        XCTAssertEqual(ui.calls, [])
+    }
+
+    func testAllowedNetworkJwtContinuesAfterBootstrap() throws {
+        let jwtFile = try networkJwt()
+        sdk.result = bootstrapResult(ca: CAFixtures.rootA)
+        sdk.providers = both
+        let enrolled = CZiti.ZitiIdentity(id: "real-id", ztAPIs: ["https://ctrl"])
+        enrolled.ca = CAFixtures.interA + "\n" + CAFixtures.rootA
+        sdk.enrollToResult = (enrolled, nil)
+        let result = run(makeIdentity(claims: ["sub": "s", "iss": "i", "em": "network"]), jwtFile: jwtFile,
+                         hint: Enrollment.Hint(provider: "both", enrollTo: .cert), policy: allowRootA)
+        XCTAssertEqual(describe(result), "enrolled real-id cert")
+        XCTAssertEqual(sdk.calls, ["enroll jwt(\"\(jwtFile)\")", "query jwt(\"\(jwtFile)\")",
+                                   "enroll jwt(\"\(jwtFile)\") to cert with both"])
+    }
+
+    func testBootstrapFailureFailsWithoutQuery() throws {
+        let jwtFile = try networkJwt()
+        sdk.result = (nil, Enrollment.Failure(message: "no route", alreadyEnrolled: false))
+        let result = run(makeIdentity(claims: ["sub": "s", "iss": "i", "em": "network"]), jwtFile: jwtFile, policy: allowRootA)
+        XCTAssertEqual(describe(result), "failed no route")
+        XCTAssertEqual(sdk.calls, ["enroll jwt(\"\(jwtFile)\")"])
+    }
+
+    // The bundle after enrollment is still checked: a controller could answer differently once signed in
+    func testRefusedAfterEnrollmentKeepsNoMfaOrProvider() throws {
+        let jwtFile = try networkJwt()
+        sdk.result = bootstrapResult(ca: CAFixtures.rootA)
+        sdk.providers = both
+        let enrolled = CZiti.ZitiIdentity(id: "real-id", ztAPIs: ["https://ctrl"])
+        enrolled.ca = CAFixtures.rootB
+        sdk.enrollToResult = (enrolled, nil)
+        sdk.mfaCodeError = .some(nil)
+        ui.mfaCode = "123456"
+        let zid = makeIdentity(claims: ["sub": "s", "iss": "i", "em": "network"])
+        let result = run(zid, jwtFile: jwtFile, hint: Enrollment.Hint(provider: "both", enrollTo: .token), policy: allowRootA)
+        XCTAssertEqual(describe(result), "refused")
         XCTAssertTrue(sdk.calls.contains("discard real-id"))
-        XCTAssertEqual(describe(try runOtt(ca: nil)), "failed \(CABundlePolicy.notAllowedMessage)")
+        XCTAssertFalse(zid.isMfaEnabled)
+        XCTAssertNil(zid.enrollProvider)
     }
 }

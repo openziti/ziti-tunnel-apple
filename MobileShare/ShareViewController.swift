@@ -188,8 +188,7 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                        case .blocked(let reason) = policy.check(zidResp.ca) {
                         zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
                         Ziti(withId: zidResp).forget()
-                        _ = zidStore.store(zid)
-                        self.tableView.reloadData()
+                        // not stored: nothing of it is usable, so there's no pending identity to keep
                         self.showAlert("Unable to enroll", CABundlePolicy.notAllowedMessage)
                         return
                     }

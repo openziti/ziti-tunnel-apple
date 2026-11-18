@@ -71,6 +71,8 @@ class Enrollment {
         case enrolled(CZiti.ZitiIdentity, ZitiIdentity.EnrollTo)
         case failed(String)
         case cancelled
+        /// The policy doesn't allow the identity's network. Nothing of it is usable, so the pending identity goes too
+        case refused
     }
 
     /// Answers to use instead of asking, when they fit what the network offers
@@ -102,7 +104,7 @@ class Enrollment {
     private var lastMfaAuth:Date?
     private var provider:String?
 
-    /// With a `policy`, an identity whose network it doesn't allow is discarded and the enrollment fails
+    /// With a `policy`, an identity whose network it doesn't allow is refused, and anything enrollment stored is discarded
     init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK(), hint:Hint = Hint(), policy:CABundlePolicy? = nil) {
         self.zid = zid
         self.ui = ui
@@ -123,6 +125,29 @@ class Enrollment {
             enroll(source)
             return
         }
+        guard let policy = policy else {
+            queryProviders(source)
+            return
+        }
+        // A network JWT or controller URL gives the network's CA bundle before anyone signs in (bootstrap only: no key,
+        // nothing created on the controller), so an outside network is refused before it's asked for its providers
+        DispatchQueue.global().async {
+            self.sdk.enroll(source, self.once { zidResp, failure in
+                guard failure == nil, let zidResp = zidResp else {
+                    self.finish(.failed(failure?.message ?? "invalid response"))
+                    return
+                }
+                if case .blocked(let reason) = policy.check(zidResp.ca) {
+                    zLog.warn("Not enrolling \(self.zid.name), its network isn't allowed: \(reason)")
+                    self.finish(.refused)
+                    return
+                }
+                self.queryProviders(source)
+            })
+        }
+    }
+
+    private func queryProviders(_ source:Source) {
         DispatchQueue.global().async {
             self.sdk.queryProviders(source) { providers in
                 DispatchQueue.main.async { self.choose(source, providers) }
@@ -274,13 +299,14 @@ class Enrollment {
         }
     }
 
-    /// MFA set up or used during enrollment, and the provider chosen, are applied once it succeeds
+    /// An identity the policy refuses is discarded. Otherwise MFA set up or used during enrollment, and the provider
+    /// chosen, are applied once it succeeds
     private func finish(_ result:Result) {
         var result = result
         if case .enrolled(let zidResp, _) = result, let policy = policy, case .blocked(let reason) = policy.check(zidResp.ca) {
             zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
             sdk.discard(zidResp)
-            result = .failed(CABundlePolicy.notAllowedMessage)
+            result = .refused
         }
         if case .enrolled = result {
             zid.enrollProvider = provider

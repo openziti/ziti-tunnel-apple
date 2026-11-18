@@ -518,6 +518,17 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 self.dialogAlert("Unable to enroll \(zid.name)", msg)
             case .cancelled:
                 break
+            case .refused:
+                // removing it also forgets anything stored under its temporary id; the list reloads on the removal
+                if let error = self.tvc?.zidStore.remove(zid) {
+                    zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
+                }
+                let alert = UIAlertController(title: "Unable to enroll \(zid.name)", message: CABundlePolicy.notAllowedMessage,
+                                              preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default) { _ in
+                    self.navigationController?.popViewController(animated: true)
+                })
+                self.present(alert, animated: true, completion: nil)
             }
         }
     }
