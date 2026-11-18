@@ -38,6 +38,7 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
         case AppexNotifications
         case EnrollTo
         case EnrollProvider
+        case ManagedController
     }
     
     var presentedItemURL:URL? = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)
@@ -212,6 +213,9 @@ class ZitiIdentityStore : NSObject, NSFilePresenter {
             }
             if options.contains(.EnrollProvider) {
                 zidOnDisk?.enrollProvider = zid.enrollProvider
+            }
+            if options.contains(.ManagedController) {
+                zidOnDisk?.managedController = zid.managedController
             }
             
             // store to disk

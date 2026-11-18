@@ -52,9 +52,18 @@ struct ManagedConfig : Equatable, CustomStringConvertible {
         return ManagedConfig { defaults.managedValue(forKey: $0) }
     }
 
-    /// Identities on a managed network's controller, enrolled or not
+    /// The managed network an identity belongs to, enrolled or not: the one recorded for it, otherwise one on its
+    /// controllers (e.g., an identity added before the configuration)
+    func network(for zid:ZitiIdentity) -> EnrollmentLink? {
+        if let recorded = zid.managedController.flatMap({ URL(string: $0) }).flatMap(EnrollmentLink.endpoint),
+           let link = networks.first(where: { EnrollmentLink.endpoint($0.controller) == recorded }) {
+            return link
+        }
+        return networks.first { zid.isOnController(of: $0) }
+    }
+
     func isManaged(_ zid:ZitiIdentity) -> Bool {
-        return networks.contains { zid.isOnController(of: $0) }
+        return network(for: zid) != nil
     }
 
     func canRemove(_ zid:ZitiIdentity) -> Bool {
@@ -74,7 +83,7 @@ struct ManagedConfig : Equatable, CustomStringConvertible {
 
     /// The provider and enrollment type set for the identity's network, if any
     func hint(for zid:ZitiIdentity) -> Enrollment.Hint {
-        return networks.first { zid.isOnController(of: $0) }?.hint ?? Enrollment.Hint()
+        return network(for: zid)?.hint ?? Enrollment.Hint()
     }
 
     /// What's set, without values, for the log and the status summary
@@ -126,13 +135,23 @@ struct ManagedConfig : Equatable, CustomStringConvertible {
 }
 
 extension Array where Element == ZitiIdentity {
-    /// Adds a pending identity for each managed network that doesn't have an identity yet, enrolled or not.
-    /// Returns how many were added
+    /// Adds a pending identity for each managed network that doesn't have an identity yet, enrolled or not, and records
+    /// the network on each one, so it stays matched when its controller addresses change. Returns how many were added
     mutating func insertManaged(_ config:ManagedConfig, _ zidStore:ZitiIdentityStore) -> Int {
         var added = 0
-        for link in config.networks where !contains(where: { $0.isOnController(of: link) }) {
+        for link in config.networks {
+            let controller = link.controller.absoluteString
+            if let zid = first(where: { config.network(for: $0) == link }) {
+                if zid.managedController != controller {
+                    zid.managedController = controller
+                    _ = zidStore.update(zid, [.ManagedController])
+                }
+                continue
+            }
             do {
                 try insertFromLink(link, zidStore, at: 0)
+                self[0].managedController = controller
+                _ = zidStore.update(self[0], [.ManagedController])
                 added += 1
             } catch {
                 zLog.error("Unable to add identity for managed network \(link.controllerName): \(error.localizedDescription)")
