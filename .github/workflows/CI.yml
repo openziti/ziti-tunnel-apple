@@ -29,6 +29,8 @@ jobs:
 
   build:
     runs-on: macos-26
+    # a stuck run would hold the TestFlight queue below for GitHub's 6 hour default
+    timeout-minutes: 90
     # PR runs take App Store Connect's latest build number + 1 and upload it, so runs started together pick the same
     # number. Queue them per app until the upload is processed. Push runs don't upload and don't wait
     concurrency:
@@ -221,18 +223,25 @@ jobs:
     - name: Wait For Build Processing
       if: github.event_name == 'pull_request'
       env:
-        bearer: "${{ steps.create_acs_token.outputs.bearer }}"
+        AUTH_KEY_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ID }}
+        AUTH_KEY_ISSUER_ID: ${{ secrets.APPLE_DEVELOPER_KEY_ISSUER_ID }}
+        api_key_fn: ${{ steps.store_api_key.outputs.api_key_fn }}
         uploaded_build: "${{ steps.configure_versions.outputs.next_bundle_version }}"
       run: |
         mvers=$(agvtool mvers -terse1)
         app="${{ steps.get_app_info.outputs.apple_id }}"
         url="https://api.appstoreconnect.apple.com/v1/builds?filter[app]=${app}&fields[builds]=version&filter[preReleaseVersion.version]=${mvers}&sort=-uploadedDate&limit=1"
-        while [ 1 ] ; do
+        # up to 45 minutes, with a new token each time: the one from Create App Store Connect Token expires after 20
+        for attempt in $(seq 1 90) ; do
           echo "Waiting for build processing to complete for ${mvers}.${uploaded_build}..."
-          latest_build=$(curl -g -s -H "Authorization: Bearer ${bearer}" "${url}" | jq '.data[].attributes.version|tonumber')
-          if [ "$latest_build" = "$uploaded_build" ] ; then echo "Build processing complete"; break; fi
+          bearer=$(ruby jwt.rb ${AUTH_KEY_ISSUER_ID} ${AUTH_KEY_ID} ${api_key_fn})
+          # a failed request just means another try
+          latest_build=$(curl -g -s -H "Authorization: Bearer ${bearer}" "${url}" | jq -r '.data[0].attributes.version // empty' || true)
+          if [ "$latest_build" = "$uploaded_build" ] ; then echo "Build processing complete"; exit 0; fi
           sleep 30
         done
+        echo "::error::Build ${mvers}.${uploaded_build} wasn't processed within 45 minutes"
+        exit 1
 
     - name: Cleanup Keychain
       if: always()
