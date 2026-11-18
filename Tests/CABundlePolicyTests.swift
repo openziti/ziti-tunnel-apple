@@ -99,13 +99,52 @@ final class CABundlePolicyTests: XCTestCase {
         let p = policy(CAFixtures.rootA)
         XCTAssertEqual(p.check(nil), .blocked("no CA bundle"))
         XCTAssertEqual(p.check(""), .blocked("no CA bundle"))
-        XCTAssertEqual(p.check("not a bundle"), .blocked("no CA bundle"))
+        XCTAssertEqual(p.check("pem:"), .blocked("no CA bundle"))
+        XCTAssertEqual(p.check(" \n\t"), .blocked("no CA bundle"))
+        XCTAssertEqual(p.check("not a bundle"), .blocked("CA bundle can't be read"))
         XCTAssertEqual(p.check("-----BEGIN CERTIFICATE-----\n!!!\n-----END CERTIFICATE-----"), .blocked("CA bundle can't be read"))
         XCTAssertEqual(p.check(bundle(CAFixtures.rootA, "-----BEGIN CERTIFICATE-----\nMIIB")), .blocked("CA bundle can't be read"))
     }
 
     func testPemPrefix() {
         XCTAssertEqual(policy(CAFixtures.rootA).check("pem:" + CAFixtures.rootA), .allowed)
+    }
+
+    func testWhitespaceAroundBlocks() {
+        let crlf = bundle(CAFixtures.interA, CAFixtures.rootA).replacingOccurrences(of: "\n", with: "\r\n")
+        XCTAssertEqual(policy(CAFixtures.rootA).check("\n  " + crlf + "\r\n\n"), .allowed)
+    }
+
+    // The SDK reads more than CERTIFICATE blocks, so anything else must not get past the check with an allowed cert
+    func testOtherTextBlocked() {
+        let p = policy(CAFixtures.rootA)
+        let legacy = CAFixtures.rootB.replacingOccurrences(of: "CERTIFICATE-----", with: "X509 CERTIFICATE-----")
+        let trusted = CAFixtures.rootB.replacingOccurrences(of: "CERTIFICATE-----", with: "TRUSTED CERTIFICATE-----")
+        for (name, ca) in [
+            ("legacy label", bundle(CAFixtures.rootA, legacy)),
+            ("trusted label", bundle(CAFixtures.rootA, trusted)),
+            ("file URL", "file:///nonexistent/" + CAFixtures.rootA),
+            ("file reference", "file:/nonexistent/" + CAFixtures.rootA),
+            ("path", "/nonexistent/dir\n" + CAFixtures.rootA),
+            ("leading text", "subject=CN=rootA\n" + CAFixtures.rootA),
+            ("trailing text", CAFixtures.rootA + "\ntrailer"),
+            ("text between", bundle(CAFixtures.interA, "comment", CAFixtures.rootA)),
+            ("pem prefix twice", "pem:pem:" + CAFixtures.rootA),
+        ] {
+            XCTAssertEqual(p.check(ca), .blocked("CA bundle can't be read"), name)
+        }
+    }
+
+    func testPemRoundTrip() {
+        let certs = CABundlePolicy.certificates("pem:" + bundle(CAFixtures.interA, CAFixtures.rootA))!
+        let pem = CABundlePolicy.pem(certs)
+        XCTAssertTrue(pem.hasPrefix("-----BEGIN CERTIFICATE-----\n"))
+        XCTAssertTrue(pem.hasSuffix("-----END CERTIFICATE-----\n"))
+        XCTAssertFalse(pem.contains("pem:"))
+        XCTAssertTrue(pem.components(separatedBy: "\n").allSatisfy { $0.count <= 64 })
+        XCTAssertEqual(CABundlePolicy.certificates(pem)!.map(CABundlePolicy.fingerprint), certs.map(CABundlePolicy.fingerprint))
+        XCTAssertEqual(policy(CAFixtures.rootA).check(pem), .allowed)
+        XCTAssertEqual(CABundlePolicy.pem([]), "")
     }
 
     // MARK: - Identities

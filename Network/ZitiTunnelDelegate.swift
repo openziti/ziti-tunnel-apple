@@ -72,14 +72,19 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 _ = zidStore.store(tzid)
 
                 // checked whether enrolled or not: the file says which, and without a CA bundle the SDK trusts the system's CAs
-                if let policy = ptp?.caBundlePolicy, case .blocked(let reason) = policy.check(czid.ca) {
-                    if tzid.isEnrolled {
-                        zLog.warn("Not loading \(tzid.name):\(tzid.id), blocked by \(ProviderConfig.ALLOWED_CAS_KEY): \(reason)")
-                    } else {
-                        // the usual case is a pending identity, which has no CA bundle until it enrolls
-                        zLog.info("Not loading \(tzid.name):\(tzid.id), not enrolled (\(reason))")
+                if let policy = ptp?.caBundlePolicy {
+                    if case .blocked(let reason) = policy.check(czid.ca) {
+                        if tzid.isEnrolled {
+                            zLog.warn("Not loading \(tzid.name):\(tzid.id), blocked by \(ProviderConfig.ALLOWED_CAS_KEY): \(reason)")
+                        } else {
+                            // the usual case is a pending identity, which has no CA bundle until it enrolls
+                            zLog.info("Not loading \(tzid.name):\(tzid.id), not enrolled (\(reason))")
+                        }
+                        return
                     }
-                    return
+                    // the SDK gets the checked certificates, re-encoded, not the file's text, which it could read differently
+                    guard let certs = CABundlePolicy.certificates(czid.ca) else { return }
+                    czid.ca = CABundlePolicy.pem(certs)
                 }
                 zids.append(czid)
             }

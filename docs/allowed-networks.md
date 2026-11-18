@@ -10,6 +10,8 @@ Every Ziti identity carries a CA bundle: the certificates it trusts for its netw
 
 `allowedCAs` lists the SHA-256 fingerprints of your networks' CA certificates. An identity is allowed when its CA bundle is not empty and every certificate in it either is listed or chains, within the bundle, to a listed one. Listing a network's root is usually enough; listing an intermediate allows only what it signed.
 
+The bundle must be plain PEM certificates (`-----BEGIN CERTIFICATE-----` blocks). Anything else in it, such as other PEM blocks, a file reference or extra text, makes it unreadable, and the identity isn't allowed. The tunnel then gives the identity exactly the certificates it checked.
+
 An identity that isn't allowed:
 
 - isn't loaded by the tunnel, and shows as "Blocked by your organization" in the app, with its on/off switch disabled. Its files are kept, so it comes back if the policy changes;
@@ -97,6 +99,6 @@ On iOS this is mostly given: apps come only from the App Store, and device manag
 
 ## Troubleshooting
 
-- **An identity shows "Blocked by your organization".** The snapshot's `Blocked:` line names the certificate that isn't allowed. Either list it (or the CA it chains to), or the identity belongs to a network you don't allow.
+- **An identity shows "Blocked by your organization".** The snapshot's `Blocked:` line gives the reason: usually the certificate that isn't allowed, which you either list (or the CA it chains to), or it belongs to a network you don't allow. "no CA bundle" or "CA bundle can't be read" means the identity's bundle is missing or isn't plain PEM certificates.
 - **Nothing is blocked.** Check the snapshot for `Allowed CAs:`. "ignored, the tunnel settings aren't locked" means the profile needs `locked`. No line at all means the key isn't in the installed configuration.
 - **Everything is blocked.** `Allowed CAs: 0` means no listed fingerprint was valid; the app log has a warning for each invalid entry.

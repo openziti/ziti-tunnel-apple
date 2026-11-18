@@ -74,19 +74,32 @@ struct CABundlePolicy : Equatable {
         return SHA256.hash(data: SecCertificateCopyData(cert) as Data).map { String(format: "%02X", $0) }.joined(separator: ":")
     }
 
-    /// The certificates in a PEM bundle (optionally "pem:" prefixed, as the SDK stores it), or nil if one can't be read
+    /// The certificates in a PEM bundle (optionally "pem:" prefixed, as the SDK stores it), or nil if it can't be read.
+    /// Only CERTIFICATE blocks and whitespace are accepted: the SDK reads more ("file:" references, paths, legacy
+    /// "X509 CERTIFICATE" blocks), so anything else could hide certificates from the check
     static func certificates(_ caBundle:String?) -> [SecCertificate]? {
         let begin = "-----BEGIN CERTIFICATE-----", end = "-----END CERTIFICATE-----"
         var certs:[SecCertificate] = []
         var rest = Substring(caBundle ?? "")
-        while let b = rest.range(of: begin) {
-            guard let e = rest.range(of: end, range: b.upperBound..<rest.endIndex),
-                  let der = Data(base64Encoded: String(rest[b.upperBound..<e.lowerBound].filter { !$0.isWhitespace })),
+        if rest.hasPrefix("pem:") { rest = rest.dropFirst(4) }
+        while true {
+            rest = rest.drop { $0.isWhitespace }
+            guard !rest.isEmpty else { return certs }
+            guard rest.hasPrefix(begin), let e = rest.range(of: end),
+                  let der = Data(base64Encoded: String(rest[rest.index(rest.startIndex, offsetBy: begin.count)..<e.lowerBound].filter { !$0.isWhitespace })),
                   let cert = SecCertificateCreateWithData(nil, der as CFData) else { return nil }
             certs.append(cert)
             rest = rest[e.upperBound...]
         }
-        return certs
+    }
+
+    /// The certificates as a plain PEM bundle. The tunnel gives the SDK this rather than the identity's own text, so the
+    /// SDK loads exactly what was checked
+    static func pem(_ certs:[SecCertificate]) -> String {
+        return certs.map { cert in
+            let b64 = (SecCertificateCopyData(cert) as Data).base64EncodedString(options: [.lineLength64Characters, .endLineWithLineFeed])
+            return "-----BEGIN CERTIFICATE-----\n\(b64)\n-----END CERTIFICATE-----\n"
+        }.joined()
     }
 
     private static func normalize(_ value:String) -> String? {
