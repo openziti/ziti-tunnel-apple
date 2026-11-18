@@ -15,9 +15,11 @@ The bundle must be plain PEM certificates (`-----BEGIN CERTIFICATE-----` blocks)
 An identity that isn't allowed:
 
 - isn't loaded by the tunnel, and shows as "Blocked by your organization" in the app, with its on/off switch disabled. Its files are kept, so it comes back if the policy changes;
-- can't be added: enrolling with a network that isn't allowed fails with "This network isn't allowed by your organization." and the app removes what the enrollment created on the device.
+- can't be added: enrolling with a network that isn't allowed fails with "This network isn't allowed by your organization." and the app removes the identity it was enrolling. With a controller URL or a network JWT this happens before anyone signs in, from the CA bundle the network publishes. A one-time token JWT carries no CA bundle, so it's checked once enrolled: the device keeps nothing, but the identity stays on that network's controller.
 
-If a controller later sends an identity a new CA bundle that isn't allowed (e.g., after a CA rotation that the policy doesn't list yet), the tunnel stops that identity and shows a notification.
+On iOS, sharing a JWT file to Ziti Mobile Edge from another app is checked against the policy the app last saw. Until the app has run with the profile installed, such an enrollment is kept, but the tunnel still doesn't load it.
+
+If a controller later sends an identity a new CA bundle that isn't allowed (e.g., after a CA rotation that the policy doesn't list yet), the tunnel stops that identity at once (a connection opened in that moment can still go through) and shows a notification. It stays stopped until the tunnel restarts.
 
 HA clusters need nothing extra: their controllers and routers share the network's CAs.
 
@@ -41,7 +43,7 @@ Add `allowedCAs` to the `VendorConfig` of a tunnel configuration profile with `l
 - Fingerprints are hex, in any case, with or without colons. A single comma-separated string also works.
 - Without `locked`, `allowedCAs` is ignored: an unlocked configuration can be edited or replaced.
 - If `allowedCAs` is set but contains no valid fingerprint (including an empty list), no network is allowed, so a typo can't silently lift the restriction. Invalid entries are skipped and logged.
-- Changes take effect when the tunnel restarts. If the tunnel is connected when a profile with `allowedCAs` arrives, the app restarts it on the profile's settings (briefly disconnecting) the next time the app opens or comes to the front.
+- Changes take effect when the tunnel restarts. When a profile with `allowedCAs` arrives, the app switches the tunnel to the profile's settings right away, briefly disconnecting if it was connected. If the app isn't running (or, on iOS, is in the background), it does so when it next starts or comes to the front.
 
 ## Getting the fingerprints
 
@@ -92,10 +94,25 @@ Self-hosted networks: a quickstart or `ziti pki`-based setup creates a dedicated
 The setting closes the Ziti Desktop Edge and Ziti Mobile Edge path only. A user who can run other software could use another OpenZiti tunneler or SDK app (some need no admin rights). So, with your device management:
 
 - users don't have admin rights;
-- only approved software can run;
-- other VPN apps are blocked.
+- only approved software can run, at a version that supports `allowedCAs` (older versions ignore it);
+- other VPN apps are blocked;
+- on macOS, Ziti Desktop Edge runs at login, since it's what switches the tunnel to the profile's settings.
 
 On iOS this is mostly given: apps come only from the App Store, and device management can restrict which ones are installed.
+
+## Exact rules
+
+For checking a setup, or implementing the same restriction elsewhere.
+
+- **Fingerprints.** SHA-256 over the certificate's DER encoding. An entry is trimmed, colons are removed and case is ignored, and it must then be 64 hex digits; anything else is skipped. A string value is split on commas.
+- **When it applies.** Only in a locked configuration. Set, but with no valid fingerprint, it allows nothing.
+- **Reading a bundle.** An optional `pem:` prefix is ignored, once. What's left must be only whitespace and `-----BEGIN CERTIFICATE-----` / `-----END CERTIFICATE-----` blocks whose base64 decodes to a certificate. Anything else (other labels such as `X509 CERTIFICATE`, `file:` references, paths, comments) makes the bundle unreadable. An empty or unreadable bundle isn't allowed.
+- **Allowed bundles.** Every certificate is listed, or chains to a listed certificate using only the bundle's certificates, with the listed ones as the only trust anchors (not the system's or the user's). Signatures and CA constraints count; dates don't have to be current, since the question is which network a certificate belongs to. A certificate is evaluated at its own start, midpoint and end dates.
+- **What's loaded.** The tunnel gives an allowed identity exactly the certificates it checked, re-encoded as PEM, not the identity file's own text.
+- **Which identities.** Every identity file is checked, whether it says it's enrolled or not, so identities waiting to enroll aren't loaded.
+- **New bundles.** A refreshed bundle is checked when the controller sends it; one that isn't allowed stops the identity until the tunnel restarts, and it can't be turned back on in the meantime. An update without a bundle keeps the current one.
+- **Enrolling.** A controller URL or network JWT is checked from the bundle the network publishes, before sign-in. Every enrollment's resulting bundle is checked too. A refused enrollment keeps nothing on the device.
+- **Profiles.** A locked configuration with `allowedCAs` replaces the app's own as soon as the app sees it, even while the app's own is connected.
 
 ## Troubleshooting
 
