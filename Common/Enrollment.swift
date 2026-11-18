@@ -103,6 +103,8 @@ class Enrollment {
     private var mfaEnabled = false
     private var lastMfaAuth:Date?
     private var provider:String?
+    /// The bootstrap enrollment made to check the network's bundle. Enrolling without a provider gives the same result
+    private var bootstrapped:CZiti.ZitiIdentity?
 
     /// With a `policy`, an identity whose network it doesn't allow is refused, and anything enrollment stored is discarded
     init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK(), hint:Hint = Hint(), policy:CABundlePolicy? = nil) {
@@ -142,6 +144,7 @@ class Enrollment {
                     self.finish(.refused)
                     return
                 }
+                self.bootstrapped = zidResp
                 self.queryProviders(source)
             })
         }
@@ -207,6 +210,10 @@ class Enrollment {
     }
 
     private func enroll(_ source:Source) {
+        if let zidResp = bootstrapped {
+            finish(.enrolled(zidResp, .none))
+            return
+        }
         DispatchQueue.global().async {
             self.sdk.enroll(source, self.once { zidResp, failure in
                 guard failure == nil, let zidResp = zidResp else {

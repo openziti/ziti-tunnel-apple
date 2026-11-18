@@ -456,6 +456,16 @@ final class EnrollmentTests: XCTestCase {
                                    "enroll jwt(\"\(jwtFile)\") to cert with both"])
     }
 
+    // Enrolling without a provider is the bootstrap enrollment again, so its result is used rather than fetched twice
+    func testAllowedNetworkWithoutProvidersEnrollsOnce() throws {
+        let jwtFile = try networkJwt()
+        sdk.result = bootstrapResult(ca: CAFixtures.rootA)
+        sdk.providers = nil
+        let result = run(makeIdentity(claims: ["sub": "s", "iss": "i", "em": "network"]), jwtFile: jwtFile, policy: allowRootA)
+        XCTAssertEqual(describe(result), "enrolled bootstrap-id none")
+        XCTAssertEqual(sdk.calls, ["enroll jwt(\"\(jwtFile)\")", "query jwt(\"\(jwtFile)\")"])
+    }
+
     func testBootstrapFailureFailsWithoutQuery() throws {
         let jwtFile = try networkJwt()
         sdk.result = (nil, Enrollment.Failure(message: "no route", alreadyEnrolled: false))
