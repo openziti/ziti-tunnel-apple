@@ -46,7 +46,7 @@ The IDs above are for the App Store builds. Builds with other identifiers (see t
 ## Behavior
 
 - **Joining networks.** For each network without an identity yet, the app adds one waiting to enroll, at the top of the list. Enrollment starts when the user taps Enroll, and goes straight to the network's `provider` and `type` when they're set. Nothing opens in the browser until the user asks.
-- **Matching.** An identity belongs to a network when one of its controllers has the same host and port (443 if not given), enrolled or not, so the app doesn't add a second one on later launches.
+- **Matching.** An identity belongs to a network when one of its controllers has the same host and port (443 if not given), enrolled or not, so the app doesn't add a second one on later launches. The app records the network on the identity, so it stays matched after the network reports other controller addresses (an HA cluster's members, for example) than the one in the configuration.
 - **Adding turned off.** macOS: the + button is disabled, and enrollment links are refused. iOS: the Add Identity row is hidden, and files, links and imports through the share sheet are refused. Identities added before the configuration arrived can't be enrolled either. The app explains that adding identities is turned off by the organization.
 - **Links for your networks.** A `ziti://enroll` link for a network in `networks` is refused, whatever the restrictions, since the configuration already adds it.
 - **Removing turned off.** The remove button (macOS) or Forget This Identity (iOS) is disabled or hidden for identities on the `networks` controllers.

@@ -262,6 +262,57 @@ final class ManagedConfigTests: XCTestCase {
         }
     }
 
+    /// What a config event does: the controller addresses become the ones the network reports
+    private func reportControllers(_ zid:ZitiIdentity, _ ztAPIs:[String]) {
+        zid.czid?.ztAPI = ztAPIs[0]
+        zid.czid?.ztAPIs = ztAPIs
+    }
+
+    func testAddedNetworkStaysManagedWhenControllersChange() {
+        withStore { store in
+            let cfg = ManagedConfig([ManagedConfig.NETWORKS_KEY: [["controller": "https://ctrl.example.com", "provider": "Okta", "type": "cert"]],
+                                     ManagedConfig.DISABLE_REMOVE_IDENTITY_KEY: true])!
+            var zids:[ZitiIdentity] = []
+            XCTAssertEqual(zids.insertManaged(cfg, store), 1)
+            XCTAssertEqual(zids[0].managedController, "https://ctrl.example.com")
+            XCTAssertEqual(store.loadAll().0?.first?.managedController, "https://ctrl.example.com", "recorded on disk")
+
+            // enrolled, then the cluster reports its members, none of them the configured address
+            zids[0].enrolled = true
+            reportControllers(zids[0], ["https://ha1.example.com:443/edge/client/v1", "https://ha2.example.com:443/edge/client/v1"])
+            XCTAssertTrue(cfg.isManaged(zids[0]))
+            XCTAssertFalse(cfg.canRemove(zids[0]))
+            XCTAssertEqual(cfg.hint(for: zids[0]), Enrollment.Hint(provider: "Okta", enrollTo: .cert))
+            XCTAssertEqual(zids.insertManaged(cfg, store), 0, "no duplicate")
+            XCTAssertEqual(zids.count, 1)
+        }
+    }
+
+    func testExistingIdentityRecordedAsManaged() {
+        withStore { store in
+            // added before the configuration, so only its controllers say it's on the managed network
+            let zid = identity(["https://ctrl.example.com:443/edge/client/v1"], enrolled: true)
+            XCTAssertNil(store.store(zid))
+            var zids = [zid]
+            let cfg = config([["controller": "https://ctrl.example.com"]])!
+            XCTAssertEqual(zids.insertManaged(cfg, store), 0)
+            XCTAssertEqual(zid.managedController, "https://ctrl.example.com")
+            XCTAssertEqual(store.loadAll().0?.first?.managedController, "https://ctrl.example.com", "recorded on disk")
+
+            reportControllers(zid, ["https://ha1.example.com"])
+            XCTAssertTrue(cfg.isManaged(zid))
+            XCTAssertEqual(zids.insertManaged(cfg, store), 0)
+        }
+    }
+
+    func testRecordedNetworkMustStillBeConfigured() {
+        let zid = identity(["https://ha1.example.com"], enrolled: true)
+        zid.managedController = "https://old.example.com"
+        XCTAssertFalse(config([["controller": "https://other.example.com"]])!.isManaged(zid), "dropped from the configuration")
+        XCTAssertTrue(config([["controller": "https://OLD.example.com:443"]])!.isManaged(zid), "same host and port")
+        XCTAssertTrue(config([["controller": "https://ha1.example.com"]])!.isManaged(zid), "still matched by its controllers")
+    }
+
     func testInsertManagedKeepsGoingAfterFailure() {
         // a store that can't write: every insert fails, none throws, and each network is tried
         let store = TestableZitiIdentityStore(testDir: URL(fileURLWithPath: "/nonexistent-\(UUID().uuidString)"))
