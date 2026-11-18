@@ -43,7 +43,7 @@ Add `allowedCAs` to the `VendorConfig` of a tunnel configuration profile with `l
 - Fingerprints are hex, in any case, with or without colons. A single comma-separated string also works.
 - Without `locked`, `allowedCAs` is ignored: an unlocked configuration can be edited or replaced.
 - If `allowedCAs` is set but contains no valid fingerprint (including an empty list), no network is allowed, so a typo can't silently lift the restriction. Invalid entries are skipped and logged.
-- Changes take effect when the tunnel restarts. When a profile with `allowedCAs` arrives, the app switches the tunnel to the profile's settings right away, briefly disconnecting if it was connected. If the app isn't running (or, on iOS, is in the background), it does so when it next starts or comes to the front.
+- Changes take effect when the tunnel restarts. When a profile with `allowedCAs` arrives, the app switches the tunnel to the profile's settings right away, briefly disconnecting if it was connected. If the app isn't running (or, on iOS, is in the background), it does so when it next starts or comes to the front. Until then, on a device that already had the app, the app's own configuration is still in the system's VPN settings, and connecting it there starts the tunnel without the restriction.
 
 ## Getting the fingerprints
 
@@ -96,9 +96,10 @@ The setting closes the Ziti Desktop Edge and Ziti Mobile Edge path only. A user 
 - users don't have admin rights;
 - only approved software can run, at a version that supports `allowedCAs` (older versions ignore it);
 - other VPN apps are blocked;
-- on macOS, Ziti Desktop Edge runs at login, since it's what switches the tunnel to the profile's settings.
+- on macOS, Ziti Desktop Edge runs at login, since it's what switches the tunnel to the profile's settings;
+- on devices that already had the app, users open it once after the profile arrives, for the same reason (or deploy the profile before or with the app).
 
-On iOS this is mostly given: apps come only from the App Store, and device management can restrict which ones are installed.
+On iOS the first three are mostly given: apps come only from the App Store, and device management can restrict which ones are installed.
 
 ## Exact rules
 
@@ -112,7 +113,7 @@ For checking a setup, or implementing the same restriction elsewhere.
 - **Which identities.** Every identity file is checked, whether it says it's enrolled or not, so identities waiting to enroll aren't loaded.
 - **New bundles.** A refreshed bundle is checked when the controller sends it; one that isn't allowed stops the identity until the tunnel restarts, and it can't be turned back on in the meantime. An update without a bundle keeps the current one.
 - **Enrolling.** A controller URL or network JWT is checked from the bundle the network publishes, before sign-in. Every enrollment's resulting bundle is checked too. A refused enrollment keeps nothing on the device.
-- **Profiles.** A locked configuration with `allowedCAs` replaces the app's own as soon as the app sees it, even while the app's own is connected.
+- **Profiles.** A locked configuration with `allowedCAs` replaces the app's own as soon as the app sees it, even while the app's own is connected. Until the app sees it, the app's own configuration isn't restricted.
 
 ## Troubleshooting
 
