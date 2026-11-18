@@ -147,6 +147,52 @@ final class CABundlePolicyTests: XCTestCase {
         XCTAssertEqual(CABundlePolicy.pem([]), "")
     }
 
+    // MARK: - Tunnel decisions
+
+    func testLoadGivesTheSDKTheCheckedCertificates() {
+        let p = policy(CAFixtures.rootA)
+        let ca = "pem:\r\n" + bundle(CAFixtures.interA, CAFixtures.rootA).replacingOccurrences(of: "\n", with: "\r\n")
+        let expected = CABundlePolicy.pem(CABundlePolicy.certificates(ca)!)
+        XCTAssertEqual(p.load(ca), .load(expected))
+        XCTAssertNotEqual(expected, ca)
+        XCTAssertEqual(p.load(CABundlePolicy.pem(CABundlePolicy.certificates(CAFixtures.rootA)!)),
+                       .load(CABundlePolicy.pem(CABundlePolicy.certificates(CAFixtures.rootA)!)))
+    }
+
+    func testLoadBlocksWhatCheckBlocks() {
+        let p = policy(CAFixtures.rootA)
+        XCTAssertEqual(p.load(nil), .blocked("no CA bundle"))
+        XCTAssertEqual(p.load("file:///nonexistent/" + CAFixtures.rootA), .blocked("CA bundle can't be read"))
+        guard case .blocked(let reason) = p.load(bundle(CAFixtures.rootA, CAFixtures.rootB)) else {
+            return XCTFail("outside root loaded")
+        }
+        XCTAssertEqual(reason, "CA \(CABundlePolicy.displayFingerprint(cert(CAFixtures.rootB))) isn't allowed")
+    }
+
+    func testStopReasonForRefreshedBundle() {
+        let p = policy(CAFixtures.rootA)
+        XCTAssertNil(p.stopReason(refreshed: ""), "an event without a bundle keeps the current one")
+        XCTAssertNil(p.stopReason(refreshed: bundle(CAFixtures.interA, CAFixtures.rootA)))
+        XCTAssertEqual(p.stopReason(refreshed: CAFixtures.rootB),
+                       "CA \(CABundlePolicy.displayFingerprint(cert(CAFixtures.rootB))) isn't allowed")
+        XCTAssertEqual(p.stopReason(refreshed: "junk"), "CA bundle can't be read")
+    }
+
+    func testPolicyStops() {
+        var stops = PolicyStops()
+        XCTAssertTrue(stops.shouldRun("a", enabled: true))
+        XCTAssertFalse(stops.shouldRun("a", enabled: false))
+        XCTAssertEqual(stops.setEnabled("a", true), .proceed)
+        XCTAssertEqual(stops.setEnabled("a", false), .proceed)
+
+        stops.stop("a")
+        XCTAssertFalse(stops.shouldRun("a", enabled: true), "sleep and wake leave a stopped identity alone")
+        XCTAssertEqual(stops.setEnabled("a", true), .refuse)
+        XCTAssertEqual(stops.setEnabled("a", false), .alreadyStopped)
+        XCTAssertTrue(stops.shouldRun("b", enabled: true))
+        XCTAssertEqual(stops.setEnabled("b", true), .proceed)
+    }
+
     // MARK: - Identities
 
     func testBlocksEnrolledIdentitiesOnly() {

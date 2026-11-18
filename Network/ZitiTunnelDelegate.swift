@@ -39,7 +39,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
 
     /// Identities stopped because a refreshed CA bundle isn't allowed, kept off until the tunnel restarts. Only used on the
     /// tunnel's loop (events, `perform`)
-    private(set) var blockedIds = Set<String>()
+    private(set) var policyStops = PolicyStops()
     
     private var identitiesLoaded:Bool = false // when true, restart is required to update routes for services intercepted by IP
     
@@ -73,7 +73,10 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
 
                 // checked whether enrolled or not: the file says which, and without a CA bundle the SDK trusts the system's CAs
                 if let policy = ptp?.caBundlePolicy {
-                    if case .blocked(let reason) = policy.check(czid.ca) {
+                    switch policy.load(czid.ca) {
+                    case .load(let ca):
+                        czid.ca = ca
+                    case .blocked(let reason):
                         if tzid.isEnrolled {
                             zLog.warn("Not loading \(tzid.name):\(tzid.id), blocked by \(ProviderConfig.ALLOWED_CAS_KEY): \(reason)")
                         } else {
@@ -82,9 +85,6 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                         }
                         return
                     }
-                    // the SDK gets the checked certificates, re-encoded, not the file's text, which it could read differently
-                    guard let certs = CABundlePolicy.certificates(czid.ca) else { return }
-                    czid.ca = CABundlePolicy.pem(certs)
                 }
                 zids.append(czid)
             }
@@ -465,11 +465,11 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         // tunnel provider has already updated tzid with event data before calling us, so just save the zid
         _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
 
-        // the SDK applies a refreshed CA bundle before we hear about it, so all that's left is to stop the identity.
-        // An event without a bundle (e.g., only the controllers changed) keeps the current one
-        if !event.caBundle.isEmpty, let policy = ptp?.caBundlePolicy, case .blocked(let reason) = policy.check(event.caBundle) {
+        // the SDK applies a refreshed CA bundle before we hear about it, so the identity is stopped as soon as it can be:
+        // setEnabled(false) is queued work, so connections made in the meantime use the new bundle
+        if let policy = ptp?.caBundlePolicy, let reason = policy.stopReason(refreshed: event.caBundle) {
             zLog.error("Stopping \(tzid.name):\(tzid.id), updated CA bundle blocked by \(ProviderConfig.ALLOWED_CAS_KEY): \(reason)")
-            blockedIds.insert(ziti.id.id)
+            policyStops.stop(ziti.id.id)
             ziti.setEnabled(false)
             userNotifications.post(.Error, "Network not allowed", "\(tzid.name) was stopped: its network isn't allowed by your organization", tzid)
         }
@@ -632,10 +632,9 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
     }
     
-    /// Enabled and not stopped by the CA policy. A stopped one is already disabled, so it sends no event to wait for.
-    /// Call on the loop (where `blockedIds` changes)
+    /// Call on the loop (where `policyStops` changes)
     private func shouldRun(_ z:Ziti, _ tzid:ZitiIdentity) -> Bool {
-        return tzid.isEnabled && !blockedIds.contains(z.id.id)
+        return policyStops.shouldRun(z.id.id, enabled: tzid.isEnabled)
     }
 
     func onSleep(_ completionHandler: @escaping () -> Void) {

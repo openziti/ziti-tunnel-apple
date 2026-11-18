@@ -59,6 +59,26 @@ struct CABundlePolicy : Equatable {
         return .allowed
     }
 
+    enum Load : Equatable {
+        case load(String)
+        case blocked(String)
+    }
+
+    /// What the tunnel gives the SDK for an identity's bundle: the checked certificates, re-encoded as plain PEM so the
+    /// SDK can't read the identity's own text differently, or why the identity isn't loaded
+    func load(_ caBundle:String?) -> Load {
+        if case .blocked(let reason) = check(caBundle) { return .blocked(reason) }
+        guard let certs = CABundlePolicy.certificates(caBundle) else { return .blocked("CA bundle can't be read") }
+        return .load(CABundlePolicy.pem(certs))
+    }
+
+    /// Why an identity has to stop after a config event refreshed its bundle, if it does. An event without a bundle
+    /// (e.g., only the controllers changed) keeps the current one
+    func stopReason(refreshed caBundle:String) -> String? {
+        guard !caBundle.isEmpty, case .blocked(let reason) = check(caBundle) else { return nil }
+        return reason
+    }
+
     /// An enrolled identity the tunnel won't load. Pending ones are checked when they enroll
     func blocks(_ zid:ZitiIdentity) -> Bool {
         return zid.isEnrolled && check(zid.czid?.ca) != .allowed
@@ -137,6 +157,31 @@ struct CABundlePolicy : Equatable {
         guard tbs.next() != nil, tbs.next() != nil, tbs.next() != nil, // serial, signature algorithm, issuer
               var validity = tbs.next(0x30), let notBefore = validity.time(), let notAfter = validity.time() else { return nil }
         return (notBefore, notAfter)
+    }
+}
+
+/// Identities the tunnel stopped while running because a refreshed CA bundle isn't allowed. They stay stopped until the
+/// tunnel restarts and the load check runs again
+struct PolicyStops {
+    enum SetEnabled : Equatable {
+        case proceed, refuse, alreadyStopped
+    }
+
+    private(set) var ids = Set<String>()
+
+    mutating func stop(_ id:String) {
+        ids.insert(id)
+    }
+
+    /// Enabled and not stopped. A stopped identity is already disabled, so it sends no event to wait for
+    func shouldRun(_ id:String, enabled:Bool) -> Bool {
+        return enabled && !ids.contains(id)
+    }
+
+    /// A stopped identity can't be enabled, and disabling it has nothing left to do
+    func setEnabled(_ id:String, _ enabled:Bool) -> SetEnabled {
+        guard ids.contains(id) else { return .proceed }
+        return enabled ? .refuse : .alreadyStopped
     }
 }
 
