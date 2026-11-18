@@ -29,6 +29,12 @@ jobs:
 
   build:
     runs-on: macos-26
+    # PR runs take App Store Connect's latest build number + 1 and upload it, so runs started together pick the same
+    # number. Queue them per app until the upload is processed. Push runs don't upload and don't wait
+    concurrency:
+      group: ${{ github.event_name == 'pull_request' && format('testflight-{0}', matrix.spec.sdk) || format('build-{0}-{1}', github.run_id, matrix.spec.sdk) }}
+      cancel-in-progress: false
+      queue: max
     outputs:
       bundle_version: ${{ steps.configure_versions.outputs.bundle_version }}
       next_bundle_version: ${{ steps.configure_versions.outputs.next_bundle_version }}
