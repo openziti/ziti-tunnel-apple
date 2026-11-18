@@ -632,10 +632,16 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
     }
     
+    /// Enabled and not stopped by the CA policy. A stopped one is already disabled, so it sends no event to wait for.
+    /// Call on the loop (where `blockedIds` changes)
+    private func shouldRun(_ z:Ziti, _ tzid:ZitiIdentity) -> Bool {
+        return tzid.isEnabled && !blockedIds.contains(z.id.id)
+    }
+
     func onSleep(_ completionHandler: @escaping () -> Void) {
         var sleepsPending = 0
         allZitis.forEach { z in
-            if let tzid = zidToTzid(z.id.id), tzid.isEnabled {
+            if let tzid = zidToTzid(z.id.id), shouldRun(z, tzid) {
                 sleepsPending += 1
             }
         }
@@ -647,7 +653,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
         
         allZitis.forEach { z in
-            if let tzid = zidToTzid(z.id.id) {
+            if let tzid = zidToTzid(z.id.id), shouldRun(z, tzid) {
                 let disableCompleteHandler:IpcAppexServer.CompletionHandler = { _ in
                     sleepsPending -= 1
                     if sleepsPending == 0 {
@@ -656,10 +662,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                     }
                 }
                 z.userData[IpcAppexServer.CONTEXT_EVENT_ENABLED_CALLBACK_KEY] = disableCompleteHandler
-                
-                if tzid.isEnabled {
-                    z.setEnabled(false)
-                }
+                z.setEnabled(false)
             }
         }
     }
@@ -667,11 +670,9 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     func onWake() {
         lastWakeTime = Date()
         allZitis.forEach { z in
-            if let tzid = zidToTzid(z.id.id), !blockedIds.contains(z.id.id) {
-                if tzid.isEnabled {
-                    if !z.isEnabled() { z.setEnabled(true) }
-                    z.endpointStateChange(true, false)
-                }
+            if let tzid = zidToTzid(z.id.id), shouldRun(z, tzid) {
+                if !z.isEnabled() { z.setEnabled(true) }
+                z.endpointStateChange(true, false)
             }
         }
     }

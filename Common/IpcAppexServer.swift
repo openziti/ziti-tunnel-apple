@@ -121,10 +121,15 @@ class IpcAppexServer : NSObject {
         }
 
         ziti.perform {
-            if enabled, self.ptp.zitiTunnelDelegate?.blockedIds.contains(ziti.id.id) ?? false {
-                let errStr = CABundlePolicy.notAllowedMessage
-                zLog.warn("Not enabling \(ziti.id.name ?? ""):\(ziti.id.id): \(errStr)")
-                completionHandler?(self.errData(errStr))
+            if self.ptp.zitiTunnelDelegate?.blockedIds.contains(ziti.id.id) ?? false {
+                guard !enabled else {
+                    let errStr = CABundlePolicy.notAllowedMessage
+                    zLog.warn("Not enabling \(ziti.id.name ?? ""):\(ziti.id.id): \(errStr)")
+                    completionHandler?(self.errData(errStr))
+                    return
+                }
+                // already stopped by the CA policy, so no event will come to answer with
+                completionHandler?(try? self.encoder.encode(IpcSetEnabledResponseMessage(ziti.id.id, Int64(Ziti.ZITI_DISABLED))))
                 return
             }
             zLog.info("Setting Enabled to \(enabled) for \(ziti.id.name ?? ""):\(ziti.id.id), controller: \(ziti.id.ztAPI)")
