@@ -41,7 +41,7 @@ Add `allowedCAs` to the `VendorConfig` of a tunnel configuration profile with `l
 - Fingerprints are hex, in any case, with or without colons. A single comma-separated string also works.
 - Without `locked`, `allowedCAs` is ignored: an unlocked configuration can be edited or replaced.
 - If `allowedCAs` is set but contains no valid fingerprint (including an empty list), no network is allowed, so a typo can't silently lift the restriction. Invalid entries are skipped and logged.
-- Changes take effect when the tunnel restarts.
+- Changes take effect when the tunnel restarts. If the tunnel is connected when a profile with `allowedCAs` arrives, the app restarts it on the profile's settings (briefly disconnecting) the next time the app opens or comes to the front.
 
 ## Getting the fingerprints
 

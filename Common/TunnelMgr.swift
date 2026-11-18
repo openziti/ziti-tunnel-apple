@@ -154,6 +154,15 @@ class TunnelMgr: NSObject {
         return !isLocked(preferred) && managers.contains { targets($0, bid) && isUsableLocked($0) }
     }
 
+    /// True when the waiting locked configuration restricts networks (`allowedCAs`). It doesn't wait for a disconnect
+    /// the user can put off: the tunnel restarts on it now
+    static func lockedPendingRestricts(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String) -> Bool {
+        return !isLocked(preferred) && managers.contains {
+            targets($0, bid) && isUsableLocked($0) &&
+                ProviderConfig.caBundlePolicy(($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration) != nil
+        }
+    }
+
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
     
     /// Loads the preferred tunnel configuration, creating one on first run. Reloads pass `createIfMissing: false`
@@ -168,6 +177,7 @@ class TunnelMgr: NSObject {
         loadedBid = bid
         
         var tpm = NETunnelProviderManager()
+        var switchToLocked = false
         NETunnelProviderManager.loadAllFromPreferences { [weak self] savedManagers, error in
             if let error = error {
                 zLog.error(error.localizedDescription)
@@ -179,6 +189,7 @@ class TunnelMgr: NSObject {
             if let savedManagers = savedManagers, let preferred = TunnelMgr.preferredManager(savedManagers, bid) {
                 tpm = preferred
                 self?.lockedPending = TunnelMgr.lockedPending(savedManagers, preferred, bid)
+                switchToLocked = TunnelMgr.lockedPendingRestricts(savedManagers, preferred, bid)
                 
                 TunnelMgr.supersededManagers(savedManagers, preferred, bid).forEach { mgr in
                     let name = mgr.localizedDescription ?? ""
@@ -248,6 +259,11 @@ class TunnelMgr: NSObject {
                     if !creating { tmgr.loading = false }
                     completionHandler?(tpm, nil)
                     tmgr.tsChangedCallbacks.forEach { cb in cb(tmgr.status) }
+
+                    if switchToLocked {
+                        zLog.info("Locked configuration restricts networks, restarting the tunnel on it")
+                        tmgr.restartTunnel()
+                    }
                 } else {
                     completionHandler?(nil, ZitiError("Tunnel preferencecs load fail due to retain scope"))
                 }
@@ -292,12 +308,25 @@ class TunnelMgr: NSObject {
         if tunnelRestarting == true {
             if status == .disconnected {
                 tunnelRestarting = false
-                do {
-                    try startTunnel()
-                } catch {
-                    zLog.error("Failed (re-)starting tunnel \(error.localizedDescription)")
+                // A waiting locked configuration takes over on any restart, not just when the user disconnects
+                if lockedPending && !loading, let bid = loadedBid {
+                    zLog.info("Tunnel restarting, switching to locked configuration")
+                    lockedPending = false
+                    loadFromPreferences(bid, createIfMissing: false) { [weak self] mgr, error in
+                        guard mgr != nil, error == nil else { return }
+                        do {
+                            try self?.startTunnel()
+                        } catch {
+                            zLog.error("Failed starting tunnel on locked configuration \(error.localizedDescription)")
+                        }
+                    }
+                } else {
+                    do {
+                        try startTunnel()
+                    } catch {
+                        zLog.error("Failed (re-)starting tunnel \(error.localizedDescription)")
+                    }
                 }
-                
             }
             tsChangedCallbacks.forEach { cb in cb(.reasserting) }
         } else {
