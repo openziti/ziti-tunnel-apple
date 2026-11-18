@@ -44,7 +44,8 @@ class DateFormatterTimeAgoTests: XCTestCase {
     }
 
     func testTimeSince_secondsAgo() {
-        let tenSecondsAgo = Date().timeIntervalSince1970 - 10
+        // half a second either side, since whole seconds are counted and the dates' conversions can round down
+        let tenSecondsAgo = Date().timeIntervalSince1970 - 10.5
         XCTAssertEqual(formatter.timeSince(tenSecondsAgo), "10 seconds ago")
     }
 
