@@ -73,7 +73,12 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
 
                 // checked whether enrolled or not: the file says which, and without a CA bundle the SDK trusts the system's CAs
                 if let policy = ptp?.caBundlePolicy, case .blocked(let reason) = policy.check(czid.ca) {
-                    zLog.warn("Not loading \(tzid.name):\(tzid.id), blocked by \(ProviderConfig.ALLOWED_CAS_KEY): \(reason)")
+                    if tzid.isEnrolled {
+                        zLog.warn("Not loading \(tzid.name):\(tzid.id), blocked by \(ProviderConfig.ALLOWED_CAS_KEY): \(reason)")
+                    } else {
+                        // the usual case is a pending identity, which has no CA bundle until it enrolls
+                        zLog.info("Not loading \(tzid.name):\(tzid.id), not enrolled (\(reason))")
+                    }
                     return
                 }
                 zids.append(czid)
