@@ -55,6 +55,17 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5AE3581D30ACE588008D6819"
+               BuildableName = "ZitiMobileUITests.xctest"
+               BlueprintName = "ZitiMobileUITests"
+               ReferencedContainer = "container:ZitiPacketTunnel.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
