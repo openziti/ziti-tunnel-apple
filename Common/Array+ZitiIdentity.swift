@@ -84,9 +84,10 @@ extension Array where Element == ZitiIdentity {
     }
     
     mutating func insertFromURL(_ url:URL, _ zidStore:ZitiIdentityStore, at:Int) throws {
-        guard let host = url.host else { return }
+        guard let host = url.host else { throw ZitiError("No host in controller URL") }
+        // a temp id, like network JWTs: the host alone isn't unique (one host can serve several networks on different ports)
         let zid = ZitiIdentity()
-        zid.czid = CZiti.ZitiIdentity(id: host, ztAPIs: [url.absoluteString], name: url.host)
+        zid.czid = CZiti.ZitiIdentity(id: UUID().uuidString, ztAPIs: [url.absoluteString], name: host)
 
         // store zid
         if let error = zidStore.store(zid) { throw error }

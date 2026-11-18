@@ -19,8 +19,10 @@ import Foundation
 /// Restrictions the app passes on to the share extension, which can't read the app's managed configuration.
 /// The app saves them in the app group each time it reads the configuration. No file means no restrictions.
 enum SharedRestrictions {
+    // the same key as ManagedConfig's, which the share extension doesn't compile
     private static let DISABLE_ADD_IDENTITY_KEY = "disableAddIdentity"
 
+    /// Here rather than on ManagedConfig so the share extension can show it too
     static let addDisabledMessage = "Adding identities is turned off by your organization."
 
     static var url:URL? {

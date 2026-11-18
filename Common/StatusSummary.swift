@@ -40,7 +40,7 @@ class StatusSummary {
     }
 
     /// `config` is the saved tunnel configuration, listed as stored (invalid values included)
-    static func text(version:String, status:NEVPNStatus, config:ProviderConfigDict?, managedConfig:ManagedConfig? = nil, zids:[ZitiIdentity]) -> String {
+    static func text(version:String, status:NEVPNStatus, config:ProviderConfigDict?, managedConfig:ManagedConfig?, zids:[ZitiIdentity]) -> String {
         var lines = [
             "======= Status ==========",
             version,

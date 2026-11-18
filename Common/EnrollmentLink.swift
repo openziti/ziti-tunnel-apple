@@ -76,6 +76,12 @@ struct EnrollmentLink : Equatable {
         return comps.string ?? url.scheme ?? ""
     }
 
+    /// Host and port, with the https default, so "https://CTRL" and "https://ctrl:443/edge/client/v1" are the same controller
+    static func endpoint(_ url:URL) -> String? {
+        guard let host = url.host?.lowercased() else { return nil }
+        return "\(host):\(url.port ?? 443)"
+    }
+
     static func controllerName(_ url:URL) -> String {
         guard let host = url.host else { return url.absoluteString }
         if let port = url.port { return "\(host):\(port)" }
@@ -101,12 +107,19 @@ struct EnrollmentLink : Equatable {
     }
 }
 
+extension ZitiIdentity {
+    /// Whether one of the identity's controllers is the link's, enrolled or not
+    func isOnController(of link:EnrollmentLink) -> Bool {
+        guard let czid = czid, let target = EnrollmentLink.endpoint(link.controller) else { return false }
+        return ([czid.ztAPI] + (czid.ztAPIs ?? [])).contains { URL(string: $0).flatMap(EnrollmentLink.endpoint) == target }
+    }
+}
+
 extension Array where Element == ZitiIdentity {
     /// An identity already added from the same link and not yet enrolled (links are easy to open twice)
     func pending(_ link:EnrollmentLink) -> ZitiIdentity? {
         return first { zid in
-            guard !zid.isEnrolled, let ztAPI = zid.czid?.ztAPI, let url = URL(string: ztAPI),
-                  EnrollmentLink.controllerName(url) == link.controllerName else { return false }
+            guard !zid.isEnrolled, zid.isOnController(of: link) else { return false }
             switch link.source {
             case .controller: return zid.claims == nil
             case .jwt: return zid.claims?.em == "network"

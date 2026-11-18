@@ -18,24 +18,30 @@ import Foundation
 
 /// Settings an organization sets for the app (managed app configuration): networks to add, each as the fields of
 /// an enrollment link, and whether users can add or remove identities.
-struct ManagedConfig : Equatable {
+struct ManagedConfig : Equatable, CustomStringConvertible {
     static let NETWORKS_KEY = "networks"
     static let DISABLE_ADD_IDENTITY_KEY = "disableAddIdentity"
     static let DISABLE_REMOVE_IDENTITY_KEY = "disableRemoveIdentity"
     static let keys = [NETWORKS_KEY, DISABLE_ADD_IDENTITY_KEY, DISABLE_REMOVE_IDENTITY_KEY]
 
     static let removeDisabledMessage = "Removing this identity is turned off by your organization."
+    static let managedNetworkMessage = "This network is set up by your organization."
 
     let networks:[EnrollmentLink]
     let disableAddIdentity:Bool
     let disableRemoveIdentity:Bool
+    /// What was skipped or corrected while reading, for the app to log when the configuration changes
+    let problems:[String]
 
-    /// nil when none of the keys are set. Invalid values are logged and ignored
+    /// nil when none of the keys are set. Invalid networks are skipped, and a restriction that isn't a valid boolean
+    /// is on, so a mistake doesn't lift it
     init?(_ value:(String) -> Any?) {
         guard ManagedConfig.keys.contains(where: { value($0) != nil }) else { return nil }
-        networks = ManagedConfig.networks(value(ManagedConfig.NETWORKS_KEY))
-        disableAddIdentity = ManagedConfig.flag(value, ManagedConfig.DISABLE_ADD_IDENTITY_KEY)
-        disableRemoveIdentity = ManagedConfig.flag(value, ManagedConfig.DISABLE_REMOVE_IDENTITY_KEY)
+        var problems:[String] = []
+        networks = ManagedConfig.networks(value(ManagedConfig.NETWORKS_KEY), &problems)
+        disableAddIdentity = ManagedConfig.flag(value, ManagedConfig.DISABLE_ADD_IDENTITY_KEY, &problems)
+        disableRemoveIdentity = ManagedConfig.flag(value, ManagedConfig.DISABLE_REMOVE_IDENTITY_KEY, &problems)
+        self.problems = problems
     }
 
     init?(_ dict:[String: Any]) {
@@ -48,16 +54,27 @@ struct ManagedConfig : Equatable {
 
     /// Identities on a managed network's controller, enrolled or not
     func isManaged(_ zid:ZitiIdentity) -> Bool {
-        return networks.contains { ManagedConfig.isOnController(zid, $0) }
+        return networks.contains { zid.isOnController(of: $0) }
     }
 
     func canRemove(_ zid:ZitiIdentity) -> Bool {
         return !disableRemoveIdentity || !isManaged(zid)
     }
 
+    /// With adding turned off, only the organization's networks can be enrolled (not identities added before)
+    func canEnroll(_ zid:ZitiIdentity) -> Bool {
+        return !disableAddIdentity || isManaged(zid)
+    }
+
+    /// A link for one of the organization's networks adds nothing the configuration doesn't
+    func manages(_ link:EnrollmentLink) -> Bool {
+        let endpoint = EnrollmentLink.endpoint(link.controller)
+        return networks.contains { EnrollmentLink.endpoint($0.controller) == endpoint }
+    }
+
     /// The provider and enrollment type set for the identity's network, if any
     func hint(for zid:ZitiIdentity) -> Enrollment.Hint {
-        return networks.first { ManagedConfig.isOnController(zid, $0) }?.hint ?? Enrollment.Hint()
+        return networks.first { zid.isOnController(of: $0) }?.hint ?? Enrollment.Hint()
     }
 
     /// What's set, without values, for the log and the status summary
@@ -65,6 +82,7 @@ struct ManagedConfig : Equatable {
         var parts = ["\(networks.count) network\(networks.count == 1 ? "" : "s")"]
         if disableAddIdentity { parts.append("adding identities turned off") }
         if disableRemoveIdentity { parts.append("removing managed identities turned off") }
+        if !problems.isEmpty { parts.append("\(problems.count) problem\(problems.count == 1 ? "" : "s") (see the app log)") }
         return parts.joined(separator: ", ")
     }
 
@@ -72,10 +90,10 @@ struct ManagedConfig : Equatable {
 
     private static let networkFields = ["controller", "jwt", "provider", "type"]
 
-    private static func networks(_ obj:Any?) -> [EnrollmentLink] {
+    private static func networks(_ obj:Any?, _ problems:inout [String]) -> [EnrollmentLink] {
         guard let obj = obj else { return [] }
         guard let entries = obj as? [Any] else {
-            zLog.warn("Ignoring managed \(NETWORKS_KEY): not a list")
+            problems.append("Ignoring managed \(NETWORKS_KEY): not a list")
             return []
         }
         var links:[EnrollmentLink] = []
@@ -85,11 +103,11 @@ struct ManagedConfig : Equatable {
                   dict.allSatisfy({ !networkFields.contains($0.key) || $0.value is String }),
                   let link = EnrollmentLink(controller: dict["controller"] as? String, jwt: dict["jwt"] as? String,
                                             provider: dict["provider"] as? String, type: dict["type"] as? String) else {
-                zLog.warn("Ignoring invalid managed network \(i + 1)")
+                problems.append("Ignoring invalid managed network \(i + 1)")
                 continue
             }
-            guard !links.contains(where: { endpoint($0.controller) == endpoint(link.controller) }) else {
-                zLog.warn("Ignoring managed network \(i + 1): same controller as an earlier one")
+            guard !links.contains(where: { EnrollmentLink.endpoint($0.controller) == EnrollmentLink.endpoint(link.controller) }) else {
+                problems.append("Ignoring managed network \(i + 1): same controller as an earlier one")
                 continue
             }
             links.append(link)
@@ -97,26 +115,13 @@ struct ManagedConfig : Equatable {
         return links
     }
 
-    private static func flag(_ value:(String) -> Any?, _ key:String) -> Bool {
+    private static func flag(_ value:(String) -> Any?, _ key:String, _ problems:inout [String]) -> Bool {
         guard let obj = value(key) else { return false }
         guard let flag = ProviderConfig.boolValue(obj) else {
-            zLog.warn("Ignoring invalid managed \(key)")
-            return false
+            problems.append("Invalid managed \(key), treating it as true")
+            return true
         }
         return flag
-    }
-
-    // MARK: - Matching identities to networks
-
-    /// Host and port, with the https default, so "https://ctrl" and "https://ctrl:443/edge/client/v1" match
-    private static func endpoint(_ url:URL) -> String? {
-        guard let host = url.host?.lowercased() else { return nil }
-        return "\(host):\(url.port ?? 443)"
-    }
-
-    fileprivate static func isOnController(_ zid:ZitiIdentity, _ link:EnrollmentLink) -> Bool {
-        guard let czid = zid.czid, let target = endpoint(link.controller) else { return false }
-        return ([czid.ztAPI] + (czid.ztAPIs ?? [])).contains { URL(string: $0).flatMap(endpoint) == target }
     }
 }
 
@@ -125,7 +130,7 @@ extension Array where Element == ZitiIdentity {
     /// Returns how many were added
     mutating func insertManaged(_ config:ManagedConfig, _ zidStore:ZitiIdentityStore) -> Int {
         var added = 0
-        for link in config.networks where !contains(where: { ManagedConfig.isOnController($0, link) }) {
+        for link in config.networks where !contains(where: { $0.isOnController(of: link) }) {
             do {
                 try insertFromLink(link, zidStore, at: 0)
                 added += 1
@@ -146,7 +151,12 @@ extension UserDefaults {
 #if os(macOS)
         return objectIsForced(forKey: key) ? object(forKey: key) : nil
 #else
-        return dictionary(forKey: UserDefaults.MANAGED_CONFIGURATION_KEY)?[key]
+        return managedAppConfiguration?[key]
 #endif
+    }
+
+    /// iOS: the managed app configuration an MDM delivers. Only the MDM writes it, so every value counts
+    var managedAppConfiguration:[String: Any]? {
+        return dictionary(forKey: UserDefaults.MANAGED_CONFIGURATION_KEY)
     }
 }

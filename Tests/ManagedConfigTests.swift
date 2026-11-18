@@ -31,24 +31,12 @@ private class FakeDefaults : UserDefaults {
 
 final class ManagedConfigTests: XCTestCase {
 
-    private func networkJwt(_ iss:String = "https://ctrl.example.com:443/", em:String = "network") -> String {
-        let payload = try! JSONSerialization.data(withJSONObject: ["iss": iss, "sub": iss, "em": em])
-            .base64EncodedString()
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
-        return "eyJhbGciOiJSUzI1NiJ9.\(payload).c2ln"
-    }
-
     private func config(_ networks:Any) -> ManagedConfig? {
         return ManagedConfig([ManagedConfig.NETWORKS_KEY: networks])
     }
 
     private func identity(_ ztAPIs:[String], enrolled:Bool = false) -> ZitiIdentity {
-        let zid = ZitiIdentity()
-        zid.czid = CZiti.ZitiIdentity(id: UUID().uuidString, ztAPIs: ztAPIs)
-        zid.enrolled = enrolled
-        return zid
+        return makeIdentity(id: UUID().uuidString, ztAPI: ztAPIs[0], ztAPIs: ztAPIs, enrolled: enrolled)
     }
 
     // MARK: - Parsing
@@ -61,7 +49,7 @@ final class ManagedConfigTests: XCTestCase {
     func testNetworks() {
         let cfg = config([
             ["controller": "https://ctrl.example.com:1280", "provider": "Okta", "type": "cert"],
-            ["jwt": networkJwt("https://other.example.com:443/")]
+            ["jwt": makeNetworkJwt("https://other.example.com:443/")]
         ])
         XCTAssertEqual(cfg?.networks.count, 2)
         XCTAssertEqual(cfg?.networks.first?.source, .controller(URL(string: "https://ctrl.example.com:1280")!))
@@ -72,7 +60,7 @@ final class ManagedConfigTests: XCTestCase {
     }
 
     func testSameAsEnrollmentLink() {
-        let jwt = networkJwt()
+        let jwt = makeNetworkJwt()
         let link = EnrollmentLink(URL(string: "ziti://enroll?jwt=\(jwt)&provider=Okta&type=token")!)
         XCTAssertNotNil(link)
         XCTAssertEqual(config([["jwt": jwt, "provider": "Okta", "type": "token"]])?.networks, [link!])
@@ -81,10 +69,10 @@ final class ManagedConfigTests: XCTestCase {
     func testInvalidNetworksAreSkipped() {
         let valid = ["controller": "https://ctrl.example.com"]
         let cfg = config([
-            ["controller": "https://a.example.com", "jwt": networkJwt()],   // both
+            ["controller": "https://a.example.com", "jwt": makeNetworkJwt()],   // both
             ["provider": "Okta"],                                           // neither
             ["controller": "http://b.example.com"],                         // not https
-            ["jwt": networkJwt(em: "ott")],                                 // one-time token
+            ["jwt": makeNetworkJwt(em: "ott")],                                 // one-time token
             ["controller": "https://c.example.com", "type": "password"],    // unknown type
             ["controller": "https://d.example.com", "provider": 1],         // wrong field type
             "https://e.example.com",                                        // not a dictionary
@@ -115,13 +103,34 @@ final class ManagedConfigTests: XCTestCase {
             XCTAssertEqual(cfg?.networks, [])
         }
         XCTAssertEqual(ManagedConfig([ManagedConfig.DISABLE_ADD_IDENTITY_KEY: false])?.disableAddIdentity, false)
-        XCTAssertEqual(ManagedConfig([ManagedConfig.DISABLE_ADD_IDENTITY_KEY: "maybe"])?.disableAddIdentity, false)
+        XCTAssertEqual(ManagedConfig([ManagedConfig.DISABLE_ADD_IDENTITY_KEY: "no"])?.problems, [])
+    }
+
+    func testInvalidRestrictionIsOn() {
+        // a mistake doesn't lift a restriction
+        for value in ["maybe", "tru", [], ["a": 1]] as [Any] {
+            let cfg = ManagedConfig([ManagedConfig.DISABLE_REMOVE_IDENTITY_KEY: value])
+            XCTAssertEqual(cfg?.disableRemoveIdentity, true, "\(value)")
+            XCTAssertEqual(cfg?.problems, ["Invalid managed disableRemoveIdentity, treating it as true"], "\(value)")
+        }
+    }
+
+    func testProblemsAreCollectedNotLogged() {
+        let cfg = ManagedConfig([ManagedConfig.NETWORKS_KEY: [["provider": "Okta"], ["controller": "https://c.example.com"],
+                                                              ["controller": "https://C.example.com:443"]],
+                                 ManagedConfig.DISABLE_ADD_IDENTITY_KEY: "maybe"])
+        XCTAssertEqual(cfg?.problems, ["Ignoring invalid managed network 1",
+                                       "Ignoring managed network 3: same controller as an earlier one",
+                                       "Invalid managed disableAddIdentity, treating it as true"])
+        XCTAssertEqual(ManagedConfig([ManagedConfig.NETWORKS_KEY: "https://c.example.com"])?.problems,
+                       ["Ignoring managed networks: not a list"])
     }
 
     func testDescription() {
         XCTAssertEqual(config([["controller": "https://ctrl.example.com"]])?.description, "1 network")
         let cfg = ManagedConfig([ManagedConfig.DISABLE_ADD_IDENTITY_KEY: true, ManagedConfig.DISABLE_REMOVE_IDENTITY_KEY: true])
         XCTAssertEqual(cfg?.description, "0 networks, adding identities turned off, removing managed identities turned off")
+        XCTAssertEqual(config([["provider": "Okta"], ["controller": "https://c.example.com"]])?.description, "1 network, 1 problem (see the app log)")
     }
 
     // MARK: - Reading
@@ -141,15 +150,51 @@ final class ManagedConfigTests: XCTestCase {
     }
 #endif
 
+    func testManagedAppConfiguration() {
+        // the iOS source, readable on macOS too
+        let suite = "ManagedConfigTests-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        XCTAssertNil(defaults.managedAppConfiguration)
+
+        defaults.set([ManagedConfig.NETWORKS_KEY: [["controller": "https://ctrl.example.com"]],
+                      ManagedConfig.DISABLE_ADD_IDENTITY_KEY: true], forKey: UserDefaults.MANAGED_CONFIGURATION_KEY)
+        let cfg = ManagedConfig { defaults.managedAppConfiguration?[$0] }
+        XCTAssertEqual(cfg?.networks.count, 1)
+        XCTAssertEqual(cfg?.disableAddIdentity, true)
+
+        defaults.set([String: Any](), forKey: UserDefaults.MANAGED_CONFIGURATION_KEY)
+        XCTAssertNil(ManagedConfig { defaults.managedAppConfiguration?[$0] })
+        defaults.set("not a dictionary", forKey: UserDefaults.MANAGED_CONFIGURATION_KEY)
+        XCTAssertNil(defaults.managedAppConfiguration)
+    }
+
     // MARK: - Identities
 
     func testIsManagedMatchesHostAndPort() {
-        let cfg = config([["controller": "https://ctrl.example.com"], ["jwt": networkJwt("https://other.example.com:1280")]])!
+        let cfg = config([["controller": "https://ctrl.example.com"], ["jwt": makeNetworkJwt("https://other.example.com:1280")]])!
         XCTAssertTrue(cfg.isManaged(identity(["https://ctrl.example.com:443/edge/client/v1"], enrolled: true)))
         XCTAssertTrue(cfg.isManaged(identity(["https://OTHER.example.com:1280"])))
         XCTAssertTrue(cfg.isManaged(identity(["https://ha1.example.com", "https://ctrl.example.com"])))
         XCTAssertFalse(cfg.isManaged(identity(["https://ctrl.example.com:1280"])))
         XCTAssertFalse(cfg.isManaged(identity(["https://ctrl.example.com.evil.example"])))
+
+        let v6 = config([["controller": "https://[2001:db8::1]:1280"]])!
+        XCTAssertTrue(v6.isManaged(identity(["https://[2001:db8::1]:1280/edge/client/v1"])))
+        XCTAssertFalse(v6.isManaged(identity(["https://[2001:db8::1]:1281"])))
+    }
+
+    func testCanEnrollAndManages() {
+        let managed = identity(["https://ctrl.example.com"]), other = identity(["https://other.example.com"])
+        let networks = [["controller": "https://ctrl.example.com"]]
+
+        let locked = ManagedConfig([ManagedConfig.NETWORKS_KEY: networks, ManagedConfig.DISABLE_ADD_IDENTITY_KEY: true])!
+        XCTAssertTrue(locked.canEnroll(managed))
+        XCTAssertFalse(locked.canEnroll(other), "added before adding was turned off")
+        XCTAssertTrue(config(networks)!.canEnroll(other))
+
+        XCTAssertTrue(locked.manages(EnrollmentLink(URL(string: "ziti://enroll?controller=https://CTRL.example.com:443")!)!))
+        XCTAssertFalse(locked.manages(EnrollmentLink(URL(string: "ziti://enroll?controller=https://other.example.com")!)!))
     }
 
     func testCanRemove() {
@@ -189,6 +234,43 @@ final class ManagedConfigTests: XCTestCase {
         XCTAssertEqual(zids.count, 2)
     }
 
+    private func withStore(_ test:(TestableZitiIdentityStore) -> Void) {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ManagedConfigTests-\(UUID().uuidString)")
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        test(TestableZitiIdentityStore(testDir: dir))
+    }
+
+    func testInsertManagedSameHostOtherPorts() {
+        withStore { store in
+            var zids:[ZitiIdentity] = []
+            let cfg = config([["controller": "https://ctrl.example.com"], ["controller": "https://ctrl.example.com:1280"]])!
+            XCTAssertEqual(zids.insertManaged(cfg, store), 2)
+            XCTAssertEqual(Set(zids.map(\.id)).count, 2)
+            XCTAssertEqual(store.loadAll().0?.count, 2)
+        }
+    }
+
+    func testInsertManagedNetworkJwt() {
+        withStore { store in
+            var zids:[ZitiIdentity] = []
+            let cfg = config([["jwt": makeNetworkJwt("https://jwt.example.com:1280/")]])!
+            XCTAssertEqual(zids.insertManaged(cfg, store), 1)
+            XCTAssertEqual(zids.first?.claims?.em, "network")
+            XCTAssertTrue(cfg.isManaged(zids[0]))
+            XCTAssertEqual(zids.insertManaged(cfg, store), 0)
+        }
+    }
+
+    func testInsertManagedKeepsGoingAfterFailure() {
+        // a store that can't write: every insert fails, none throws, and each network is tried
+        let store = TestableZitiIdentityStore(testDir: URL(fileURLWithPath: "/nonexistent-\(UUID().uuidString)"))
+        var zids:[ZitiIdentity] = []
+        let cfg = config([["controller": "https://a.example.com"], ["controller": "https://b.example.com"]])!
+        XCTAssertEqual(zids.insertManaged(cfg, store), 0)
+        XCTAssertEqual(zids.count, 0)
+    }
+
     // MARK: - Restrictions for the share extension
 
     func testSharedRestrictions() {
@@ -200,6 +282,20 @@ final class ManagedConfigTests: XCTestCase {
         XCTAssertTrue(SharedRestrictions.isAddIdentityDisabled(at: url))
         SharedRestrictions.save(addIdentityDisabled: false, to: url)
         XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+        XCTAssertFalse(SharedRestrictions.isAddIdentityDisabled(at: url))
+    }
+
+    func testSharedRestrictionsMalformedFile() {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("restrictions-\(UUID().uuidString).plist")
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        try! Data("not a plist".utf8).write(to: url)
+        XCTAssertFalse(SharedRestrictions.isAddIdentityDisabled(at: url))
+        SharedRestrictions.save(addIdentityDisabled: true, to: url)
+        XCTAssertTrue(SharedRestrictions.isAddIdentityDisabled(at: url))
+
+        // only a boolean counts: the app writes one
+        try! PropertyListSerialization.data(fromPropertyList: ["disableAddIdentity": "true"], format: .xml, options: 0).write(to: url)
         XCTAssertFalse(SharedRestrictions.isAddIdentityDisabled(at: url))
     }
 }

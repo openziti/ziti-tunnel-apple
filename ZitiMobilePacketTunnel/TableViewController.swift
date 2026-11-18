@@ -97,6 +97,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     weak var ivc:IdentityViewController?
     var enrollingIds:[ZitiIdentity] = []
     private(set) var managedConfig:ManagedConfig?
+    private var restrictionsShared = false
     let sc = ScannerViewController()
     private var hasShownWelcome = false
     private var gatheringFeedback = false
@@ -528,15 +529,19 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         }
     }
 
-    /// Adds identities for the organization's networks, waiting for the user to enroll them, and applies its restrictions
+    /// Adds identities for the organization's networks, waiting for the user to enroll them, and applies its restrictions.
+    /// Also called before each decision the restrictions affect, so none rests on a stale copy
     func applyManagedConfig() {
         let config = ManagedConfig.current()
-        // saved every time, so the share extension never sees a restriction that's since been lifted
+        guard config != managedConfig || !restrictionsShared else { return }
+        // also saved at launch, since the configuration can change while the app isn't running
         if let url = SharedRestrictions.url {
             SharedRestrictions.save(addIdentityDisabled: config?.disableAddIdentity ?? false, to: url)
         }
+        restrictionsShared = true
         guard config != managedConfig else { return }
         managedConfig = config
+        config?.problems.forEach { zLog.warn($0) }
         zLog.info("Managed configuration: \(config?.description ?? "none")")
         
         if let config = config {
@@ -548,6 +553,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     
     /// `tempDir` holds a temporary copy of the file, removed once it's been read
     func onNewUrl(_ url:URL, tempDir:URL? = nil) {
+        applyManagedConfig()
         if managedConfig?.disableAddIdentity ?? false {
             zLog.info("Not adding identity: turned off by managed configuration")
             if let tempDir = tempDir {
@@ -607,6 +613,15 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     func onEnrollmentLink(_ link:EnrollmentLink) {
+        if managedConfig?.manages(link) ?? false {
+            let alert = UIAlertController(
+                title:"Unable to add identity",
+                message: ManagedConfig.managedNetworkMessage,
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+            linkPresenter.present(alert, animated: true)
+            return
+        }
         // the link closes whatever screen is showing, which could be part of that enrollment
         if let zid = enrollingIds.first {
             let alert = UIAlertController(

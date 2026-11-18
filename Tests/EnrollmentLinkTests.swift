@@ -22,19 +22,6 @@ private typealias ZitiIdentity = Ziti_Desktop_Edge.ZitiIdentity
 
 final class EnrollmentLinkTests: XCTestCase {
 
-    private func jwt(_ claims:[String: Any]) -> String {
-        let payload = try! JSONSerialization.data(withJSONObject: claims)
-            .base64EncodedString()
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
-        return "eyJhbGciOiJSUzI1NiJ9.\(payload).c2ln"
-    }
-
-    private func networkJwt(_ iss:String = "https://ctrl.example.com:443/") -> String {
-        return jwt(["iss": iss, "sub": iss, "em": "network"])
-    }
-
     private func link(_ str:String) -> EnrollmentLink? {
         return EnrollmentLink(URL(string: str)!)
     }
@@ -57,22 +44,22 @@ final class EnrollmentLinkTests: XCTestCase {
     }
 
     func testNetworkJwtLink() {
-        let token = networkJwt()
+        let token = makeNetworkJwt()
         let l = link("ziti://enroll?jwt=\(token)")
         XCTAssertEqual(l?.source, .jwt(token))
         XCTAssertEqual(l?.controllerName, "ctrl.example.com:443")
     }
 
     func testRejectsOneTimeTokens() {
-        XCTAssertNil(link("ziti://enroll?jwt=\(jwt(["iss": "https://ctrl.example.com", "sub": "abc", "em": "ott"]))"))
-        XCTAssertNil(link("ziti://enroll?jwt=\(jwt(["iss": "https://ctrl.example.com", "sub": "abc", "em": "ottca"]))"))
-        XCTAssertNil(link("ziti://enroll?jwt=\(jwt(["iss": "https://ctrl.example.com", "sub": "abc"]))"))
+        XCTAssertNil(link("ziti://enroll?jwt=\(makeJwt(["iss": "https://ctrl.example.com", "sub": "abc", "em": "ott"]))"))
+        XCTAssertNil(link("ziti://enroll?jwt=\(makeJwt(["iss": "https://ctrl.example.com", "sub": "abc", "em": "ottca"]))"))
+        XCTAssertNil(link("ziti://enroll?jwt=\(makeJwt(["iss": "https://ctrl.example.com", "sub": "abc"]))"))
     }
 
     func testHints() {
         let l = link("ziti://enroll?controller=https://ctrl.example.com&provider=alpha&type=cert")
         XCTAssertEqual(l?.hint, Enrollment.Hint(provider: "alpha", enrollTo: .cert))
-        XCTAssertEqual(link("ziti://enroll?jwt=\(networkJwt())&type=token")?.hint, Enrollment.Hint(provider: nil, enrollTo: .token))
+        XCTAssertEqual(link("ziti://enroll?jwt=\(makeNetworkJwt())&type=token")?.hint, Enrollment.Hint(provider: nil, enrollTo: .token))
     }
 
     func testRejectsUnknownType() {
@@ -89,7 +76,7 @@ final class EnrollmentLinkTests: XCTestCase {
     }
 
     func testRejectsBothKinds() {
-        XCTAssertNil(link("ziti://enroll?controller=https://ctrl.example.com&jwt=\(networkJwt())"))
+        XCTAssertNil(link("ziti://enroll?controller=https://ctrl.example.com&jwt=\(makeNetworkJwt())"))
     }
 
     func testRejectsNonHttpsController() {
@@ -98,13 +85,13 @@ final class EnrollmentLinkTests: XCTestCase {
         XCTAssertNil(link("ziti://enroll?controller=https://user@ctrl.example.com"))
         XCTAssertNil(link("ziti://enroll?controller=https://:pw@ctrl.example.com"))
         XCTAssertNil(link("ziti://enroll?controller="))
-        XCTAssertNil(link("ziti://enroll?jwt=\(networkJwt("http://ctrl.example.com"))"))
+        XCTAssertNil(link("ziti://enroll?jwt=\(makeNetworkJwt("http://ctrl.example.com"))"))
     }
 
     func testRejectsEncodedHosts() {
         XCTAssertNil(link("ziti://enroll?controller=https%3A%2F%2F..%252F..%252Fx"))
         XCTAssertNil(link("ziti://enroll?controller=https%3A%2F%2Fctrl.example.com%250Aevil"))
-        XCTAssertNil(link("ziti://enroll?jwt=\(networkJwt("https://..%2F..%2Fx/"))"))
+        XCTAssertNil(link("ziti://enroll?jwt=\(makeNetworkJwt("https://..%2F..%2Fx/"))"))
     }
 
     func testRejectsControllerQueryOrFragment() {
@@ -123,11 +110,11 @@ final class EnrollmentLinkTests: XCTestCase {
     func testRejectsMalformedJwt() {
         XCTAssertNil(link("ziti://enroll?jwt=not-a-jwt"))
         XCTAssertNil(link("ziti://enroll?jwt=a.b.c"))
-        XCTAssertNil(link("ziti://enroll?jwt=\(jwt(["em": "network"]))"))
+        XCTAssertNil(link("ziti://enroll?jwt=\(makeJwt(["em": "network"]))"))
     }
 
     func testRedacted() {
-        XCTAssertEqual(EnrollmentLink.redacted(URL(string: "ziti://enroll?jwt=\(networkJwt())#x")!), "ziti://enroll")
+        XCTAssertEqual(EnrollmentLink.redacted(URL(string: "ziti://enroll?jwt=\(makeNetworkJwt())#x")!), "ziti://enroll")
         XCTAssertEqual(EnrollmentLink.redacted(URL(string: "https://ctrl.example.com:1280/path")!), "https://ctrl.example.com:1280/path")
         XCTAssertEqual(EnrollmentLink.redacted(URL(string: "https://user:pw@ctrl.example.com")!), "https://ctrl.example.com")
     }
@@ -154,7 +141,12 @@ final class EnrollmentLinkTests: XCTestCase {
 
     func testPendingMatchesNetworkJwtIssuer() {
         let zid = identity("https://ctrl.example.com:443/", em: "network")
-        XCTAssertTrue([identity("https://ctrl.example.com:443/"), zid].pending(link("ziti://enroll?jwt=\(networkJwt())")!) === zid)
+        XCTAssertTrue([identity("https://ctrl.example.com:443/"), zid].pending(link("ziti://enroll?jwt=\(makeNetworkJwt())")!) === zid)
+    }
+
+    func testPendingMatchesSameControllerWrittenDifferently() {
+        let zid = identity("https://CTRL.example.com")
+        XCTAssertTrue([zid].pending(link("ziti://enroll?controller=https://ctrl.example.com:443")!) === zid)
     }
 
     func testPendingIgnoresEnrolledAndOtherPorts() {
@@ -165,6 +157,6 @@ final class EnrollmentLinkTests: XCTestCase {
     func testPendingIgnoresOtherSources() {
         let zids = [identity("https://ctrl.example.com:443", em: "ott"), identity("https://ctrl.example.com:443", em: "network")]
         XCTAssertNil(zids.pending(link("ziti://enroll?controller=https://ctrl.example.com:443")!))
-        XCTAssertNil([identity("https://ctrl.example.com:443", em: "ott")].pending(link("ziti://enroll?jwt=\(networkJwt())")!))
+        XCTAssertNil([identity("https://ctrl.example.com:443", em: "ott")].pending(link("ziti://enroll?jwt=\(makeNetworkJwt())")!))
     }
 }

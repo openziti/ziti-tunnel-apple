@@ -140,7 +140,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     func updateServiceUI(zId:ZitiIdentity?=nil) {
-        updateIdentityButtons(zId)
+        updateIdentityButtons()
                         
         if let zId = zId {
             let cs = zId.edgeStatus ?? ZitiIdentity.EdgeStatus(0, status:.None)
@@ -661,7 +661,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func addIdentityJwt(_ sender: Any) {
-        guard let window = view.window else { return }
+        guard let window = view.window, addingAllowed() else { return }
         
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
@@ -674,7 +674,8 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         
         panel.beginSheetModal(for: window) { (result) in
             //DispatchQueue(label: "JwtLoader").async {
-            if result == NSApplication.ModalResponse.OK {
+            // the configuration may have changed while the panel was open
+            if result == NSApplication.ModalResponse.OK, self.addingAllowed() {
                 do {
                     try self.zids.insertFromJWT(panel.urls[0], self.zidStore, at: 0)
                     DispatchQueue.main.async {
@@ -694,7 +695,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func addIdentityUrl(_ sender: Any) {
-        guard view.window != nil else { return }
+        guard view.window != nil, addingAllowed() else { return }
         
         let urlStr = dialogForString(question: "Controller URL", text: "Enter the controller URL", width: 400)
         if urlStr == nil { return }
@@ -715,38 +716,55 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
-    /// Adds identities for the organization's networks, waiting for the user to enroll them, and applies its restrictions
+    /// Adds identities for the organization's networks, waiting for the user to enroll them, and applies its restrictions.
+    /// Also called before each decision the restrictions affect, so none rests on a stale copy
     func applyManagedConfig() {
         let config = ManagedConfig.current()
         guard config != managedConfig else { return }
         managedConfig = config
+        config?.problems.forEach { zLog.warn($0) }
         zLog.info("Managed configuration: \(config?.description ?? "none")")
         
+        let selected = selectedIdentity
         if let config = config, zids.insertManaged(config, zidStore) > 0 {
             tableView.reloadData()
-            representedObject = 0
-            tableView.selectRowIndexes([0], byExtendingSelection: false)
-        } else if let indx = representedObject as? Int, indx < zids.count {
-            updateIdentityButtons(zids[indx])
+            // the new identities go first, so keep the selection on the identity the user was looking at
+            let indx = selected.flatMap { s in zids.firstIndex { $0 === s } } ?? 0
+            representedObject = indx
+            tableView.selectRowIndexes([indx], byExtendingSelection: false)
         } else {
-            updateIdentityButtons(nil)
+            updateIdentityButtons()
         }
     }
     
-    private func updateIdentityButtons(_ zid:ZitiIdentity?) {
+    private var selectedIdentity:ZitiIdentity? {
+        guard let indx = representedObject as? Int, indx < zids.count else { return nil }
+        return zids[indx]
+    }
+    
+    /// From the selected identity, not the one an update was about (e.g., an enrollment that finished after the user moved on)
+    private func updateIdentityButtons() {
         let canAdd = !(managedConfig?.disableAddIdentity ?? false)
         addIdentityBtn.isEnabled = canAdd
         addIdentityBtn.toolTip = canAdd ? nil : SharedRestrictions.addDisabledMessage
         
-        let canRemove = zid.map { managedConfig?.canRemove($0) ?? true } ?? true
+        let canRemove = selectedIdentity.map { managedConfig?.canRemove($0) ?? true } ?? true
         removeIdentityBtn.isEnabled = canRemove
         removeIdentityBtn.toolTip = canRemove ? nil : ManagedConfig.removeDisabledMessage
     }
     
+    private func addingAllowed() -> Bool {
+        applyManagedConfig()
+        guard managedConfig?.disableAddIdentity ?? false else { return true }
+        zLog.info("Not adding identity: turned off by managed configuration")
+        dialogAlert("Unable to add identity", SharedRestrictions.addDisabledMessage)
+        return false
+    }
+    
     func onEnrollmentLink(_ link:EnrollmentLink) {
-        if managedConfig?.disableAddIdentity ?? false {
-            zLog.info("Not adding identity for \(link.controllerName): turned off by managed configuration")
-            dialogAlert("Unable to add identity", SharedRestrictions.addDisabledMessage)
+        guard addingAllowed() else { return }
+        if managedConfig?.manages(link) ?? false {
+            dialogAlert("Unable to add identity", ManagedConfig.managedNetworkMessage)
             return
         }
         // one enrollment at a time, so its dialogs aren't mixed up with the link's
@@ -785,10 +803,15 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
     
     @IBAction func removeIdentityButton(_ sender: Any) {
+        applyManagedConfig() // first: it can insert identities, moving the selection's index
         guard zids.count > 0 else { return }
         guard let indx = representedObject as? Int else { return }
         
         let zid = zids[indx]
+        if let config = managedConfig, !config.canRemove(zid) {
+            dialogAlert("Unable to remove identity", ManagedConfig.removeDisabledMessage)
+            return
+        }
         let text = "Deleting identity \(zid.name) (\(zid.id)) can't be undone"
         if dialogOKCancel(question: "Are you sure?", text: text) == true {
             let error = zidStore.remove(zid)
@@ -1142,8 +1165,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     }
 
     @IBAction func onEnrollButton(_ sender: Any) {
-        guard let indx = representedObject as? Int else { return }
-        enroll(managedConfig?.hint(for: zids[indx]) ?? Enrollment.Hint())
+        applyManagedConfig()
+        guard let zid = selectedIdentity else { return }
+        if let config = managedConfig, !config.canEnroll(zid) {
+            dialogAlert("Unable to enroll \(zid.name)", SharedRestrictions.addDisabledMessage)
+            return
+        }
+        enroll(managedConfig?.hint(for: zid) ?? Enrollment.Hint())
     }
 
     func enroll(_ hint:Enrollment.Hint = Enrollment.Hint()) {
