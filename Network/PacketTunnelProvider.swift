@@ -418,10 +418,17 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
                 // While the network is down the SDK backs off its authentication retries (up to ~17 minutes), and
                 // nothing tells it when the network comes back. Nudge it so identities reconnect now.
+                // Jitter the nudge: when a shared network recovers, every device on it sees it at the same time,
+                // and they shouldn't all hit the controller at once.
                 if let prev = prevStatus, prev != .satisfied {
-                    zLog.info("Network path became satisfied (was \(prev))")
-                    self.zitiTunnel?.perform {
-                        self.zitiTunnelDelegate?.onNetworkRestored()
+                    let delay = Double.random(in: 0...5)
+                    zLog.info("Network path became satisfied (was \(prev)), authenticating in \(String(format: "%.2f", delay))s")
+                    self.netMonQueue.asyncAfter(deadline: .now() + delay) {
+                        // nothing to do if the network went away again in the meantime
+                        guard self.lastPathStatus == .satisfied else { return }
+                        self.zitiTunnel?.perform {
+                            self.zitiTunnelDelegate?.onNetworkRestored()
+                        }
                     }
                 }
             }
