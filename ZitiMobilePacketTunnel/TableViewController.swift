@@ -581,6 +581,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             onEnrollmentLink(link)
             return
         }
+        let config = managedConfig
         DispatchQueue(label: "JwtLoader").async {
             defer {
                 if let tempDir = tempDir {
@@ -588,14 +589,22 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 }
             }
             do {
-                if url.isFileURL {
-                    try self.zids.insertFromJWT(url, self.zidStore, at: 0)
-                } else {
-                    try self.zids.insertFromURL(url, self.zidStore, at: 0)
+                // a managed network goes to the identity the configuration added for it
+                let managed = try config.flatMap { config in
+                    try url.isFileURL ? self.zids.managedIdentity(forJWT: url, config, self.zidStore)
+                                      : self.zids.managedIdentity(at: url, config, self.zidStore)
+                }
+                if managed == nil {
+                    if url.isFileURL {
+                        try self.zids.insertFromJWT(url, self.zidStore, at: 0)
+                    } else {
+                        try self.zids.insertFromURL(url, self.zidStore, at: 0)
+                    }
                 }
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
-                    self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
+                    let row = managed.flatMap { zid in self.zids.firstIndex { $0 === zid } } ?? 0
+                    self.tableView.selectRow(at: IndexPath(row: row, section: 1), animated: false, scrollPosition: .none)
                     self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
                 }
             } catch {
@@ -613,15 +622,6 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
     }
     
     func onEnrollmentLink(_ link:EnrollmentLink) {
-        if managedConfig?.manages(link) ?? false {
-            let alert = UIAlertController(
-                title:"Unable to add identity",
-                message: ManagedConfig.managedNetworkMessage,
-                preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
-            linkPresenter.present(alert, animated: true)
-            return
-        }
         // the link closes whatever screen is showing, which could be part of that enrollment
         if let zid = enrollingIds.first {
             let alert = UIAlertController(
@@ -630,6 +630,30 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
             linkPresenter.present(alert, animated: true)
+            return
+        }
+        // a managed network goes to the identity the configuration added for it
+        let managed:ZitiIdentity?
+        do {
+            managed = try managedConfig.flatMap { try zids.managedIdentity(at: link.controller, $0, zidStore) }
+        } catch {
+            let alert = UIAlertController(
+                title:"Unable to add identity",
+                message: error.localizedDescription,
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default))
+            linkPresenter.present(alert, animated: true)
+            return
+        }
+        // it may have just been added back, before the user confirms
+        if managed != nil {
+            tableView.reloadData()
+        }
+        if let zid = managed, zid.isEnrolled {
+            // already set up, so showing it is all the link can do
+            navigationController?.dismiss(animated: false)
+            navigationController?.popToRootViewController(animated: false)
+            showLinkedIdentity(zid)
             return
         }
         let alert = UIAlertController(
@@ -641,6 +665,12 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             // start from the identity list, whatever was showing when the link arrived
             self.navigationController?.dismiss(animated: false)
             self.navigationController?.popToRootViewController(animated: false)
+            if let zid = managed {
+                self.showLinkedIdentity(zid)
+                // the configuration's settings, as from the Enroll button, not the link's
+                self.enrollWhenShowing(nil)
+                return
+            }
             do {
                 try self.zids.insertFromLink(link, self.zidStore, at: 0)
             } catch {
@@ -653,19 +683,29 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
                 zLog.error("Unable to add identity: \(error.localizedDescription)")
                 return
             }
-            self.tableView.reloadData()
-            self.tableView.selectRow(at: IndexPath(row: 0, section: 1), animated: false, scrollPosition: .none)
-            self.performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
-            
-            // enroll once the identity screen is showing, so it can present the enrollment sheets
-            let ivc = self.ivc
-            if let tc = self.navigationController?.transitionCoordinator {
-                tc.animate(alongsideTransition: nil) { _ in ivc?.onEnroll(link.hint) }
-            } else {
-                ivc?.onEnroll(link.hint)
-            }
+            self.showLinkedIdentity(self.zids[0])
+            self.enrollWhenShowing(link.hint)
         })
         linkPresenter.present(alert, animated: true)
+    }
+
+    /// Opens an identity from the list
+    private func showLinkedIdentity(_ zid:ZitiIdentity) {
+        tableView.reloadData()
+        let row = zids.firstIndex { $0 === zid } ?? 0
+        tableView.selectRow(at: IndexPath(row: row, section: 1), animated: false, scrollPosition: .none)
+        performSegue(withIdentifier: "IDENTITY_SEGUE", sender: self)
+    }
+
+    /// Enrolls once the identity screen is showing, so it can present the enrollment sheets. A nil hint uses the
+    /// managed configuration's
+    private func enrollWhenShowing(_ hint:Enrollment.Hint?) {
+        let ivc = self.ivc
+        if let tc = navigationController?.transitionCoordinator {
+            tc.animate(alongsideTransition: nil) { _ in ivc?.onEnroll(hint) }
+        } else {
+            ivc?.onEnroll(hint)
+        }
     }
     
     /// Links can arrive while another screen or dialog is showing

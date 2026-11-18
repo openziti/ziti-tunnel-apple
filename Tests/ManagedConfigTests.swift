@@ -184,7 +184,7 @@ final class ManagedConfigTests: XCTestCase {
         XCTAssertFalse(v6.isManaged(identity(["https://[2001:db8::1]:1281"])))
     }
 
-    func testCanEnrollAndManages() {
+    func testCanEnrollAndNetworkAt() {
         let managed = identity(["https://ctrl.example.com"]), other = identity(["https://other.example.com"])
         let networks = [["controller": "https://ctrl.example.com"]]
 
@@ -193,8 +193,9 @@ final class ManagedConfigTests: XCTestCase {
         XCTAssertFalse(locked.canEnroll(other), "added before adding was turned off")
         XCTAssertTrue(config(networks)!.canEnroll(other))
 
-        XCTAssertTrue(locked.manages(EnrollmentLink(URL(string: "ziti://enroll?controller=https://CTRL.example.com:443")!)!))
-        XCTAssertFalse(locked.manages(EnrollmentLink(URL(string: "ziti://enroll?controller=https://other.example.com")!)!))
+        XCTAssertEqual(locked.network(at: URL(string: "https://CTRL.example.com:443/edge/client/v1")!), locked.networks[0])
+        XCTAssertNil(locked.network(at: URL(string: "https://ctrl.example.com:1280")!))
+        XCTAssertNil(locked.network(at: URL(string: "https://other.example.com")!))
     }
 
     func testCanRemove() {
@@ -234,11 +235,11 @@ final class ManagedConfigTests: XCTestCase {
         XCTAssertEqual(zids.count, 2)
     }
 
-    private func withStore(_ test:(TestableZitiIdentityStore) -> Void) {
+    private func withStore(_ test:(TestableZitiIdentityStore) throws -> Void) rethrows {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ManagedConfigTests-\(UUID().uuidString)")
         try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
-        test(TestableZitiIdentityStore(testDir: dir))
+        try test(TestableZitiIdentityStore(testDir: dir))
     }
 
     func testInsertManagedSameHostOtherPorts() {
@@ -311,6 +312,53 @@ final class ManagedConfigTests: XCTestCase {
         XCTAssertFalse(config([["controller": "https://other.example.com"]])!.isManaged(zid), "dropped from the configuration")
         XCTAssertTrue(config([["controller": "https://OLD.example.com:443"]])!.isManaged(zid), "same host and port")
         XCTAssertTrue(config([["controller": "https://ha1.example.com"]])!.isManaged(zid), "still matched by its controllers")
+    }
+
+    func testManagedIdentityAt() throws {
+        try withStore { store in
+            let cfg = config([["controller": "https://ctrl.example.com"]])!
+            var zids:[ZitiIdentity] = []
+            XCTAssertNil(try zids.managedIdentity(at: URL(string: "https://other.example.com")!, cfg, store))
+            XCTAssertEqual(zids.count, 0, "nothing added for another network")
+
+            let zid = try zids.managedIdentity(at: URL(string: "https://CTRL.example.com:443")!, cfg, store)
+            XCTAssertNotNil(zid)
+            XCTAssertTrue(cfg.isManaged(zid!))
+            XCTAssertEqual(zids.count, 1)
+            XCTAssertTrue(try zids.managedIdentity(at: URL(string: "https://ctrl.example.com")!, cfg, store) === zid, "the same one, not another")
+
+            // removed by the user, then added again
+            XCTAssertNil(store.remove(zid!))
+            zids.removeAll()
+            let again = try zids.managedIdentity(at: URL(string: "https://ctrl.example.com")!, cfg, store)
+            XCTAssertNotNil(again)
+            XCTAssertEqual(store.loadAll().0?.count, 1)
+        }
+    }
+
+    func testManagedIdentityAtThrowsWhenItCantBeAdded() {
+        let store = TestableZitiIdentityStore(testDir: URL(fileURLWithPath: "/nonexistent-\(UUID().uuidString)"))
+        var zids:[ZitiIdentity] = []
+        let cfg = config([["controller": "https://ctrl.example.com"]])!
+        XCTAssertThrowsError(try zids.managedIdentity(at: URL(string: "https://ctrl.example.com")!, cfg, store))
+    }
+
+    func testManagedIdentityForJWT() throws {
+        try withStore { store in
+            let file = { (jwt:String) -> URL in
+                let url = store.presentedItemURL!.appendingPathComponent("\(UUID().uuidString).jwt")
+                try! jwt.write(to: url, atomically: true, encoding: .utf8)
+                return url
+            }
+            let cfg = config([["controller": "https://ctrl.example.com"]])!
+            var zids:[ZitiIdentity] = []
+            let zid = try zids.managedIdentity(forJWT: file(makeNetworkJwt()), cfg, store)
+            XCTAssertNotNil(zid)
+            XCTAssertTrue(cfg.isManaged(zid!))
+            XCTAssertNil(try zids.managedIdentity(forJWT: file(makeNetworkJwt(em: "ott")), cfg, store), "a one-time token is its own identity")
+            XCTAssertNil(try zids.managedIdentity(forJWT: file(makeNetworkJwt("https://other.example.com/")), cfg, store))
+            XCTAssertEqual(zids.count, 1)
+        }
     }
 
     func testInsertManagedKeepsGoingAfterFailure() {

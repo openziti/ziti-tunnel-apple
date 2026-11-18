@@ -133,30 +133,85 @@ final class EnrollmentLinkTests: XCTestCase {
         return zid
     }
 
+    private func url(_ str:String) -> URL { URL(string: str)! }
+
     func testPendingMatchesController() {
         let zid = identity("https://ctrl.example.com:1280")
         let zids = [identity("https://other.example.com:1280"), zid]
-        XCTAssertTrue(zids.pending(link("ziti://enroll?controller=https://ctrl.example.com:1280/")!) === zid)
+        XCTAssertTrue(zids.pending(controller: url("https://ctrl.example.com:1280/"), networkJwt: false) === zid)
     }
 
     func testPendingMatchesNetworkJwtIssuer() {
         let zid = identity("https://ctrl.example.com:443/", em: "network")
-        XCTAssertTrue([identity("https://ctrl.example.com:443/"), zid].pending(link("ziti://enroll?jwt=\(makeNetworkJwt())")!) === zid)
+        XCTAssertTrue([identity("https://ctrl.example.com:443/"), zid].pending(controller: url("https://ctrl.example.com:443/"), networkJwt: true) === zid)
     }
 
     func testPendingMatchesSameControllerWrittenDifferently() {
         let zid = identity("https://CTRL.example.com")
-        XCTAssertTrue([zid].pending(link("ziti://enroll?controller=https://ctrl.example.com:443")!) === zid)
+        XCTAssertTrue([zid].pending(controller: url("https://ctrl.example.com:443"), networkJwt: false) === zid)
     }
 
     func testPendingIgnoresEnrolledAndOtherPorts() {
         let zids = [identity("https://ctrl.example.com:1280", enrolled: true), identity("https://ctrl.example.com:443")]
-        XCTAssertNil(zids.pending(link("ziti://enroll?controller=https://ctrl.example.com:1280")!))
+        XCTAssertNil(zids.pending(controller: url("https://ctrl.example.com:1280"), networkJwt: false))
     }
 
     func testPendingIgnoresOtherSources() {
         let zids = [identity("https://ctrl.example.com:443", em: "ott"), identity("https://ctrl.example.com:443", em: "network")]
-        XCTAssertNil(zids.pending(link("ziti://enroll?controller=https://ctrl.example.com:443")!))
-        XCTAssertNil([identity("https://ctrl.example.com:443", em: "ott")].pending(link("ziti://enroll?jwt=\(makeNetworkJwt())")!))
+        XCTAssertNil(zids.pending(controller: url("https://ctrl.example.com:443"), networkJwt: false))
+        XCTAssertNil([identity("https://ctrl.example.com:443", em: "ott")].pending(controller: url("https://ctrl.example.com:443"), networkJwt: true))
+    }
+
+    private func withStore(_ test:(TestableZitiIdentityStore) throws -> Void) rethrows {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("EnrollmentLinkTests-\(UUID().uuidString)")
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try test(TestableZitiIdentityStore(testDir: dir))
+    }
+
+    private func jwtFile(_ jwt:String, in dir:URL) -> URL {
+        let file = dir.appendingPathComponent("\(UUID().uuidString).jwt")
+        try! jwt.write(to: file, atomically: true, encoding: .utf8)
+        return file
+    }
+
+    func testInsertFromURLRefusesAnotherPendingForTheController() throws {
+        try withStore { store in
+            var zids:[ZitiIdentity] = []
+            XCTAssertNoThrow(try zids.insertFromURL(url("https://ctrl.example.com:1280"), store, at: 0))
+            XCTAssertThrowsError(try zids.insertFromURL(url("https://CTRL.example.com:1280/edge/client/v1"), store, at: 0))
+            XCTAssertNoThrow(try zids.insertFromURL(url("https://ctrl.example.com:443"), store, at: 0), "other port")
+            XCTAssertEqual(store.loadAll().0?.count, 2, "nothing stored for the refused one")
+
+            // once enrolled, the controller can be added again
+            zids.forEach { $0.enrolled = true }
+            XCTAssertNoThrow(try zids.insertFromURL(url("https://ctrl.example.com:1280"), store, at: 0))
+        }
+    }
+
+    func testInsertFromJWTRefusesAnotherPendingNetworkJwt() throws {
+        try withStore { store in
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent("EnrollmentLinkTests-jwt-\(UUID().uuidString)")
+            try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: dir) }
+
+            var zids:[ZitiIdentity] = []
+            XCTAssertNoThrow(try zids.insertFromJWT(jwtFile(makeNetworkJwt(), in: dir), store, at: 0))
+            XCTAssertThrowsError(try zids.insertFromJWT(jwtFile(makeNetworkJwt(), in: dir), store, at: 0))
+            // a URL identity for the same controller is enrolled differently, so it doesn't count
+            XCTAssertNoThrow(try zids.insertFromURL(url("https://ctrl.example.com:443/"), store, at: 0))
+            XCTAssertEqual(zids.count, 2)
+        }
+    }
+
+    func testInsertFromLinkRefusesAnotherPending() throws {
+        try withStore { store in
+            var zids:[ZitiIdentity] = []
+            XCTAssertNoThrow(try zids.insertFromLink(link("ziti://enroll?controller=https://ctrl.example.com")!, store, at: 0))
+            XCTAssertThrowsError(try zids.insertFromLink(link("ziti://enroll?controller=https://ctrl.example.com:443")!, store, at: 0))
+            XCTAssertNoThrow(try zids.insertFromLink(link("ziti://enroll?jwt=\(makeNetworkJwt())")!, store, at: 0))
+            XCTAssertThrowsError(try zids.insertFromLink(link("ziti://enroll?jwt=\(makeNetworkJwt())")!, store, at: 0))
+            XCTAssertEqual(zids.count, 2)
+        }
     }
 }
