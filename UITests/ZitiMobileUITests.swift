@@ -1,0 +1,50 @@
+//
+// Copyright NetFoundry Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+import XCTest
+
+/// The simulator keeps the app's data between runs, so tests don't assume a fresh install
+final class ZitiMobileUITests: XCTestCase {
+    private var app:XCUIApplication!
+    private let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+    }
+
+    /// Launches the app, allows its permission prompts (notifications, and on a device the VPN configuration) and closes
+    /// Get Started, shown when there are no identities. While a prompt is up the app stays inactive, so it doesn't handle links
+    private func launch(_ arguments:[String] = []) {
+        app.launchArguments = arguments
+        app.launch()
+        let allow = springboard.alerts.buttons["Allow"]
+        var answered = 0
+        while answered < 3, allow.waitForExistence(timeout: 5) {
+            allow.tap()
+            answered += 1
+        }
+        let getStarted = app.navigationBars["Get Started"]
+        if getStarted.waitForExistence(timeout: 5) {
+            getStarted.buttons["Done"].tap()
+        }
+    }
+
+    func testAddIdentityRow() {
+        launch()
+        XCTAssertTrue(app.cells.staticTexts["Add Identity"].waitForExistence(timeout: 5))
+    }
+}
