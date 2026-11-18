@@ -15,6 +15,7 @@
 //
 
 import Foundation
+import CZiti
 
 /// Settings an organization sets for the app (managed app configuration): networks to add, each as the fields of
 /// an enrollment link, and whether users can add or remove identities.
@@ -25,7 +26,6 @@ struct ManagedConfig : Equatable, CustomStringConvertible {
     static let keys = [NETWORKS_KEY, DISABLE_ADD_IDENTITY_KEY, DISABLE_REMOVE_IDENTITY_KEY]
 
     static let removeDisabledMessage = "Removing this identity is turned off by your organization."
-    static let managedNetworkMessage = "This network is set up by your organization."
 
     let networks:[EnrollmentLink]
     let disableAddIdentity:Bool
@@ -55,8 +55,8 @@ struct ManagedConfig : Equatable, CustomStringConvertible {
     /// The managed network an identity belongs to, enrolled or not: the one recorded for it, otherwise one on its
     /// controllers (e.g., an identity added before the configuration)
     func network(for zid:ZitiIdentity) -> EnrollmentLink? {
-        if let recorded = zid.managedController.flatMap({ URL(string: $0) }).flatMap(EnrollmentLink.endpoint),
-           let link = networks.first(where: { EnrollmentLink.endpoint($0.controller) == recorded }) {
+        if let recorded = zid.managedController.flatMap({ URL(string: $0) }).flatMap(ZitiIdentity.endpoint),
+           let link = networks.first(where: { ZitiIdentity.endpoint($0.controller) == recorded }) {
             return link
         }
         return networks.first { zid.isOnController(of: $0) }
@@ -75,10 +75,10 @@ struct ManagedConfig : Equatable, CustomStringConvertible {
         return !disableAddIdentity || isManaged(zid)
     }
 
-    /// A link for one of the organization's networks adds nothing the configuration doesn't
-    func manages(_ link:EnrollmentLink) -> Bool {
-        let endpoint = EnrollmentLink.endpoint(link.controller)
-        return networks.contains { EnrollmentLink.endpoint($0.controller) == endpoint }
+    /// The network at a controller (same host and port), if it's one of the organization's
+    func network(at controller:URL) -> EnrollmentLink? {
+        guard let endpoint = ZitiIdentity.endpoint(controller) else { return nil }
+        return networks.first { ZitiIdentity.endpoint($0.controller) == endpoint }
     }
 
     /// The provider and enrollment type set for the identity's network, if any
@@ -115,7 +115,7 @@ struct ManagedConfig : Equatable, CustomStringConvertible {
                 problems.append("Ignoring invalid managed network \(i + 1)")
                 continue
             }
-            guard !links.contains(where: { EnrollmentLink.endpoint($0.controller) == EnrollmentLink.endpoint(link.controller) }) else {
+            guard !links.contains(where: { ZitiIdentity.endpoint($0.controller) == ZitiIdentity.endpoint(link.controller) }) else {
                 problems.append("Ignoring managed network \(i + 1): same controller as an earlier one")
                 continue
             }
@@ -158,6 +158,26 @@ extension Array where Element == ZitiIdentity {
             }
         }
         return added
+    }
+
+    /// The identity for the organization's network at a controller, added again if the user removed it, so adding
+    /// that network (by link, URL or network JWT) goes to it instead of adding another. nil when the controller isn't
+    /// one of the organization's networks
+    mutating func managedIdentity(at controller:URL, _ config:ManagedConfig, _ zidStore:ZitiIdentityStore) throws -> ZitiIdentity? {
+        guard let link = config.network(at: controller) else { return nil }
+        _ = insertManaged(config, zidStore)
+        guard let zid = first(where: { config.network(for: $0) == link }) else {
+            // insertManaged logged why
+            throw ZitiError("Unable to add the identity for \(link.controllerName)")
+        }
+        return zid
+    }
+
+    /// The same for a JWT file. Only network JWTs: a one-time token is an identity of its own
+    mutating func managedIdentity(forJWT url:URL, _ config:ManagedConfig, _ zidStore:ZitiIdentityStore) throws -> ZitiIdentity? {
+        guard let claims = ZitiEnroller(url.path).getClaims(), claims.em == "network",
+              let controller = claims.iss.flatMap({ URL(string: $0) }) else { return nil }
+        return try managedIdentity(at: controller, config, zidStore)
     }
 }
 

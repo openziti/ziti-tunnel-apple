@@ -17,7 +17,44 @@
 import Foundation
 import CZiti
 
+extension ZitiIdentity {
+    /// Host and port, with the https default, so "https://CTRL" and "https://ctrl:443/edge/client/v1" are the same controller
+    static func endpoint(_ url:URL) -> String? {
+        guard let host = url.host?.lowercased() else { return nil }
+        return "\(host):\(url.port ?? 443)"
+    }
+
+    /// Host, plus the port when given, to show the user
+    static func controllerName(_ url:URL) -> String {
+        guard let host = url.host else { return url.absoluteString }
+        if let port = url.port { return "\(host):\(port)" }
+        return host
+    }
+
+    /// Whether one of the identity's controllers has the same host and port, enrolled or not
+    func isOnController(_ controller:URL) -> Bool {
+        guard let czid = czid, let target = ZitiIdentity.endpoint(controller) else { return false }
+        return ([czid.ztAPI] + (czid.ztAPIs ?? [])).contains { URL(string: $0).flatMap(ZitiIdentity.endpoint) == target }
+    }
+}
+
 extension Array where Element == ZitiIdentity {
+    /// An identity not yet enrolled, added for the controller from a controller URL, or from a network JWT
+    /// (links, URLs and files are easy to add twice)
+    func pending(controller:URL, networkJwt:Bool) -> ZitiIdentity? {
+        return first { zid in
+            guard !zid.isEnrolled, zid.isOnController(controller) else { return false }
+            return networkJwt ? zid.claims?.em == "network" : zid.claims == nil
+        }
+    }
+
+    /// Refuses a second identity waiting to enroll the same way with the same controller
+    private func checkNotPending(controller:URL, networkJwt:Bool) throws {
+        if let zid = pending(controller: controller, networkJwt: networkJwt) {
+            throw ZitiError("\(zid.name) is already waiting to enroll with \(ZitiIdentity.controllerName(controller))")
+        }
+    }
+
     mutating func updateIdentity(_ zid:ZitiIdentity) {
         var found = false
         for i in 0..<count {
@@ -64,6 +101,10 @@ extension Array where Element == ZitiIdentity {
             throw ZitiError("Unsupported enrollment method: \(zid.claims?.em ?? "unknown")")
         }
 
+        if zid.claims?.em == "network", let controller = URL(string: ztAPI) {
+            try checkNotPending(controller: controller, networkJwt: true)
+        }
+
         // OTT uses subject as identity ID; network JWTs use a temp UUID
         let idStr = (em == .ott) ? subj : UUID().uuidString
         zid.czid = CZiti.ZitiIdentity(id: idStr, ztAPIs: [ztAPI], name: url.lastPathComponent)
@@ -85,6 +126,7 @@ extension Array where Element == ZitiIdentity {
     
     mutating func insertFromURL(_ url:URL, _ zidStore:ZitiIdentityStore, at:Int) throws {
         guard let host = url.host else { throw ZitiError("No host in controller URL") }
+        try checkNotPending(controller: url, networkJwt: false)
         // a temp id, like network JWTs: the host alone isn't unique (one host can serve several networks on different ports)
         let zid = ZitiIdentity()
         zid.czid = CZiti.ZitiIdentity(id: UUID().uuidString, ztAPIs: [url.absoluteString], name: host)

@@ -679,6 +679,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             // the configuration may have changed while the panel was open
             if result == NSApplication.ModalResponse.OK, self.addingAllowed() {
                 do {
+                    if let config = self.managedConfig,
+                       let zid = try self.zids.managedIdentity(forJWT: panel.urls[0], config, self.zidStore) {
+                        DispatchQueue.main.async { self.selectManaged(zid) }
+                        return
+                    }
                     try self.zids.insertFromJWT(panel.urls[0], self.zidStore, at: 0)
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
@@ -707,6 +712,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
         
         do {
+            if let config = managedConfig, let zid = try zids.managedIdentity(at: ctrlUrl, config, zidStore) {
+                selectManaged(zid)
+                return
+            }
             try self.zids.insertFromURL(ctrlUrl, self.zidStore, at: 0)
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -739,6 +748,15 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         }
     }
     
+    /// Shows the identity the configuration added for a network the user tried to add again
+    private func selectManaged(_ zid:ZitiIdentity) {
+        // it may have just been added back
+        tableView.reloadData()
+        let indx = zids.firstIndex { $0 === zid } ?? 0
+        representedObject = indx
+        tableView.selectRowIndexes([indx], byExtendingSelection: false)
+    }
+
     private var selectedIdentity:ZitiIdentity? {
         guard let indx = representedObject as? Int, indx < zids.count else { return nil }
         return zids[indx]
@@ -765,14 +783,22 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     
     func onEnrollmentLink(_ link:EnrollmentLink) {
         guard addingAllowed() else { return }
-        if managedConfig?.manages(link) ?? false {
-            dialogAlert("Unable to add identity", ManagedConfig.managedNetworkMessage)
-            return
-        }
         // one enrollment at a time, so its dialogs aren't mixed up with the link's
         if let zid = enrollingIds.first {
             dialogAlert("Unable to add identity", "\(zid.name) is still enrolling. Open the link again when it finishes.")
             return
+        }
+        let managed:ZitiIdentity?
+        do {
+            managed = try managedConfig.flatMap { try zids.managedIdentity(at: link.controller, $0, zidStore) }
+        } catch {
+            dialogAlert("Unable to add identity", error.localizedDescription)
+            return
+        }
+        if let zid = managed {
+            selectManaged(zid)
+            // already set up, so showing it is all the link can do
+            if zid.isEnrolled { return }
         }
         let alert = NSAlert()
         alert.messageText = "Enroll Identity"
@@ -782,6 +808,11 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         alert.addButton(withTitle: "Cancel")
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         
+        if let zid = managed {
+            // the configuration's settings, as from the Enroll button, not the link's
+            enroll(managedConfig?.hint(for: zid) ?? link.hint)
+            return
+        }
         do {
             try self.zids.insertFromLink(link, self.zidStore, at: 0)
         } catch {
