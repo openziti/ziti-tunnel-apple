@@ -251,6 +251,9 @@ class TunnelMgr: NSObject {
                     NotificationCenter.default.addObserver(tmgr, selector:
                         #selector(TunnelMgr.tunnelStatusDidChange(_:)), name:
                         NSNotification.Name.NEVPNStatusDidChange, object: nil)
+                    NotificationCenter.default.addObserver(tmgr, selector:
+                        #selector(TunnelMgr.tunnelConfigurationDidChange(_:)), name:
+                        NSNotification.Name.NEVPNConfigurationChange, object: nil)
                 
                     tmgr.tpm = tpm
                     
@@ -298,6 +301,13 @@ class TunnelMgr: NSObject {
         Logger.updateRotateSettings(pc.logRotateDaily, pc.logRotateCount, pc.logRotateSizeMB)
     }
     
+    /// A profile installed or removed while the app runs is picked up now, not when the app next comes to the front:
+    /// until then the configuration it supersedes could still be connected from the system's VPN settings
+    @objc func tunnelConfigurationDidChange(_ notification: Notification?) {
+        guard let bid = loadedBid else { return }
+        loadFromPreferences(bid, createIfMissing: false)
+    }
+
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
         // A starting tunnel reads its log settings from the configuration, so the app goes back to them too
         if status == .connecting && sessionLogSettings != nil {
