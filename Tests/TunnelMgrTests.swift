@@ -195,4 +195,12 @@ class TunnelMgrTests: XCTestCase {
         let noProtocol = makeManager(nil, "second")
         XCTAssertTrue(TunnelMgr.preferredManager([first, noProtocol], bid) === first)
     }
+
+    func testDisconnectAction() {
+        typealias Action = TunnelMgr.DisconnectAction
+        XCTAssertEqual(TunnelMgr.disconnectAction(restarting: true, lockedPending: true), Action.switchToLocked(start: true))
+        XCTAssertEqual(TunnelMgr.disconnectAction(restarting: false, lockedPending: true), Action.switchToLocked(start: false))
+        XCTAssertEqual(TunnelMgr.disconnectAction(restarting: true, lockedPending: false), Action.restart)
+        XCTAssertEqual(TunnelMgr.disconnectAction(restarting: false, lockedPending: false), Action.none)
+    }
 }

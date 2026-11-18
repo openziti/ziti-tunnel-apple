@@ -49,6 +49,10 @@ class TunnelMgr: NSObject {
     private var loading = false
     private var loadedBid:String?
     private var lockedPending = false
+    /// A switch to the waiting locked configuration that found a load running, made once it finishes: true to also
+    /// start the tunnel. The running load can't stand in for it, since it may have listed the configurations while
+    /// ours was still active, and so kept ours
+    private var deferredSwitch:Bool?
     var tlsuvLoggingEnabled = false
     
     typealias LogSettings = (level:ZitiLog.LogLevel, tlsuv:Bool)
@@ -163,6 +167,22 @@ class TunnelMgr: NSObject {
         }
     }
 
+    /// What to do once the tunnel is down
+    enum DisconnectAction : Equatable {
+        case none, restart
+        /// Load the waiting locked configuration, and start the tunnel on it when `start`
+        case switchToLocked(start:Bool)
+    }
+
+    /// A waiting locked configuration takes over on any restart, and when the user disconnects. Never a restart on
+    /// ours while one waits, even if a load is running (the switch waits for it instead)
+    static func disconnectAction(restarting:Bool, lockedPending:Bool) -> DisconnectAction {
+        if lockedPending {
+            return .switchToLocked(start: restarting)
+        }
+        return restarting ? .restart : .none
+    }
+
     typealias LoadCompletionHandler = (NETunnelProviderManager?, Error?) -> Void
     
     /// Loads the preferred tunnel configuration, creating one on first run. Reloads pass `createIfMissing: false`
@@ -181,7 +201,7 @@ class TunnelMgr: NSObject {
         NETunnelProviderManager.loadAllFromPreferences { [weak self] savedManagers, error in
             if let error = error {
                 zLog.error(error.localizedDescription)
-                self?.loading = false
+                self?.loadFinished()
                 completionHandler?(nil, error)
                 return
             }
@@ -202,7 +222,7 @@ class TunnelMgr: NSObject {
                 }
             } else if !createIfMissing {
                 zLog.info("No tunnel configuration found, not creating one on reload")
-                self?.loading = false
+                self?.loadFinished()
                 completionHandler?(nil, nil)
                 return
             }
@@ -210,7 +230,7 @@ class TunnelMgr: NSObject {
             tpm.loadFromPreferences { error in
                 if let error = error {
                     zLog.error(error.localizedDescription)
-                    self?.loading = false
+                    self?.loadFinished()
                     completionHandler?(nil, error)
                     return
                 }
@@ -233,14 +253,14 @@ class TunnelMgr: NSObject {
                     
                     self?.savePreferences(tpm) { error in
                         guard error == nil else {
-                            self?.loading = false
+                            self?.loadFinished()
                             return
                         }
                         zLog.info("Re-loading preferences")
                         // ios hack per apple forums (else NEVPNErrorDomain Code=1)
                         tpm.loadFromPreferences { error in
                             zLog.error("Re-loaded preferences, error=\(error != nil)")
-                            self?.loading = false
+                            self?.loadFinished()
                         }
                     }
                 }
@@ -259,7 +279,7 @@ class TunnelMgr: NSObject {
                     
                     tmgr.applyLogSettings()
                     
-                    if !creating { tmgr.loading = false }
+                    if !creating { tmgr.loadFinished() }
                     completionHandler?(tpm, nil)
                     tmgr.tsChangedCallbacks.forEach { cb in cb(tmgr.status) }
 
@@ -318,38 +338,66 @@ class TunnelMgr: NSObject {
         if tunnelRestarting == true {
             if status == .disconnected {
                 tunnelRestarting = false
-                // A waiting locked configuration takes over on any restart, not just when the user disconnects
-                if lockedPending && !loading, let bid = loadedBid {
-                    zLog.info("Tunnel restarting, switching to locked configuration")
-                    lockedPending = false
-                    loadFromPreferences(bid, createIfMissing: false) { [weak self] mgr, error in
-                        guard mgr != nil, error == nil else { return }
-                        do {
-                            try self?.startTunnel()
-                        } catch {
-                            zLog.error("Failed starting tunnel on locked configuration \(error.localizedDescription)")
-                        }
-                    }
-                } else {
-                    do {
-                        try startTunnel()
-                    } catch {
-                        zLog.error("Failed (re-)starting tunnel \(error.localizedDescription)")
-                    }
-                }
+                onDisconnected(restarting: true)
             }
             tsChangedCallbacks.forEach { cb in cb(.reasserting) }
         } else {
-            // A locked configuration arrived while ours was active. Switch to it now that ours is down.
-            if lockedPending && status == .disconnected, let bid = loadedBid {
-                zLog.info("Tunnel disconnected, switching to locked configuration")
-                lockedPending = false
-                loadFromPreferences(bid, createIfMissing: false)
+            if status == .disconnected {
+                onDisconnected(restarting: false)
             }
             tsChangedCallbacks.forEach { cb in cb(status) }
         }
     }
-    
+
+    private func onDisconnected(restarting:Bool) {
+        switch TunnelMgr.disconnectAction(restarting: restarting, lockedPending: lockedPending) {
+        case .none:
+            break
+        case .restart:
+            do {
+                try startTunnel()
+            } catch {
+                zLog.error("Failed (re-)starting tunnel \(error.localizedDescription)")
+            }
+        case .switchToLocked(let start):
+            switchToLocked(start: start)
+        }
+    }
+
+    /// Loads the waiting locked configuration now that ours is down, which makes it the preferred one
+    private func switchToLocked(start:Bool) {
+        guard let bid = loadedBid else { return }
+        guard !loading else {
+            zLog.info("Tunnel down, switching to locked configuration once the current load finishes")
+            deferredSwitch = (deferredSwitch ?? false) || start
+            return
+        }
+        zLog.info("Tunnel down, switching to locked configuration")
+        lockedPending = false
+        loadFromPreferences(bid, createIfMissing: false) { [weak self] mgr, error in
+            guard start else { return }
+            guard mgr != nil, error == nil else {
+                // safer down than on the configuration it replaces; loadFromPreferences logged why
+                zLog.error("Unable to load the locked configuration, leaving the tunnel down")
+                return
+            }
+            do {
+                try self?.startTunnel()
+            } catch {
+                zLog.error("Failed starting tunnel on locked configuration \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func loadFinished() {
+        loading = false
+        if let start = deferredSwitch {
+            deferredSwitch = nil
+            // after the finished load's completion handlers, so it doesn't start a load in the middle of them
+            DispatchQueue.main.async { self.switchToLocked(start: start) }
+        }
+    }
+
     /// Saves the tunnel configuration (the loaded one unless another is given). All app-side
     /// writes go through here so failures are reported consistently. Locked configurations are never saved.
     func savePreferences(_ mgr:NETunnelProviderManager? = nil, _ completionHandler:((Error?) -> Void)? = nil) {
