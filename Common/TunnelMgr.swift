@@ -389,7 +389,7 @@ class TunnelMgr: NSObject {
             return
         }
         zLog.info("Tunnel down, switching to locked configuration")
-        lockedPending = false
+        // lockedPending stays set until the load replaces it: if the load fails, the next disconnect or restart tries again
         loadFromPreferences(bid, createIfMissing: false) { [weak self] mgr, error in
             guard start else { return }
             guard mgr != nil, error == nil else {
@@ -469,6 +469,12 @@ class TunnelMgr: NSObject {
     }
     
     func startTunnel() throws {
+        // a locked configuration still waiting while the tunnel is down (its switch didn't load): try the switch again
+        // rather than starting on the configuration it replaces
+        if lockedPending && status == .disconnected {
+            switchToLocked(start: true)
+            return
+        }
         guard let tpm = self.tpm else {
             zLog.error("Unable to access TPM")
             return
