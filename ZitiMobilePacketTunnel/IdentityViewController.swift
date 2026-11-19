@@ -505,7 +505,10 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         tvc?.enrollingIds.append(zid)
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory: false).path
-        Enrollment(zid, ui: self, hint: hint, policy: tvc?.tunnelMgr.caBundlePolicy).start(jwtFile: jwtFile) { result in
+        // the manager is taken now, so the policy can't turn unknown during the sign-in; without the list there's none
+        // to ask: unknown, not unrestricted
+        let policy:() -> Enrollment.Policy = { [tunnelMgr = tvc?.tunnelMgr] in tunnelMgr?.enrollmentPolicy ?? .unknown }
+        Enrollment(zid, ui: self, hint: hint, policy: policy).start(jwtFile: jwtFile) { result in
             self.hideSpinner()
             self.tvc?.enrollingIds.removeAll { $0 === zid }
             switch result {

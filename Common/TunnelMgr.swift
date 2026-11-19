@@ -36,6 +36,22 @@ class TunnelMgr: NSObject {
     }
     private var blockedByBundle:[String: Bool] = [:]
 
+    /// The policy as enrollment sees it, which can't be known before a tunnel configuration has loaded
+    var enrollmentPolicy:Enrollment.Policy {
+#if targetEnvironment(simulator)
+        // the simulator can't load tunnel configurations ("IPC failed"), so no profile can apply there
+        let loaded = true
+#else
+        let loaded = tpm != nil
+#endif
+        return TunnelMgr.enrollmentPolicy(loaded: loaded, caBundlePolicy)
+    }
+
+    static func enrollmentPolicy(loaded:Bool, _ policy:CABundlePolicy?) -> Enrollment.Policy {
+        guard loaded else { return .unknown }
+        return policy.map { .restricted($0) } ?? .unrestricted
+    }
+
     /// Whether the policy blocks an identity, cached by CA bundle since the identity screens ask on every refresh
     func isBlocked(_ zid:ZitiIdentity) -> Bool {
         guard let policy = caBundlePolicy, zid.isEnrolled else { return false }

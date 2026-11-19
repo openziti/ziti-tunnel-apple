@@ -94,11 +94,22 @@ class Enrollment {
         return providers
     }
 
+    /// The networks enrollment may join, from the tunnel configuration
+    enum Policy : Equatable {
+        /// The tunnel configuration hasn't loaded, so whether it restricts networks isn't known
+        case unknown
+        case unrestricted
+        case restricted(CABundlePolicy)
+    }
+
+    static let policyUnknownMessage = "The tunnel settings haven't loaded yet. Try again in a moment, or restart the app if this keeps happening."
+
     let zid:ZitiIdentity
     private let ui:EnrollmentUI
     private let sdk:EnrollmentSDK
     private let hint:Hint
-    private let policy:CABundlePolicy?
+    /// Read when enrollment starts and again when it finishes, since a profile can arrive during the sign-in
+    private let policy:() -> Policy
     private var completion:((Result) -> Void)?
     private var mfaEnabled = false
     private var lastMfaAuth:Date?
@@ -106,8 +117,10 @@ class Enrollment {
     /// The bootstrap enrollment made to check the network's bundle. Enrolling without a provider gives the same result
     private var bootstrapped:CZiti.ZitiIdentity?
 
-    /// With a `policy`, an identity whose network it doesn't allow is refused, and anything enrollment stored is discarded
-    init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK(), hint:Hint = Hint(), policy:CABundlePolicy? = nil) {
+    /// Under a restricting `policy`, an identity whose network it doesn't allow is refused, and anything enrollment
+    /// stored is discarded. With the policy unknown, nothing is enrolled
+    init(_ zid:ZitiIdentity, ui:EnrollmentUI, sdk:EnrollmentSDK = ZitiEnrollmentSDK(), hint:Hint = Hint(),
+         policy:@escaping () -> Policy) {
         self.zid = zid
         self.ui = ui
         self.sdk = sdk
@@ -123,11 +136,17 @@ class Enrollment {
             finish(.failed("No JWT file or controller URL available"))
             return
         }
+        let current = policy()
+        if case .unknown = current {
+            zLog.warn("Not enrolling \(zid.name): the tunnel configuration hasn't loaded, so its network restrictions aren't known")
+            finish(.failed(Enrollment.policyUnknownMessage))
+            return
+        }
         if case .ott = source {
             enroll(source)
             return
         }
-        guard let policy = policy else {
+        guard case .restricted(let policy) = current else {
             queryProviders(source)
             return
         }
@@ -310,10 +329,23 @@ class Enrollment {
     /// chosen, are applied once it succeeds
     private func finish(_ result:Result) {
         var result = result
-        if case .enrolled(let zidResp, _) = result, let policy = policy, case .blocked(let reason) = policy.check(zidResp.ca) {
-            zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
-            sdk.discard(zidResp)
-            result = .refused
+        if case .enrolled(let zidResp, _) = result {
+            switch policy() {
+            case .unknown:
+                // fail closed. The callers' sources don't turn unknown once known, so this is a backstop; a
+                // one-time token is used up by now, so trying again won't work for one
+                zLog.warn("Discarding \(zid.name): its network restrictions aren't known")
+                sdk.discard(zidResp)
+                result = .failed(Enrollment.policyUnknownMessage)
+            case .restricted(let policy):
+                if case .blocked(let reason) = policy.check(zidResp.ca) {
+                    zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
+                    sdk.discard(zidResp)
+                    result = .refused
+                }
+            case .unrestricted:
+                break
+            }
         }
         if case .enrolled = result {
             zid.enrollProvider = provider

@@ -103,11 +103,13 @@ final class EnrollmentTests: XCTestCase {
     private let noJwt = "/nonexistent/id.jwt"
     private let both = [Enrollment.Provider(name: "both", canCert: true, canToken: true)]
 
+    /// `currentPolicy`, when given, is what enrollment reads each time it asks; otherwise `policy` throughout
     private func run(_ zid:ZitiIdentity, jwtFile:String? = nil, hint:Enrollment.Hint = Enrollment.Hint(),
-                     policy:CABundlePolicy? = nil) -> Enrollment.Result {
+                     policy:CABundlePolicy? = nil, currentPolicy:(() -> Enrollment.Policy)? = nil) -> Enrollment.Result {
         let done = expectation(description: "enrollment completes")
         var result:Enrollment.Result?
-        Enrollment(zid, ui: ui, sdk: sdk, hint: hint, policy: policy).start(jwtFile: jwtFile ?? noJwt) { r in
+        let fixed:Enrollment.Policy = policy.map { .restricted($0) } ?? .unrestricted
+        Enrollment(zid, ui: ui, sdk: sdk, hint: hint, policy: currentPolicy ?? { fixed }).start(jwtFile: jwtFile ?? noJwt) { r in
             XCTAssertNil(result, "completed more than once")
             result = r
             done.fulfill()
@@ -385,7 +387,7 @@ final class EnrollmentTests: XCTestCase {
     }
 
     /// One-time token enrollment whose identity comes back with `ca`
-    private func runOtt(ca:String?) throws -> Enrollment.Result {
+    private func runOtt(ca:String?, currentPolicy:(() -> Enrollment.Policy)? = nil) throws -> Enrollment.Result {
         let jwtFile = NSTemporaryDirectory() + UUID().uuidString + ".jwt"
         try "jwt".write(toFile: jwtFile, atomically: true, encoding: .utf8)
         defer { try? FileManager.default.removeItem(atPath: jwtFile) }
@@ -393,7 +395,59 @@ final class EnrollmentTests: XCTestCase {
         let resp = CZiti.ZitiIdentity(id: "real-id", ztAPIs: ["https://ctrl"])
         resp.ca = ca
         sdk.result = (resp, nil)
-        return run(makeIdentity(claims: ["sub": "s", "iss": "i", "em": "ott"]), jwtFile: jwtFile, policy: allowRootA)
+        return run(makeIdentity(claims: ["sub": "s", "iss": "i", "em": "ott"]), jwtFile: jwtFile, policy: allowRootA,
+                   currentPolicy: currentPolicy)
+    }
+
+    // Before the tunnel configuration loads, whether a policy applies isn't known, so nothing is enrolled
+    func testUnknownPolicyEnrollsNothing() throws {
+        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootA, currentPolicy: { .unknown })), "failed \(Enrollment.policyUnknownMessage)")
+        XCTAssertEqual(sdk.calls, [])
+
+        let jwtFile = try networkJwt()
+        sdk.providers = both
+        let result = run(makeIdentity(claims: ["sub": "s", "iss": "i", "em": "network"]), jwtFile: jwtFile,
+                         currentPolicy: { .unknown })
+        XCTAssertEqual(describe(result), "failed \(Enrollment.policyUnknownMessage)")
+        XCTAssertEqual(sdk.calls, [])
+        XCTAssertEqual(ui.calls, [])
+
+        let byURL = run(makeIdentity(ztAPIs: ["https://ctrl.example.com"]), currentPolicy: { .unknown })
+        XCTAssertEqual(describe(byURL), "failed \(Enrollment.policyUnknownMessage)")
+        XCTAssertEqual(sdk.calls, [])
+    }
+
+    // A profile can arrive while the user signs in: the result is checked against the policy at the end
+    func testPolicyReadAgainWhenEnrollmentFinishes() throws {
+        var asked = 0
+        let restrictsLater:() -> Enrollment.Policy = {
+            asked += 1
+            return asked == 1 ? .unrestricted : .restricted(self.allowRootA)
+        }
+        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootB, currentPolicy: restrictsLater)), "refused")
+        XCTAssertEqual(sdk.calls.filter { $0 == "discard real-id" }.count, 1)
+        XCTAssertEqual(asked, 2)
+    }
+
+    // only if the list behind the policy goes away during the sign-in (iOS): nothing is kept
+    func testPolicyUnknownWhenEnrollmentFinishes() throws {
+        var asked = 0
+        let lostLater:() -> Enrollment.Policy = {
+            asked += 1
+            return asked == 1 ? .unrestricted : .unknown
+        }
+        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootA, currentPolicy: lostLater)), "failed \(Enrollment.policyUnknownMessage)")
+        XCTAssertEqual(sdk.calls.filter { $0 == "discard real-id" }.count, 1)
+    }
+
+    func testPolicyLiftedDuringEnrollment() throws {
+        var asked = 0
+        let liftsLater:() -> Enrollment.Policy = {
+            asked += 1
+            return asked == 1 ? .restricted(self.allowRootA) : .unrestricted
+        }
+        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootB, currentPolicy: liftsLater)), "enrolled real-id none")
+        XCTAssertFalse(sdk.calls.contains("discard real-id"))
     }
 
     func testAllowedNetworkEnrolls() throws {

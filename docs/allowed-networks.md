@@ -112,7 +112,7 @@ For checking a setup, or implementing the same restriction elsewhere.
 - **What's loaded.** The tunnel gives an allowed identity exactly the certificates it checked, re-encoded as PEM, not the identity file's own text.
 - **Which identities.** Every identity file is checked, whether it says it's enrolled or not, so identities waiting to enroll aren't loaded.
 - **New bundles.** A refreshed bundle is checked when the controller sends it; one that isn't allowed stops the identity until the tunnel restarts, and it can't be turned back on in the meantime. An update without a bundle keeps the current one.
-- **Enrolling.** A controller URL or network JWT is checked from the bundle the network publishes, before sign-in. Every enrollment's resulting bundle is checked too. A refused enrollment keeps nothing on the device.
+- **Enrolling.** A controller URL or network JWT is checked from the bundle the network publishes, before sign-in. Every enrollment's resulting bundle is checked too, against the policy when it finishes (a profile can arrive during the sign-in). A refused enrollment keeps nothing on the device. Before its tunnel settings have loaded, the app can't tell whether a policy applies, so it doesn't enroll and asks the user to try again. (The iOS share sheet, which enrolls one-time tokens itself, only knows the policy once the app has run with the profile.)
 - **Profiles.** A locked configuration with `allowedCAs` replaces the app's own as soon as the app sees it, even while the app's own is connected. Until the app sees it, the app's own configuration isn't restricted.
 
 ## Troubleshooting

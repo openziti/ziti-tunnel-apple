@@ -203,4 +203,12 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertEqual(TunnelMgr.disconnectAction(restarting: true, lockedPending: false), Action.restart)
         XCTAssertEqual(TunnelMgr.disconnectAction(restarting: false, lockedPending: false), Action.none)
     }
+
+    func testEnrollmentPolicy() {
+        let policy = CABundlePolicy([String(repeating: "ab", count: 32)])
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: false, nil), .unknown)
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: false, policy), .unknown)
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, nil), .unrestricted)
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, policy), .restricted(policy))
+    }
 }
