@@ -646,6 +646,21 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
             }
         }
     }
+
+    // The network came back after being unavailable. The SDK backs off its authentication retries while the network
+    // is down and has no way to know it's back. Reporting "woken" makes the SDK authenticate now (ziti_endpoint_state_change).
+    // Only identities that aren't connected are nudged: a connected one doesn't need it, and reporting "woken" to its
+    // controller could set off MFA posture checks that prompt on wake. (Without an API session, the posture report
+    // itself is not sent.)
+    func onNetworkRestored() {
+        allZitis.forEach { z in
+            guard let tzid = zidToTzid(z.id.id), tzid.isEnabled, z.isEnabled() else { return }
+            if tzid.edgeStatus?.status != .Available {
+                zLog.info("Network restored: authenticating \(tzid.name) now")
+                z.endpointStateChange(true, false)
+            }
+        }
+    }
 }
 
 extension ZitiTunnelDelegate: UNUserNotificationCenterDelegate {
