@@ -53,6 +53,11 @@ class TunnelMgr: NSObject {
     /// start the tunnel. The running load can't stand in for it, since it may have listed the configurations while
     /// ours was still active, and so kept ours
     private var deferredSwitch:Bool?
+    /// Rechecks scheduled after a configuration change, so a burst of notifications shares one set
+    private var configRechecksPending = false
+    /// A profile's configuration can become readable after its change notification, with no second notification
+    /// (seen on macOS 26.5), so changes are looked at again after these delays
+    static let configRecheckDelays:[TimeInterval] = [2, 10]
     var tlsuvLoggingEnabled = false
     
     typealias LogSettings = (level:ZitiLog.LogLevel, tlsuv:Bool)
@@ -326,6 +331,17 @@ class TunnelMgr: NSObject {
     @objc func tunnelConfigurationDidChange(_ notification: Notification?) {
         guard let bid = loadedBid else { return }
         loadFromPreferences(bid, createIfMissing: false)
+
+        guard !configRechecksPending else { return }
+        configRechecksPending = true
+        let delays = TunnelMgr.configRecheckDelays
+        for (i, delay) in delays.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                if i == delays.count - 1 { self?.configRechecksPending = false }
+                zLog.info("Rechecking tunnel configurations after a change")
+                self?.loadFromPreferences(bid, createIfMissing: false)
+            }
+        }
     }
 
     @objc func tunnelStatusDidChange(_ notification: Notification?) {
