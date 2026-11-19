@@ -372,6 +372,44 @@ class ProviderConfigTests: XCTestCase {
         XCTAssertFalse(ProviderConfig.isLocked(ProviderConfig().createDictionary()))
     }
 
+    // MARK: - Allowed CAs
+
+    private let fingerprintA = String(repeating: "ab", count: 32)
+    private let fingerprintB = String(repeating: "cd", count: 32)
+
+    private func lockedConfig(_ allowedCAs:Any) -> ProviderConfigDict {
+        return [ProviderConfig.LOCKED_KEY: true, ProviderConfig.ALLOWED_CAS_KEY: allowedCAs]
+    }
+
+    func testCABundlePolicy_noneWithoutKey() {
+        XCTAssertNil(ProviderConfig.caBundlePolicy(nil))
+        XCTAssertNil(ProviderConfig.caBundlePolicy([ProviderConfig.LOCKED_KEY: true]))
+    }
+
+    func testCABundlePolicy_onlyWhenLocked() {
+        XCTAssertNil(ProviderConfig.caBundlePolicy([ProviderConfig.ALLOWED_CAS_KEY: [fingerprintA]]))
+        XCTAssertNil(ProviderConfig.caBundlePolicy([ProviderConfig.LOCKED_KEY: false, ProviderConfig.ALLOWED_CAS_KEY: [fingerprintA]]))
+        XCTAssertEqual(ProviderConfig.caBundlePolicy(lockedConfig([fingerprintA]))?.fingerprints, [fingerprintA])
+    }
+
+    func testCABundlePolicy_listOrString() {
+        XCTAssertEqual(ProviderConfig.caBundlePolicy(lockedConfig([fingerprintA, fingerprintB]))?.fingerprints, [fingerprintA, fingerprintB])
+        XCTAssertEqual(ProviderConfig.caBundlePolicy(lockedConfig("\(fingerprintA), \(fingerprintB)"))?.fingerprints, [fingerprintA, fingerprintB])
+    }
+
+    func testCABundlePolicy_invalidValueAllowsNothing() {
+        for value in [[], [""], ["bogus"], "", 42, ["a": fingerprintA]] as [Any] {
+            XCTAssertEqual(ProviderConfig.caBundlePolicy(lockedConfig(value))?.fingerprints, [], "\(value)")
+        }
+        XCTAssertEqual(ProviderConfig.caBundlePolicy(lockedConfig([fingerprintA, 42]))?.fingerprints, [fingerprintA])
+    }
+
+    func testCABundlePolicy_doesntAffectValidation() {
+        var conf = validBaseConfig()
+        conf[ProviderConfig.ALLOWED_CAS_KEY] = ["bogus"]
+        XCTAssertNil(ProviderConfig().validateDictionaty(conf))
+    }
+
     // MARK: - Merge
 
     func testMerge_keepsSavedSettingsNotShown() {

@@ -36,6 +36,10 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     var routeUpdatesPending = false
     var tunnelShuttingDown = false
     var lastWakeTime:Date?
+
+    /// Identities stopped because a refreshed CA bundle isn't allowed, kept off until the tunnel restarts. Only used on the
+    /// tunnel's loop (events, `perform`)
+    private(set) var policyStops = PolicyStops()
     
     private var identitiesLoaded:Bool = false // when true, restart is required to update routes for services intercepted by IP
     
@@ -66,6 +70,22 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                 }
                 tzid.edgeStatus = ZitiIdentity.EdgeStatus(Date().timeIntervalSince1970, status: .Unavailable)
                 _ = zidStore.store(tzid)
+
+                // checked whether enrolled or not: the file says which, and without a CA bundle the SDK trusts the system's CAs
+                if let policy = ptp?.caBundlePolicy {
+                    switch policy.load(czid.ca) {
+                    case .load(let ca):
+                        czid.ca = ca
+                    case .blocked(let reason):
+                        if tzid.isEnrolled {
+                            zLog.warn("Not loading \(tzid.name):\(tzid.id), blocked by \(ProviderConfig.ALLOWED_CAS_KEY): \(reason)")
+                        } else {
+                            // the usual case is a pending identity, which has no CA bundle until it enrolls
+                            zLog.info("Not loading \(tzid.name):\(tzid.id), not enrolled (\(reason))")
+                        }
+                        return
+                    }
+                }
                 zids.append(czid)
             }
         }
@@ -444,6 +464,15 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                   "   caBundle=\(event.caBundle).")
         // tunnel provider has already updated tzid with event data before calling us, so just save the zid
         _ = zidStore.update(tzid, [.CZitiIdentity, .ControllerVersion])
+
+        // the SDK applies a refreshed CA bundle before we hear about it, so the identity is stopped as soon as it can be:
+        // setEnabled(false) is queued work, so connections made in the meantime use the new bundle
+        if let policy = ptp?.caBundlePolicy, let reason = policy.stopReason(refreshed: event.caBundle) {
+            zLog.error("Stopping \(tzid.name):\(tzid.id), updated CA bundle blocked by \(ProviderConfig.ALLOWED_CAS_KEY): \(reason)")
+            policyStops.stop(ziti.id.id)
+            ziti.setEnabled(false)
+            userNotifications.post(.Error, "Network not allowed", "\(tzid.name) was stopped: its network isn't allowed by your organization", tzid)
+        }
     }
     
     private func handleMfaEvent(_ ziti:Ziti, _ tzid:ZitiIdentity, _ event:ZitiTunnelMfaEvent) {
@@ -603,10 +632,15 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
     }
     
+    /// Call on the loop (where `policyStops` changes)
+    private func shouldRun(_ z:Ziti, _ tzid:ZitiIdentity) -> Bool {
+        return policyStops.shouldRun(z.id.id, enabled: tzid.isEnabled)
+    }
+
     func onSleep(_ completionHandler: @escaping () -> Void) {
         var sleepsPending = 0
         allZitis.forEach { z in
-            if let tzid = zidToTzid(z.id.id), tzid.isEnabled {
+            if let tzid = zidToTzid(z.id.id), shouldRun(z, tzid) {
                 sleepsPending += 1
             }
         }
@@ -618,7 +652,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
         }
         
         allZitis.forEach { z in
-            if let tzid = zidToTzid(z.id.id) {
+            if let tzid = zidToTzid(z.id.id), shouldRun(z, tzid) {
                 let disableCompleteHandler:IpcAppexServer.CompletionHandler = { _ in
                     sleepsPending -= 1
                     if sleepsPending == 0 {
@@ -627,10 +661,7 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
                     }
                 }
                 z.userData[IpcAppexServer.CONTEXT_EVENT_ENABLED_CALLBACK_KEY] = disableCompleteHandler
-                
-                if tzid.isEnabled {
-                    z.setEnabled(false)
-                }
+                z.setEnabled(false)
             }
         }
     }
@@ -638,11 +669,9 @@ class ZitiTunnelDelegate: NSObject, CZiti.ZitiTunnelProvider {
     func onWake() {
         lastWakeTime = Date()
         allZitis.forEach { z in
-            if let tzid = zidToTzid(z.id.id) {
-                if tzid.isEnabled {
-                    if !z.isEnabled() { z.setEnabled(true) }
-                    z.endpointStateChange(true, false)
-                }
+            if let tzid = zidToTzid(z.id.id), shouldRun(z, tzid) {
+                if !z.isEnabled() { z.setEnabled(true) }
+                z.endpointStateChange(true, false)
             }
         }
     }

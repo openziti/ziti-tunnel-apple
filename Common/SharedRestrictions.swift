@@ -16,14 +16,17 @@
 
 import Foundation
 
-/// Restrictions the app passes on to the share extension, which can't read the app's managed configuration.
-/// The app saves them in the app group each time it reads the configuration. No file means no restrictions.
+/// Restrictions the app passes on to the share extension, which can't read the app's managed configuration or its
+/// tunnel configuration. The app saves them in the app group each time it reads those. No file means no restrictions.
 enum SharedRestrictions {
     // the same key as ManagedConfig's, which the share extension doesn't compile
     private static let DISABLE_ADD_IDENTITY_KEY = "disableAddIdentity"
+    private static let ALLOWED_CAS_KEY = "allowedCAs"
+    private static let MANAGED_CONTROLLERS_KEY = "managedControllers"
 
     /// Here rather than on ManagedConfig so the share extension can show it too
     static let addDisabledMessage = "Adding identities is turned off by your organization."
+    static let managedNetworkMessage = "This network is set up by your organization. Open Ziti Mobile Edge to find it."
 
     static var url:URL? {
         return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)?
@@ -31,27 +34,54 @@ enum SharedRestrictions {
     }
 
     static func save(addIdentityDisabled:Bool, to url:URL) {
-        // called whenever the configuration might have changed, so only write when it did
-        guard addIdentityDisabled != isAddIdentityDisabled(at: url) else { return }
-        guard addIdentityDisabled else {
-            do {
-                try FileManager.default.removeItem(at: url)
-            } catch {
-                zLog.error("Unable to remove \(url.lastPathComponent): \(error.localizedDescription)")
-            }
-            return
-        }
-        do {
-            let data = try PropertyListSerialization.data(fromPropertyList: [DISABLE_ADD_IDENTITY_KEY: true], format: .xml, options: 0)
-            try data.write(to: url, options: .atomic)
-        } catch {
-            zLog.error("Unable to save \(url.lastPathComponent): \(error.localizedDescription)")
-        }
+        update(url) { $0[DISABLE_ADD_IDENTITY_KEY] = addIdentityDisabled ? true : nil }
+    }
+
+    static func save(caBundlePolicy:CABundlePolicy?, to url:URL) {
+        update(url) { $0[ALLOWED_CAS_KEY] = caBundlePolicy.map { $0.fingerprints.sorted() } }
+    }
+
+    /// The organization's networks, by controller host and port, so the share extension leaves them to the app
+    static func save(managedControllers:[URL], to url:URL) {
+        let endpoints = Set(managedControllers.compactMap(ZitiIdentity.endpoint)).sorted()
+        update(url) { $0[MANAGED_CONTROLLERS_KEY] = endpoints.isEmpty ? nil : endpoints }
     }
 
     static func isAddIdentityDisabled(at url:URL) -> Bool {
+        return read(url)[DISABLE_ADD_IDENTITY_KEY] as? Bool ?? false
+    }
+
+    /// Whether a controller (same host and port) is one of the organization's networks
+    static func isManaged(controller:URL, at url:URL) -> Bool {
+        guard let endpoint = ZitiIdentity.endpoint(controller) else { return false }
+        return (read(url)[MANAGED_CONTROLLERS_KEY] as? [String] ?? []).contains(endpoint)
+    }
+
+    static func caBundlePolicy(at url:URL) -> CABundlePolicy? {
+        return (read(url)[ALLOWED_CAS_KEY] as? [String]).map { CABundlePolicy($0) }
+    }
+
+    private static func read(_ url:URL) -> [String: Any] {
         guard let data = try? Data(contentsOf: url),
-              let dict = (try? PropertyListSerialization.propertyList(from: data, format: nil)) as? [String: Any] else { return false }
-        return dict[DISABLE_ADD_IDENTITY_KEY] as? Bool ?? false
+              let dict = (try? PropertyListSerialization.propertyList(from: data, format: nil)) as? [String: Any] else { return [:] }
+        return dict
+    }
+
+    /// Called whenever a configuration might have changed, so only writes when something did. No restrictions, no file
+    private static func update(_ url:URL, _ change:(inout [String: Any]) -> Void) {
+        let current = read(url)
+        var restrictions = current
+        change(&restrictions)
+        guard !NSDictionary(dictionary: restrictions).isEqual(to: current) else { return }
+        do {
+            if restrictions.isEmpty {
+                try FileManager.default.removeItem(at: url)
+            } else {
+                let data = try PropertyListSerialization.data(fromPropertyList: restrictions, format: .xml, options: 0)
+                try data.write(to: url, options: .atomic)
+            }
+        } catch {
+            zLog.error("Unable to save \(url.lastPathComponent): \(error.localizedDescription)")
+        }
     }
 }

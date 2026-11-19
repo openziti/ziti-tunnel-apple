@@ -82,6 +82,17 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                                 self?.extensionContext?.cancelRequest(withError: zErr!)
                             }
                         } else {
+                            // a network JWT for one of the organization's networks is the app's: it shows the identity
+                            // the configuration added rather than adding another
+                            if let restrictions = SharedRestrictions.url, let claims = ZitiEnroller(url.path).getClaims(),
+                               claims.em == "network", let controller = claims.iss.flatMap({ URL(string: $0) }),
+                               SharedRestrictions.isManaged(controller: controller, at: restrictions) {
+                                zLog.info("Not importing: the network is set up by managed configuration")
+                                self?.showAlert(alertTitle, SharedRestrictions.managedNetworkMessage) { _ in
+                                    self?.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+                                }
+                                return
+                            }
                             do {
                                 var zids = loadedZids ?? []
                                 try zids.insertFromJWT(url, zidStore, at: 0)
@@ -184,6 +195,21 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                         return
                     }
                     
+                    if let url = SharedRestrictions.url, let policy = SharedRestrictions.caBundlePolicy(at: url),
+                       case .blocked(let reason) = policy.check(zidResp.ca) {
+                        zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
+                        Ziti(withId: zidResp).forget()
+                        // the pending identity and its JWT were stored on import, and the token is used up, so nothing
+                        // of it is usable
+                        if let error = zidStore.remove(zid) {
+                            zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
+                        }
+                        self.showAlert("Unable to enroll", CABundlePolicy.notAllowedMessage) { _ in
+                            self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+                        }
+                        return
+                    }
+
                     if zid.czid == nil {
                         zid.czid = CZiti.ZitiIdentity(id: zidResp.id, ztAPIs: [zidResp.ztAPI])
                     }

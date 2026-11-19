@@ -506,7 +506,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         tvc?.enrollingIds.append(zid)
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory: false).path
-        Enrollment(zid, ui: self, hint: hint).start(jwtFile: jwtFile) { result in
+        Enrollment(zid, ui: self, hint: hint, policy: tvc?.tunnelMgr.caBundlePolicy).start(jwtFile: jwtFile) { result in
             self.hideSpinner()
             self.tvc?.enrollingIds.removeAll { $0 === zid }
             switch result {
@@ -519,6 +519,17 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 self.dialogAlert("Unable to enroll \(zid.name)", msg)
             case .cancelled:
                 break
+            case .refused:
+                // removing it also forgets anything stored under its temporary id; the list reloads on the removal
+                if let error = self.tvc?.zidStore.remove(zid) {
+                    zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
+                }
+                let alert = UIAlertController(title: "Unable to enroll \(zid.name)", message: CABundlePolicy.notAllowedMessage,
+                                              preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default) { _ in
+                    self.navigationController?.popViewController(animated: true)
+                })
+                self.present(alert, animated: true, completion: nil)
             }
         }
     }
@@ -778,7 +789,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
             if let ivCell = cell as? IdentityEnabledCell {
                 ivCell.ivc = self
                 ivCell.switch.isOn = zid?.isEnabled ?? false
-                ivCell.switch.isEnabled = zid?.isEnrolled ?? false
+                ivCell.switch.isEnabled = zid.map { $0.isEnrolled && !(tvc?.tunnelMgr.isBlocked($0) ?? false) } ?? false
                 ivCell.label.isEnabled = ivCell.switch.isEnabled
             }
         } else if indexPath.section == 1 {
@@ -833,7 +844,11 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 cell?.detailTextLabel?.text = csStr
             } else {
                 cell?.textLabel?.text = "Enrollment Status"
-                cell?.detailTextLabel?.text = zid?.enrollmentStatusDisplay ?? ""
+                if let zid = zid, tvc?.tunnelMgr.isBlocked(zid) ?? false {
+                    cell?.detailTextLabel?.text = CABundlePolicy.blockedStatus
+                } else {
+                    cell?.detailTextLabel?.text = zid?.enrollmentStatusDisplay ?? ""
+                }
             }
         } else if indexPath.section == 3 {
             if let zid = zid, zid.isEnrolled {

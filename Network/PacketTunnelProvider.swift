@@ -22,6 +22,7 @@ import UserNotifications
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     let providerConfig = ProviderConfig()
+    private(set) var caBundlePolicy:CABundlePolicy?
     var appLogLevel:ZitiLog.LogLevel?
     let netMon = NWPathMonitor()
     var zitiTunnel:ZitiTunnel?
@@ -206,6 +207,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
         
         zLog.info("\(self.providerConfig.debugDescription)")
+
+        caBundlePolicy = ProviderConfig.caBundlePolicy(conf)
+        if let policy = caBundlePolicy {
+            zLog.info("Allowed CAs: \(policy.fingerprints.count)")
+        } else if conf[ProviderConfig.ALLOWED_CAS_KEY] != nil {
+            zLog.warn("Ignoring \(ProviderConfig.ALLOWED_CAS_KEY): the configuration isn't locked")
+        }
         return nil
     }
     

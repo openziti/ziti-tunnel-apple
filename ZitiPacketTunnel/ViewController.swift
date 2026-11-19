@@ -157,11 +157,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             box.alphaValue = 1.0
             
             if tunnelMgr.status != .connected { enableStatePendingIds = [] }
+            let blocked = tunnelMgr.isBlocked(zId)
             if enableStatePendingIds.contains(where: { $0.id == zId.id }) {
                 idEnabledBtn.isEnabled = false
             } else {
-                idEnabledBtn.isEnabled = zId.isEnrolled
+                idEnabledBtn.isEnabled = zId.isEnrolled && !blocked
             }
+            idEnabledBtn.toolTip = blocked ? CABundlePolicy.notAllowedMessage : nil
             idEnabledBtn.state = zId.isEnabled ? .on : .off
             mfaSwitch.isEnabled = zId.isEnabled && (tunnelMgr.status == .connected || tunnelMgr.status == .connecting)
             mfaSwitch.state = zId.isMfaEnabled ? .on : .off
@@ -215,7 +217,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             idNameLabel.stringValue = zId.name
             idNetworkLabel.stringValue = zId.networkDisplay
             idControllerStatusLabel.stringValue = zId.controllerVersion ?? "" //csStr
-            let enrollStatusStr = zId.enrollmentStatusDisplay
+            let enrollStatusStr = blocked ? CABundlePolicy.blockedStatus : zId.enrollmentStatusDisplay
             idEnrollStatusLabel.stringValue = enrollStatusStr
             if let expDate = zId.expDate {
                 idExpiresAtLabel.stringValue = "(expiration: \(dateToString(expDate))"
@@ -1225,7 +1227,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
         updateServiceUI(zId: zid)
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory:false).path
-        Enrollment(zid, ui: self, hint: hint).start(jwtFile: jwtFile) { result in
+        Enrollment(zid, ui: self, hint: hint, policy: tunnelMgr.caBundlePolicy).start(jwtFile: jwtFile) { result in
             self.enrollingIds.removeAll { $0.id == zid.id }
             switch result {
             case .enrolled(let zidResp, let enrollTo):
@@ -1236,6 +1238,12 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 self.dialogAlert("Unable to enroll \(zid.name)", msg)
             case .cancelled:
                 self.updateServiceUI(zId: zid)
+            case .refused:
+                // removing it also forgets anything stored under its temporary id; the list reloads on the removal
+                if let error = self.zidStore.remove(zid) {
+                    zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
+                }
+                self.dialogAlert("Unable to enroll \(zid.name)", CABundlePolicy.notAllowedMessage)
             }
         }
     }
