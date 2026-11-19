@@ -22,14 +22,15 @@ class TunnelMgrTests: XCTestCase {
 
     let bid = "org.openziti.test.ptp"
 
-    func makeManager(_ providerBundleId:String?, _ name:String, locked:Bool = false) -> NETunnelProviderManager {
+    func makeManager(_ providerBundleId:String?, _ name:String, locked:Bool = false, allowedCAs:[String]? = nil) -> NETunnelProviderManager {
         let mgr = NETunnelProviderManager()
         if let providerBundleId = providerBundleId {
             let proto = NETunnelProviderProtocol()
             proto.providerBundleIdentifier = providerBundleId
-            if locked {
+            if locked || allowedCAs != nil {
                 var conf = ProviderConfig().createDictionary()
-                conf[ProviderConfig.LOCKED_KEY] = true
+                if locked { conf[ProviderConfig.LOCKED_KEY] = true }
+                if let allowedCAs = allowedCAs { conf[ProviderConfig.ALLOWED_CAS_KEY] = allowedCAs }
                 proto.providerConfiguration = conf
             }
             mgr.protocolConfiguration = proto
@@ -116,6 +117,32 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertFalse(TunnelMgr.lockedPending([ours], ours, bid))
     }
 
+    func testLockedPendingRestricts_onlyWithAllowedCAs() {
+        // A locked configuration that restricts networks takes over now, not when the user gets around to disconnecting
+        let fp = String(repeating: "ab", count: 32)
+        let ours = makeManager(bid, "ours")
+        let restricting = makeManager(bid, "restricting", locked: true, allowedCAs: [fp])
+        let locked = makeManager(bid, "locked", locked: true)
+        XCTAssertTrue(TunnelMgr.lockedPendingRestricts([restricting, ours], ours, bid))
+        XCTAssertTrue(TunnelMgr.lockedPendingRestricts([ours, locked, restricting], ours, bid))
+        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([locked, ours], ours, bid), "locked without allowedCAs waits for a disconnect")
+        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([restricting, ours], restricting, bid), "already in use")
+        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([ours], ours, bid))
+    }
+
+    func testLockedPendingRestricts_ignoresUnusableOrUnlocked() {
+        let fp = String(repeating: "ab", count: 32)
+        let ours = makeManager(bid, "ours")
+        let unlocked = makeManager(bid, "unlocked", allowedCAs: [fp])
+        let invalid = makeManager(bid, "invalid")
+        (invalid.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration =
+            [ProviderConfig.LOCKED_KEY: true, ProviderConfig.ALLOWED_CAS_KEY: [fp]]
+        let other = makeManager("org.example.other", "other", locked: true, allowedCAs: [fp])
+        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([unlocked, ours], ours, bid))
+        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([invalid, ours], ours, bid))
+        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([other, ours], ours, bid))
+    }
+
     func testSupersededManagers_keepsActive() {
         let ours = makeManager(bid, "ours")
         let locked = makeManager(bid, "locked", locked: true)
@@ -167,5 +194,13 @@ class TunnelMgrTests: XCTestCase {
         let first = makeManager("org.example.other", "first")
         let noProtocol = makeManager(nil, "second")
         XCTAssertTrue(TunnelMgr.preferredManager([first, noProtocol], bid) === first)
+    }
+
+    func testDisconnectAction() {
+        typealias Action = TunnelMgr.DisconnectAction
+        XCTAssertEqual(TunnelMgr.disconnectAction(restarting: true, lockedPending: true), Action.switchToLocked(start: true))
+        XCTAssertEqual(TunnelMgr.disconnectAction(restarting: false, lockedPending: true), Action.switchToLocked(start: false))
+        XCTAssertEqual(TunnelMgr.disconnectAction(restarting: true, lockedPending: false), Action.restart)
+        XCTAssertEqual(TunnelMgr.disconnectAction(restarting: false, lockedPending: false), Action.none)
     }
 }

@@ -36,6 +36,9 @@ class StatusSummary {
         if let num = value as? NSNumber, ProviderConfig.isBoolean(num) {
             return num.boolValue ? "true" : "false"
         }
+        if let list = value as? [Any] {
+            return list.map { valueDescription($0) }.joined(separator: ", ")
+        }
         return "\(value)"
     }
 
@@ -50,6 +53,12 @@ class StatusSummary {
             lines += config.keys.sorted().map { "  \($0): \(valueDescription(config[$0]!))" }
         } else {
             lines.append("Tunnel settings: None saved")
+        }
+        let policy = ProviderConfig.caBundlePolicy(config)
+        if let policy = policy {
+            lines.append("Allowed CAs: \(policy.fingerprints.count)")
+        } else if config?[ProviderConfig.ALLOWED_CAS_KEY] != nil {
+            lines.append("Allowed CAs: ignored, the tunnel settings aren't locked")
         }
         if let managedConfig = managedConfig {
             lines.append("Managed configuration: \(managedConfig.description)")
@@ -67,6 +76,14 @@ class StatusSummary {
                 lines.append("  MFA: \(zid.isMfaVerified ? "Verified" : "Not verified")\(zid.isMfaPending ? ", pending" : "")")
             }
             lines.append("  Services: \(zid.services.count)")
+            // so admins can copy the fingerprints for allowed CAs from a device that works
+            for cert in CABundlePolicy.certificates(zid.czid?.ca) ?? [] {
+                let name = SecCertificateCopySubjectSummary(cert) as String? ?? "?"
+                lines.append("  CA: \(name) \(CABundlePolicy.displayFingerprint(cert))")
+            }
+            if let policy = policy, zid.isEnrolled, case .blocked(let reason) = policy.check(zid.czid?.ca) {
+                lines.append("  Blocked: \(reason)")
+            }
         }
         return lines.joined(separator: "\n") + "\n"
     }
