@@ -1239,7 +1239,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             case .cancelled:
                 self.updateServiceUI(zId: zid)
             case .refused:
-                // removing it also forgets anything stored under its temporary id; the list reloads on the removal
+                // removing it also forgets anything stored under its temporary id; the list drops it when the store reports the removal
                 if let error = self.zidStore.remove(zid) {
                     zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
                 }
