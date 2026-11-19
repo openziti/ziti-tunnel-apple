@@ -75,6 +75,9 @@ class ZitiIdentity : NSObject, Codable {
     var jwtProviders:[CZiti.JWTProvider]?
     var selectedJWTProvider:CZiti.JWTProvider?
     var enrollProvider:String? // chosen when enrolling, used for the first external login
+    /// The controller URL of the managed network it belongs to (managed app configuration). Kept because config events
+    /// replace its controller addresses with the ones the network reports, which needn't include that URL
+    var managedController:String?
     var extAuthPending:Bool? = false
     
     var name:String { return czid?.name ?? "--" }

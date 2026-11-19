@@ -21,7 +21,7 @@ import NetworkExtension
 final class StatusSummaryTests: XCTestCase {
 
     func testNoIdentities() {
-        let text = StatusSummary.text(version: "Ziti Version: 2.60 (0), OS: 26.5", status: .disconnected, config: nil, zids: [])
+        let text = StatusSummary.text(version: "Ziti Version: 2.60 (0), OS: 26.5", status: .disconnected, config: nil, managedConfig: nil, zids: [])
         XCTAssertEqual(text, """
             ======= Status ==========
             Ziti Version: 2.60 (0), OS: 26.5
@@ -40,7 +40,7 @@ final class StatusSummaryTests: XCTestCase {
         zid.edgeStatus = ZitiIdentity.EdgeStatus(0, status: .Available)
 
         let config:ProviderConfigDict = ["mtu": "4000", "locked": true, "dns": "100.64.0.2"]
-        let text = StatusSummary.text(version: "v", status: .connected, config: config, zids: [zid])
+        let text = StatusSummary.text(version: "v", status: .connected, config: config, managedConfig: nil, zids: [zid])
         XCTAssertEqual(text, """
             ======= Status ==========
             v
@@ -66,7 +66,7 @@ final class StatusSummaryTests: XCTestCase {
         let pending = makeIdentity(id: "id2", name: "phone", mfaEnabled: true, mfaVerified: false, mfaPending: true)
         let verified = makeIdentity(id: "id3", name: "tablet", mfaEnabled: true, mfaVerified: true)
 
-        let text = StatusSummary.text(version: "v", status: .connecting, config: [:], zids: [pending, verified])
+        let text = StatusSummary.text(version: "v", status: .connecting, config: [:], managedConfig: nil, zids: [pending, verified])
         XCTAssertTrue(text.contains("Tunnel: Connecting\nTunnel settings: Editable\nIdentities: 2\n"))
         XCTAssertTrue(text.contains("""
             Identity: phone [id2]
@@ -81,9 +81,20 @@ final class StatusSummaryTests: XCTestCase {
         XCTAssertTrue(text.contains("  MFA: Verified\n"))
     }
 
+    func testManagedConfig() {
+        let managed = ManagedConfig([ManagedConfig.NETWORKS_KEY: [["controller": "https://ctrl.example.com"]],
+                                     ManagedConfig.DISABLE_ADD_IDENTITY_KEY: true])
+        let text = StatusSummary.text(version: "v", status: .connected, config: nil, managedConfig: managed, zids: [])
+        XCTAssertTrue(text.contains("""
+            Tunnel settings: None saved
+            Managed configuration: 1 network, adding identities turned off
+            Identities: 0
+            """))
+    }
+
     func testInvalidSettingsListedAsStored() {
         let config:ProviderConfigDict = ["mtu": "abc", "locked": "yes"]
-        let text = StatusSummary.text(version: "v", status: .invalid, config: config, zids: [])
+        let text = StatusSummary.text(version: "v", status: .invalid, config: config, managedConfig: nil, zids: [])
         XCTAssertTrue(text.contains("""
             Tunnel settings: Locked by an installed profile
               locked: yes
@@ -95,7 +106,7 @@ final class StatusSummaryTests: XCTestCase {
     // Saved settings come back from preferences as NSNumber, not Swift Bool or Int
     func testSavedNumbersListed() {
         let config:ProviderConfigDict = ["locked": kCFBooleanTrue as NSNumber, "lowPowerMode": kCFBooleanFalse as NSNumber, "mtu": NSNumber(value: 1)]
-        let text = StatusSummary.text(version: "v", status: .connected, config: config, zids: [])
+        let text = StatusSummary.text(version: "v", status: .connected, config: config, managedConfig: nil, zids: [])
         XCTAssertTrue(text.contains("""
             Tunnel settings: Locked by an installed profile
               locked: true

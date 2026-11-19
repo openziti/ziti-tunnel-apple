@@ -72,4 +72,4 @@ Without `locked`, a profile's settings can be changed in the app, and the change
 - The app picks up profiles installed or removed while it's running when it next becomes active.
 - When the profile is removed, the app creates its own default configuration again.
 - Proxy credentials can't be set in a profile. Users enter them in the app's tunnel settings, including when `locked` is set.
-- Identities are not part of the profile. Users enroll as usual.
+- Identities are not part of the profile. Users enroll as usual, or the app can add your networks for them through [managed app configuration](managed-app-config.md).

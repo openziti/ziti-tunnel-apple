@@ -29,6 +29,7 @@ func decodeJSON<T: Decodable>(_ type: T.Type, from dict: [String: Any]) -> T {
 func makeIdentity(
     id: String = "test-id",
     ztAPI: String = "https://ctrl.example.com",
+    ztAPIs: [String]? = nil,
     name: String = "test-identity",
     enrolled: Bool = false,
     enabled: Bool = false,
@@ -49,7 +50,7 @@ func makeIdentity(
         "czid": [
             "id": id,
             "ztAPI": ztAPI,
-            "ztAPIs": [ztAPI],
+            "ztAPIs": ztAPIs ?? [ztAPI],
             "name": name
         ]
     ]
@@ -113,4 +114,18 @@ func makeServiceJSON(
     ] as [String : Any]
     if let pqs = postureQuerySets { json["postureQuerySets"] = pqs }
     return json
+}
+
+/// An unsigned JWT with the given claims, enough for parsing
+func makeJwt(_ claims: [String: Any]) -> String {
+    let payload = try! JSONSerialization.data(withJSONObject: claims)
+        .base64EncodedString()
+        .replacingOccurrences(of: "+", with: "-")
+        .replacingOccurrences(of: "/", with: "_")
+        .replacingOccurrences(of: "=", with: "")
+    return "eyJhbGciOiJSUzI1NiJ9.\(payload).c2ln"
+}
+
+func makeNetworkJwt(_ iss: String = "https://ctrl.example.com:443/", em: String = "network") -> String {
+    return makeJwt(["iss": iss, "sub": iss, "em": em])
 }
