@@ -384,6 +384,26 @@ final class ManagedConfigTests: XCTestCase {
         XCTAssertFalse(SharedRestrictions.isAddIdentityDisabled(at: url))
     }
 
+    func testSharedRestrictionsManagedControllers() {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("restrictions-\(UUID().uuidString).plist")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let ctrl = URL(string: "https://ctrl.example.com/edge/client/v1")!
+
+        XCTAssertFalse(SharedRestrictions.isManaged(controller: ctrl, at: url))
+        SharedRestrictions.save(managedControllers: [URL(string: "https://CTRL.example.com:443")!, URL(string: "https://other.example.com:1280")!], to: url)
+        XCTAssertTrue(SharedRestrictions.isManaged(controller: ctrl, at: url), "same host and port")
+        XCTAssertTrue(SharedRestrictions.isManaged(controller: URL(string: "https://other.example.com:1280")!, at: url))
+        XCTAssertFalse(SharedRestrictions.isManaged(controller: URL(string: "https://ctrl.example.com:1280")!, at: url), "other port")
+
+        // kept alongside the other restrictions, and no file once none are left
+        SharedRestrictions.save(addIdentityDisabled: true, to: url)
+        XCTAssertTrue(SharedRestrictions.isManaged(controller: ctrl, at: url))
+        SharedRestrictions.save(addIdentityDisabled: false, to: url)
+        SharedRestrictions.save(managedControllers: [], to: url)
+        XCTAssertFalse(SharedRestrictions.isManaged(controller: ctrl, at: url))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+    }
+
     func testSharedRestrictionsMalformedFile() {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("restrictions-\(UUID().uuidString).plist")
         defer { try? FileManager.default.removeItem(at: url) }

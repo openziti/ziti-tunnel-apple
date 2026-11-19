@@ -22,9 +22,11 @@ enum SharedRestrictions {
     // the same key as ManagedConfig's, which the share extension doesn't compile
     private static let DISABLE_ADD_IDENTITY_KEY = "disableAddIdentity"
     private static let ALLOWED_CAS_KEY = "allowedCAs"
+    private static let MANAGED_CONTROLLERS_KEY = "managedControllers"
 
     /// Here rather than on ManagedConfig so the share extension can show it too
     static let addDisabledMessage = "Adding identities is turned off by your organization."
+    static let managedNetworkMessage = "This network is set up by your organization. Open Ziti Mobile Edge to find it."
 
     static var url:URL? {
         return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.APP_GROUP_ID)?
@@ -39,8 +41,20 @@ enum SharedRestrictions {
         update(url) { $0[ALLOWED_CAS_KEY] = caBundlePolicy.map { $0.fingerprints.sorted() } }
     }
 
+    /// The organization's networks, by controller host and port, so the share extension leaves them to the app
+    static func save(managedControllers:[URL], to url:URL) {
+        let endpoints = Set(managedControllers.compactMap(ZitiIdentity.endpoint)).sorted()
+        update(url) { $0[MANAGED_CONTROLLERS_KEY] = endpoints.isEmpty ? nil : endpoints }
+    }
+
     static func isAddIdentityDisabled(at url:URL) -> Bool {
         return read(url)[DISABLE_ADD_IDENTITY_KEY] as? Bool ?? false
+    }
+
+    /// Whether a controller (same host and port) is one of the organization's networks
+    static func isManaged(controller:URL, at url:URL) -> Bool {
+        guard let endpoint = ZitiIdentity.endpoint(controller) else { return false }
+        return (read(url)[MANAGED_CONTROLLERS_KEY] as? [String] ?? []).contains(endpoint)
     }
 
     static func caBundlePolicy(at url:URL) -> CABundlePolicy? {

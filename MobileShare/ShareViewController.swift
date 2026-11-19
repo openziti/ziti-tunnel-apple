@@ -82,6 +82,17 @@ class ShareViewController: UIViewController, UITableViewDelegate, UITableViewDat
                                 self?.extensionContext?.cancelRequest(withError: zErr!)
                             }
                         } else {
+                            // a network JWT for one of the organization's networks is the app's: it shows the identity
+                            // the configuration added rather than adding another
+                            if let restrictions = SharedRestrictions.url, let claims = ZitiEnroller(url.path).getClaims(),
+                               claims.em == "network", let controller = claims.iss.flatMap({ URL(string: $0) }),
+                               SharedRestrictions.isManaged(controller: controller, at: restrictions) {
+                                zLog.info("Not importing: the network is set up by managed configuration")
+                                self?.showAlert(alertTitle, SharedRestrictions.managedNetworkMessage) { _ in
+                                    self?.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+                                }
+                                return
+                            }
                             do {
                                 var zids = loadedZids ?? []
                                 try zids.insertFromJWT(url, zidStore, at: 0)

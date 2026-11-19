@@ -537,6 +537,7 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
         // also saved at launch, since the configuration can change while the app isn't running
         if let url = SharedRestrictions.url {
             SharedRestrictions.save(addIdentityDisabled: config?.disableAddIdentity ?? false, to: url)
+            SharedRestrictions.save(managedControllers: config?.networks.map { $0.controller } ?? [], to: url)
         }
         restrictionsShared = true
         guard config != managedConfig else { return }
