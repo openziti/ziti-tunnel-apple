@@ -339,10 +339,14 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             
             DispatchQueue.main.async {
+                // only a removal the app didn't make: its own removes and enrollment renames are already in the list
+                let selected = self.selectedIdentity
+                guard self.zids.removeReported(id) != nil else { return }
                 zLog.info("\(id) REMOVED")
-                let (loadedZids, _) = self.zidStore.loadAll()
-                self.zids = loadedZids ?? []
-                self.representedObject = Int(0)
+                self.tableView.reloadData()
+                let indx = selected.flatMap { s in self.zids.firstIndex { $0 === s } } ?? 0
+                self.representedObject = indx
+                self.tableView.selectRowIndexes([indx], byExtendingSelection: false)
                 self.tunnelMgr.restartTunnel()
             }
         }
@@ -852,6 +856,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             
             self.zids.remove(at: indx)
+            tunnelMgr.restartTunnel()
             tableView.reloadData()
             if indx >= self.zids.count {
                 representedObject = self.zids.count - 1

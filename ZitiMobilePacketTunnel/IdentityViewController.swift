@@ -437,6 +437,7 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                     if let indx = self.tvc?.zids.firstIndex(of: zid) {
                         self.tvc?.zids.remove(at: indx)
                     }
+                    self.tvc?.tunnelMgr.restartTunnel()
                 }
                 self.navigationController?.popViewController(animated: true)
                 self.tvc?.tableView.reloadData()

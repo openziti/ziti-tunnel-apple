@@ -71,6 +71,13 @@ extension Array where Element == ZitiIdentity {
         }
     }
     
+    /// Drops an identity the store reported removed. nil when the list doesn't have it: the app removed it itself, or
+    /// enrollment gave it its real id (the store then reports the temporary id as removed)
+    mutating func removeReported(_ id:String) -> ZitiIdentity? {
+        guard let indx = firstIndex(where: { $0.id == id }) else { return nil }
+        return remove(at: indx)
+    }
+
     func getZidIndx(_ zidStr:String?) -> Int {
         guard let zidStr = zidStr else {
             return -1

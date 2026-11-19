@@ -15,7 +15,10 @@
 //
 
 import XCTest
+import CZiti
 @testable import Ziti_Desktop_Edge
+
+private typealias ZitiIdentity = Ziti_Desktop_Edge.ZitiIdentity
 
 class ArrayZitiIdentityTests: XCTestCase {
 
@@ -87,5 +90,39 @@ class ArrayZitiIdentityTests: XCTestCase {
     func testGetZidIndx_emptyArray() {
         let arr: [ZitiIdentity] = []
         XCTAssertEqual(arr.getZidIndx("anything"), -1)
+    }
+
+    // MARK: - removeReported
+
+    func testRemoveReported_removesAndReturnsIt() {
+        let gone = makeIdentity(id: "id-2", name: "Second")
+        var arr: [ZitiIdentity] = [makeIdentity(id: "id-1", name: "First"), gone, makeIdentity(id: "id-3", name: "Third")]
+        XCTAssertTrue(arr.removeReported("id-2") === gone)
+        XCTAssertEqual(arr.map(\.id), ["id-1", "id-3"], "the others keep their order")
+    }
+
+    func testRemoveReported_ignoresIdsNotInTheList() {
+        var arr: [ZitiIdentity] = [makeIdentity(id: "id-1", name: "First")]
+        XCTAssertNil(arr.removeReported("removed-by-the-app"))
+        XCTAssertEqual(arr.count, 1)
+    }
+
+    // Enrollment gives an identity its real id by storing it under the new id and removing the temporary file, which
+    // the store reports as a removal. The identity is still in the list, as the same object, so nothing is removed
+    func testRemoveReported_ignoresTheTemporaryIdAfterEnrollment() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("ArrayZitiIdentityTests-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = TestableZitiIdentityStore(testDir: dir)
+
+        let pending = makeIdentity(id: "temp-id", ztAPI: "https://ctrl.example.com", name: "ctrl.example.com")
+        XCTAssertNil(store.store(pending))
+        var arr: [ZitiIdentity] = [makeIdentity(id: "other", name: "Other"), pending]
+
+        let resp = CZiti.ZitiIdentity(id: "real-id", ztAPIs: ["https://ctrl.example.com"])
+        XCTAssertTrue(pending.applyEnrollmentResponse(resp, enrollTo: .token, zidStore: store))
+        XCTAssertNil(arr.removeReported("temp-id"))
+        XCTAssertEqual(arr.map(\.id), ["other", "real-id"])
+        XCTAssertTrue(arr[1] === pending)
     }
 }
