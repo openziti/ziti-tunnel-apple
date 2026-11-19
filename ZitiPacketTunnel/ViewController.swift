@@ -341,10 +341,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             DispatchQueue.main.async {
                 // only a removal the app didn't make: its own removes and enrollment renames are already in the list
                 let selected = self.selectedIdentity
+                let selectedIndx = self.representedObject as? Int ?? 0
                 guard self.zids.removeReported(id) != nil else { return }
                 zLog.info("\(id) REMOVED")
                 self.tableView.reloadData()
-                let indx = selected.flatMap { s in self.zids.firstIndex { $0 === s } } ?? 0
+                // the selected one removed: the one now in its place, as with the remove button
+                let indx = selected.flatMap { s in self.zids.firstIndex { $0 === s } }
+                    ?? min(selectedIndx, max(self.zids.count - 1, 0))
                 self.representedObject = indx
                 self.tableView.selectRowIndexes([indx], byExtendingSelection: false)
                 self.tunnelMgr.restartTunnel()
@@ -1239,8 +1242,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
 
     func handleEnrollmentSuccess(zid: ZitiIdentity, zidResp: CZiti.ZitiIdentity,
                                  enrollTo: ZitiIdentity.EnrollTo) {
-        // the list may have changed while enrolling (e.g., an identity added from a link)
-        let indx = zids.firstIndex { $0 === zid }
+        // the list may have changed while enrolling (e.g., an identity added from a link, or a copy of this one read
+        // back from disk), so fall back to its temporary id
+        let tempId = zid.id
+        let indx = zids.firstIndex { $0 === zid } ?? zids.firstIndex { $0.id == tempId }
         var zid = zid
         let idChanged = zid.applyEnrollmentResponse(zidResp, enrollTo: enrollTo, zidStore: zidStore)
 
