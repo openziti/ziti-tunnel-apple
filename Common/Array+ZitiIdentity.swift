@@ -78,6 +78,13 @@ extension Array where Element == ZitiIdentity {
         return remove(at: indx)
     }
 
+    /// Where the selection goes after a removal: the selected identity if it's still listed, otherwise the one now in
+    /// `indx`'s place (the last, when `indx` was past it), and 0 for an empty list
+    func selectionAfterRemoval(selected:ZitiIdentity?, at indx:Int) -> Int {
+        if let selected = selected, let i = firstIndex(where: { $0 === selected }) { return i }
+        return Swift.min(Swift.max(indx, 0), Swift.max(count - 1, 0))
+    }
+
     func getZidIndx(_ zidStr:String?) -> Int {
         guard let zidStr = zidStr else {
             return -1

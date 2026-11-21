@@ -346,12 +346,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 let selectedIndx = self.representedObject as? Int ?? 0
                 guard self.zids.removeReported(id) != nil else { return }
                 zLog.info("\(id) REMOVED")
-                self.tableView.reloadData()
-                // the selected one removed: the one now in its place, as with the remove button
-                let indx = selected.flatMap { s in self.zids.firstIndex { $0 === s } }
-                    ?? min(selectedIndx, max(self.zids.count - 1, 0))
-                self.representedObject = indx
-                self.tableView.selectRowIndexes([indx], byExtendingSelection: false)
+                self.selectAfterRemoval(selected: selected, at: selectedIndx)
                 self.tunnelMgr.restartTunnel()
             }
         }
@@ -862,13 +857,18 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             
             self.zids.remove(at: indx)
             tunnelMgr.restartTunnel()
-            tableView.reloadData()
-            if indx >= self.zids.count {
-                representedObject = self.zids.count - 1
-            } else {
-                representedObject = indx
-            }
-            tableView.selectRowIndexes([indx], byExtendingSelection: false)
+            selectAfterRemoval(selected: nil, at: indx)
+        }
+    }
+
+    /// Reloads the list after a removal and selects where the selection goes: never past the end, and no row when the
+    /// list is empty
+    private func selectAfterRemoval(selected:ZitiIdentity?, at indx:Int) {
+        tableView.reloadData()
+        let newIndx = zids.selectionAfterRemoval(selected: selected, at: indx)
+        representedObject = newIndx
+        if zids.count > 0 {
+            tableView.selectRowIndexes([newIndx], byExtendingSelection: false)
         }
     }
     

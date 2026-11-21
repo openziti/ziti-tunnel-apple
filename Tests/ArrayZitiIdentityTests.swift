@@ -125,4 +125,32 @@ class ArrayZitiIdentityTests: XCTestCase {
         XCTAssertEqual(arr.map(\.id), ["other", "real-id"])
         XCTAssertTrue(arr[1] === pending)
     }
+
+    // MARK: - selectionAfterRemoval
+
+    func testSelectionAfterRemoval_followsTheSelectedIdentity() {
+        // [id-1, id-2 (selected), id-3] with id-1 removed: id-2 moved up, so the old index would select id-3
+        let selected = makeIdentity(id: "id-2", name: "Second")
+        let arr: [ZitiIdentity] = [selected, makeIdentity(id: "id-3", name: "Third")]
+        XCTAssertEqual(arr.selectionAfterRemoval(selected: selected, at: 1), 0)
+    }
+
+    func testSelectionAfterRemoval_takesTheOneInTheRemovedOnesPlace() {
+        let arr: [ZitiIdentity] = [makeIdentity(id: "id-1", name: "First"), makeIdentity(id: "id-3", name: "Third")]
+        XCTAssertEqual(arr.selectionAfterRemoval(selected: nil, at: 1), 1)
+        XCTAssertEqual(arr.selectionAfterRemoval(selected: makeIdentity(id: "id-2", name: "Second"), at: 1), 1,
+                       "a selected identity that's no longer listed")
+    }
+
+    func testSelectionAfterRemoval_neverPastTheEnd() {
+        let arr: [ZitiIdentity] = [makeIdentity(id: "id-1", name: "First")]
+        XCTAssertEqual(arr.selectionAfterRemoval(selected: nil, at: 1), 0, "the last one was removed")
+    }
+
+    // an identity added later is then read at the selection, which must be a valid index once the list has one
+    func testSelectionAfterRemoval_isZeroForAnEmptyList() {
+        let arr: [ZitiIdentity] = []
+        XCTAssertEqual(arr.selectionAfterRemoval(selected: nil, at: 0), 0)
+        XCTAssertEqual(arr.selectionAfterRemoval(selected: nil, at: -1), 0)
+    }
 }

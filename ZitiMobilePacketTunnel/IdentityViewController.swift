@@ -433,8 +433,13 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                         self.dialogAlert("Unable to remove identity", ManagedConfig.removeDisabledMessage)
                         return
                     }
-                    _ = self.tvc?.zidStore.remove(zid)
-                    if let indx = self.tvc?.zids.firstIndex(of: zid) {
+                    if let error = self.tvc?.zidStore.remove(zid) {
+                        // still on disk, so it stays listed and the tunnel keeps running it
+                        self.dialogAlert("Unable to remove identity", error.localizedDescription)
+                        return
+                    }
+                    // by id: a change report may have replaced the listed copy since this screen opened
+                    if let indx = self.tvc?.zids.firstIndex(where: { $0.id == zid.id }) {
                         self.tvc?.zids.remove(at: indx)
                     }
                     self.tvc?.tunnelMgr.restartTunnel()
