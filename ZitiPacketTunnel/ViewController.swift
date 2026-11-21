@@ -1230,12 +1230,12 @@ class ViewController: NSViewController, NSTextFieldDelegate {
                 self.dialogAlert("Unable to enroll \(zid.name)", msg)
             case .cancelled:
                 self.updateServiceUI(zId: zid)
-            case .refused:
+            case .refused(let msg):
                 // removing it also forgets anything stored under its temporary id; the list reloads on the removal
                 if let error = self.zidStore.remove(zid) {
                     zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
                 }
-                self.dialogAlert("Unable to enroll \(zid.name)", CABundlePolicy.notAllowedMessage)
+                self.dialogAlert("Unable to enroll \(zid.name)", msg)
             }
         }
     }

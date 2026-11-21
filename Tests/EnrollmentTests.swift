@@ -108,7 +108,7 @@ final class EnrollmentTests: XCTestCase {
                      policy:CABundlePolicy? = nil, currentPolicy:(() -> Enrollment.Policy)? = nil) -> Enrollment.Result {
         let done = expectation(description: "enrollment completes")
         var result:Enrollment.Result?
-        let fixed:Enrollment.Policy = policy.map { .restricted($0) } ?? .unrestricted
+        let fixed = TunnelMgr.enrollmentPolicy(loaded: true, policy)
         Enrollment(zid, ui: ui, sdk: sdk, hint: hint, policy: currentPolicy ?? { fixed }).start(jwtFile: jwtFile ?? noJwt) { r in
             XCTAssertNil(result, "completed more than once")
             result = r
@@ -125,7 +125,8 @@ final class EnrollmentTests: XCTestCase {
         case .enrolled(let zidResp, let enrollTo): return "enrolled \(zidResp.id) \(enrollTo)"
         case .failed(let msg): return "failed \(msg)"
         case .cancelled: return "cancelled"
-        case .refused: return "refused"
+        // a refusal for the network keeps the short name the expectations use; any other says why
+        case .refused(let msg): return msg == CABundlePolicy.notAllowedMessage ? "refused" : "refused \(msg)"
         }
     }
 
@@ -429,14 +430,16 @@ final class EnrollmentTests: XCTestCase {
         XCTAssertEqual(asked, 2)
     }
 
-    // only if the list behind the policy goes away during the sign-in (iOS): nothing is kept
+    // a backstop: the callers' policy can't turn unknown once known, but if it did, a spent one-time token leaves nothing
+    // to try again with, so nothing is kept
     func testPolicyUnknownWhenEnrollmentFinishes() throws {
         var asked = 0
         let lostLater:() -> Enrollment.Policy = {
             asked += 1
             return asked == 1 ? .unrestricted : .unknown
         }
-        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootA, currentPolicy: lostLater)), "failed \(Enrollment.policyUnknownMessage)")
+        XCTAssertEqual(describe(try runOtt(ca: CAFixtures.rootA, currentPolicy: lostLater)),
+                       "refused \(Enrollment.policyUnknownAfterEnrollingMessage)")
         XCTAssertEqual(sdk.calls.filter { $0 == "discard real-id" }.count, 1)
     }
 

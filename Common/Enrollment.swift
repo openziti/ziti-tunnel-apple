@@ -71,8 +71,9 @@ class Enrollment {
         case enrolled(CZiti.ZitiIdentity, ZitiIdentity.EnrollTo)
         case failed(String)
         case cancelled
-        /// The policy doesn't allow the identity's network. Nothing of it is usable, so the pending identity goes too
-        case refused
+        /// Nothing of the identity is usable, so the pending identity goes too: the policy doesn't allow its network, or
+        /// it couldn't be checked once enrolling had used up a one-time token. The message says which
+        case refused(String)
     }
 
     /// Answers to use instead of asking, when they fit what the network offers
@@ -103,6 +104,7 @@ class Enrollment {
     }
 
     static let policyUnknownMessage = "The tunnel settings haven't loaded yet. Try again in a moment, or restart the app if this keeps happening."
+    static let policyUnknownAfterEnrollingMessage = "The tunnel settings weren't available to check this identity's network, so it wasn't kept. Add it again."
 
     let zid:ZitiIdentity
     private let ui:EnrollmentUI
@@ -160,7 +162,7 @@ class Enrollment {
                 }
                 if case .blocked(let reason) = policy.check(zidResp.ca) {
                     zLog.warn("Not enrolling \(self.zid.name), its network isn't allowed: \(reason)")
-                    self.finish(.refused)
+                    self.finish(.refused(CABundlePolicy.notAllowedMessage))
                     return
                 }
                 self.bootstrapped = zidResp
@@ -332,16 +334,16 @@ class Enrollment {
         if case .enrolled(let zidResp, _) = result {
             switch policy() {
             case .unknown:
-                // fail closed. The callers' sources don't turn unknown once known, so this is a backstop; a
-                // one-time token is used up by now, so trying again won't work for one
+                // fail closed. The callers' sources don't turn unknown once known, so this is a backstop. A one-time
+                // token is used up by now, so the pending identity can't try again: it goes, as for a refusal
                 zLog.warn("Discarding \(zid.name): its network restrictions aren't known")
                 sdk.discard(zidResp)
-                result = .failed(Enrollment.policyUnknownMessage)
+                result = .refused(Enrollment.policyUnknownAfterEnrollingMessage)
             case .restricted(let policy):
                 if case .blocked(let reason) = policy.check(zidResp.ca) {
                     zLog.warn("Discarding \(zid.name), its network isn't allowed: \(reason)")
                     sdk.discard(zidResp)
-                    result = .refused
+                    result = .refused(CABundlePolicy.notAllowedMessage)
                 }
             case .unrestricted:
                 break

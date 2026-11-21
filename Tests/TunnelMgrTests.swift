@@ -117,20 +117,20 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertFalse(TunnelMgr.lockedPending([ours], ours, bid))
     }
 
-    func testLockedPendingRestricts_onlyWithAllowedCAs() {
+    func testLockedPendingPolicy_onlyWithAllowedCAs() {
         // A locked configuration that restricts networks takes over now, not when the user gets around to disconnecting
         let fp = String(repeating: "ab", count: 32)
         let ours = makeManager(bid, "ours")
         let restricting = makeManager(bid, "restricting", locked: true, allowedCAs: [fp])
         let locked = makeManager(bid, "locked", locked: true)
-        XCTAssertTrue(TunnelMgr.lockedPendingRestricts([restricting, ours], ours, bid))
-        XCTAssertTrue(TunnelMgr.lockedPendingRestricts([ours, locked, restricting], ours, bid))
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([locked, ours], ours, bid), "locked without allowedCAs waits for a disconnect")
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([restricting, ours], restricting, bid), "already in use")
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([ours], ours, bid))
+        XCTAssertEqual(TunnelMgr.lockedPendingPolicy([restricting, ours], ours, bid), CABundlePolicy([fp]))
+        XCTAssertEqual(TunnelMgr.lockedPendingPolicy([ours, locked, restricting], ours, bid), CABundlePolicy([fp]))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([locked, ours], ours, bid), "locked without allowedCAs waits for a disconnect")
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([restricting, ours], restricting, bid), "already in use")
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([ours], ours, bid))
     }
 
-    func testLockedPendingRestricts_ignoresUnusableOrUnlocked() {
+    func testLockedPendingPolicy_ignoresUnusableOrUnlocked() {
         let fp = String(repeating: "ab", count: 32)
         let ours = makeManager(bid, "ours")
         let unlocked = makeManager(bid, "unlocked", allowedCAs: [fp])
@@ -138,9 +138,9 @@ class TunnelMgrTests: XCTestCase {
         (invalid.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration =
             [ProviderConfig.LOCKED_KEY: true, ProviderConfig.ALLOWED_CAS_KEY: [fp]]
         let other = makeManager("org.example.other", "other", locked: true, allowedCAs: [fp])
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([unlocked, ours], ours, bid))
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([invalid, ours], ours, bid))
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([other, ours], ours, bid))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([unlocked, ours], ours, bid))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([invalid, ours], ours, bid))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([other, ours], ours, bid))
     }
 
     func testSupersededManagers_keepsActive() {
@@ -210,5 +210,15 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: false, policy), .unknown)
         XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, nil), .unrestricted)
         XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, policy), .restricted(policy))
+    }
+
+    // a waiting locked configuration's policy applies at once: the switch to it can fail and leave ours loaded
+    func testEnrollmentPolicy_pendingLockedAppliesFirst() {
+        let pending = CABundlePolicy([String(repeating: "ab", count: 32)])
+        let loaded = CABundlePolicy([String(repeating: "cd", count: 32)])
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, nil, pendingLocked: pending), .restricted(pending))
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, loaded, pendingLocked: pending), .restricted(pending))
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, loaded, pendingLocked: nil), .restricted(loaded))
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: false, nil, pendingLocked: pending), .unknown)
     }
 }

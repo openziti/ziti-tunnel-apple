@@ -22,13 +22,22 @@ class TunnelMgr: NSObject {
     var tpm:NETunnelProviderManager? {
         didSet {
             caBundlePolicy = ProviderConfig.caBundlePolicy((tpm?.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration)
-#if os(iOS)
-            // the share extension enrolls one-time tokens itself
-            if let url = SharedRestrictions.url {
-                SharedRestrictions.save(caBundlePolicy: caBundlePolicy, to: url)
-            }
-#endif
+            saveSharedPolicy()
         }
+    }
+    /// The policy of a waiting locked configuration that restricts networks. Enrollment follows it from the moment the
+    /// load finds it, not once the tunnel restarts on it: the switch can fail and leave ours loaded
+    private var pendingLockedPolicy:CABundlePolicy? {
+        didSet { saveSharedPolicy() }
+    }
+
+    private func saveSharedPolicy() {
+#if os(iOS)
+        // the share extension enrolls one-time tokens itself
+        if let url = SharedRestrictions.url {
+            SharedRestrictions.save(caBundlePolicy: pendingLockedPolicy ?? caBundlePolicy, to: url)
+        }
+#endif
     }
     /// The networks identities may belong to, from the loaded configuration (nil: no restriction)
     private(set) var caBundlePolicy:CABundlePolicy? {
@@ -44,12 +53,13 @@ class TunnelMgr: NSObject {
 #else
         let loaded = tpm != nil
 #endif
-        return TunnelMgr.enrollmentPolicy(loaded: loaded, caBundlePolicy)
+        return TunnelMgr.enrollmentPolicy(loaded: loaded, caBundlePolicy, pendingLocked: pendingLockedPolicy)
     }
 
-    static func enrollmentPolicy(loaded:Bool, _ policy:CABundlePolicy?) -> Enrollment.Policy {
+    /// `pendingLocked`, a waiting locked configuration's policy, applies ahead of the loaded configuration's
+    static func enrollmentPolicy(loaded:Bool, _ policy:CABundlePolicy?, pendingLocked:CABundlePolicy? = nil) -> Enrollment.Policy {
         guard loaded else { return .unknown }
-        return policy.map { .restricted($0) } ?? .unrestricted
+        return (pendingLocked ?? policy).map { .restricted($0) } ?? .unrestricted
     }
 
     /// Whether the policy blocks an identity, cached by CA bundle since the identity screens ask on every refresh
@@ -179,13 +189,14 @@ class TunnelMgr: NSObject {
         return !isLocked(preferred) && managers.contains { targets($0, bid) && isUsableLocked($0) }
     }
 
-    /// True when the waiting locked configuration restricts networks (`allowedCAs`). It doesn't wait for a disconnect
-    /// the user can put off: the tunnel restarts on it now
-    static func lockedPendingRestricts(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String) -> Bool {
-        return !isLocked(preferred) && managers.contains {
-            targets($0, bid) && isUsableLocked($0) &&
-                ProviderConfig.caBundlePolicy(($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration) != nil
-        }
+    /// The policy of a waiting locked configuration that restricts networks (`allowedCAs`), nil when none does. It
+    /// doesn't wait for a disconnect the user can put off: the tunnel restarts on it now
+    static func lockedPendingPolicy(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String) -> CABundlePolicy? {
+        guard !isLocked(preferred) else { return nil }
+        return managers.lazy.compactMap { mgr -> CABundlePolicy? in
+            guard targets(mgr, bid) && isUsableLocked(mgr) else { return nil }
+            return ProviderConfig.caBundlePolicy((mgr.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration)
+        }.first
     }
 
     /// What to do once the tunnel is down
@@ -227,10 +238,14 @@ class TunnelMgr: NSObject {
                 return
             }
             
+            // none without a configuration to wait on. Set once per listing, so the share extension never sees it cleared
+            // in between
+            var pendingPolicy:CABundlePolicy?
             if let savedManagers = savedManagers, let preferred = TunnelMgr.preferredManager(savedManagers, bid) {
                 tpm = preferred
                 self?.lockedPending = TunnelMgr.lockedPending(savedManagers, preferred, bid)
-                switchToLocked = TunnelMgr.lockedPendingRestricts(savedManagers, preferred, bid)
+                pendingPolicy = TunnelMgr.lockedPendingPolicy(savedManagers, preferred, bid)
+                switchToLocked = pendingPolicy != nil
                 
                 TunnelMgr.supersededManagers(savedManagers, preferred, bid).forEach { mgr in
                     let name = mgr.localizedDescription ?? ""
@@ -243,10 +258,12 @@ class TunnelMgr: NSObject {
                 }
             } else if !createIfMissing {
                 zLog.info("No tunnel configuration found, not creating one on reload")
+                self?.pendingLockedPolicy = nil
                 self?.loadFinished()
                 completionHandler?(nil, nil)
                 return
             }
+            self?.pendingLockedPolicy = pendingPolicy
             
             tpm.loadFromPreferences { error in
                 if let error = error {
