@@ -189,14 +189,14 @@ class TunnelMgr: NSObject {
         return !isLocked(preferred) && managers.contains { targets($0, bid) && isUsableLocked($0) }
     }
 
-    /// The policy of a waiting locked configuration that restricts networks (`allowedCAs`), nil when none does. It
-    /// doesn't wait for a disconnect the user can put off: the tunnel restarts on it now
+    /// The policy of the waiting locked configuration when it restricts networks (`allowedCAs`), nil when it doesn't or
+    /// none waits. It doesn't wait for a disconnect the user can put off: the tunnel restarts on it now. The one the
+    /// switch loads (preferredManager's choice once ours is down), so the policy checked is the one that applies
     static func lockedPendingPolicy(_ managers:[NETunnelProviderManager], _ preferred:NETunnelProviderManager, _ bid:String) -> CABundlePolicy? {
-        guard !isLocked(preferred) else { return nil }
-        return managers.lazy.compactMap { mgr -> CABundlePolicy? in
-            guard targets(mgr, bid) && isUsableLocked(mgr) else { return nil }
-            return ProviderConfig.caBundlePolicy((mgr.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration)
-        }.first
+        guard !isLocked(preferred), let next = managers.first(where: { targets($0, bid) && isUsableLocked($0) }) else {
+            return nil
+        }
+        return ProviderConfig.caBundlePolicy((next.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration)
     }
 
     /// What to do once the tunnel is down

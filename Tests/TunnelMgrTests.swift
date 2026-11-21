@@ -124,7 +124,11 @@ class TunnelMgrTests: XCTestCase {
         let restricting = makeManager(bid, "restricting", locked: true, allowedCAs: [fp])
         let locked = makeManager(bid, "locked", locked: true)
         XCTAssertEqual(TunnelMgr.lockedPendingPolicy([restricting, ours], ours, bid), CABundlePolicy([fp]))
-        XCTAssertEqual(TunnelMgr.lockedPendingPolicy([ours, locked, restricting], ours, bid), CABundlePolicy([fp]))
+        XCTAssertEqual(TunnelMgr.lockedPendingPolicy([ours, restricting, locked], ours, bid), CABundlePolicy([fp]))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([ours, locked, restricting], ours, bid),
+                     "the switch loads the first locked one, which doesn't restrict")
+        XCTAssertTrue(TunnelMgr.preferredManager([ours, locked, restricting], bid) { _ in .disconnected } === locked,
+                      "what the switch loads once ours is down")
         XCTAssertNil(TunnelMgr.lockedPendingPolicy([locked, ours], ours, bid), "locked without allowedCAs waits for a disconnect")
         XCTAssertNil(TunnelMgr.lockedPendingPolicy([restricting, ours], restricting, bid), "already in use")
         XCTAssertNil(TunnelMgr.lockedPendingPolicy([ours], ours, bid))
