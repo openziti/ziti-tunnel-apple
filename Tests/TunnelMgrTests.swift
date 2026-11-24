@@ -16,6 +16,7 @@
 
 import XCTest
 import NetworkExtension
+import CZiti
 @testable import Ziti_Desktop_Edge
 
 class TunnelMgrTests: XCTestCase {
@@ -117,20 +118,24 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertFalse(TunnelMgr.lockedPending([ours], ours, bid))
     }
 
-    func testLockedPendingRestricts_onlyWithAllowedCAs() {
+    func testLockedPendingPolicy_onlyWithAllowedCAs() {
         // A locked configuration that restricts networks takes over now, not when the user gets around to disconnecting
         let fp = String(repeating: "ab", count: 32)
         let ours = makeManager(bid, "ours")
         let restricting = makeManager(bid, "restricting", locked: true, allowedCAs: [fp])
         let locked = makeManager(bid, "locked", locked: true)
-        XCTAssertTrue(TunnelMgr.lockedPendingRestricts([restricting, ours], ours, bid))
-        XCTAssertTrue(TunnelMgr.lockedPendingRestricts([ours, locked, restricting], ours, bid))
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([locked, ours], ours, bid), "locked without allowedCAs waits for a disconnect")
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([restricting, ours], restricting, bid), "already in use")
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([ours], ours, bid))
+        XCTAssertEqual(TunnelMgr.lockedPendingPolicy([restricting, ours], ours, bid), CABundlePolicy([fp]))
+        XCTAssertEqual(TunnelMgr.lockedPendingPolicy([ours, restricting, locked], ours, bid), CABundlePolicy([fp]))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([ours, locked, restricting], ours, bid),
+                     "the switch loads the first locked one, which doesn't restrict")
+        XCTAssertTrue(TunnelMgr.preferredManager([ours, locked, restricting], bid) { _ in .disconnected } === locked,
+                      "what the switch loads once ours is down")
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([locked, ours], ours, bid), "locked without allowedCAs waits for a disconnect")
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([restricting, ours], restricting, bid), "already in use")
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([ours], ours, bid))
     }
 
-    func testLockedPendingRestricts_ignoresUnusableOrUnlocked() {
+    func testLockedPendingPolicy_ignoresUnusableOrUnlocked() {
         let fp = String(repeating: "ab", count: 32)
         let ours = makeManager(bid, "ours")
         let unlocked = makeManager(bid, "unlocked", allowedCAs: [fp])
@@ -138,9 +143,9 @@ class TunnelMgrTests: XCTestCase {
         (invalid.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration =
             [ProviderConfig.LOCKED_KEY: true, ProviderConfig.ALLOWED_CAS_KEY: [fp]]
         let other = makeManager("org.example.other", "other", locked: true, allowedCAs: [fp])
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([unlocked, ours], ours, bid))
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([invalid, ours], ours, bid))
-        XCTAssertFalse(TunnelMgr.lockedPendingRestricts([other, ours], ours, bid))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([unlocked, ours], ours, bid))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([invalid, ours], ours, bid))
+        XCTAssertNil(TunnelMgr.lockedPendingPolicy([other, ours], ours, bid))
     }
 
     func testSupersededManagers_keepsActive() {
@@ -202,5 +207,55 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertEqual(TunnelMgr.disconnectAction(restarting: false, lockedPending: true), Action.switchToLocked(start: false))
         XCTAssertEqual(TunnelMgr.disconnectAction(restarting: true, lockedPending: false), Action.restart)
         XCTAssertEqual(TunnelMgr.disconnectAction(restarting: false, lockedPending: false), Action.none)
+    }
+
+    func testEnrollmentPolicy() {
+        let policy = CABundlePolicy([String(repeating: "ab", count: 32)])
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: false, nil), .unknown)
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: false, policy), .unknown)
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, nil), .unrestricted)
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, policy), .restricted(policy))
+    }
+
+    // a waiting locked configuration's policy applies at once: the switch to it can fail and leave ours loaded
+    func testEnrollmentPolicy_pendingLockedAppliesFirst() {
+        let pending = CABundlePolicy([String(repeating: "ab", count: 32)])
+        let loaded = CABundlePolicy([String(repeating: "cd", count: 32)])
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, nil, pendingLocked: pending), .restricted(pending))
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, loaded, pendingLocked: pending), .restricted(pending))
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, loaded, pendingLocked: nil), .restricted(loaded))
+        XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: false, nil, pendingLocked: pending), .unknown)
+    }
+
+    // the identities already there follow the same policy as enrollment
+    func testPolicyInEffect_pendingLockedAppliesFirst() {
+        let pending = CABundlePolicy([String(repeating: "ab", count: 32)])
+        let loaded = CABundlePolicy([String(repeating: "cd", count: 32)])
+        XCTAssertEqual(TunnelMgr.policyInEffect(nil, pendingLocked: pending), pending)
+        XCTAssertEqual(TunnelMgr.policyInEffect(loaded, pendingLocked: pending), pending)
+        XCTAssertEqual(TunnelMgr.policyInEffect(loaded, pendingLocked: nil), loaded)
+        XCTAssertNil(TunnelMgr.policyInEffect(nil, pendingLocked: nil))
+    }
+
+    // the switch to a waiting locked configuration can fail and leave ours loaded: the identities already there show as
+    // blocked by its policy, as enrollment refuses them
+    func testIsBlocked_followsThePendingLockedPolicy() {
+        let fingerprint = { (pem:String) in CABundlePolicy.fingerprint(CABundlePolicy.certificates(pem)!.first!) }
+        let allowsA = CABundlePolicy([fingerprint(CAFixtures.rootA)])
+        let allowsB = CABundlePolicy([fingerprint(CAFixtures.rootB)])
+        let zid = ZitiIdentity()
+        zid.czid = CZiti.ZitiIdentity(id: "id", ztAPIs: ["https://ctrl"], ca: CAFixtures.rootB)
+        zid.enrolled = true
+
+        var cache:[String: Bool] = [:]
+        XCTAssertFalse(TunnelMgr.isBlocked(zid, allowsB, pendingLocked: nil, cache: &cache))
+        cache = [:]
+        XCTAssertTrue(TunnelMgr.isBlocked(zid, allowsB, pendingLocked: allowsA, cache: &cache))
+        cache = [:]
+        XCTAssertTrue(TunnelMgr.isBlocked(zid, nil, pendingLocked: allowsA, cache: &cache))
+        cache = [:]
+        XCTAssertFalse(TunnelMgr.isBlocked(zid, allowsA, pendingLocked: allowsB, cache: &cache))
+        XCTAssertEqual(cache, [CAFixtures.rootB: false], "cached by CA bundle")
+        XCTAssertFalse(TunnelMgr.isBlocked(zid, nil, pendingLocked: nil, cache: &cache), "no policy blocks nothing")
     }
 }

@@ -511,7 +511,10 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
         tvc?.enrollingIds.append(zid)
 
         let jwtFile = presentedItemURL.appendingPathComponent("\(zid.id).jwt", isDirectory: false).path
-        Enrollment(zid, ui: self, hint: hint, policy: tvc?.tunnelMgr.caBundlePolicy).start(jwtFile: jwtFile) { result in
+        // the manager is taken now, so the policy can't turn unknown during the sign-in; without the list there's none
+        // to ask: unknown, not unrestricted
+        let policy:() -> Enrollment.Policy = { [tunnelMgr = tvc?.tunnelMgr] in tunnelMgr?.enrollmentPolicy ?? .unknown }
+        Enrollment(zid, ui: self, hint: hint, policy: policy).start(jwtFile: jwtFile) { result in
             self.hideSpinner()
             self.tvc?.enrollingIds.removeAll { $0 === zid }
             switch result {
@@ -524,12 +527,12 @@ class IdentityViewController: UITableViewController, MFMailComposeViewController
                 self.dialogAlert("Unable to enroll \(zid.name)", msg)
             case .cancelled:
                 break
-            case .refused:
+            case .refused(let msg):
                 // removing it also forgets anything stored under its temporary id; the list drops it when the store reports the removal
                 if let error = self.tvc?.zidStore.remove(zid) {
                     zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
                 }
-                let alert = UIAlertController(title: "Unable to enroll \(zid.name)", message: CABundlePolicy.notAllowedMessage,
+                let alert = UIAlertController(title: "Unable to enroll \(zid.name)", message: msg,
                                               preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default) { _ in
                     self.navigationController?.popViewController(animated: true)
