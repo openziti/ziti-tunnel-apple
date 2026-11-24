@@ -341,10 +341,12 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             
             DispatchQueue.main.async {
+                // only a removal the app didn't make: its own removes and enrollment renames are already in the list
+                let selected = self.selectedIdentity
+                let selectedIndx = self.representedObject as? Int ?? 0
+                guard self.zids.removeReported(id) != nil else { return }
                 zLog.info("\(id) REMOVED")
-                let (loadedZids, _) = self.zidStore.loadAll()
-                self.zids = loadedZids ?? []
-                self.representedObject = Int(0)
+                self.selectAfterRemoval(selected: selected, at: selectedIndx)
                 self.tunnelMgr.restartTunnel()
             }
         }
@@ -854,13 +856,19 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             }
             
             self.zids.remove(at: indx)
-            tableView.reloadData()
-            if indx >= self.zids.count {
-                representedObject = self.zids.count - 1
-            } else {
-                representedObject = indx
-            }
-            tableView.selectRowIndexes([indx], byExtendingSelection: false)
+            tunnelMgr.restartTunnel()
+            selectAfterRemoval(selected: nil, at: indx)
+        }
+    }
+
+    /// Reloads the list after a removal and selects where the selection goes: never past the end, and no row when the
+    /// list is empty
+    private func selectAfterRemoval(selected:ZitiIdentity?, at indx:Int) {
+        tableView.reloadData()
+        let newIndx = zids.selectionAfterRemoval(selected: selected, at: indx)
+        representedObject = newIndx
+        if zids.count > 0 {
+            tableView.selectRowIndexes([newIndx], byExtendingSelection: false)
         }
     }
     
@@ -1231,7 +1239,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             case .cancelled:
                 self.updateServiceUI(zId: zid)
             case .refused:
-                // removing it also forgets anything stored under its temporary id; the list reloads on the removal
+                // removing it also forgets anything stored under its temporary id; the list drops it when the store reports the removal
                 if let error = self.zidStore.remove(zid) {
                     zLog.error("Unable to remove refused identity \(zid.name): \(error.localizedDescription)")
                 }
@@ -1242,8 +1250,10 @@ class ViewController: NSViewController, NSTextFieldDelegate {
 
     func handleEnrollmentSuccess(zid: ZitiIdentity, zidResp: CZiti.ZitiIdentity,
                                  enrollTo: ZitiIdentity.EnrollTo) {
-        // the list may have changed while enrolling (e.g., an identity added from a link)
-        let indx = zids.firstIndex { $0 === zid }
+        // the list may have changed while enrolling (e.g., an identity added from a link, or a copy of this one read
+        // back from disk), so fall back to its temporary id
+        let tempId = zid.id
+        let indx = zids.firstIndex { $0 === zid } ?? zids.firstIndex { $0.id == tempId }
         var zid = zid
         let idChanged = zid.applyEnrollmentResponse(zidResp, enrollTo: enrollTo, zidStore: zidStore)
 
