@@ -16,6 +16,7 @@
 
 import XCTest
 import NetworkExtension
+import CZiti
 @testable import Ziti_Desktop_Edge
 
 class TunnelMgrTests: XCTestCase {
@@ -224,5 +225,37 @@ class TunnelMgrTests: XCTestCase {
         XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, loaded, pendingLocked: pending), .restricted(pending))
         XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: true, loaded, pendingLocked: nil), .restricted(loaded))
         XCTAssertEqual(TunnelMgr.enrollmentPolicy(loaded: false, nil, pendingLocked: pending), .unknown)
+    }
+
+    // the identities already there follow the same policy as enrollment
+    func testPolicyInEffect_pendingLockedAppliesFirst() {
+        let pending = CABundlePolicy([String(repeating: "ab", count: 32)])
+        let loaded = CABundlePolicy([String(repeating: "cd", count: 32)])
+        XCTAssertEqual(TunnelMgr.policyInEffect(nil, pendingLocked: pending), pending)
+        XCTAssertEqual(TunnelMgr.policyInEffect(loaded, pendingLocked: pending), pending)
+        XCTAssertEqual(TunnelMgr.policyInEffect(loaded, pendingLocked: nil), loaded)
+        XCTAssertNil(TunnelMgr.policyInEffect(nil, pendingLocked: nil))
+    }
+
+    // the switch to a waiting locked configuration can fail and leave ours loaded: the identities already there show as
+    // blocked by its policy, as enrollment refuses them
+    func testIsBlocked_followsThePendingLockedPolicy() {
+        let fingerprint = { (pem:String) in CABundlePolicy.fingerprint(CABundlePolicy.certificates(pem)!.first!) }
+        let allowsA = CABundlePolicy([fingerprint(CAFixtures.rootA)])
+        let allowsB = CABundlePolicy([fingerprint(CAFixtures.rootB)])
+        let zid = ZitiIdentity()
+        zid.czid = CZiti.ZitiIdentity(id: "id", ztAPIs: ["https://ctrl"], ca: CAFixtures.rootB)
+        zid.enrolled = true
+
+        var cache:[String: Bool] = [:]
+        XCTAssertFalse(TunnelMgr.isBlocked(zid, allowsB, pendingLocked: nil, cache: &cache))
+        cache = [:]
+        XCTAssertTrue(TunnelMgr.isBlocked(zid, allowsB, pendingLocked: allowsA, cache: &cache))
+        cache = [:]
+        XCTAssertTrue(TunnelMgr.isBlocked(zid, nil, pendingLocked: allowsA, cache: &cache))
+        cache = [:]
+        XCTAssertFalse(TunnelMgr.isBlocked(zid, allowsA, pendingLocked: allowsB, cache: &cache))
+        XCTAssertEqual(cache, [CAFixtures.rootB: false], "cached by CA bundle")
+        XCTAssertFalse(TunnelMgr.isBlocked(zid, nil, pendingLocked: nil, cache: &cache), "no policy blocks nothing")
     }
 }
