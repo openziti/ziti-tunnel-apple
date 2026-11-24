@@ -199,9 +199,9 @@ class TableViewController: UITableViewController, UIDocumentPickerDelegate, MFMa
             }
             
             DispatchQueue.main.async {
+                // only a removal the app didn't make: its own removes and enrollment renames are already in the list
+                guard self.zids.removeReported(id) != nil else { return }
                 zLog.info("\(id) REMOVED")
-                let (loadedZids, _) = self.zidStore.loadAll()
-                self.zids = loadedZids ?? []
                 self.tableView.reloadData()
                 self.ivc?.tableView.reloadData()
                 self.tunnelMgr.restartTunnel()
